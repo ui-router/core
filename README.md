@@ -77,4 +77,4 @@ On the other hand, UI-Router for React uses a simple javascript based bootstrap,
 
 ## Getting help
 
-[Create an issue](https://ui-router.github.io/core/issues) or contact us on [Gitter](https://gitter.im/angular-ui/ui-router).
+[Create an issue](https://github.com/ui-router/core/issues) or contact us on [Gitter](https://gitter.im/angular-ui/ui-router).
