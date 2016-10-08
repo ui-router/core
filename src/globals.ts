@@ -6,7 +6,6 @@ import {Transition} from "./transition/transition";
 import {Queue} from "./common/queue";
 import {TransitionService} from "./transition/transitionService";
 import {copy} from "./common/common";
-import {Observable} from "rxjs/Rx";
 
 /**
  * Global mutable state
