@@ -1,7 +1,7 @@
 {
   "name": "ui-router-core",
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "scripts": {
     "test": "karma start karma.conf.js",
     "debug": "karma start karma.conf.js --singleRun=false --browsers=Chrome --autoWatch=true --autoWatchInterval=1",
@@ -50,13 +50,8 @@
   "devDependencies": {
     "@types/jasmine": "^2.2.34",
     "@types/jquery": "^1.10.31",
-    "awesome-typescript-loader": "^2.2.4",
-    "babel-core": "^5.8.14",
-    "clone": "^1.0.2",
     "conventional-changelog": "^1.1.0",
     "conventional-changelog-cli": "^1.1.1",
-    "core-js": "^2.4.1",
-    "glob": "^7.0.5",
     "jasmine-core": "^2.4.1",
     "karma": "^1.2.0",
     "karma-chrome-launcher": "~0.1.0",
@@ -65,13 +60,9 @@
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-script-launcher": "~0.1.0",
     "karma-systemjs": "^0.7.2",
-    "lodash": "^4.5.1",
-    "parallelshell": "^2.0.0",
-    "remap-istanbul": "^0.6.3",
     "shelljs": "^0.7.0",
     "systemjs": "^0.18.4",
     "tslint": "=2.5.0",
-    "typescript": "~2.0.2",
-    "yargs": "^4.2.0"
+    "typescript": "~2.0.2"
   }
 }
