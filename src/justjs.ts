@@ -3,7 +3,7 @@
  *
  * @module justjs
  */ /** */
-export * from "./core";
+export * from "./index";
 import {services} from "./common/coreservices";
 import {stringify} from "./common/strings";
 import {isFunction, isArray, isObject, isInjectable} from "./common/predicates";

@@ -1,23 +1,12 @@
 {
-  "name": "ui-router",
-  "description": "State-based routing for Javascript",
+  "name": "ui-router-core",
+  "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
   "version": "1.0.0-beta.3",
   "scripts": {
-    "test": "npm run test:integrate",
-    "build": "node ./scripts/package.js core && node ./scripts/package.js ng1 && node ./scripts/package.js ng2",
-    "watch": "node_modules/watch/cli.js 'npm run test' src test",
-    "test:core": "karma start config/karma.core.js",
-    "debug:core": "karma start config/karma.core.js --singleRun=false --browsers=Chrome --autoWatch=true --autoWatchInterval=1",
-    "test:ng1": "karma start config/karma.ng15.js",
-    "debug:ng1": "karma start config/karma.ng15.js --singleRun=false --browsers=Chrome --autoWatch=true --autoWatchInterval=1",
-    "watch:ng1": "node_modules/watch/cli.js 'npm run test:ng1' src test",
-    "test:ng12": "karma start config/karma.ng12.js",
-    "test:ng13": "karma start config/karma.ng13.js",
-    "test:ng14": "karma start config/karma.ng14.js",
-    "test:ng15": "karma start config/karma.ng15.js",
-    "test:ng2": "karma start config/karma.ng2.js",
-    "test:integrate": "tsc && npm run test:core && npm run test:ng12 && npm run test:ng13 && npm run test:ng14 && npm run test:ng15",
-    "docs": "./scripts/docs.sh"
+    "test": "karma start karma.conf.js",
+    "debug": "karma start karma.conf.js --singleRun=false --browsers=Chrome --autoWatch=true --autoWatchInterval=1",
+    "clean": "rm -rf lib*",
+    "build": "npm run clean && tsc && tsc --outDir lib-esm -t es5 -m es6"
   },
   "homepage": "https://ui-router.github.io",
   "contributors": [
@@ -47,26 +36,18 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular-ui/ui-router.git"
+    "url": "https://github.com/ui-router/core.git"
   },
   "bugs": {
-    "url": "https://github.com/angular-ui/ui-router/issues"
+    "url": "https://github.com/ui-router/core/issues"
   },
   "engines": {
     "node": ">4"
   },
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "license": "MIT",
   "devDependencies": {
-    "@angular/common": "^2.0.0",
-    "@angular/compiler": "^2.0.0",
-    "@angular/compiler-cli": "^0.6.2",
-    "@angular/core": "^2.0.0",
-    "@angular/platform-browser": "^2.0.0",
-    "@angular/platform-browser-dynamic": "^2.0.0",
-    "@angular/platform-server": "^2.0.0",
-    "@types/angular": "^1.5.14",
-    "@types/angular-animate": "^1.5.5",
-    "@types/angular-mocks": "^1.5.5",
     "@types/jasmine": "^2.2.34",
     "@types/jquery": "^1.10.31",
     "awesome-typescript-loader": "^2.2.4",
@@ -87,17 +68,10 @@
     "lodash": "^4.5.1",
     "parallelshell": "^2.0.0",
     "remap-istanbul": "^0.6.3",
-    "rxjs": "5.0.0-beta.12",
     "shelljs": "^0.7.0",
     "systemjs": "^0.18.4",
     "tslint": "=2.5.0",
-    "typedoc": "^0.4.4",
-    "typedoc-plugin-external-module-name": "^1.0.2",
     "typescript": "~2.0.2",
-    "watch": "^0.18.0",
-    "webpack": "1.x",
-    "webpack-dev-server": "1.x",
-    "yargs": "^4.2.0",
-    "zone.js": "^0.6.21"
+    "yargs": "^4.2.0"
   }
 }

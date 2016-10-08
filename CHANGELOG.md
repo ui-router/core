@@ -44,6 +44,7 @@ Major breaking changes for Angular 2 bootstrap between beta.2 and beta.3
 - Added `UIRouterModule.forRoot()` and `UIRouterModule.forChild()` factory methods
 - See https://ui-router.github.io/docs/latest/classes/ng2.uiroutermodule.html
 
+```
 @NgModule({
   imports: [
     UIRouterModule.forRoot({
@@ -68,7 +69,7 @@ class RootAppModule {}
   ],
   declarations: FEATURE_COMPONENTS
 })
-
+```
 
 <a name="1.0.0-beta.2"></a>
 # [1.0.0-beta.2 commits](https://github.com/angular-ui/ui-router/compare/1.0.0-beta.1...1.0.0-beta.2) (2016-09-09)
