@@ -6,7 +6,7 @@
     "test": "karma start karma.conf.js",
     "debug": "karma start karma.conf.js --singleRun=false --browsers=Chrome --autoWatch=true --autoWatchInterval=1",
     "clean": "rm -rf lib*",
-    "build": "npm run clean && ./node_modules/typescript/bin/tsc && ./node_modules/typescript/bin/tsc --outDir lib-esm -t es5 -m es6",
+    "build": "npm run clean && tsc && tsc --outDir lib-esm -t es5 -m es6",
     "prepublish": "npm run build"
   },
   "homepage": "https://ui-router.github.io",
