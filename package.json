@@ -5,7 +5,7 @@
   "scripts": {
     "test": "karma start karma.conf.js",
     "debug": "karma start karma.conf.js --singleRun=false --browsers=Chrome --autoWatch=true --autoWatchInterval=1",
-    "clean": "rm -rf lib*",
+    "clean": "node -e \"require('rimraf').sync('lib*')\"",
     "build": "npm run clean && tsc && tsc --outDir lib-esm -t es5 -m es6",
     "prepublish": "npm run build"
   },
@@ -49,6 +49,7 @@
   "typings": "lib/index.d.ts",
   "license": "MIT",
   "devDependencies": {
+    "rimraf": "^2.5.4",
     "@types/jasmine": "^2.2.34",
     "@types/jquery": "^1.10.31",
     "conventional-changelog": "^1.1.0",
