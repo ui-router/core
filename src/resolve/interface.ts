@@ -1,22 +1,45 @@
-/** @module resolve */ /** for typedoc */
+/**
+ * The Resolve subsystem
+ *
+ * This subsystem is an asynchronous, hierarchical Dependency Injection system.
+ *
+ * Typically, resolve is configured on a state using a [[StateDeclaration.resolve]] declaration.
+ *
+ * @module resolve
+ */ /** for typedoc */
 import {Resolvable} from "./resolvable";
 
-export interface Resolvables {
-  [key: string]: Resolvable;
+/**
+ * An interface which is similar to an Angular 2 `Provider`
+ */
+export interface ProviderLike {
+  provide: any,
+  useClass?: any,
+  useFactory?: Function,
+  useValue?: any,
+  useExisting?: any,
+  deps?: any[]
 }
 
 /**
  * A plain object used to describe a [[Resolvable]]
  *
- * These objects may be defined in [[StateDefinition.resolve]] blocks to declare
+ * These objects may be defined in [[StateDeclaration.resolve]] blocks to declare
  * async data that the state or substates require.
  */
 export interface ResolvableLiteral {
-  /** The Dependency Injection token that will be used to inject/access the resolvable */
+  /**
+   * A Dependency Injection token
+   *
+   * This Resolvable's DI token.
+   * The Resolvable will be injectable elsewhere using the token.
+   */
   token: any;
 
   /**
-   * The function that returns one of:
+   * A function which fetches the Resolvable's data
+   *
+   * A function which returns one of:
    *
    * - The resolved value (synchronously)
    * - A promise for the resolved value
@@ -27,16 +50,25 @@ export interface ResolvableLiteral {
    */
   resolveFn: Function;
 
-  /** A policy that defines when to invoke the resolve, and whether to wait for async and unwrap the data */
+  /**
+   * Defines the Resolve Policy
+   *
+   * A policy that defines when to invoke the resolve,
+   * and whether to wait for async and unwrap the data
+   */
   policy?: ResolvePolicy;
 
   /**
-   * The Dependency Injection tokens for dependencies of the [[resolveFn]].
-   * The DI tokens are references to other `Resolvables`, or to global services.
+   * The Dependency Injection tokens
+   *
+   * This is an array of Dependency Injection tokens for the dependencies of the [[resolveFn]].
+   *
+   * The DI tokens are references to other `Resolvables`, or to other
+   * services from the native DI system.
    */
   deps?: any[];
 
-  /** Pre-resolved value. */
+  /** Pre-resolved data. */
   data?: any
 }
 
@@ -45,9 +77,8 @@ export interface ResolvableLiteral {
  *
  * This object is the [[StateDeclaration.resolvePolicy]] property.
  *
- * @example
+ * #### Example:
  * ```js
- *
  * // Fetched when the resolve's state is being entered.
  * // Wait for the promise to resolve.
  * var policy1 = { when: "LAZY", async: "WAIT" }
@@ -60,13 +91,12 @@ export interface ResolvableLiteral {
  *
  * The policy for a given Resolvable is merged from three sources (highest priority first):
  *
- * 1) Individual resolve definition
- * 2) State definition
- * 3) Global default
+ * - 1) Individual resolve definition
+ * - 2) State definition
+ * - 3) Global default
  *
- * @example
+ * #### Example:
  * ```js
- *
  * // Wait for an Observable to emit one item.
  * // Since `wait` is not specified, it uses the `wait`
  * // policy defined on the state, or the global default
@@ -78,21 +108,26 @@ export interface ResolvePolicy {
   /**
    * Defines when a Resolvable is resolved (fetched) during a transition
    *
-   * - `LAZY` (default) resolved as the resolve's state is being entered
-   * - `EAGER` resolved as the transition is starting
+   * - `LAZY` (default)
+   *   - Resolved as the resolve's state is being entered
+   * - `EAGER`
+   *   - Resolved as the transition is starting
    */
   when?: PolicyWhen;
 
   /**
    * Determines the unwrapping behavior of asynchronous resolve values.
    *
-   * - `WAIT` (default) if a promise is returned from the resolveFn, wait for the promise before proceeding
-   * - `NOWAIT` if a promise is returned from the resolve, do not wait for the promise.
-   *            The promise will not be unwrapped.
-   *            The promise itself will be provided when the resolve is injected or bound elsewhere.
-   * - `RXWAIT` When an Observable is returned from the resolveFn, wait until the Observable emits at least one item.
-   *            The Observable item will not be unwrapped.
-   *            The Observable stream itself will be provided when the resolve is injected or bound elsewhere.
+   * - `WAIT` (default)
+   *   - If a promise is returned from the resolveFn, wait for the promise before proceeding
+   * - `NOWAIT`
+   *   - If a promise is returned from the resolve, do not wait for the promise.
+   *   - The promise will not be unwrapped.
+   *   - The promise itself will be provided when the resolve is injected or bound elsewhere.
+   * - `RXWAIT`
+   *   - When an Observable is returned from the resolveFn, wait until the Observable emits at least one item.
+   *   - The Observable item will not be unwrapped.
+   *   - The Observable stream itself will be provided when the resolve is injected or bound elsewhere.
    */
   async?: PolicyAsync;
 }
@@ -100,6 +135,7 @@ export interface ResolvePolicy {
 export type PolicyWhen = "LAZY" | "EAGER" ;
 export type PolicyAsync = "WAIT" | "NOWAIT" | "RXWAIT" ;
 
+/** @internalapi */
 export let resolvePolicies = {
   when: {
     LAZY: "LAZY",

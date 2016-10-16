@@ -11,11 +11,13 @@ import {UIRouterGlobals, Globals} from "./globals";
 /**
  * The master class used to instantiate an instance of UI-Router.
  *
- * This class instantiates and wires the global UI-Router services.
+ * UI-Router (for a specific framework) will create an instance of this class during bootstrap.
+ * This class instantiates and wires the UI-Router services together.
  *
- * After instantiating a new instance of the Router class, configure it for your app.  For instance, register
- * your app states with the [[stateRegistry]] (and set url options using ...).  Then, tell UI-Router to monitor
- * the URL by calling `urlRouter.listen()` ([[URLRouter.listen]])
+ * After a new instance of the UIRouter class is created, it should be configured for your app.
+ * For instance, app states should be registered with the [[stateRegistry]].
+ *
+ * Tell UI-Router to monitor the URL by calling `uiRouter.urlRouter.listen()` ([[UrlRouter.listen]])
  */
 export class UIRouter {
   viewService = new ViewService();

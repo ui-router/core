@@ -1,4 +1,4 @@
-/** @module common */ 
+/** @module core */
 /** 
  * Matches state names using glob-like pattern strings.
  *
@@ -6,11 +6,8 @@
  *
  * - [[StateService.is]]
  * - [[StateService.includes]]
- * - [[HookMatchCriteria.to]]
- * - [[HookMatchCriteria.from]]
- * - [[HookMatchCriteria.exiting]]
- * - [[HookMatchCriteria.retained]]
- * - [[HookMatchCriteria.entering]]
+ * - The first argument to Hook Registration functions like [[TransitionService.onStart]]
+ *    - [[HookMatchCriteria]] and [[HookMatchCriterion]]
  *
  * A `Glob` string is a pattern which matches state names.
  * Nested state names are split into segments (separated by a dot) when processing.

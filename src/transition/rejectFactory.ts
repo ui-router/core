@@ -1,4 +1,4 @@
-/** @module transition */ /** for typedoc */
+/** @internal @module transition */ /** for typedoc */
 "use strict";
 import {extend, silentRejection} from "../common/common";
 import {stringify} from "../common/strings";

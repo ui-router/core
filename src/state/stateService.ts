@@ -25,22 +25,49 @@ import {HrefOptions} from "./interface";
 import {bindFunctions} from "../common/common";
 import {Globals} from "../globals";
 import {UIRouter} from "../router";
-import {UIInjector} from "../common/interface";
+import {UIInjector} from "../interface";
 import {ResolveContext} from "../resolve/resolveContext";
 import {StateParams} from "../params/stateParams"; // has or is using
 
 export type OnInvalidCallback =
     (toState?: TargetState, fromState?: TargetState, injector?: UIInjector) => HookResult;
 
+/**
+ * Provides state related service functions
+ *
+ * This class provides services related to ui-router states.
+ * An instance of this class is located on the global [[UIRouter]] object.
+ */
 export class StateService {
+  /** @internalapi */
   invalidCallbacks: OnInvalidCallback[] = [];
 
+  /**
+   * The [[Transition]] currently in progress (or null)
+   *
+   * This is a passthrough through to [[UIRouterGlobals.transition]]
+   */
   get transition()  { return this.router.globals.transition; }
+  /**
+   * The latest successful state parameters
+   *
+   * This is a passthrough through to [[UIRouterGlobals.params]]
+   */
   get params()      { return this.router.globals.params; }
+  /**
+   * The current [[StateDeclaration]]
+   *
+   * This is a passthrough through to [[UIRouterGlobals.current]]
+   */
   get current()     { return this.router.globals.current; }
+  /**
+   * The current [[State]]
+   *
+   * This is a passthrough through to [[UIRouterGlobals.$current]]
+   */
   get $current()    { return this.router.globals.$current; }
 
-  /** @hidden */
+  /** @internalapi */
   constructor(private router: UIRouter) {
     let getters = ['current', '$current', 'params', 'transition'];
     let boundFns = Object.keys(StateService.prototype).filter(key => getters.indexOf(key) === -1);
@@ -55,6 +82,8 @@ export class StateService {
    * The results of the callbacks are wrapped in $q.when(), so the callbacks may return promises.
    *
    * If a callback returns an TargetState, then it is used as arguments to $state.transitionTo() and the result returned.
+   *
+   * @internalapi
    */
   private _handleInvalidTargetState(fromPath: PathNode[], toState: TargetState) {
     let fromState = PathFactory.makeTargetState(fromPath);
@@ -122,16 +151,13 @@ export class StateService {
 
 
   /**
-   * @ngdoc function
-   * @name ui.router.state.$state#reload
-   * @methodOf ui.router.state.$state
+   * Reloads the current state
    *
-   * @description
-   * A method that force reloads the current state, or a partial state hierarchy. All resolves are re-resolved,
-   * controllers reinstantiated, and events re-fired.
+   * A method that force reloads the current state, or a partial state hierarchy.
+   * All resolves are re-resolved, and components reinstantiated.
    *
-   * @example
-   * <pre>
+   * #### Example:
+   * ```js
    * let app angular.module('app', ['ui.router']);
    *
    * app.controller('ctrl', function ($scope, $state) {
@@ -139,18 +165,21 @@ export class StateService {
    *     $state.reload();
    *   }
    * });
-   * </pre>
+   * ```
    *
-   * `reload()` is just an alias for:
-   * <pre>
-   * $state.transitionTo($state.current, $stateParams, {
-   *   reload: true, inherit: false, notify: true
+   * Note: `reload()` is just an alias for:
+   *
+   * ```js
+   * $state.transitionTo($state.current, $state.params, {
+   *   reload: true, inherit: false
    * });
-   * </pre>
+   * ```
    *
-   * @param {string=|object=} reloadState - A state name or a state object, which is the root of the resolves to be re-resolved.
-   * @example
-   * <pre>
+   * @param reloadState A state name or a state object.
+   *    If present, this state and all its children will be reloaded, but ancestors will not reload.
+   *
+   * #### Example:
+   * ```js
    * //assuming app application consists of 3 states: 'contacts', 'contacts.detail', 'contacts.detail.item'
    * //and current state is 'contacts.detail.item'
    * let app angular.module('app', ['ui.router']);
@@ -161,10 +190,9 @@ export class StateService {
    *     $state.reload('contact.detail');
    *   }
    * });
-   * </pre>
+   * ```
    *
-   * @returns {promise} A promise representing the state of the new transition. See
-   * {@link ui.router.state.$state#methods_go $state.go}.
+   * @returns A promise representing the state of the new transition. See [[StateService.go]]
    */
   reload(reloadState?: StateOrName): Promise<State> {
     return this.transitionTo(this.current, this.params, {
@@ -175,20 +203,18 @@ export class StateService {
   };
 
   /**
-   * @ngdoc function
-   * @name ui.router.state.$state#go
-   * @methodOf ui.router.state.$state
+   * Transition to a different state or parameters
    *
-   * @description
-   * Convenience method for transitioning to a new state. `$state.go` calls
-   * `$state.transitionTo` internally but automatically sets options to
+   * Convenience method for transitioning to a new state.
+   *
+   * `$state.go` calls `$state.transitionTo` internally but automatically sets options to
    * `{ location: true, inherit: true, relative: $state.$current, notify: true }`.
    * This allows you to easily use an absolute or relative to path and specify
    * only the parameters you'd like to update (while letting unspecified parameters
    * inherit from the currently active ancestor states).
    *
-   * @example
-   * <pre>
+   * #### Example:
+   * ```js
    * let app = angular.module('app', ['ui.router']);
    *
    * app.controller('ctrl', function ($scope, $state) {
@@ -196,48 +222,37 @@ export class StateService {
    *     $state.go('contact.detail');
    *   };
    * });
-   * </pre>
-   * <img src='../ngdoc_assets/StateGoExamples.png'/>
+   * ```
    *
-   * @param {string|object} to Absolute state name, state object, or relative state path. Some examples:
+   *
+   * @param to Absolute state name, state object, or relative state path. Some examples:
    *
    * - `$state.go('contact.detail')` - will go to the `contact.detail` state
    * - `$state.go('^')` - will go to a parent state
    * - `$state.go('^.sibling')` - will go to a sibling state
    * - `$state.go('.child.grandchild')` - will go to grandchild state
    *
-   * @param {object=} params A map of the parameters that will be sent to the state,
-   * will populate $stateParams. Any parameters that are not specified will be inherited from currently
-   * defined parameters. This allows, for example, going to a sibling state that shares parameters
-   * specified in a parent state. Parameter inheritance only works between common ancestor states, I.e.
-   * transitioning to a sibling will get you the parameters for all parents, transitioning to a child
-   * will get you all current parameters, etc.
-   * @param {object=} options Options object. The options are:
+   * @param params A map of the parameters that will be sent to the state, will populate $stateParams.
    *
-   * - **`location`** - {boolean=true|string=} - If `true` will update the url in the location bar, if `false`
-   *    will not. If string, must be `"replace"`, which will update url and also replace last history record.
-   * - **`inherit`** - {boolean=true}, If `true` will inherit url parameters from current url.
-   * - **`relative`** - {object=$state.$current}, When transitioning with relative path (e.g '^'),
-   *    defines which state to be relative from.
-   * - **`notify`** - {boolean=true}, If `true` will broadcast $stateChangeStart and $stateChangeSuccess events.
-   * - **`reload`** (v0.2.5) - {boolean=false}, If `true` will force transition even if the state or params
-   *    have not changed, aka a reload of the same state. It differs from reloadOnSearch because you'd
-   *    use this when you want to force a reload when *everything* is the same, including search params.
+   *    Any parameters that are not specified will be inherited from currently defined parameters (because of `inherit: true`).
+   *    This allows, for example, going to a sibling state that shares parameters specified in a parent state.
+   *
+   *    Parameter inheritance only works between common ancestor states, I.e.
+   *    transitioning to a sibling will get you the parameters for all parents, transitioning to a child
+   *    will get you all current parameters, etc.
+   *
+   * @param options Transition options
    *
    * @returns {promise} A promise representing the state of the new transition.
    *
-   * Possible success values:
+   * - Possible success values:
+   *    - $state.current
    *
-   * - $state.current
-   *
-   * <br/>Possible rejection values:
-   *
-   * - 'transition superseded' - when a newer transition has been started after this one
-   * - 'transition prevented' - when `event.preventDefault()` has been called in a `$stateChangeStart` listener
-   * - 'transition aborted' - when `event.preventDefault()` has been called in a `$stateNotFound` listener or
-   *   when a `$stateNotFound` `event.retry` promise errors.
-   * - 'transition failed' - when a state has been unsuccessfully found after 2 tries.
-   * - *resolve error* - when an error has occurred with a `resolve`
+   * - Possible rejection reasons:
+   *   - transition superseded - when a newer transition has been started after this one
+   *   - transition aborted - when the transition is cancelled by a Transition Hook returning `false`
+   *   - transition failed - when a transition hook errors
+   *   - resolve error - when a resolve has errored or rejected
    *
    */
   go(to: StateOrName, params?: RawParams, options?: TransitionOptions): TransitionPromise {
@@ -246,7 +261,13 @@ export class StateService {
     return this.transitionTo(to, params, transOpts);
   };
 
-  /** Factory method for creating a TargetState */
+  /**
+   * Creates a [[TargetState]]
+   *
+   * This is a factory method for creating a TargetState
+   *
+   * This may be returned from a Transition Hook to redirect a transition, for example.
+   */
   target(identifier: StateOrName, params?: ParamsOrArray, options: TransitionOptions = {}): TargetState {
     // If we're reloading, find the state object to reload from
     if (isObject(options.reload) && !(<any>options.reload).name)
@@ -262,16 +283,12 @@ export class StateService {
   };
 
   /**
-   * @ngdoc function
-   * @name ui.router.state.$state#transitionTo
-   * @methodOf ui.router.state.$state
+   * Low-level method for transitioning to a new state.
    *
-   * @description
-   * Low-level method for transitioning to a new state. {@link ui.router.state.$state#methods_go $state.go}
-   * uses `transitionTo` internally. `$state.go` is recommended in most situations.
+   * The [[go]] method (which uses `transitionTo` internally) is recommended in most situations.
    *
-   * @example
-   * <pre>
+   * #### Example:
+   * ```js
    * let app = angular.module('app', ['ui.router']);
    *
    * app.controller('ctrl', function ($scope, $state) {
@@ -279,25 +296,14 @@ export class StateService {
    *     $state.transitionTo('contact.detail');
    *   };
    * });
-   * </pre>
+   * ```
    *
-   * @param {string|object} to State name or state object.
-   * @param {object=} toParams A map of the parameters that will be sent to the state,
-   * will populate $stateParams.
-   * @param {object=} options Options object. The options are:
+   * @param to State name or state object.
+   * @param toParams A map of the parameters that will be sent to the state,
+   *      will populate $stateParams.
+   * @param options Transition options
    *
-   * - **`location`** - {boolean=true|string=} - If `true` will update the url in the location bar, if `false`
-   *    will not. If string, must be `"replace"`, which will update url and also replace last history record.
-   * - **`inherit`** - {boolean=false}, If `true` will inherit url parameters from current url.
-   * - **`relative`** - {object=}, When transitioning with relative path (e.g '^'),
-   *    defines which state to be relative from.
-   * - **`notify`** - {boolean=true}, If `true` will broadcast $stateChangeStart and $stateChangeSuccess events.
-   * - **`reload`** (v0.2.5) - {boolean=false}, If `true` will force transition even if the state or params
-   *    have not changed, aka a reload of the same state. It differs from reloadOnSearch because you'd
-   *    use this when you want to force a reload when *everything* is the same, including search params.
-   *
-   * @returns {promise} A promise representing the state of the new transition. See
-   * {@link ui.router.state.$state#methods_go $state.go}.
+   * @returns A promise representing the state of the new transition. See [[go]]
    */
   transitionTo(to: StateOrName, toParams: RawParams = {}, options: TransitionOptions = {}): TransitionPromise {
     let router = this.router;
@@ -363,40 +369,37 @@ export class StateService {
   };
 
   /**
-   * @ngdoc function
-   * @name ui.router.state.$state#is
-   * @methodOf ui.router.state.$state
+   * Checks if the current state *is* the provided state
    *
-   * @description
-   * Similar to {@link ui.router.state.$state#methods_includes $state.includes},
-   * but only checks for the full state name. If params is supplied then it will be
-   * tested for strict equality against the current active params object, so all params
-   * must match with none missing and no extras.
+   * Similar to [[includes]] but only checks for the full state name.
+   * If params is supplied then it will be tested for strict equality against the current
+   * active params object, so all params must match with none missing and no extras.
    *
-   * @example
-   * <pre>
+   * #### Example:
+   * ```js
    * $state.$current.name = 'contacts.details.item';
    *
    * // absolute name
    * $state.is('contact.details.item'); // returns true
    * $state.is(contactDetailItemStateObject); // returns true
+   * ```
    *
    * // relative name (. and ^), typically from a template
    * // E.g. from the 'contacts.details' template
+   * ```html
    * <div ng-class="{highlighted: $state.is('.item')}">Item</div>
-   * </pre>
+   * ```
    *
-   * @param {string|object} stateOrName The state name (absolute or relative) or state object you'd like to check.
-   * @param {object=} params A param object, e.g. `{sectionId: section.id}`, that you'd like
+   * @param stateOrName The state name (absolute or relative) or state object you'd like to check.
+   * @param params A param object, e.g. `{sectionId: section.id}`, that you'd like
    * to test against the current active state.
-   * @param {object=} options An options object.  The options are:
+   * @param options An options object. The options are:
+   *   - `relative`: If `stateOrName` is a relative state name and `options.relative` is set, .is will
+   *     test relative to `options.relative` state (or name).
    *
-   * - **`relative`** - {string|object} -  If `stateOrName` is a relative state name and `options.relative` is set, .is will
-   * test relative to `options.relative` state (or name).
-   *
-   * @returns {boolean} Returns true if it is the state.
+   * @returns Returns true if it is the state.
    */
-  is(stateOrName: StateOrName, params?: RawParams, options?: TransitionOptions): boolean {
+  is(stateOrName: StateOrName, params?: RawParams, options?: { relative: StateOrName }): boolean {
     options = defaults(options, { relative: this.$current });
     let state = this.router.stateRegistry.matcher.find(stateOrName, options.relative);
     if (!isDefined(state)) return undefined;
@@ -405,36 +408,24 @@ export class StateService {
   };
 
   /**
-   * @ngdoc function
-   * @name ui.router.state.$state#includes
-   * @methodOf ui.router.state.$state
+   * Checks if the current state *includes* the provided state
    *
-   * @description
    * A method to determine if the current active state is equal to or is the child of the
    * state stateName. If any params are passed then they will be tested for a match as well.
    * Not all the parameters need to be passed, just the ones you'd like to test for equality.
    *
-   * @example
-   * Partial and relative names
-   * <pre>
-   * $state.$current.name = 'contacts.details.item';
-   *
+   * #### Example when `$state.$current.name === 'contacts.details.item'`
+   * ```js
    * // Using partial names
    * $state.includes("contacts"); // returns true
    * $state.includes("contacts.details"); // returns true
    * $state.includes("contacts.details.item"); // returns true
    * $state.includes("contacts.list"); // returns false
    * $state.includes("about"); // returns false
+   * ```
    *
-   * // Using relative names (. and ^), typically from a template
-   * // E.g. from the 'contacts.details' template
-   * <div ng-class="{highlighted: $state.includes('.item')}">Item</div>
-   * </pre>
-   *
-   * Basic globbing patterns
-   * <pre>
-   * $state.$current.name = 'contacts.details.item.url';
-   *
+   * #### Glob Examples when `* $state.$current.name === 'contacts.details.item.url'`:
+   * ```js
    * $state.includes("*.details.*.*"); // returns true
    * $state.includes("*.details.**"); // returns true
    * $state.includes("**.item.**"); // returns true
@@ -442,16 +433,15 @@ export class StateService {
    * $state.includes("*.details.*.url"); // returns true
    * $state.includes("*.details.*"); // returns false
    * $state.includes("item.**"); // returns false
-   * </pre>
+   * ```
    *
-   * @param {string|object} stateOrName A partial name, relative name, glob pattern,
-   * or state object to be searched for within the current state name.
-   * @param {object=} params A param object, e.g. `{sectionId: section.id}`,
-   * that you'd like to test against the current active state.
-   * @param {object=} options An options object.  The options are:
-   *
-   * - **`relative`** - {string|object=} -  If `stateOrName` is a relative state reference and `options.relative` is set,
-   * .includes will test relative to `options.relative` state (or name).
+   * @param stateOrName A partial name, relative name, glob pattern,
+   *   or state object to be searched for within the current state name.
+   * @param params A param object, e.g. `{sectionId: section.id}`,
+   *   that you'd like to test against the current active state.
+   * @param options An options object. The options are:
+   *   - `relative`: If `stateOrName` is a relative state name and `options.relative` is set, .is will
+   *     test relative to `options.relative` state (or name).
    *
    * @returns {boolean} Returns true if it does include the state
    */
@@ -473,21 +463,18 @@ export class StateService {
 
 
   /**
-   * @ngdoc function
-   * @name ui.router.state.$state#href
-   * @methodOf ui.router.state.$state
+   * Generates a URL for a state and parameters
    *
-   * @description
-   * A url generation method that returns the compiled url for the given state populated with the given params.
+   * Returns the url for the given state populated with the given params.
    *
-   * @example
-   * <pre>
+   * #### Example:
+   * ```js
    * expect($state.href("about.person", { person: "bob" })).toEqual("/about/bob");
-   * </pre>
+   * ```
    *
-   * @param {string|object} stateOrName The state name or state object you'd like to generate a url from.
-   * @param {object=} params An object of parameter values to fill the state's required parameters.
-   * @param {object=} options Options object. The options are:
+   * @param stateOrName The state name or state object you'd like to generate a url from.
+   * @param params An object of parameter values to fill the state's required parameters.
+   * @param options Options object. The options are:
    *
    * - **`lossy`** - {boolean=true} -  If true, and if there is no url associated with the state provided in the
    *    first parameter, then the constructed href url will be built from the first navigable ancestor (aka
@@ -552,9 +539,8 @@ export class StateService {
    *
    * You can provide your own custom handler.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * stateService.defaultErrorHandler(function() {
    *   // Do not log transitionTo errors
    * });
@@ -568,17 +554,15 @@ export class StateService {
   }
 
   /**
-   * @ngdoc function
-   * @name ui.router.state.$state#get
-   * @methodOf ui.router.state.$state
+   * Gets a registered [[StateDeclaration]] object
    *
-   * @description
-   * Returns the state configuration object for any specific state or all states.
+   * Returns the state declaration object for any specific state, or for all registered states.
    *
-   * @param {string|Object=} stateOrName (absolute or relative) If provided, will only get the config for
+   * @param stateOrName (absolute or relative) If provided, will only get the config for
    * the requested state. If not provided, returns an array of ALL state configs.
-   * @param {string|object=} base When stateOrName is a relative state reference, the state will be retrieved relative to context.
-   * @returns {Object|Array} State configuration object or array of all objects.
+   * @param base When stateOrName is a relative state reference, the state will be retrieved relative to context.
+   *
+   * @returns a [[StateDeclaration]] object (or array of all registered [[StateDeclaration]] objects.)
    */
   get(): StateDeclaration[];
   get(stateOrName: StateOrName): StateDeclaration;

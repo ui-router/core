@@ -8,22 +8,14 @@ import {Transition} from "../transition/transition";
 import {TransitionStateHookFn} from "../transition/interface";
 import {ResolvePolicy, ResolvableLiteral} from "../resolve/interface";
 import {Resolvable} from "../resolve/resolvable";
-import {UIInjector} from "../common/interface";
+import {ProviderLike} from "../resolve/interface";
 import {TargetState} from "./targetState";
 
 export type StateOrName = (string|StateDeclaration|State);
 
+/** @internalapi */
 export interface TransitionPromise extends Promise<State> {
   transition: Transition;
-}
-
-export interface ProviderLike {
-  provide: any,
-  useClass?: any,
-  useFactory?: Function,
-  useValue?: any,
-  useExisting?: any,
-  deps?: any[]
 }
 
 export type ResolveTypes = Resolvable | ResolvableLiteral | ProviderLike;
@@ -33,13 +25,11 @@ export type ResolveTypes = Resolvable | ResolvableLiteral | ProviderLike;
  * This interface defines the basic data that a normalized view declaration will have on it.
  * Framework-specific implementations may add additional fields (to their interfaces which extend this interface).
  *
- * @hidden
+ * @internalapi
  */
 export interface _ViewDeclaration {
   /**
    * The raw name for the view declaration, i.e., the [[StateDeclaration.views]] property name.
-   * 
-   * @hidden
    */
   $name?: string;
 
@@ -52,8 +42,6 @@ export interface _ViewDeclaration {
    *
    * The `uiViewName` can also target a _nested view_ by providing a dot-notation address
    * @example `foo.bar` or `foo.$default.bar`
-   * 
-   * @hidden
    */
   $uiViewName?: string;
   
@@ -61,8 +49,6 @@ export interface _ViewDeclaration {
    * The normalized context anchor (state name) for the `uiViewName`
    *
    * When targeting a `ui-view`, the `uiViewName` address is anchored to a context name (state name).
-   * 
-   * @hidden
    */
   $uiViewContextAnchor?: string;
 
@@ -71,25 +57,20 @@ export interface _ViewDeclaration {
    *
    * This is used when loading prerequisites for the view, before it enters the DOM.  Different types of views
    * may load differently (e.g., templateProvider+controllerProvider vs component class)
-   *
-   * @hidden
    */
   $type?: string;
 
   /**
    * The context that this view is declared within.
-   * @hidden
    */
   $context?: ViewContext;
 }
 
 /**
  * The StateDeclaration object is used to define a state or nested state.
- * It should be registered with the [[$stateProvider]].
  *
- * @example
+ * #### Example:
  * ```js
- *
  * // StateDeclaration object
  * var foldersState = {
  *   name: 'folders',
@@ -105,6 +86,8 @@ export interface _ViewDeclaration {
  *   }
  * }
  * ```
+ *
+ * Note: Each front-end framework extends this interface as necessary
  */
 export interface StateDeclaration {
   /**
@@ -137,9 +120,8 @@ export interface StateDeclaration {
    *
    * When using this property, the state's name should not have any dots in it.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * var parentstate = {
    *   name: 'parentstate'
    * }
@@ -152,11 +134,13 @@ export interface StateDeclaration {
    * ```
    */
   parent?: (string|StateDeclaration);
-  
-  /** 
-   * Gets the private API portion of the state
-   * 
-   * @hidden 
+
+  /**
+   * Gets the internal API
+   *
+   * Gets the *internal API* for a registered state.
+   *
+   * Note: the internal [[State]] API is subject to change without notice
    */
   $$state?: () => State;
 
@@ -176,13 +160,10 @@ export interface StateDeclaration {
    * - an Angular 2 style [provider literal](https://angular.io/docs/ts/latest/cookbook/dependency-injection.html#!#provide), e.g.,
    *   `{ provide: 'token', useFactory: (http) => http.get('/'), deps: [ Http ] }`
    *
-   * @example
+   * #### ng2 Example:
    * ```js
-   *
    * import {Resolvable} from "ui-router-ng2"; // or "angular-ui-router"
    * ...
-   *
-   * // ng2 example
    * resolve: [
    *   // If you inject `myStateDependency` into a component, you'll get "abc"
    *   { provide: 'myStateDependency', useFactory: () => 'abc' }, // ng2 style provide literal
@@ -198,10 +179,8 @@ export interface StateDeclaration {
    * Note: You cannot specify a policy for each Resolvable, nor can you use non-string
    * tokens when using the object style `resolve:` block.
    *
-   * @example
+   * #### ng1 Example:
    * ```js
-   *
-   * // ng1 example
    * resolve: {
    *   // If you inject `myStateDependency` into a controller, you'll get "abc"
    *   myStateDependency: function() {
@@ -255,9 +234,8 @@ export interface StateDeclaration {
    *    "to" and "from" State Parameters and transition options.
    * - Other resolves: This resolve can depend on another resolve, either from the same state, or from any parent state.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * // Injecting a resolve into another resolve
    * resolve: [
    *   // Define a resolve 'allusers' which delegates to the UserService.list()
@@ -322,9 +300,8 @@ export interface StateDeclaration {
    * An object which optionally configures parameters declared in the url, or defines additional non-url
    * parameters. For each parameter being configured, add a [[ParamDeclaration]] keyed to the name of the parameter.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * params: {
    *   param1: {
    *    type: "int",
@@ -353,9 +330,8 @@ export interface StateDeclaration {
    *
    *  Targets three named ui-views in the parent state's template
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * views: {
    *   header: {
    *     controller: "headerCtrl",
@@ -420,9 +396,8 @@ export interface StateDeclaration {
    *   - The return value is processed using the previously mentioned rules.
    *   - If the return value is a promise, the promise is waited for, then the resolved async value is processed using the same rules.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * // a string
    * .state('A', {
    *   redirectTo: 'A.B'
@@ -464,9 +439,8 @@ export interface StateDeclaration {
   /**
    * A Transition Hook called with the state is being entered.  See: [[IHookRegistry.onEnter]]
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * .state({
    *   name: 'mystate',
    *   onEnter: function(trans, state) {
@@ -485,9 +459,8 @@ export interface StateDeclaration {
   /**
    * A [[TransitionStateHookFn]] called with the state is being retained/kept. See: [[IHookRegistry.onRetain]]
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * .state({
    *   name: 'mystate',
    *   onRetain: function(trans, state) {
@@ -506,9 +479,8 @@ export interface StateDeclaration {
   /**
    * A Transition Hook called with the state is being exited. See: [[IHookRegistry.onExit]]
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * .state({
    *   name: 'mystate',
    *   onExit: function(trans, state) {
@@ -614,10 +586,20 @@ export interface StateDeclaration {
   reloadOnSearch?: boolean;
 }
 
+/**
+ * The return type of a [[StateDeclaration.lazyLoad]] function
+ *
+ * If your state has a `lazyLoad` function, it should return a promise.
+ * If promise resolves to an object matching this interface, then the `states` array
+ * of [[StateDeclaration]] objects will be automatically registered.
+ *
+ * @internalapi
+ */
 export interface LazyLoadResult {
   states?: StateDeclaration[];
 }
 
+/** @internalapi */
 export interface HrefOptions {
   relative?:  StateOrName;
   lossy?:     boolean;

@@ -94,9 +94,8 @@ export class UrlRouterProvider {
    *
    * If a rule returns a string, the URL is replaced with the string, and all rules are fired again.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * var app = angular.module('app', ['ui.router.router']);
    *
    * app.config(function ($urlRouterProvider) {
@@ -137,9 +136,8 @@ export class UrlRouterProvider {
   /**
    * Defines the path or behavior to use when no url can be matched.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * var app = angular.module('app', ['ui.router.router']);
    *
    * app.config(function ($urlRouterProvider) {
@@ -268,9 +266,8 @@ export class UrlRouterProvider {
    * This can be useful to perform some asynchronous initialization before the router starts.
    * Once the initialization is complete, call [[listen]] to tell UI-Router to start watching and synchronizing the URL.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * var app = angular.module('app', ['ui.router']);
    *
    * app.config(function ($urlRouterProvider) {
@@ -319,9 +316,8 @@ export class UrlRouter {
    * perform some custom logic (route protection, auth, config, redirection, etc) and then finally proceed
    * with the transition by calling `$urlRouter.sync()`.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * angular.module('app', ['ui.router'])
    *   .run(function($rootScope, $urlRouter) {
    *     $rootScope.$on('$locationChangeSuccess', function(evt) {
@@ -379,9 +375,8 @@ export class UrlRouter {
   /**
    * Builds and returns a URL with interpolated parameters
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * $bob = $urlRouter.href(new UrlMatcher("/about/:person"), {
    *   person: "bob"
    * });

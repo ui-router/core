@@ -1,12 +1,13 @@
 /**
  * This module contains APIs related to a Transition.
  *
- * See [[Transition]], [[$transitions]]
+ * See:
+ * - [[TransitionService]]
+ * - [[Transition]]
+ * - [[HookFn]], [[TransitionHookFn]], [[TransitionStateHookFn]], [[HookMatchCriteria]], [[HookResult]]
  *
- * @module transition
- * @preferred
- */
-/** for typedoc */
+ * @internal @preferred @module transition
+ */ /** for typedoc */
 export * from "./interface";
 export * from "./hookBuilder";
 export * from "./hookRegistry";

@@ -1,4 +1,10 @@
-/** Predicates @module common_predicates */ /** */
+/** Predicates
+ *
+ * These predicates return true/false based on the input.
+ * Although these functions are exported, they are subject to change without notice.
+ *
+ * @module common_predicates
+ */ /** */
 import {and, not, pipe, prop} from "./hof";
 import {Predicate} from "./common"; // has or is using
 

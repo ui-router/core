@@ -49,9 +49,8 @@ export class Resolvable implements ResolvableLiteral {
   /**
    * This constructor creates a new `Resolvable`
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * var resolvable1 = new Resolvable('mytoken', http => http.get('foo.json').toPromise(), [Http]);
    *
    * var resolvable2 = new Resolvable(UserService, dep => new UserService(dep.data), [SomeDependency]);

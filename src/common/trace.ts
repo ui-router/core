@@ -1,30 +1,33 @@
 /**
  * UI-Router Transition Tracing
  *
- * Enable transition tracing to print transition information to the console, in order to help debug your application.
+ * Enable transition tracing to print transition information to the console,
+ * in order to help debug your application.
  * Tracing logs detailed information about each Transition to your console.
  *
- * To enable tracing, import the [[trace]] singleton and enable one or more categories.
+ * To enable tracing, import the [[Trace]] singleton and enable one or more categories.
  *
- * ES6
- * ```
- *
+ * ### ES6
+ * ```js
  * import {trace} from "ui-router-ng2"; // or "angular-ui-router"
  * trace.enable(1, 5); // TRANSITION and VIEWCONFIG
  * ```
  *
- * CJS
- * ```
- *
+ * ### CJS
+ * ```js
  * let trace = require("angular-ui-router").trace; // or "ui-router-ng2"
  * trace.enable("TRANSITION", "VIEWCONFIG");
  * ```
  *
- * Globals
- * ```
- *
+ * ### Globals
+ * ```js
  * let trace = window["angular-ui-router"].trace; // or "ui-router-ng2"
  * trace.enable(); // Trace everything (very verbose)
+ * ```
+ *
+ * ### Angular 1:
+ * ```js
+ * app.run($trace => $trace.enable());
  * ```
  *
  * @module trace
@@ -61,9 +64,9 @@ function normalizedCat(input: Category|string): string {
 
 
 /**
- * Trace categories
+ * Trace categories Enum
  *
- * [[Trace.enable]] or [[Trace.disable]] a category
+ * Enable or disable a category using [[Trace.enable]] or [[Trace.disable]]
  *
  * `trace.enable(Category.TRANSITION)`
  *
@@ -81,8 +84,10 @@ export enum Category {
  * Prints UI-Router Transition trace information to the console.
  */
 export class Trace {
+  /** @hidden */
   approximateDigests: number;
 
+  /** @hidden */
   constructor() {
     this.approximateDigests = 0;
   }
@@ -104,7 +109,7 @@ export class Trace {
   /**
    * Enables a trace [[Category]]
    *
-   * ```
+   * ```js
    * trace.enable("TRANSITION");
    * ```
    *
@@ -115,7 +120,7 @@ export class Trace {
   /**
    * Disables a trace [[Category]]
    *
-   * ```
+   * ```js
    * trace.disable("VIEWCONFIG");
    * ```
    *
@@ -127,7 +132,7 @@ export class Trace {
   /**
    * Retrieves the enabled stateus of a [[Category]]
    *
-   * ```
+   * ```js
    * trace.enabled("VIEWCONFIG"); // true or false
    * ```
    *
@@ -137,7 +142,7 @@ export class Trace {
     return !!this._enabled[normalizedCat(category)];
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceTransitionStart(transition: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
     let tid = transition.$id,
@@ -146,7 +151,7 @@ export class Trace {
     console.log(`Transition #${tid} Digest #${digest}: Started  -> ${transitionStr}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceTransitionIgnored(trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
     let tid = trans && trans.$id,
@@ -155,7 +160,7 @@ export class Trace {
     console.log(`Transition #${tid} Digest #${digest}: Ignored  <> ${transitionStr}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceHookInvocation(step: TransitionHook, options: any) {
     if (!this.enabled(Category.HOOK)) return;
     let tid = parse("transition.$id")(options),
@@ -166,7 +171,7 @@ export class Trace {
     console.log(`Transition #${tid} Digest #${digest}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceHookResult(hookResult: HookResult, transitionOptions: any) {
     if (!this.enabled(Category.HOOK)) return;
     let tid = parse("transition.$id")(transitionOptions),
@@ -175,7 +180,7 @@ export class Trace {
     console.log(`Transition #${tid} Digest #${digest}:   <- Hook returned: ${maxLength(200, hookResultStr)}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceResolvePath(path: PathNode[], when: PolicyWhen, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
     let tid = trans && trans.$id,
@@ -184,7 +189,7 @@ export class Trace {
     console.log(`Transition #${tid} Digest #${digest}:         Resolving ${pathStr} (${when})`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceResolvableResolved(resolvable: Resolvable, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
     let tid = trans && trans.$id,
@@ -194,7 +199,7 @@ export class Trace {
     console.log(`Transition #${tid} Digest #${digest}:               <- Resolved  ${resolvableStr} to: ${maxLength(200, result)}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceError(reason: any, trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
     let tid = trans && trans.$id,
@@ -203,7 +208,7 @@ export class Trace {
     console.log(`Transition #${tid} Digest #${digest}: <- Rejected ${transitionStr}, reason: ${reason}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceSuccess(finalState: State, trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
     let tid = trans && trans.$id,
@@ -213,31 +218,31 @@ export class Trace {
     console.log(`Transition #${tid} Digest #${digest}: <- Success  ${transitionStr}, final state: ${state}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceUIViewEvent(event: string, viewData: ActiveUIView, extra = "") {
     if (!this.enabled(Category.UIVIEW)) return;
     console.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceUIViewConfigUpdated(viewData: ActiveUIView, context: ViewContext) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent("Updating", viewData, ` with ViewConfig from context='${context}'`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceUIViewFill(viewData: ActiveUIView, html: string) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent("Fill", viewData, ` with: ${maxLength(200, html)}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceViewServiceEvent(event: string, viewConfig: ViewConfig) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
     console.log(`VIEWCONFIG: ${event} ${viewConfigString(viewConfig)}`);
   }
 
-  /** called by ui-router code */
+  /** @internalapi called by ui-router code */
   traceViewServiceUIViewEvent(event: string, viewData: ActiveUIView) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
     console.log(`VIEWCONFIG: ${event} ${uiViewString(viewData)}`);
@@ -247,9 +252,8 @@ export class Trace {
 /**
  * The [[Trace]] singleton
  *
- * @example
+ * #### Example:
  * ```js
- *
  * import {trace} from "angular-ui-router";
  * trace.enable(1, 5);
  * ```

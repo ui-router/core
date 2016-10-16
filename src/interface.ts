@@ -1,7 +1,14 @@
-/** @module common */ /** */
+/**
+ * Core classes and interfaces
+ *
+ * The classes and interfaces that are core to ui-router and do not belong
+ * to a more specific subsystem (such as resolve).
+ *
+ * @preferred @module core
+ */ /** for typedoc */
 
 // Need to import or export at least one concrete something
-import {noop} from "./common";
+import {noop} from "./common/common";
 
 /**
  * An interface for getting values from dependency injection.
@@ -17,17 +24,13 @@ export interface UIInjector {
   /**
    * Gets a value from the injector
    *
-   * @example
+   * #### ng1 Example:
    * ```js
-   *
-   * // ng1
    * injector.get('$state').go('home');
    * ```
    *
-   * @example
+   * #### ng2 Example:
    * ```js
-   *
-   * // ng2
    * import {StateService} from "ui-router-ng2";
    * injector.get(StateService).go('home');
    * ```
@@ -47,9 +50,8 @@ export interface UIInjector {
    * Returns a promise for a value from the injector.
    * Returns resolve values and/or values from the native injector (ng1/ng2).
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * return injector.getAsync('myResolve').then(value => {
    *   if (value === 'declined') return false;
    * });

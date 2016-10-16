@@ -11,7 +11,7 @@ import {State} from "../state/stateObject";
 import {PathFactory} from "../path/pathFactory";
 import {stringify} from "../common/strings";
 import {Transition} from "../transition/transition";
-import {UIInjector} from "../common/interface";
+import {UIInjector} from "../interface";
 
 const when = resolvePolicies.when;
 const ALL_WHENS = [when.EAGER, when.LAZY];

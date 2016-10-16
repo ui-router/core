@@ -1,4 +1,6 @@
-/** @module common */ /** for typedoc */
+/**
+ * @module common
+ */ /** for typedoc */
 
 export class Queue<T> {
   constructor(private _items: T[] = [], private _limit: number = null) { }

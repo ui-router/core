@@ -11,3 +11,4 @@ export * from "./view/module";
 export * from "./globals";
 
 export * from "./router";
+export * from "./interface";

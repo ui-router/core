@@ -1,6 +1,8 @@
 /**
  * Higher order functions
  *
+ * These utility functions are exported, but are subject to change without notice.
+ *
  * @module common_hof
  */ /** */
 

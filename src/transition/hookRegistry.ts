@@ -1,4 +1,4 @@
-/** @module transition */ /** for typedoc */
+/** @internal @module transition */ /** for typedoc */
 import {extend, removeFrom, allTrueR, tail} from "../common/common";
 import {isString, isFunction} from "../common/predicates";
 import {PathNode} from "../path/node";

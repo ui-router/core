@@ -55,9 +55,8 @@ export class StateRegistry {
    *
    * Adds a callback that is invoked when states are registered or deregistered with the StateRegistry.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * let allStates = registry.get();
    *
    * // Later, invoke deregisterFn() to remove the listener
@@ -104,7 +103,7 @@ export class StateRegistry {
   /**
    * Adds a state to the registry
    *
-   * Registers a [[StateDefinition]] or queues it for registration.
+   * Registers a [[StateDeclaration]] or queues it for registration.
    *
    * Note: a state will be queued if the state's parent isn't yet registered.
    * It will also be queued if the queue is not yet in [[StateQueueManager.autoFlush]] mode.

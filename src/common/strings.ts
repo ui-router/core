@@ -1,4 +1,10 @@
-/** @module common_strings */ /** */
+/**
+ * Functions that manipulate strings
+ *
+ * Although these functions are exported, they are subject to change without notice.
+ *
+ * @module common_strings
+ */ /** */
 
 import {isString, isArray, isDefined, isNull, isPromise, isInjectable, isObject} from "./predicates";
 import {Rejection} from "../transition/rejectFactory";

@@ -247,9 +247,8 @@ export class UrlMatcher {
    * they are not present in `search`. This means that search parameters are always treated
    * as optional.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * new UrlMatcher('/user/{id}?q&r').exec('/user/bob', {
    *   x: '1', q: 'hello'
    * });
@@ -372,9 +371,8 @@ export class UrlMatcher {
    * Creates a URL that matches this pattern by substituting the specified values
    * for the path and search parameters.
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * new UrlMatcher('/user/{id}?q').format({ id:'bob', q:'yes' });
    * // returns '/user/bob?q=yes'
    * ```

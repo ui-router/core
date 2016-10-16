@@ -1,4 +1,4 @@
-/** @module transition */ /** for typedoc */
+/** @internal @module transition */ /** for typedoc */
 import {StateDeclaration} from "../state/interface";
 import {Predicate} from "../common/common";
 
@@ -6,7 +6,6 @@ import {Transition} from "./transition";
 import {State} from "../state/stateObject";
 import {PathNode} from "../path/node";
 import {TargetState} from "../state/targetState";
-import {UIInjector} from "../common/interface";
 
 /**
  * The TransitionOptions object can be used to change the behavior of a transition.
@@ -178,7 +177,7 @@ export type IHookRegistration = (matchCriteria: HookMatchCriteria, callback: Hoo
  *
  * @returns a [[HookResult]] which may alter the transition
  *
- * @see
+ * See:
  *
  * - [[IHookRegistry.onBefore]]
  * - [[IHookRegistry.onStart]]
@@ -205,7 +204,7 @@ export interface TransitionHookFn {
  *
  * @returns a [[HookResult]] which may alter the transition
  *
- * @see
+ * See:
  *
  * - [[IHookRegistry.onExit]]
  * - [[IHookRegistry.onRetain]]
@@ -700,9 +699,8 @@ export type IStateMatch = Predicate<State>
  * All properties are optional.  If any property is omitted, it is replaced with the value `true`, and always matches.
  * To match any transition, use an empty criteria object `{}`.
  *
- * @example
+ * #### Example:
  * ```js
- *
  * // This matches a transition coming from the `parent` state and going to the `parent.child` state.
  * var match = {
  *   to: 'parent',
@@ -710,9 +708,8 @@ export type IStateMatch = Predicate<State>
  * }
  * ```
  *
- * @example
+ * #### Example:
  * ```js
- *
  * // This matches a transition coming from any substate of `parent` and going directly to the `parent` state.
  * var match = {
  *   to: 'parent',
@@ -720,18 +717,16 @@ export type IStateMatch = Predicate<State>
  * }
  * ```
  *
- * @example
+ * #### Example:
  * ```js
- *
  * // This matches a transition coming from any state and going to any substate of `mymodule`
  * var match = {
  *   to: 'mymodule.**'
  * }
  * ```
  *
- * @example
+ * #### Example:
  * ```js
- *
  * // This matches a transition coming from any state and going to any state that has `data.authRequired`
  * // set to a truthy value.
  * var match = {
@@ -741,9 +736,8 @@ export type IStateMatch = Predicate<State>
  * }
  * ```
  *
- * @example
+ * #### Example:
  * ```js
- *
  * // This matches a transition that is exiting `parent.child`
  * var match = {
  *   exiting: 'parent.child'

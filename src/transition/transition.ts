@@ -1,4 +1,4 @@
-/** @module transition */ /** for typedoc */
+/** @internal @module transition */ /** for typedoc */
 import {stringify} from "../common/strings";
 import {trace} from "../common/trace";
 import {services} from "../common/coreservices";
@@ -29,7 +29,7 @@ import {Rejection} from "./rejectFactory";
 import {ResolveContext} from "../resolve/resolveContext";
 import {UIRouter} from "../router";
 import {Globals} from "../globals";
-import {UIInjector} from "../common/interface";
+import {UIInjector} from "../interface";
 import {RawParams} from "../params/interface";
 
 
@@ -303,9 +303,8 @@ export class Transition implements IHookRegistry {
    * Gets the transition from which this transition was redirected.
    *
    *
-   * @example
+   * #### Example:
    * ```js
-   *
    * let transitionA = $state.go('A').transitionA
    * transitionA.onStart({}, () => $state.target('B'));
    * $transitions.onSuccess({ to: 'B' }, (trans) => {

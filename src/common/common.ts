@@ -1,6 +1,8 @@
 /**
  * Random utility functions used in the UI-Router code
  *
+ * These functions are exported, but are subject to change without notice.
+ *
  * @preferred @module common
  */ /** for typedoc */
 
