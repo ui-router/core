@@ -1,19 +1,15 @@
 # Any hidden files
 **/.*
 
-# Build related stuff
-/build
-/config
-/ngdoc_assets
-/test
-**/node_modules
+src
+test
+scripts
+node_modules
 
-# Package managers
-bower.json
-component.json
-
-**/tsconfig.json
-**/webpack.config.js
+karma.**.js
+tslint.json
+tsconfig.json
+tsconfig.*.json
 
 *.iml
 *.ipr

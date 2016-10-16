@@ -1,12 +1,12 @@
 {
   "name": "ui-router-core",
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0",
   "scripts": {
     "test": "karma start karma.conf.js",
     "debug": "karma start karma.conf.js --singleRun=false --browsers=Chrome --autoWatch=true --autoWatchInterval=1",
-    "clean": "rm -rf lib*",
-    "build": "npm run clean && tsc && tsc --outDir lib-esm -t es5 -m es6",
+    "clean": "shx rm -rf lib lib-esm",
+    "build": "npm run clean && tsc && tsc -p tsconfig.esm.json",
     "prepublish": "npm run build"
   },
   "homepage": "https://ui-router.github.io",
@@ -45,6 +45,7 @@
   "engines": {
     "node": ">4"
   },
+  "jsnext:main": "lib-esm/index.js",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "license": "MIT",
@@ -62,6 +63,7 @@
     "karma-script-launcher": "~0.1.0",
     "karma-systemjs": "^0.7.2",
     "shelljs": "^0.7.0",
+    "shx": "^0.1.4",
     "systemjs": "^0.18.4",
     "tslint": "=2.5.0",
     "typescript": "~2.0.2"
