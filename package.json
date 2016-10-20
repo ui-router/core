@@ -7,7 +7,7 @@
     "debug": "karma start karma.conf.js --singleRun=false --browsers=Chrome --autoWatch=true --autoWatchInterval=1",
     "clean": "shx rm -rf lib lib-esm",
     "build": "npm run clean && tsc && tsc -p tsconfig.esm.json",
-    "prepublish": "npm run build"
+    "prepublish": "npm test && npm run build"
   },
   "homepage": "https://ui-router.github.io",
   "contributors": [

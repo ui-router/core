@@ -399,7 +399,7 @@ export class StateService {
    *
    * @returns Returns true if it is the state.
    */
-  is(stateOrName: StateOrName, params?: RawParams, options?: { relative: StateOrName }): boolean {
+  is(stateOrName: StateOrName, params?: RawParams, options?: { relative?: StateOrName }): boolean {
     options = defaults(options, { relative: this.$current });
     let state = this.router.stateRegistry.matcher.find(stateOrName, options.relative);
     if (!isDefined(state)) return undefined;
