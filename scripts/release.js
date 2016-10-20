@@ -21,7 +21,7 @@ if (!readlineSync.keyInYN('Did you push all changes back to origin?')) {
 }
 
 util.ensureCleanMaster('master');
-// _exec(`npm publish`);
-// _exec(`git tag ${version}`);
-// _exec(`git push ${version}`);
+_exec(`npm publish`);
+_exec(`git tag ${version}`);
+_exec(`git push ${version}`);
 
