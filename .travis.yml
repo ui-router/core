@@ -6,16 +6,15 @@ before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - npm install -g karma
-  - npm install -g grunt-cli
   - ./nodeserver.sh > /dev/null &
 
 script:
-  - npm run test:integrate
+  - npm run test
 
 sudo: false
 
 git:
-  depth: 10
+  depth: 3
 
 notifications:
   slack: angularbuddies:b6leQM9gkBCW0S7MNDsELpqU
