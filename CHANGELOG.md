@@ -1,3 +1,19 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/ui-router/core/compare/1.0.0-beta.3...1.0.0) (2016-10-20)
+
+
+### Features
+
+- This is the 1.0.0 release of ui-router-core.
+- We've moved ui-router-core to its new home at https://github.com/ui-router/core
+- ui-router-core will now follow SemVer.
+
+# BREAKING CHANGE
+
+commonjs files now output to `/lib` and ES5 + ES6 module now output to `/lib-esm`.
+No bundles are being created.
+
+
 <a name="1.0.0-beta.3"></a>
 # [1.0.0-beta.3 commits](https://github.com/angular-ui/ui-router/compare/1.0.0-beta.2...1.0.0-beta.3) (2016-09-23)
 
