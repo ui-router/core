@@ -94,30 +94,43 @@ export class TransitionHook {
     return `${event} context: ${context}, ${maxLength(200, name)}`;
   }
 
-
   /**
-   * Given an array of TransitionHooks, runs each one synchronously and sequentially.
-   *
-   * Returns a promise chain composed of any promises returned from each hook.invokeStep() call
+   * Run all TransitionHooks, ignoring their return value.
    */
-  static runSynchronousHooks(hooks: TransitionHook[], swallowExceptions: boolean = false): Promise<any> {
-    let results: Promise<HookResult>[] = [];
-    for (let i = 0; i < hooks.length; i++) {
-      let hook = hooks[i];
+  static runAllHooks(hooks: TransitionHook[]): void {
+    hooks.forEach(hook => {
       try {
-        results.push(hook.invokeHook());
+        hook.invokeHook();
       } catch (exception) {
-        if (!swallowExceptions) {
-          return Rejection.errored(exception).toPromise();
-        }
-
         let errorHandler = hook.transition.router.stateService.defaultErrorHandler();
         errorHandler(exception);
       }
-    }
+    });
+  }
 
-    let rejections = results.filter(Rejection.isTransitionRejectionPromise);
-    if (rejections.length) return rejections[0];
+  /**
+   * Given an array of TransitionHooks, runs each one synchronously and sequentially.
+   * Should any hook return a Rejection synchronously, the remaining hooks will not run.
+   *
+   * Returns a promise chain composed of any promises returned from each hook.invokeStep() call
+   */
+  static runSynchronousHooks(hooks: TransitionHook[]): Promise<any> {
+    let results: Promise<HookResult>[] = [];
+
+    for (let hook of hooks) {
+      try {
+        let hookResult = hook.invokeHook();
+        
+        if (Rejection.isTransitionRejectionPromise(hookResult)) {
+          // Break on first thrown error or false/TargetState
+          return hookResult;
+        }
+
+        results.push(hookResult);
+      } catch (exception) {
+        return Rejection.errored(exception).toPromise();
+      }
+    }
 
     return results
         .filter(isPromise)
