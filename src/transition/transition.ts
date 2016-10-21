@@ -473,6 +473,7 @@ export class Transition implements IHookRegistry {
    */
   run(): Promise<any> {
     let runSynchronousHooks = TransitionHook.runSynchronousHooks;
+    let runAllHooks = TransitionHook.runAllHooks;
     let hookBuilder = this.hookBuilder();
     let globals = <Globals> this.router.globals;
     globals.transitionHistory.enqueue(this);
@@ -503,7 +504,7 @@ export class Transition implements IHookRegistry {
       trace.traceSuccess(this.$to(), this);
       this.success = true;
       this._deferred.resolve(this.to());
-      runSynchronousHooks(hookBuilder.getOnSuccessHooks(), true);
+      runAllHooks(hookBuilder.getOnSuccessHooks());
     };
 
     const transitionError = (reason: any) => {
@@ -511,7 +512,7 @@ export class Transition implements IHookRegistry {
       this.success = false;
       this._deferred.reject(reason);
       this._error = reason;
-      runSynchronousHooks(hookBuilder.getOnErrorHooks(), true);
+      runAllHooks(hookBuilder.getOnErrorHooks());
     };
 
     trace.traceTransitionStart(this);

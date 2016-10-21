@@ -152,6 +152,61 @@ describe('transition', function () {
         }), 20);
       }));
 
+      describe('.onBefore()', function() {
+        beforeEach(() => $state.defaultErrorHandler(() => {}));
+
+        it('should stop running remaining hooks if hook modifies transition synchronously', ((done) => {
+          let counter = 0;
+          let increment = (amount) => {
+            return () => {
+              counter += amount;
+              return false;
+            };
+          };
+
+          $transitions.onBefore({}, increment(1), { priority: 2 });
+          $transitions.onBefore({}, increment(100), { priority: 1 });
+
+          Promise.resolve()
+            .then(goFail('first', 'second'))
+            .then(() => expect(counter).toBe(1))
+            .then(goFail('second', 'third'))
+            .then(() => expect(counter).toBe(2))
+            .then(done);
+        }));
+
+        it('should stop running remaining hooks when synchronous result throws or returns false|TargetState', ((done) => {
+          let current = null;
+
+          $transitions.onBefore({}, (t) => { current = t.to().name; });
+          $transitions.onBefore({ to: 'first' }, () => {
+            throw Error('first-error');
+          }, { priority: 1 });
+          $transitions.onBefore({ to: 'second' }, () => false, { priority: 3 });
+          $transitions.onBefore({ to: 'third' }, () => $state.target('A'), { priority: 2 });
+
+          Promise.resolve()
+            .then(goFail('A', 'first'))
+            .then((res) => {
+              expect(res.type).toBe(RejectType.ERROR);
+              expect(current).toBe(null);
+            })
+            .then(goFail('A', 'second'))
+            .then((res) => {
+              expect(res.type).toBe(RejectType.ABORTED);
+              expect(current).toBe(null);
+            })
+            .then(goFail('A', 'third'))
+            .then((res) => {
+              expect(res.type).toBe(RejectType.SUPERSEDED);
+              expect(current).toBe(null);
+            })
+            .then(go('A', 'B'))
+            .then(() => expect(current).toBe('B'))
+            .then(done);
+        }));
+      });
+
       describe('.onStart()', function() {
         it('should fire matching events when transition starts', ((done) => {
           var t = null;
@@ -317,7 +372,9 @@ describe('transition', function () {
               .then(done);
         }));
 
-        it('should be called even if other .onSuccess() callbacks fail (throw errors, etc)', ((done) => {
+        it('should call all .onSuccess() even when callbacks fail (throw errors, etc)', ((done) => {
+          $transitions.onSuccess({ from: "*", to: "*" }, () => false);
+          $transitions.onSuccess({ from: "*", to: "*" }, () => $state.target('A'));
           $transitions.onSuccess({ from: "*", to: "*" }, function() { throw new Error("oops!"); });
           $transitions.onSuccess({ from: "*", to: "*" }, function(trans) { states.push(trans.to().name); });
 
@@ -362,6 +419,33 @@ describe('transition', function () {
           Promise.resolve()
               .then(goFail("A", "D"))
               .then(() => expect(hooks).toEqual([ 'splatsplat', 'AD' ]))
+              .then(done);
+        }));
+
+        it('should call all error handlers when transition fails.', ((done) => {
+          let count = 0;
+
+          $state.defaultErrorHandler(() => {});
+          $transitions.onStart({}, () => false);
+          $transitions.onError({}, () => {
+            count += 1;
+            return false;
+          });
+          $transitions.onError({}, () => {
+            count += 10;
+            $state.target('A');
+          });
+          $transitions.onError({}, function() {
+            count += 100;
+            throw new Error("oops!");
+          });
+          $transitions.onError({}, () => {
+            count += 1000;
+          });
+
+          Promise.resolve()
+              .then(goFail("B", "C"))
+              .then(() => expect(count).toBe(1111))
               .then(done);
         }));
       });
