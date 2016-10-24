@@ -117,7 +117,7 @@ export class UrlRouterProvider {
    *
    * @return [[$urlRouterProvider]] (`this`)
    */
-  rule(rule: ($injector: $InjectorLike, $location: LocationServices) => string): UrlRouterProvider {
+  rule(rule: ($injector: $InjectorLike, $location: LocationServices) => string|void): UrlRouterProvider {
     if (!isFunction(rule)) throw new Error("'rule' must be a function");
     this.rules.push(rule);
     return this;
