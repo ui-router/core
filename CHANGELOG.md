@@ -1,3 +1,14 @@
+<a name="1.0.1"></a>
+## [1.0.1](https://github.com/ui-router/core/compare/1.0.0...v1.0.1) (2016-10-24)
+
+
+### Bug Fixes
+
+* **onBefore:** Skip remaining hooks after the ([#2](https://github.com/ui-router/core/issues/2)) ([8a45d04](https://github.com/ui-router/core/commit/8a45d04))
+* **typings:** Allow urlRouter.rule to return void ([0b78bdf](https://github.com/ui-router/core/commit/0b78bdf))
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/ui-router/core/compare/1.0.0-beta.3...1.0.0) (2016-10-20)
 
