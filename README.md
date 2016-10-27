@@ -65,7 +65,7 @@ When the state is activated, the UIView should render the state's component.
 A `UISref` is a link (absolute, or relative) which activates a specific state and/or parameters.
 When the `UISref` is clicked, it should initiate a transition to the linked state.
 
-### USrefActive (optional)
+### UISrefActive (optional)
 
 When combined with a `UISref`, a `UISrefActive` toggles a CSS class on/off when its `UISref` is active/inactive.
 
@@ -73,7 +73,7 @@ When combined with a `UISref`, a `UISrefActive` toggles a CSS class on/off when 
 
 Implement framework specific bootstrap requirements, if any.
 For example, UI-Router for Angular 1 and Angular 2 integrates with the ng1/ng2 Dependency Injection lifecycles.
-On the other hand, UI-Router for React uses a simple javascript based bootstrap, i.e., `new UIRouterReact().start();`.
+On the other hand, UI-Router for React uses a simple JavaScript based bootstrap, i.e., `new UIRouterReact().start();`.
 
 ## Getting help
 
