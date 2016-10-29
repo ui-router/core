@@ -57,6 +57,7 @@
     "@types/jquery": "^1.10.31",
     "conventional-changelog": "^1.1.0",
     "conventional-changelog-cli": "^1.1.1",
+    "conventional-changelog-ui-router-core": "^1.3.0",
     "jasmine-core": "^2.4.1",
     "karma": "^1.2.0",
     "karma-chrome-launcher": "~0.1.0",

@@ -3,7 +3,7 @@
 let conventionalChangelog = require('conventional-changelog');
 
 let options = {
-  preset: 'angular'
+  preset: 'ui-router-core'
 };
 
 if(require.main === module) {
@@ -24,5 +24,6 @@ if(require.main === module) {
 }
 
 function showChangelog(context, gitOpts) {
-  conventionalChangelog(options, context, gitOpts).pipe(process.stdout);
+  var writerOpts = { doFlush: true, generateOn: function() { return false; } };
+  conventionalChangelog(options, context, gitOpts, undefined, writerOpts).pipe(process.stdout);
 }
