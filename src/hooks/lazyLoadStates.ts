@@ -24,8 +24,11 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
   var toState = transition.to();
   let registry = transition.router.stateRegistry;
 
+  const transitionSource = (trans: Transition) =>
+      trans.redirectedFrom() ? transitionSource(trans.redirectedFrom()) : trans.options().source;
+
   function retryOriginalTransition() {
-    if (transition.options().source === 'url') {
+    if (transitionSource(transition) === 'url') {
       let loc = services.location, path = loc.path(), search = loc.search(), hash = loc.hash();
 
       let matchState = state => [state, state.url && state.url.exec(path, search, hash)];
@@ -35,7 +38,9 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
         let [state, params] = matches[0];
         return transition.router.stateService.target(state, params, transition.options());
       }
+
       transition.router.urlRouter.sync();
+      return;
     }
 
     // The original transition was not triggered via url sync

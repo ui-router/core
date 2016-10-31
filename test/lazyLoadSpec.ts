@@ -213,6 +213,58 @@ describe('a Future State', function () {
         })
       })
     });
+  });
 
+  fdescribe('with a nested future state', () => {
+    let count, futureStateDefA, futureStateDefB, errors;
+    let lazyStateDefA = { name: 'A', url: '/a/:aid', params: {id: "adefault"} };
+    let lazyStateDefB = { name: 'A.B', url: '/b/:bid', params: {id: "bdefault"} };
+    beforeEach(() => {
+      futureStateDefA = {
+        name: 'A', url: '/a',
+        lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyStateDefA, futureStateDefB] }); })
+      };
+
+      futureStateDefB = {
+        name: 'A.B', url: '/b',
+        lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyStateDefB] }); })
+      };
+
+      $registry.register(futureStateDefA);
+    });
+
+    it('should load and activate a nested future state', (done) => {
+      expect($state.get('A')).toBe(futureStateDefA);
+
+      $state.go('A.B', { aid: 'aid', bid: 'bid'}).then(() => {
+        expect($state.current).toBe(lazyStateDefB);
+        done();
+      });
+    });
+
+    it('should load and activate a nested future state by url sync', (done) => {
+      services.location.setUrl('/a/aid/b/bid');
+      $urlRouter.sync();
+      $transitions.onSuccess({}, (trans) => {
+        expect($state.current.name).toBe('A.B');
+        expect($state.params).toEqualValues({ aid: 'aid', bid: 'bid' });
+
+        let prev1 = trans.redirectedFrom();
+
+        expect(prev1).toBeDefined();
+        expect(prev1.targetState().$state().name).toBe('A.B.**');
+        expect(prev1.options().source).toBe('redirect');
+
+        let prev2 = prev1.redirectedFrom();
+        expect(prev2).toBeDefined();
+        expect(prev2.targetState().$state().name).toBe('A.**');
+        expect(prev2.options().source).toBe('url');
+
+        let prev3 = prev2.redirectedFrom();
+        expect(prev3).toBeNull();
+
+        done();
+      });
+    });
   });
 });
