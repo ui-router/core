@@ -215,7 +215,7 @@ describe('a Future State', function () {
     });
   });
 
-  fdescribe('with a nested future state', () => {
+  describe('with a nested future state', () => {
     let count, futureStateDefA, futureStateDefB, errors;
     let lazyStateDefA = { name: 'A', url: '/a/:aid', params: {id: "adefault"} };
     let lazyStateDefB = { name: 'A.B', url: '/b/:bid', params: {id: "bdefault"} };
