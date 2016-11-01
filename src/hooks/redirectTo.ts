@@ -17,9 +17,10 @@ const redirectToHook: TransitionHookFn = (trans: Transition) => {
   let redirect = trans.to().redirectTo;
   if (!redirect) return;
 
-  function handleResult(result: any) {
-    let $state = trans.router.stateService;
+  let $state = trans.router.stateService;
 
+  function handleResult(result: any) {
+    if (!result) return;
     if (result instanceof TargetState) return result;
     if (isString(result)) return $state.target(<any> result, trans.params(), trans.options());
     if (result['state'] || result['params'])

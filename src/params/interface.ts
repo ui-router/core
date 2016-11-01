@@ -190,7 +190,6 @@ export interface ParamDeclaration {
    */
   squash: (boolean|string);
   /**
-   * @hidden
    * @internalapi
    *
    * An array of [[Replace]] objects.
@@ -199,13 +198,13 @@ export interface ParamDeclaration {
    * or empty string `""`.  If the transition is started, and the parameter value is equal to one of the "to"
    * values, then the parameter value is replaced with the "from" value.
    *
-   * @example
-   * ```
-   *
+   * #### Example:
+   * ```js
    * replace: [
    *   { from: undefined, to: null },
    *   { from: "", to: null }
    * ]
+   * ```
    */
   replace: Replace[];
   /**

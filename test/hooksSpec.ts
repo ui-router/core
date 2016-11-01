@@ -106,6 +106,17 @@ describe("hooks", () => {
       })
     })
 
+    // Test for #3117
+    it("should not redirect if the redirectTo: function returns undefined", (done) => {
+      find(states, s => s.name === 'A').redirectTo = function() {};
+      init();
+
+      $state.go('A').then(() => {
+        expect(router.globals.current.name).toBe('A');
+        done()
+      })
+    })
+
     it("should not redirect if the redirectTo: function returns something other than a string, { state, params}, TargetState (or promise for)", (done) => {
       find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
         setTimeout(() => resolve(12345), 50)
