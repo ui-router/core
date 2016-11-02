@@ -1,11 +1,8 @@
-import { UIRouter
-    TransitionService,
-    StateService,
-} from "../src/index";
+import { UIRouter, TransitionService, StateService } from "../src/index";
 import "../src/justjs";
-import {tree2Array} from "./_testUtils.ts";
-import {TransitionOptions} from "../src/transition/interface";
-import {LocationServices, services} from "../src/common/coreservices";
+import { tree2Array } from "./_testUtils";
+import { TransitionOptions } from "../src/transition/interface";
+import { LocationServices, services } from "../src/common/coreservices";
 
 describe('stateService', function () {
   let router: UIRouter;
@@ -79,12 +76,12 @@ describe('stateService', function () {
 
     it("should not update the URL in response to synchronizing URL", ((done) => {
       $loc.setUrl('/a/b/c');
-      spyOn($loc, 'setUrl').and.callThrough();
+      var setUrl = spyOn($loc, 'setUrl').and.callThrough();
       router.urlRouter.sync();
 
       wait().then(() => {
         expect($state.current.name).toBe('C');
-        let pushedUrls = $loc.setUrl.calls.all().map(x => x.args[0]).filter(x => x !== undefined);
+        let pushedUrls = setUrl.calls.all().map(x => x.args[0]).filter(x => x !== undefined);
         expect(pushedUrls).toEqual([]);
         expect($loc.path()).toBe('/a/b/c');
         done();
@@ -95,12 +92,12 @@ describe('stateService', function () {
       $transitions.onStart({ to: 'C' }, () => $state.target('D'));
 
       $loc.setUrl('/a/b/c');
-      spyOn($loc, 'setUrl').and.callThrough();
+      var setUrl = spyOn($loc, 'setUrl').and.callThrough();
       router.urlRouter.sync();
 
       wait().then(() => {
         expect($state.current.name).toBe('D');
-        let pushedUrls = $loc.setUrl.calls.all().map(x => x.args[0]).filter(x => x !== undefined);
+        let pushedUrls = setUrl.calls.all().map(x => x.args[0]).filter(x => x !== undefined);
         expect(pushedUrls).toEqual(['/a/b/c/d']);
         expect($loc.path()).toBe('/a/b/c/d');
         done();

@@ -1,12 +1,7 @@
+/// <reference path="./_matchers.d.ts" />
+
 import {equals} from "../src/common/common";
 declare var testablePromise;
-
-module "jasmine" {
-  interface Matchers {
-    toEqualData(expected: any): boolean;
-    toEqualValues(expected: any): boolean;
-  }
-}
 
 beforeEach(function() {
   jasmine.addMatchers(<any> {

@@ -1,10 +1,9 @@
-import { ResolveContext, State, PathNode, Resolvable } from "../src/index";
-import { copy } from "../src/index";
+import { ResolveContext, State, PathNode, Resolvable, copy } from "../src/index";
+import { services } from "../src/common/coreservices";
+import { tree2Array } from "./_testUtils";
+import { UIRouter } from "../src/router";
 
 import Spy = jasmine.Spy;
-import {services} from "../src/common/coreservices";
-import {tree2Array} from "./_testUtils.ts";
-import {UIRouter} from "../src/router";
 
 ///////////////////////////////////////////////
 

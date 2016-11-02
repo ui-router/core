@@ -1,16 +1,8 @@
-import { trace, UIRouter TransitionService, StateService } from "../src/index";
+import { UIRouter, TransitionService, StateService } from "../src/index";
 import "../src/justjs";
-import {StateRegistry} from "../src/state/stateRegistry";
-import {services} from "../src/common/coreservices";
-import {UrlRouter} from "../src/url/urlRouter";
-
-
-declare module "jasmine" {
-  interface Matchers {
-    toEqualValues(val: any): boolean;
-  }
-}
-
+import { StateRegistry } from "../src/state/stateRegistry";
+import { services } from "../src/common/coreservices";
+import { UrlRouter } from "../src/url/urlRouter";
 
 describe('a Future State', function () {
   let router: UIRouter;

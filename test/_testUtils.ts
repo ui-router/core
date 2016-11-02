@@ -1,4 +1,4 @@
-import {pick, extend, forEach, omit} from "../src/index";
+import {pick, forEach, omit} from "../src/index";
 import {map} from "../src/common/common";
 
 let stateProps = ["resolve", "resolvePolicy", "data", "template", "templateUrl", "url", "name", "params"];
@@ -27,7 +27,7 @@ export function tree2Array(tree, inheritName) {
 }
 
 export function PromiseResult(promise?) {
-  var self = this, _promise: Promise;
+  var self = this, _promise: Promise<any>;
   var resolve, reject, complete;
 
   this.setPromise = function(promise) {

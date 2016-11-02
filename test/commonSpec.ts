@@ -1,5 +1,5 @@
 import {
-    Glob, defaults, filter, is, eq, not, pattern, val, isInjectable
+    defaults, filter, is, eq, not, pattern, val, isInjectable
 } from "../src/index";
 
 describe('common', function() {
@@ -53,7 +53,7 @@ describe('common', function() {
     it('should allow double-negatives', function() {
       function T() { return true; }
       function F() { return false; }
-      function empty() { return ""; }
+      function empty(): boolean { return <any> ""; }
 
       expect(not(not(T))()).toBe(true);
       expect(not(not(F))()).toBe(false);
@@ -102,7 +102,7 @@ describe('common', function() {
     });
 
     it('should accept ng1 annotated functions', function() {
-      fn.$inject = ['foo', 'bar'];
+      fn['$inject'] = ['foo', 'bar'];
       function fn (foo, bar) {}
       expect(isInjectable(fn)).toBeTruthy();
     });

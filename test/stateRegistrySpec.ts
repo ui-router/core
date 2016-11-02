@@ -1,7 +1,7 @@
-import {UIRouter} from "../src/router";
-import {tree2Array} from "./_testUtils.ts";
-import {StateRegistry} from "../src/state/stateRegistry";
-import {services} from "../src/common/coreservices";
+import { UIRouter } from "../src/router";
+import { tree2Array } from "./_testUtils";
+import { StateRegistry } from "../src/state/stateRegistry";
+import { services } from "../src/common/coreservices";
 
 let router: UIRouter = null;
 let registry: StateRegistry = null;

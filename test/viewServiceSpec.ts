@@ -1,8 +1,8 @@
-import {UIRouter} from "../src/router";
-import {tree2Array} from "./_testUtils.ts";
-import {StateRegistry} from "../src/state/stateRegistry";
-import {ViewService} from "../src/view/view";
-import {ActiveUIView} from "../src/view/interface";
+import { UIRouter } from "../src/router";
+import { tree2Array } from "./_testUtils";
+import { StateRegistry } from "../src/state/stateRegistry";
+import { ViewService } from "../src/view/view";
+import { ActiveUIView } from "../src/view/interface";
 
 let router: UIRouter = null;
 let registry: StateRegistry = null;

@@ -1,8 +1,5 @@
-import {
-    UIRouter, TransitionService, StateService, State, PathNode, tail, PathFactory
-} from "../src/index";
-
-import {tree2Array} from "./_testUtils.ts";
+import { UIRouter, TransitionService, StateService, State, PathNode } from "../src/index";
+import { tree2Array } from "./_testUtils";
 import "../src/justjs";
 
 describe('HookBuilder:', function() {
@@ -51,7 +48,7 @@ describe('HookBuilder:', function() {
     expect(hb.getOnBeforeHooks().length).toBe(0);
 
     // Transition from 'A.B.C' to 'A'
-    let A = $state.target('A', null).$state();
+    A = $state.target('A', null).$state();
     let B = $state.target('A.B', null).$state();
     let C = $state.target('A.B.C', null).$state();
     let fromPath = [new PathNode(root), new PathNode(A), new PathNode(B), new PathNode(C)];

@@ -1,7 +1,8 @@
-
-import {UIRouter} from "../src/router";
-import {tree2Array} from "./_testUtils.ts";
-import {find} from "../src/common/common";
+import { UIRouter } from "../src/router";
+import { tree2Array } from "./_testUtils";
+import { find } from "../src/common/common";
+import { StateService } from "../src/state/stateService";
+import { StateDeclaration } from "../src/state/interface";
 
 
 let statetree = {
@@ -15,7 +16,7 @@ let statetree = {
 };
 
 describe("hooks", () => {
-  let router, $state, states, init;
+  let router, $state: StateService, states: StateDeclaration[], init;
   beforeEach(() => {
     router = new UIRouter();
     $state = router.stateService;

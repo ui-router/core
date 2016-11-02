@@ -4,12 +4,10 @@ build_packages
 site
 
 # common
+**/.*
+*~
 node_modules
 bower_components
-.DS_Store
-*~
-.tscache
-.baseDir.ts
 lib
 lib-esm
 

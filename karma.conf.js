@@ -23,30 +23,42 @@ module.exports = function (karma) {
     // Chrome, ChromeCanary, Firefox, Opera, Safari, PhantomJS
     browsers: ['PhantomJS'],
 
-    frameworks: ['systemjs', 'jasmine'],
+    frameworks: ['jasmine'],
 
     plugins: [
-      require('karma-systemjs'),
+      require('karma-webpack'),
+      require('karma-sourcemap-loader'),
       require('karma-jasmine'),
       require('karma-phantomjs-launcher'),
       require('karma-chrome-launcher')
     ],
 
+    webpack: {
+      devtool: 'source-map',
 
-    /* Files available to be served, so anything that will be require()'d */
-    files: [
-      { watched: true, included: false, nocache: true, pattern: 'src/**/*.ts' },
-      { watched: true, included: false, nocache: true, pattern: 'test/**/*.[tj]s' },
-    ],
+      resolve: {
+        modulesDirectories: ['node_modules'],
+        extensions: ['', '.js', '.ts']
+      },
 
-    systemjs: {
-      // Set up systemjs paths
-      configFile: 'karma.system.config.js',
-      files: ['src/**/*.ts'],
-      // karma-systemjs kludge: This is turned into a regexp and is the actual specs that are loaded
-      testFileSuffix: "/test/\\S+.[tj]s"
+      module: {
+        loaders: [
+          { test: /\.ts$/, loader: "awesome-typescript-loader?declaration=false&tsconfig=test/tsconfig.json" }
+        ]
+      },
+
     },
-    exclude: []
+
+    webpackMiddleware: {
+      stats: { chunks: false },
+    },
+
+    files: ['test/index.js'],
+
+    preprocessors: {
+      'test/index.js': ['webpack', 'sourcemap'],
+    },
+
   };
 
   karma.set(config);

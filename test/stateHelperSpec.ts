@@ -1,5 +1,7 @@
-import {StateMatcher, StateBuilder, UrlMatcher, TargetState, extend} from "../src/index";
+import { StateMatcher, StateBuilder, UrlMatcher, TargetState, extend } from "../src/index";
+import { ParamTypes } from "../src/params/paramTypes";
 
+var paramTypes = new ParamTypes();
 describe('state helpers', function() {
 
   var states;
@@ -127,7 +129,7 @@ describe('state helpers', function() {
       });
 
       it('should compile a UrlMatcher for ^ URLs', function() {
-        var url = new UrlMatcher('/', {});
+        var url = new UrlMatcher('/', paramTypes);
         spyOn(urlMatcherFactoryProvider, 'compile').and.returnValue(url);
         spyOn(urlMatcherFactoryProvider, 'isMatcher').and.returnValue(true);
 
@@ -155,7 +157,7 @@ describe('state helpers', function() {
 
       it('should pass through custom UrlMatchers', function() {
         var root = states[''] = { url: { append: function() {} } };
-        var url = new UrlMatcher("/", {});
+        var url = new UrlMatcher("/", paramTypes);
         spyOn(urlMatcherFactoryProvider, 'isMatcher').and.returnValue(true);
         spyOn(root.url, 'append').and.returnValue(url);
         expect(builder.builder('url')({ url: url })).toBe(url);

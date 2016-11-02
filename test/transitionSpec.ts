@@ -1,17 +1,9 @@
-import {PathNode} from "../src/path/node";
-
-import { UIRouter
-    RejectType, Rejection,
-    pluck,
-    services,
-    TransitionService,
-    StateService,
-    Rejection,
-    Resolvable,
-    Transition,
+import { PathNode } from "../src/path/node";
+import {
+    UIRouter, RejectType, Rejection, pluck, services, TransitionService, StateService, Resolvable, Transition
 } from "../src/index";
 import "../src/justjs";
-import {tree2Array, PromiseResult} from "./_testUtils.ts";
+import { tree2Array, PromiseResult } from "./_testUtils";
 
 describe('transition', function () {
 
