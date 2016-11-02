@@ -56,7 +56,7 @@ export class StateQueueManager {
 
       if (result) {
         if (states.hasOwnProperty(state.name))
-          throw new Error(`State '${name}' is already defined`);
+          throw new Error(`State '${state.name}' is already defined`);
         states[state.name] = state;
         this.attachRoute($state, state);
         if (orphanIdx >= 0) orphans.splice(orphanIdx, 1);
