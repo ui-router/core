@@ -345,6 +345,25 @@ describe('transition', function () {
               })
               .then(done);
         }));
+
+        // test for #3081
+        it('should inject resolve values from the exited state', ((done) => {
+          router.stateRegistry.register({
+            name: 'design',
+            url: '/design',
+            resolve: { cc: () => 'cc resolve' },
+            onExit: (trans, state) => {
+              expect(state.self).toBe(router.stateRegistry.get('design'));
+              expect(trans.getResolveValue('cc', 'from')).toBe('cc resolve');
+              done();
+            }
+          });
+          const $state = router.stateService;
+
+          Promise.resolve()
+              .then(() => $state.go("design"))
+              .then(() => $state.go("A"));
+        }));
       });
 
       describe('.onSuccess()', function() {

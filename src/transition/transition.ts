@@ -32,8 +32,9 @@ import {Globals} from "../globals";
 import {UIInjector} from "../interface";
 import {RawParams} from "../params/interface";
 
-
+/** @hidden */
 let transitionCount = 0;
+/** @hidden */
 const stateSelf: (_state: State) => StateDeclaration = prop("self");
 
 /**
@@ -45,8 +46,15 @@ const stateSelf: (_state: State) => StateDeclaration = prop("self");
  * It has information about all states being entered and exited as a result of the transition.
  */
 export class Transition implements IHookRegistry {
+
+  /** @hidden */
   static diToken = Transition;
-  
+
+  /**
+   * A unique identifier for the transition.
+   *
+   * This is an auto incrementing integer, starting from `0`.
+   */
   $id: number;
 
   /**
@@ -75,8 +83,11 @@ export class Transition implements IHookRegistry {
   /** @hidden */
   private _error: any;
 
+  /** @hidden */
   private _options: TransitionOptions;
+  /** @hidden */
   private _treeChanges: TreeChanges;
+  /** @hidden */
   private _targetState: TargetState;
 
   /** @inheritdoc */
@@ -102,6 +113,8 @@ export class Transition implements IHookRegistry {
    * Creates a new Transition object.
    *
    * If the target state is not valid, an error is thrown.
+   *
+   * @internalapi
    *
    * @param fromPath The path of [[PathNode]]s from which the transition is leaving.  The last node in the `fromPath`
    *        encapsulates the "from state".
@@ -139,10 +152,20 @@ export class Transition implements IHookRegistry {
     context.addResolvables(rootResolvables, rootNode.state);
   }
 
+  /**
+   * @internalapi
+   *
+   * @returns the internal from [State] object
+   */
   $from() {
     return tail(this._treeChanges.from).state;
   }
 
+  /**
+   * @internalapi
+   *
+   * @returns the internal to [State] object
+   */
   $to() {
     return tail(this._treeChanges.to).state;
   }
@@ -150,7 +173,9 @@ export class Transition implements IHookRegistry {
   /**
    * Returns the "from state"
    *
-   * @returns The state object for the Transition's "from state".
+   * Returns the state that the transition is coming *from*.
+   *
+   * @returns The state declaration object for the Transition's ("from state").
    */
   from(): StateDeclaration {
     return this.$from().self;
@@ -159,7 +184,9 @@ export class Transition implements IHookRegistry {
   /**
    * Returns the "to state"
    *
-   * @returns The state object for the Transition's target state ("to state").
+   * Returns the state that the transition is  going *from*.
+   *
+   * @returns The state declaration object for the Transition's target state ("to state").
    */
   to() {
     return this.$to().self;
@@ -168,7 +195,7 @@ export class Transition implements IHookRegistry {
   /**
    * Gets the Target State
    *
-   * A transition's [[TargetState]] encapsulates the [[to]] state, the [[params]], and the [[options]].
+   * A transition's [[TargetState]] encapsulates the [[to]] state, the [[params]], and the [[options]] as a single object.
    *
    * @returns the [[TargetState]] of this Transition
    */
@@ -193,8 +220,14 @@ export class Transition implements IHookRegistry {
   /**
    * Gets transition parameter values
    *
-   * @param pathname Pick which treeChanges path to get parameters for:
+   * Returns the parameter values for a transition as key/value pairs.
+   *
+   * By default, returns the new parameter values (for the "to state").
+   * To return the previous parameter values,  supply `'from'` as the `pathname` argument.
+   *
+   * @param pathname the name of the treeChanges path to get parameter values for:
    *   (`'to'`, `'from'`, `'entering'`, `'exiting'`, `'retained'`)
+   *
    * @returns transition parameter values for the desired path.
    */
   params(pathname: string = "to"): { [key: string]: any } {
@@ -216,7 +249,7 @@ export class Transition implements IHookRegistry {
    * @returns a [[UIInjector]]
    */
   injector(state?: StateOrName): UIInjector {
-    let path: PathNode[] = this.treeChanges().to;
+    let path: PathNode[] = this._treeChanges.to;
     if (state) path = PathFactory.subPath(path, node => node.state === state || node.state.name === state);
     return new ResolveContext(path).injector();
   }
@@ -230,10 +263,12 @@ export class Transition implements IHookRegistry {
    * The returned tokens include those defined on [[StateDeclaration.resolve]] blocks, for the states
    * in the Transition's [[TreeChanges.to]] path.
    *
+   * @param pathname resolve context's path name (e.g., `to` or `from`)
+   *
    * @returns an array of resolve tokens (keys)
    */
-  getResolveTokens(): any[] {
-    return new ResolveContext(this._treeChanges.to).getTokens();
+  getResolveTokens(pathname: string = "to"): any[] {
+    return new ResolveContext(this._treeChanges[pathname]).getTokens();
   }
 
 
@@ -250,11 +285,14 @@ export class Transition implements IHookRegistry {
    * If a resolvable doesn't exist for the token, throws an error.
    *
    * @param token the token (or array of tokens)
+   * @param pathname resolve context's path name (e.g., `to` or `from`)
    *
    * @returns an array of resolve tokens (keys)
    */
-  getResolveValue(token: (any|any[])): (any|any[]) {
-    let resolveContext = new ResolveContext(this._treeChanges.to);
+  getResolveValue(token: any[], pathname?: string): any[];
+  getResolveValue(token: any, pathname?: string): any;
+  getResolveValue(token: (any|any[]), pathname: string = "to"): (any|any[]) {
+    let resolveContext = new ResolveContext(this._treeChanges[pathname]);
     const getData = (token: any) => {
       var resolvable = resolveContext.getResolvable(token);
       if (resolvable === undefined) {
@@ -276,11 +314,12 @@ export class Transition implements IHookRegistry {
    * This is a lower level API that returns a [[Resolvable]] from the Transition for a given token.
    *
    * @param token the DI token
+   * @param pathname resolve context's path name (e.g., `to` or `from`)
    *
    * @returns the [[Resolvable]] in the transition's to path, or undefined
    */
-  getResolvable(token: any): Resolvable {
-    return new ResolveContext(this._treeChanges.to).getResolvable(token);
+  getResolvable(token: any, pathname = "to"): Resolvable {
+    return new ResolveContext(this._treeChanges[pathname]).getResolvable(token);
   }
 
   /**
@@ -374,13 +413,31 @@ export class Transition implements IHookRegistry {
     return path.map(prop("views")).filter(identity).reduce(unnestR, []);
   }
 
-  treeChanges = () => this._treeChanges;
+  /**
+   * Return the transition's tree changes
+   *
+   * A transition goes from one state/parameters to another state/parameters.
+   * During a transition, states are entered and/or exited.
+   *
+   * This function returns various branches (paths) which represent the changes to the
+   * active state tree that are caused by the transition.
+   *
+   * @param pathname The name of the tree changes path to get:
+   *   (`'to'`, `'from'`, `'entering'`, `'exiting'`, `'retained'`)
+   */
+  treeChanges(pathname: string): PathNode[];
+  treeChanges(): TreeChanges;
+  treeChanges(pathname?: string) {
+    return pathname ? this._treeChanges[pathname] : this._treeChanges;
+  }
 
   /**
    * Creates a new transition that is a redirection of the current one.
    *
    * This transition can be returned from a [[TransitionService]] hook to
    * redirect a transition to a new state and/or set of parameters.
+   *
+   * @internalapi
    *
    * @returns Returns a new [[Transition]] instance.
    */
@@ -389,8 +446,8 @@ export class Transition implements IHookRegistry {
     targetState = new TargetState(targetState.identifier(), targetState.$state(), targetState.params(), newOptions);
 
     let newTransition = this.router.transitionService.create(this._treeChanges.from, targetState);
-    let originalEnteringNodes = this.treeChanges().entering;
-    let redirectEnteringNodes = newTransition.treeChanges().entering;
+    let originalEnteringNodes = this._treeChanges.entering;
+    let redirectEnteringNodes = newTransition._treeChanges.entering;
 
     // --- Re-use resolve data from original transition ---
     // When redirecting from a parent state to a child state where the parent parameter values haven't changed
@@ -469,6 +526,8 @@ export class Transition implements IHookRegistry {
    *
    * This method is generally called from the [[StateService.transitionTo]]
    *
+   * @internalapi
+   *
    * @returns a promise for a successful transition.
    */
   run(): Promise<any> {
@@ -529,6 +588,9 @@ export class Transition implements IHookRegistry {
     return this.promise;
   }
 
+  /**
+   * Checks if this transition is currently active/running.
+   */
   isActive = () => this === this._options.current();
 
   /**
