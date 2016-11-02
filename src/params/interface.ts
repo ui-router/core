@@ -5,6 +5,14 @@ import {ParamType} from "./type";
  * Parameter values
  *
  * An object containing state parameter key/value pairs
+ *
+ * #### Example:
+ * ```js
+ * {
+ *   userId: 353474,
+ *   folderId: 'inbox'
+ * }
+ * ```
  */
 export interface RawParams {
   [key: string]: any;

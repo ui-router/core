@@ -1,5 +1,5 @@
 /** @module state */ /** for typedoc */
-import {ParamDeclaration} from "../params/interface";
+import { ParamDeclaration, RawParams } from "../params/interface";
 
 import {State} from "./stateObject";
 import {ViewContext} from "../view/interface";
@@ -65,6 +65,15 @@ export interface _ViewDeclaration {
    */
   $context?: ViewContext;
 }
+
+/**
+ * The return value of a [[redirectTo]] function
+ *
+ * - string: a state name
+ * - TargetState: a target state, parameters, and options
+ * - object: an object with a state name and parameters
+ */
+export type RedirectToResult = string | TargetState | { state?: string, params?: RawParams };
 
 /**
  * The StateDeclaration object is used to define a state or nested state.
@@ -431,10 +440,7 @@ export interface StateDeclaration {
    * })
    * ```
    */
-  redirectTo?: ( string |
-          (($transition$: Transition) => TargetState) |
-          { state: (string|StateDeclaration), params: { [key: string]: any }}
-  )
+  redirectTo?: RedirectToResult | Promise<RedirectToResult>
 
   /**
    * A Transition Hook called with the state is being entered.  See: [[IHookRegistry.onEnter]]

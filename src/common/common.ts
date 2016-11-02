@@ -24,7 +24,7 @@ export const noop = () => <any> undefined;
 
 export type Mapper<X, T> = (x: X, key?: (string|number)) => T;
 export interface TypedMap<T> { [key: string]: T; }
-export type Predicate<X> = (x: X) => boolean;
+export type Predicate<X> = (x?: X) => boolean;
 export type IInjectable = (Function|any[]);
 
 export interface Obj extends Object {
