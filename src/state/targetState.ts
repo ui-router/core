@@ -60,8 +60,8 @@ export class TargetState {
     this._params = _params || {};
   }
 
-  name() {
-    return this._definition && this._definition.name || this._identifier;
+  name(): String {
+    return this._definition && this._definition.name || <String> this._identifier;
   }
 
   identifier(): StateOrName {
