@@ -23,7 +23,7 @@ const loadEnteringViews: TransitionHookFn = (transition: Transition) => {
 };
 
 export const registerLoadEnteringViews = (transitionService: TransitionService) =>
-    transitionService.onStart({}, loadEnteringViews);
+    transitionService.onFinish({}, loadEnteringViews);
 
 /**
  * A [[TransitionHookFn]] which activates the new views when a transition is successful.
