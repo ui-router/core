@@ -71,8 +71,7 @@ describe('stateService', function () {
         expect(err.message).toContain('Too many Transition redirects');
         done();
       });
-    })
-
+    });
 
     it("should not update the URL in response to synchronizing URL", ((done) => {
       $loc.setUrl('/a/b/c');

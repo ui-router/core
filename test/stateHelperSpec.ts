@@ -63,6 +63,7 @@ describe('state helpers', function() {
     it('should resolve relative paths', function() {
       var matcher = new StateMatcher(states);
 
+      expect(matcher.find('.', states['home.about'])).toBe(states['home.about']);
       expect(matcher.find('^', states['home.about'])).toBe(states.home);
       expect(matcher.find('^.company', states['home.about.people'])).toBe(states['home.about.company']);
       expect(matcher.find('^.^.company', states['home.about.people.person'])).toBe(states['home.about.company']);
