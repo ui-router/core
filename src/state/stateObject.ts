@@ -1,4 +1,4 @@
-/** @module state */ /** for typedoc */
+/** @coreapi @module state */ /** for typedoc */
 
 import {StateDeclaration, _ViewDeclaration} from "./interface";
 import {extend, defaults, values, find} from "../common/common";

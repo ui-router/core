@@ -1,4 +1,4 @@
-/** @module url */ /** for typedoc */
+/** @coreapi @module url */ /** for typedoc */
 import {extend, bindFunctions, IInjectable, removeFrom} from "../common/common";
 import {isFunction, isString, isDefined, isArray} from "../common/predicates";
 import {UrlMatcher} from "./urlMatcher";

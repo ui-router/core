@@ -1,4 +1,4 @@
-/** @module core */ /** */
+/** @coreapi @module core */ /** */
 import {StateParams} from "./params/stateParams";
 import {StateDeclaration} from "./state/interface";
 import {State} from "./state/stateObject";

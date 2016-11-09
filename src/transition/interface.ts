@@ -1,4 +1,4 @@
-/** @internal @module transition */ /** for typedoc */
+/** @coreapi @module transition */ /** for typedoc */
 import {StateDeclaration} from "../state/interface";
 import {Predicate} from "../common/common";
 
@@ -72,19 +72,19 @@ export interface TransitionOptions {
    * You can define your own Transition Options inside this property and use them, e.g., from a Transition Hook
    */
   custom      ?: any;
-  /** @hidden @internal */
+  /** @hidden @internalapi */
   reloadState ?: (State);
-  /** @hidden @internal
+  /** @hidden @internalapi
    * If this transition is a redirect, this property should be the original Transition (which was redirected to this one)
    */
   redirectedFrom?: Transition;
-  /** @hidden @internal */
+  /** @hidden @internalapi */
   current     ?: () => Transition;
-  /** @hidden @internal */
+  /** @hidden @internalapi */
   source      ?: "sref"|"url"|"redirect"|"otherwise"|"unknown";
 }
 
-/** @hidden @internal */
+/** @internalapi */
 export interface TransitionHookOptions {
   async               ?: boolean;
   rejectIfSuperseded  ?: boolean;

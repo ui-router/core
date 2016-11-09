@@ -1,4 +1,4 @@
-/** @module state */ /** for typedoc */
+/** @coreapi @module state */ /** for typedoc */
 import { ParamDeclaration, RawParams } from "../params/interface";
 
 import {State} from "./stateObject";

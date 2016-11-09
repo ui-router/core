@@ -1,4 +1,4 @@
-/** @internal @module transition */ /** for typedoc */
+/** @coreapi @module transition */ /** for typedoc */
 import {TransitionHookOptions, IEventHook, HookResult} from "./interface";
 import {defaults, noop} from "../common/common";
 import {fnToString, maxLength} from "../common/strings";

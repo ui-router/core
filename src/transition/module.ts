@@ -6,7 +6,9 @@
  * - [[Transition]]
  * - [[HookFn]], [[TransitionHookFn]], [[TransitionStateHookFn]], [[HookMatchCriteria]], [[HookResult]]
  *
- * @internal @preferred @module transition
+ * @coreapi
+ * @preferred
+ * @module transition
  */ /** for typedoc */
 export * from "./interface";
 export * from "./hookBuilder";

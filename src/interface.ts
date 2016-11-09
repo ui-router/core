@@ -4,7 +4,9 @@
  * The classes and interfaces that are core to ui-router and do not belong
  * to a more specific subsystem (such as resolve).
  *
- * @preferred @module core
+ * @coreapi
+ * @preferred
+ * @module core
  */ /** for typedoc */
 
 // Need to import or export at least one concrete something

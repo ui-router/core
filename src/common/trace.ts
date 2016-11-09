@@ -30,6 +30,7 @@
  * app.run($trace => $trace.enable());
  * ```
  *
+ * @coreapi
  * @module trace
  */ /** for typedoc */
 import {parse} from "../common/hof";

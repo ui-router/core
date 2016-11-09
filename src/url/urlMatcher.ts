@@ -1,4 +1,4 @@
-/** @module url */ /** for typedoc */
+/** @coreapi @module url */ /** for typedoc */
 import {
   map, defaults, extend, inherit, identity,
   unnest, tail, forEach, find, Obj, pairs, allTrueR

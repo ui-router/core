@@ -1,4 +1,4 @@
-/** @module params */ /** for typedoc */
+/** @coreapi @module params */ /** for typedoc */
 import {ParamType} from "./type";
 
 /**

@@ -1,4 +1,4 @@
-/** @internal @module transition */ /** for typedoc */
+/** @coreapi @module transition */ /** for typedoc */
 import {stringify} from "../common/strings";
 import {trace} from "../common/trace";
 import {services} from "../common/coreservices";

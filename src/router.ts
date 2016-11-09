@@ -1,4 +1,4 @@
-/** @module core */ /** */
+/** @coreapi @module core */ /** */
 import {UrlMatcherFactory} from "./url/urlMatcherFactory";
 import {UrlRouterProvider} from "./url/urlRouter";
 import {UrlRouter} from "./url/urlRouter";

@@ -1,4 +1,4 @@
-/** @internal @module transition */ /** for typedoc */
+/** @coreapi @module transition */ /** for typedoc */
 import {
     IHookRegistry, TransitionOptions, HookMatchCriteria, HookRegOptions,
     TransitionStateHookFn, TransitionHookFn

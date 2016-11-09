@@ -1,4 +1,4 @@
-/** @module state */ /** for typedoc */
+/** @coreapi @module state */ /** for typedoc */
 
 import {State} from "./stateObject";
 import {StateMatcher} from "./stateMatcher";

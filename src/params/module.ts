@@ -3,7 +3,9 @@
  *
  * See [[ParamDeclaration]]
  *
- * @preferred @module params
+ * @coreapi
+ * @preferred
+ * @module params
  */ /** for typedoc */
 export * from "./interface";
 export * from "./param";

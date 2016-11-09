@@ -1,4 +1,4 @@
-/** @module resolve */ /** for typedoc */
+/** @coreapi @module resolve */ /** for typedoc */
 import {extend, equals, inArray, identity} from "../common/common";
 import {services} from "../common/coreservices";
 import {trace} from "../common/trace";
