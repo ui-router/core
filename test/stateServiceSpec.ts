@@ -59,7 +59,7 @@ describe('stateService', function () {
       .then(done, done);
     }));
 
-    it('should error after 20+ redirects', (done) => {
+    it('should error after 20+ async redirects', (done) => {
       let errors = [];
       $transitions.onEnter({ entering: "D" }, trans => trans.router.stateService.target('D'));
       $transitions.onError({}, trans => { errors.push(trans.error()) });
@@ -68,7 +68,25 @@ describe('stateService', function () {
 
       $state.go("D").catch(err => {
         expect(errors.length).toBe(21);
-        expect(err.message).toContain('Too many Transition redirects');
+        expect(err.message).toContain('Too many consecutive Transition redirects');
+        done();
+      });
+    });
+
+    it('synchronous redirects should not be allowed to cause an infinite redirect loop', (done) => {
+      let errors = [];
+      let count = 0;
+      $transitions.onBefore({ entering: "D" }, trans => {
+        if (count++ >= 1000) throw new Error(`Doh! 1000 redirects O_o`);
+        return trans.router.stateService.target('D');
+      });
+      $transitions.onError({}, trans => { errors.push(trans.error()) });
+
+      $state.defaultErrorHandler(function() {});
+
+      $state.go("D").catch(err => {
+        expect(count).toBe(21);
+        expect(err.message).toContain('Too many consecutive Transition redirects');
         done();
       });
     });
