@@ -11,6 +11,7 @@
 
 // Need to import or export at least one concrete something
 import {noop} from "./common/common";
+import {UIRouter} from "./router";
 
 /**
  * An interface for getting values from dependency injection.
@@ -80,4 +81,8 @@ export interface UIInjector {
    */
   getNative(token: any): any;
   getNative<T>(token: any): T;
+}
+
+export abstract class UIRouterPlugin {
+  abstract name(): string;
 }
