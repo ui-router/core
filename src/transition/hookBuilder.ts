@@ -41,14 +41,14 @@ export class HookBuilder {
     this.transitionOptions  = transition.options();
   }
 
-  getOnBeforeHooks  = () => this._buildNodeHooks("onBefore",  "to",       tupleSort(), { async: false });
+  getOnBeforeHooks  = () => this._buildNodeHooks("onBefore",  "to",       tupleSort());
   getOnStartHooks   = () => this._buildNodeHooks("onStart",   "to",       tupleSort());
   getOnExitHooks    = () => this._buildNodeHooks("onExit",    "exiting",  tupleSort(true),  { stateHook: true });
   getOnRetainHooks  = () => this._buildNodeHooks("onRetain",  "retained", tupleSort(false), { stateHook: true });
   getOnEnterHooks   = () => this._buildNodeHooks("onEnter",   "entering", tupleSort(false), { stateHook: true });
   getOnFinishHooks  = () => this._buildNodeHooks("onFinish",  "to",       tupleSort());
-  getOnSuccessHooks = () => this._buildNodeHooks("onSuccess", "to",       tupleSort(), { async: false, rejectIfSuperseded: false });
-  getOnErrorHooks   = () => this._buildNodeHooks("onError",   "to",       tupleSort(), { async: false, rejectIfSuperseded: false });
+  getOnSuccessHooks = () => this._buildNodeHooks("onSuccess", "to",       tupleSort(), { rejectIfSuperseded: false });
+  getOnErrorHooks   = () => this._buildNodeHooks("onError",   "to",       tupleSort(), { rejectIfSuperseded: false });
 
   asyncHooks() {
     let onStartHooks    = this.getOnStartHooks();
