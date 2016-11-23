@@ -11,12 +11,14 @@ import { prop, propEq, val, not } from "../common/hof";
 
 import {StateDeclaration, StateOrName} from "../state/interface";
 import {
-    TransitionOptions, TransitionHookOptions, TreeChanges, IHookRegistry, IHookGetter,
-    HookMatchCriteria, TransitionHookFn, TransitionStateHookFn, HookRegOptions
+    TransitionOptions, TransitionHookOptions, TreeChanges, IHookRegistry,
+    IHookGetter, HookMatchCriteria, HookRegOptions, IEventHook
 } from "./interface";
 
+import { TransitionStateHookFn, TransitionHookFn } from "./interface"; // has or is using
+
 import {TransitionHook} from "./transitionHook";
-import {HookRegistry, matchState} from "./hookRegistry";
+import {matchState, IEventHooks, makeHookRegistrationFn} from "./hookRegistry";
 import {HookBuilder} from "./hookBuilder";
 import {PathNode} from "../path/node";
 import {PathFactory} from "../path/pathFactory";
@@ -83,6 +85,9 @@ export class Transition implements IHookRegistry {
   /** @hidden */
   private _error: any;
 
+  /** @hidden Holds the hook registration functions such as those passed to Transition.onStart() */
+  private _transitionEvents: IEventHooks = { };
+
   /** @hidden */
   private _options: TransitionOptions;
   /** @hidden */
@@ -90,24 +95,32 @@ export class Transition implements IHookRegistry {
   /** @hidden */
   private _targetState: TargetState;
 
-  /** @inheritdoc */
-  onBefore (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onStart (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onExit (matchCriteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onRetain (matchCriteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onEnter (matchCriteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onFinish (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onSuccess (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onError (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
+  /** @hidden Creates a hook registration function (which can then be used to register hooks) */
+  private createHookRegFn (hookName: string) {
+    return makeHookRegistrationFn(this._transitionEvents, hookName);
+  }
 
-  getHooks:   IHookGetter;
+  /** @hidden */
+  onBefore  = this.createHookRegFn('onBefore');
+  /** @inheritdoc */
+  onStart   = this.createHookRegFn('onStart');
+  /** @inheritdoc */
+  onExit    = this.createHookRegFn('onExit');
+  /** @inheritdoc */
+  onRetain  = this.createHookRegFn('onRetain');
+  /** @inheritdoc */
+  onEnter   = this.createHookRegFn('onEnter');
+  /** @inheritdoc */
+  onFinish  = this.createHookRegFn('onFinish');
+  /** @inheritdoc */
+  onSuccess = this.createHookRegFn('onSuccess');
+  /** @inheritdoc */
+  onError   = this.createHookRegFn('onError');
+
+  /** @hidden @internalapi */
+  getHooks(hookName: string): IEventHook[] {
+    return this._transitionEvents[hookName];
+  }
 
   /**
    * Creates a new Transition object.
@@ -128,9 +141,6 @@ export class Transition implements IHookRegistry {
     if (!targetState.valid()) {
       throw new Error(targetState.error());
     }
-
-    // Makes the Transition instance a hook registry (onStart, etc)
-    HookRegistry.mixin(new HookRegistry(), this);
 
     // current() is assumed to come from targetState.options, but provide a naive implementation otherwise.
     this._options = extend({ current: val(this) }, targetState.options());
@@ -188,7 +198,7 @@ export class Transition implements IHookRegistry {
    *
    * @returns The state declaration object for the Transition's target state ("to state").
    */
-  to() {
+  to(): StateDeclaration {
     return this.$to().self;
   }
 

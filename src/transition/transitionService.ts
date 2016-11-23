@@ -1,11 +1,12 @@
 /** @coreapi @module transition */ /** for typedoc */
+import { IHookRegistry, TransitionOptions } from "./interface";
+
 import {
-    IHookRegistry, TransitionOptions, HookMatchCriteria, HookRegOptions,
-    TransitionStateHookFn, TransitionHookFn
-} from "./interface";
+  HookMatchCriteria, HookRegOptions, TransitionStateHookFn, TransitionHookFn
+} from "./interface"; // has or is using
 
 import {Transition} from "./transition";
-import {HookRegistry} from "./hookRegistry";
+import {IEventHooks, makeHookRegistrationFn} from "./hookRegistry";
 import {TargetState} from "../state/targetState";
 import {PathNode} from "../path/node";
 import {IEventHook} from "./interface";
@@ -49,6 +50,7 @@ export let defaultTransOpts: TransitionOptions = {
 export class TransitionService implements IHookRegistry {
   /** @hidden */
   public $view: ViewService;
+  private _transitionEvents: IEventHooks = { };
 
   /**
    * This object has hook de-registration functions for the built-in hooks.
@@ -71,9 +73,13 @@ export class TransitionService implements IHookRegistry {
 
   constructor(private _router: UIRouter) {
     this.$view = _router.viewService;
-    HookRegistry.mixin(new HookRegistry(), this);
     this._deregisterHookFns = <any> {};
     this.registerTransitionHooks();
+  }
+
+  /** @hidden Creates a hook registration function (which can then be used to register hooks) */
+  private createHookRegFn (hookName: string) {
+    return makeHookRegistrationFn(this._transitionEvents, hookName);
   }
 
   /** @hidden */
@@ -103,27 +109,6 @@ export class TransitionService implements IHookRegistry {
     fns.lazyLoad      = registerLazyLoadHook(this);
   }
 
-  /** @inheritdoc */
-  onBefore (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onStart (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onExit (matchCriteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onRetain (matchCriteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onEnter (matchCriteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onFinish (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onSuccess (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
-  /** @inheritdoc */
-  onError (matchCriteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions) : Function { throw ""; };
-
-
-  /** @hidden */
-  getHooks  : (hookName: string) => IEventHook[];
-
   /**
    * Creates a new [[Transition]] object
    *
@@ -136,5 +121,27 @@ export class TransitionService implements IHookRegistry {
    */
   create(fromPath: PathNode[], targetState: TargetState): Transition {
     return new Transition(fromPath, targetState, this._router);
+  }
+
+  /** @inheritdoc */
+  onBefore  = this.createHookRegFn('onBefore');
+  /** @inheritdoc */
+  onStart   = this.createHookRegFn('onStart');
+  /** @inheritdoc */
+  onExit    = this.createHookRegFn('onExit');
+  /** @inheritdoc */
+  onRetain  = this.createHookRegFn('onRetain');
+  /** @inheritdoc */
+  onEnter   = this.createHookRegFn('onEnter');
+  /** @inheritdoc */
+  onFinish  = this.createHookRegFn('onFinish');
+  /** @inheritdoc */
+  onSuccess = this.createHookRegFn('onSuccess');
+  /** @inheritdoc */
+  onError   = this.createHookRegFn('onError');
+
+  /** @hidden */
+  getHooks(hookName: string): IEventHook[] {
+    return this._transitionEvents[hookName];
   }
 }

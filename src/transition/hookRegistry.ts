@@ -30,7 +30,7 @@ export function matchState(state: State, criterion: HookMatchCriterion) {
   function matchGlobs(_state: State) {
     let globStrings = <string[]> toMatch;
     for (let i = 0; i < globStrings.length; i++) {
-      let glob = Glob.fromString(globStrings[i]);
+      let glob = new Glob(globStrings[i]);
 
       if ((glob && glob.matches(_state.name)) || (!glob && globStrings[i] === _state.name)) {
         return true;
@@ -75,9 +75,9 @@ export class EventHook implements IEventHook {
     let mc = this.matchCriteria, _matchingNodes = EventHook._matchingNodes;
 
     let matches: IMatchingNodes = {
-      to: _matchingNodes([tail(treeChanges.to)], mc.to),
-      from: _matchingNodes([tail(treeChanges.from)], mc.from),
-      exiting: _matchingNodes(treeChanges.exiting, mc.exiting),
+      to:       _matchingNodes([tail(treeChanges.to)], mc.to),
+      from:     _matchingNodes([tail(treeChanges.from)], mc.from),
+      exiting:  _matchingNodes(treeChanges.exiting, mc.exiting),
       retained: _matchingNodes(treeChanges.retained, mc.retained),
       entering: _matchingNodes(treeChanges.entering, mc.entering),
     };
@@ -92,10 +92,13 @@ export class EventHook implements IEventHook {
 }
 
 /** @hidden */
-interface ITransitionEvents { [key: string]: IEventHook[]; }
+export interface IEventHooks {
+  [key: string]: IEventHook[];
+}
 
 /** @hidden Return a registration function of the requested type. */
-function makeHookRegistrationFn(hooks: ITransitionEvents, name: string): IHookRegistration {
+export function makeHookRegistrationFn(hooks: IEventHooks, name:string): IHookRegistration {
+  hooks[name] = [];
   return function (matchObject, callback, options = {}) {
     let eventHook = new EventHook(matchObject, callback, options);
     hooks[name].push(eventHook);
@@ -105,48 +108,4 @@ function makeHookRegistrationFn(hooks: ITransitionEvents, name: string): IHookRe
       removeFrom(hooks[name])(eventHook);
     };
   };
-}
-
-/**
- * Mixin class acts as a Transition Hook registry.
- *
- * Holds the registered [[HookFn]] objects.
- * Exposes functions to register new hooks.
- *
- * This is a Mixin class which can be applied to other objects.
- *
- * The hook registration functions are [[onBefore]], [[onStart]], [[onEnter]], [[onRetain]], [[onExit]], [[onFinish]], [[onSuccess]], [[onError]].
- *
- * This class is mixed into both the [[TransitionService]] and every [[Transition]] object.
- * Global hooks are added to the [[TransitionService]].
- * Since each [[Transition]] is itself a `HookRegistry`, hooks can also be added to individual Transitions
- * (note: the hook criteria still must match the Transition).
- */
-export class HookRegistry implements IHookRegistry {
-  static mixin(source: HookRegistry, target: IHookRegistry) {
-    Object.keys(source._transitionEvents).concat(["getHooks"]).forEach(key => target[key] = source[key]);
-  }
-
-  private _transitionEvents: ITransitionEvents = {
-    onBefore: [], onStart: [], onEnter: [], onRetain: [], onExit: [], onFinish: [], onSuccess: [], onError: []
-  };
-
-  getHooks = (name: string) => this._transitionEvents[name];
-
-  /** @inheritdoc */
-  onBefore  = makeHookRegistrationFn(this._transitionEvents, "onBefore");
-  /** @inheritdoc */
-  onStart   = makeHookRegistrationFn(this._transitionEvents, "onStart");
-  /** @inheritdoc */
-  onEnter   = makeHookRegistrationFn(this._transitionEvents, "onEnter");
-  /** @inheritdoc */
-  onRetain  = makeHookRegistrationFn(this._transitionEvents, "onRetain");
-  /** @inheritdoc */
-  onExit    = makeHookRegistrationFn(this._transitionEvents, "onExit");
-  /** @inheritdoc */
-  onFinish  = makeHookRegistrationFn(this._transitionEvents, "onFinish");
-  /** @inheritdoc */
-  onSuccess = makeHookRegistrationFn(this._transitionEvents, "onSuccess");
-  /** @inheritdoc */
-  onError   = makeHookRegistrationFn(this._transitionEvents, "onError");
 }
