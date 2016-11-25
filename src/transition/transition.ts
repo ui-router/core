@@ -3,17 +3,14 @@ import {stringify} from "../common/strings";
 import {trace} from "../common/trace";
 import {services} from "../common/coreservices";
 import {
-    map, find, extend, mergeR,  tail,
+    map, find, extend, mergeR, tail,
     omit, toJson, arrayTuples, unnestR, identity, anyTrueR
 } from "../common/common";
 import { isObject, isArray } from "../common/predicates";
 import { prop, propEq, val, not } from "../common/hof";
 
 import {StateDeclaration, StateOrName} from "../state/interface";
-import {
-    TransitionOptions, TransitionHookOptions, TreeChanges, IHookRegistry,
-    IHookGetter, HookMatchCriteria, HookRegOptions, IEventHook
-} from "./interface";
+import { TransitionOptions, TreeChanges, IHookRegistry, IEventHook, TransitionHookPhase } from "./interface";
 
 import { TransitionStateHookFn, TransitionHookFn } from "./interface"; // has or is using
 
@@ -86,7 +83,7 @@ export class Transition implements IHookRegistry {
   private _error: any;
 
   /** @hidden Holds the hook registration functions such as those passed to Transition.onStart() */
-  private _transitionEvents: IEventHooks = { };
+  private _transitionHooks: IEventHooks = { };
 
   /** @hidden */
   private _options: TransitionOptions;
@@ -95,31 +92,37 @@ export class Transition implements IHookRegistry {
   /** @hidden */
   private _targetState: TargetState;
 
-  /** @hidden Creates a hook registration function (which can then be used to register hooks) */
-  private createHookRegFn (hookName: string) {
-    return makeHookRegistrationFn(this._transitionEvents, hookName);
-  }
 
   /** @hidden */
-  onBefore  = this.createHookRegFn('onBefore');
+  onBefore;
   /** @inheritdoc */
-  onStart   = this.createHookRegFn('onStart');
+  onStart;
   /** @inheritdoc */
-  onExit    = this.createHookRegFn('onExit');
+  onExit;
   /** @inheritdoc */
-  onRetain  = this.createHookRegFn('onRetain');
+  onRetain;
   /** @inheritdoc */
-  onEnter   = this.createHookRegFn('onEnter');
+  onEnter;
   /** @inheritdoc */
-  onFinish  = this.createHookRegFn('onFinish');
+  onFinish;
   /** @inheritdoc */
-  onSuccess = this.createHookRegFn('onSuccess');
+  onSuccess;
   /** @inheritdoc */
-  onError   = this.createHookRegFn('onError');
+  onError;
+
+  /** @hidden
+   * Creates the transition-level hook registration functions
+   * (which can then be used to register hooks)
+   */
+  private createTransitionHookRegFns() {
+    this.router.transitionService.getTransitionHookTypes()
+        .filter(type => type.hookPhase !== TransitionHookPhase.CREATE)
+        .forEach(type => this[type.name] =  makeHookRegistrationFn(this._transitionHooks, type.name));
+  }
 
   /** @hidden @internalapi */
   getHooks(hookName: string): IEventHook[] {
-    return this._transitionEvents[hookName];
+    return this._transitionHooks[hookName];
   }
 
   /**
@@ -160,6 +163,8 @@ export class Transition implements IHookRegistry {
     let rootNode: PathNode = this._treeChanges.to[0];
     let context = new ResolveContext(this._treeChanges.to);
     context.addResolvables(rootResolvables, rootNode.state);
+
+    this.createTransitionHookRegFns();
   }
 
   /**
@@ -530,10 +535,7 @@ export class Transition implements IHookRegistry {
    * @hidden
    */
   hookBuilder(): HookBuilder {
-    return new HookBuilder(this.router.transitionService, this, <TransitionHookOptions> {
-      transition: this,
-      current: this._options.current
-    });
+    return new HookBuilder(this);
   }
 
   /**
@@ -552,7 +554,8 @@ export class Transition implements IHookRegistry {
     let globals = <Globals> this.router.globals;
     globals.transitionHistory.enqueue(this);
 
-    let syncResult = runSynchronousHooks(hookBuilder.getOnBeforeHooks());
+    let onBeforeHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.BEFORE);
+    let syncResult = runSynchronousHooks(onBeforeHooks);
 
     if (Rejection.isTransitionRejectionPromise(syncResult)) {
       syncResult.catch(() => 0); // issue #2676
@@ -578,7 +581,8 @@ export class Transition implements IHookRegistry {
       trace.traceSuccess(this.$to(), this);
       this.success = true;
       this._deferred.resolve(this.to());
-      runAllHooks(hookBuilder.getOnSuccessHooks());
+      let onSuccessHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.SUCCESS);
+      runAllHooks(onSuccessHooks);
     };
 
     const transitionError = (reason: any) => {
@@ -586,7 +590,8 @@ export class Transition implements IHookRegistry {
       this.success = false;
       this._deferred.reject(reason);
       this._error = reason;
-      runAllHooks(hookBuilder.getOnErrorHooks());
+      let onErrorHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.ERROR);
+      runAllHooks(onErrorHooks);
     };
 
     trace.traceTransitionStart(this);
@@ -596,8 +601,9 @@ export class Transition implements IHookRegistry {
         prev.then(() => nextHook.invokeHook());
 
     // Run the hooks, then resolve or reject the overall deferred in the .then() handler
-    hookBuilder.asyncHooks()
-        .reduce(appendHookToChain, syncResult)
+    let asyncHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.ASYNC)
+
+    asyncHooks.reduce(appendHookToChain, syncResult)
         .then(transitionSuccess, transitionError);
 
     return this.promise;

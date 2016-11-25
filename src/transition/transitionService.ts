@@ -1,5 +1,5 @@
 /** @coreapi @module transition */ /** for typedoc */
-import { IHookRegistry, TransitionOptions } from "./interface";
+import {IHookRegistry, TransitionOptions, TransitionHookScope, TransitionHookPhase} from "./interface";
 
 import {
   HookMatchCriteria, HookRegOptions, TransitionStateHookFn, TransitionHookFn
@@ -19,6 +19,7 @@ import {registerUpdateUrl} from "../hooks/url";
 import {registerRedirectToHook} from "../hooks/redirectTo";
 import {registerOnExitHook, registerOnRetainHook, registerOnEnterHook} from "../hooks/onEnterExitRetain";
 import {registerLazyLoadHook} from "../hooks/lazyLoadStates";
+import {TransitionHookType} from "./transitionHookType";
 
 /**
  * The default [[Transition]] options.
@@ -48,9 +49,31 @@ export let defaultTransOpts: TransitionOptions = {
  * At bootstrap, [[UIRouter]] creates a single instance (singleton) of this class.
  */
 export class TransitionService implements IHookRegistry {
+
+  /** @inheritdoc */
+  onBefore;
+  /** @inheritdoc */
+  onStart;
+  /** @inheritdoc */
+  onExit;
+  /** @inheritdoc */
+  onRetain;
+  /** @inheritdoc */
+  onEnter;
+  /** @inheritdoc */
+  onFinish;
+  /** @inheritdoc */
+  onSuccess;
+  /** @inheritdoc */
+  onError;
+
   /** @hidden */
   public $view: ViewService;
-  private _transitionEvents: IEventHooks = { };
+
+  /** @hidden The transition hook types, such as `onEnter`, `onStart`, etc */
+  private _transitionHookTypes: TransitionHookType[] = [];
+  /** @hidden The registered transition hooks */
+  private _transitionHooks: IEventHooks = { };
 
   /**
    * This object has hook de-registration functions for the built-in hooks.
@@ -74,12 +97,67 @@ export class TransitionService implements IHookRegistry {
   constructor(private _router: UIRouter) {
     this.$view = _router.viewService;
     this._deregisterHookFns = <any> {};
+    this.registerTransitionHookTypes();
     this.registerTransitionHooks();
   }
 
-  /** @hidden Creates a hook registration function (which can then be used to register hooks) */
-  private createHookRegFn (hookName: string) {
-    return makeHookRegistrationFn(this._transitionEvents, hookName);
+  /**
+   * Creates a new [[Transition]] object
+   *
+   * This is a factory function for creating new Transition objects.
+   * It is used internally by the [[StateService]] and should generally not be called by application code.
+   *
+   * @param fromPath the path to the current state (the from state)
+   * @param targetState the target state (destination)
+   * @returns a Transition
+   */
+  create(fromPath: PathNode[], targetState: TargetState): Transition {
+    return new Transition(fromPath, targetState, this._router);
+  }
+
+  /** @hidden */
+  private registerTransitionHookTypes() {
+    const Scope = TransitionHookScope;
+    const Phase = TransitionHookPhase;
+
+    let hookTypes = [
+      new TransitionHookType("onBefore",  Scope.TRANSITION, Phase.BEFORE,  0,  "to",       t => t.treeChanges("to")),
+      new TransitionHookType("onStart",   Scope.TRANSITION, Phase.ASYNC,   0,  "to",       t => t.treeChanges("to")),
+      new TransitionHookType("onExit",    Scope.STATE,      Phase.ASYNC,   10, "exiting",  t => t.treeChanges("from"), true),
+      new TransitionHookType("onRetain",  Scope.STATE,      Phase.ASYNC,   20, "retained", t => t.treeChanges("to")),
+      new TransitionHookType("onEnter",   Scope.STATE,      Phase.ASYNC,   30, "entering", t => t.treeChanges("to")),
+      new TransitionHookType("onFinish",  Scope.TRANSITION, Phase.ASYNC,   40, "to",       t => t.treeChanges("to")),
+      new TransitionHookType("onSuccess", Scope.TRANSITION, Phase.SUCCESS, 0,  "to",       t => t.treeChanges("to")),
+      new TransitionHookType("onError",   Scope.TRANSITION, Phase.ERROR,   0,  "to",       t => t.treeChanges("to")),
+    ];
+
+    hookTypes.forEach(type => this[type.name] = this.registerTransitionHookType(type))
+  }
+
+  /**
+   * Defines a transition hook type and returns a transition hook registration
+   * function (which can then be used to register hooks of this type).
+   * @internalapi
+   */
+  registerTransitionHookType(hookType: TransitionHookType) {
+    this._transitionHookTypes.push(hookType);
+    return makeHookRegistrationFn(this._transitionHooks, hookType.name);
+  }
+
+  getTransitionHookTypes(phase?: TransitionHookPhase): TransitionHookType[] {
+    let transitionHookTypes = phase ?
+        this._transitionHookTypes.filter(type => type.hookPhase === phase) :
+        this._transitionHookTypes.slice();
+
+    return transitionHookTypes.sort((l, r) => {
+      let byphase = l.hookPhase - r.hookPhase;
+      return byphase === 0 ? l.hookOrder - r.hookOrder : byphase;
+    })
+  }
+
+  /** @hidden */
+  getHooks(hookName: string): IEventHook[] {
+    return this._transitionHooks[hookName];
   }
 
   /** @hidden */
@@ -107,41 +185,5 @@ export class TransitionService implements IHookRegistry {
 
     // Lazy load state trees
     fns.lazyLoad      = registerLazyLoadHook(this);
-  }
-
-  /**
-   * Creates a new [[Transition]] object
-   *
-   * This is a factory function for creating new Transition objects.
-   * It is used internally by the [[StateService]] and should generally not be called by application code.
-   *
-   * @param fromPath the path to the current state (the from state)
-   * @param targetState the target state (destination)
-   * @returns a Transition
-   */
-  create(fromPath: PathNode[], targetState: TargetState): Transition {
-    return new Transition(fromPath, targetState, this._router);
-  }
-
-  /** @inheritdoc */
-  onBefore  = this.createHookRegFn('onBefore');
-  /** @inheritdoc */
-  onStart   = this.createHookRegFn('onStart');
-  /** @inheritdoc */
-  onExit    = this.createHookRegFn('onExit');
-  /** @inheritdoc */
-  onRetain  = this.createHookRegFn('onRetain');
-  /** @inheritdoc */
-  onEnter   = this.createHookRegFn('onEnter');
-  /** @inheritdoc */
-  onFinish  = this.createHookRegFn('onFinish');
-  /** @inheritdoc */
-  onSuccess = this.createHookRegFn('onSuccess');
-  /** @inheritdoc */
-  onError   = this.createHookRegFn('onError');
-
-  /** @hidden */
-  getHooks(hookName: string): IEventHook[] {
-    return this._transitionEvents[hookName];
   }
 }

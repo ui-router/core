@@ -745,6 +745,8 @@ export type IStateMatch = Predicate<State>
  * ```
  */
 export interface HookMatchCriteria {
+  [key: string]: HookMatchCriterion;
+
   /** A [[HookMatchCriterion]] to match the destination state */
   to?: HookMatchCriterion;
   /** A [[HookMatchCriterion]] to match the original (from) state */
@@ -759,6 +761,7 @@ export interface HookMatchCriteria {
 
 export interface IMatchingNodes {
   [key: string]: PathNode[];
+
   to: PathNode[];
   from: PathNode[];
   exiting: PathNode[];
@@ -786,3 +789,6 @@ export interface IEventHook {
   matches:  (treeChanges: TreeChanges) => IMatchingNodes;
   _deregistered: boolean;
 }
+
+export enum TransitionHookPhase { CREATE, BEFORE, ASYNC, SUCCESS, ERROR }
+export enum TransitionHookScope { TRANSITION, STATE }

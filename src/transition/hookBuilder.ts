@@ -3,14 +3,17 @@
 import {extend, tail, assertPredicate, unnestR, identity} from "../common/common";
 import {isArray} from "../common/predicates";
 
-import {TransitionOptions, TransitionHookOptions, IHookRegistry, TreeChanges, IEventHook, IMatchingNodes} from "./interface";
+import {
+    TransitionOptions, TransitionHookOptions, IHookRegistry, TreeChanges, IEventHook, IMatchingNodes,
+    TransitionHookPhase, TransitionHookScope
+} from "./interface";
 
 import {Transition} from "./transition";
 import {TransitionHook} from "./transitionHook";
 import {State} from "../state/stateObject";
 import {PathNode} from "../path/node";
 import {TransitionService} from "./transitionService";
-import {ResolveContext} from "../resolve/resolveContext";
+import {TransitionHookType} from "./transitionHookType";
 
 /**
  * This class returns applicable TransitionHooks for a specific Transition instance.
@@ -28,37 +31,32 @@ import {ResolveContext} from "../resolve/resolveContext";
  */
 export class HookBuilder {
 
+  private $transitions: TransitionService;
+  private baseHookOptions: TransitionHookOptions;
+
   treeChanges: TreeChanges;
   transitionOptions: TransitionOptions;
 
   toState: State;
   fromState: State;
 
-  constructor(private $transitions: TransitionService, private transition: Transition, private baseHookOptions: TransitionHookOptions) {
+  constructor(private transition: Transition) {
     this.treeChanges        = transition.treeChanges();
+    this.transitionOptions  = transition.options();
     this.toState            = tail(this.treeChanges.to).state;
     this.fromState          = tail(this.treeChanges.from).state;
-    this.transitionOptions  = transition.options();
+    this.$transitions       = transition.router.transitionService;
+    this.baseHookOptions    = <TransitionHookOptions> {
+      transition: transition,
+      current: transition.options().current
+    };
   }
 
-  getOnBeforeHooks  = () => this._buildNodeHooks("onBefore",  "to",       tupleSort());
-  getOnStartHooks   = () => this._buildNodeHooks("onStart",   "to",       tupleSort());
-  getOnExitHooks    = () => this._buildNodeHooks("onExit",    "exiting",  tupleSort(true),  { stateHook: true });
-  getOnRetainHooks  = () => this._buildNodeHooks("onRetain",  "retained", tupleSort(false), { stateHook: true });
-  getOnEnterHooks   = () => this._buildNodeHooks("onEnter",   "entering", tupleSort(false), { stateHook: true });
-  getOnFinishHooks  = () => this._buildNodeHooks("onFinish",  "to",       tupleSort());
-  getOnSuccessHooks = () => this._buildNodeHooks("onSuccess", "to",       tupleSort(), { rejectIfSuperseded: false });
-  getOnErrorHooks   = () => this._buildNodeHooks("onError",   "to",       tupleSort(), { rejectIfSuperseded: false });
-
-  asyncHooks() {
-    let onStartHooks    = this.getOnStartHooks();
-    let onExitHooks     = this.getOnExitHooks();
-    let onRetainHooks   = this.getOnRetainHooks();
-    let onEnterHooks    = this.getOnEnterHooks();
-    let onFinishHooks   = this.getOnFinishHooks();
-
-    let asyncHooks = [onStartHooks, onExitHooks, onRetainHooks, onEnterHooks, onFinishHooks];
-    return asyncHooks.reduce(unnestR, []).filter(identity);
+  buildHooksForPhase(phase: TransitionHookPhase): TransitionHook[] {
+    return this.$transitions.getTransitionHookTypes(phase)
+        .map(type => this.buildHooks(type))
+        .reduce(unnestR, [])
+        .filter(identity);
   }
 
   /**
@@ -68,36 +66,27 @@ export class HookBuilder {
    * - Finds [[PathNode]] (or `PathNode[]`) to use as the TransitionHook context(s)
    * - For each of the [[PathNode]]s, creates a TransitionHook
    *
-   * @param hookType the name of the hook registration function, e.g., 'onEnter', 'onFinish'.
-   * @param matchingNodesProp selects which [[PathNode]]s from the [[IMatchingNodes]] object to create hooks for.
-   * @param getLocals a function which accepts a [[PathNode]] and returns additional locals to provide to the hook as injectables
-   * @param sortHooksFn a function which compares two HookTuple and returns <1, 0, or >1
-   * @param options any specific Transition Hook Options
+   * @param hookType the type of the hook registration function, e.g., 'onEnter', 'onFinish'.
    */
-  private _buildNodeHooks(hookType: string,
-                          matchingNodesProp: string,
-                          sortHooksFn: (l: HookTuple, r: HookTuple) => number,
-                          options?: TransitionHookOptions): TransitionHook[] {
-
+  buildHooks(hookType: TransitionHookType): TransitionHook[] {
     // Find all the matching registered hooks for a given hook type
-    let matchingHooks = this._matchingHooks(hookType, this.treeChanges);
+    let matchingHooks = this._matchingHooks(hookType.name, this.treeChanges);
     if (!matchingHooks) return [];
 
      const makeTransitionHooks = (hook: IEventHook) => {
        // Fetch the Nodes that caused this hook to match.
        let matches: IMatchingNodes = hook.matches(this.treeChanges);
        // Select the PathNode[] that will be used as TransitionHook context objects
-       let matchingNodes: PathNode[] = matches[matchingNodesProp];
-
-       // When invoking 'exiting' hooks, give them the "from path" for resolve data.
-       // Everything else gets the "to path"
-       let resolvePath = matchingNodesProp === 'exiting' ? this.treeChanges.from : this.treeChanges.to;
-       let resolveContext = new ResolveContext(resolvePath);
+       let matchingNodes: PathNode[] = matches[hookType.criteriaMatchPath];
 
        // Return an array of HookTuples
        return matchingNodes.map(node => {
-         let _options = extend({ bind: hook.bind, traceData: { hookType, context: node} }, this.baseHookOptions, options);
-         let state = _options.stateHook ? node.state : null;
+         let _options = extend({
+           bind: hook.bind,
+           traceData: { hookType: hookType.name, context: node}
+         }, this.baseHookOptions);
+
+         let state = hookType.hookScope === TransitionHookScope.STATE ? node.state : null;
          let transitionHook = new TransitionHook(this.transition, state, hook, _options);
          return <HookTuple> { hook, node, transitionHook };
        });
@@ -105,7 +94,7 @@ export class HookBuilder {
 
     return matchingHooks.map(makeTransitionHooks)
         .reduce(unnestR, [])
-        .sort(sortHooksFn)
+        .sort(tupleSort(hookType.reverseSort))
         .map(tuple => tuple.transitionHook);
   }
 
