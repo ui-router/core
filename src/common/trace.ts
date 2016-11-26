@@ -168,7 +168,7 @@ export class Trace {
         digest = this.approximateDigests,
         event = parse("traceData.hookType")(options) || "internal",
         context = parse("traceData.context.state.name")(options) || parse("traceData.context")(options) || "unknown",
-        name = functionToString((step as any).eventHook.callback);
+        name = functionToString((step as any).registeredHook.callback);
     console.log(`Transition #${tid} Digest #${digest}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
   }
 

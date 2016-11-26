@@ -4,7 +4,7 @@ import {extend, tail, assertPredicate, unnestR, identity} from "../common/common
 import {isArray} from "../common/predicates";
 
 import {
-    TransitionOptions, TransitionHookOptions, IHookRegistry, TreeChanges, IEventHook, IMatchingNodes,
+    TransitionOptions, TransitionHookOptions, IHookRegistry, TreeChanges, IMatchingNodes,
     TransitionHookPhase, TransitionHookScope
 } from "./interface";
 
@@ -14,15 +14,16 @@ import {State} from "../state/stateObject";
 import {PathNode} from "../path/node";
 import {TransitionService} from "./transitionService";
 import {TransitionHookType} from "./transitionHookType";
+import {RegisteredHook} from "./hookRegistry";
 
 /**
  * This class returns applicable TransitionHooks for a specific Transition instance.
  *
- * Hooks (IEventHook) may be registered globally, e.g., $transitions.onEnter(...), or locally, e.g.
- * myTransition.onEnter(...).  The HookBuilder finds matching IEventHooks (where the match criteria is
+ * Hooks ([[RegisteredHook]]) may be registered globally, e.g., $transitions.onEnter(...), or locally, e.g.
+ * myTransition.onEnter(...).  The HookBuilder finds matching RegisteredHooks (where the match criteria is
  * determined by the type of hook)
  *
- * The HookBuilder also converts IEventHooks objects to TransitionHook objects, which are used to run a Transition.
+ * The HookBuilder also converts RegisteredHooks objects to TransitionHook objects, which are used to run a Transition.
  *
  * The HookBuilder constructor is given the $transitions service and a Transition instance.  Thus, a HookBuilder
  * instance may only be used for one specific Transition object. (side note: the _treeChanges accessor is private
@@ -62,7 +63,7 @@ export class HookBuilder {
   /**
    * Returns an array of newly built TransitionHook objects.
    *
-   * - Finds all IEventHooks registered for the given `hookType` which matched the transition's [[TreeChanges]].
+   * - Finds all RegisteredHooks registered for the given `hookType` which matched the transition's [[TreeChanges]].
    * - Finds [[PathNode]] (or `PathNode[]`) to use as the TransitionHook context(s)
    * - For each of the [[PathNode]]s, creates a TransitionHook
    *
@@ -73,7 +74,7 @@ export class HookBuilder {
     let matchingHooks = this.getMatchingHooks(hookType, this.treeChanges);
     if (!matchingHooks) return [];
 
-     const makeTransitionHooks = (hook: IEventHook) => {
+     const makeTransitionHooks = (hook: RegisteredHook) => {
        // Fetch the Nodes that caused this hook to match.
        let matches: IMatchingNodes = hook.matches(this.treeChanges);
        // Select the PathNode[] that will be used as TransitionHook context objects
@@ -87,7 +88,7 @@ export class HookBuilder {
          }, this.baseHookOptions);
 
          let state = hookType.hookScope === TransitionHookScope.STATE ? node.state : null;
-         let transitionHook = new TransitionHook(this.transition, state, hook, hookType, _options);
+         let transitionHook = new TransitionHook(this.transition, state, hook, _options);
          return <HookTuple> { hook, node, transitionHook };
        });
     };
@@ -99,7 +100,7 @@ export class HookBuilder {
   }
 
   /**
-   * Finds all IEventHooks from:
+   * Finds all RegisteredHooks from:
    * - The Transition object instance hook registry
    * - The TransitionService ($transitions) global hook registry
    *
@@ -107,9 +108,9 @@ export class HookBuilder {
    * - the eventType
    * - the matchCriteria (to, from, exiting, retained, entering)
    *
-   * @returns an array of matched [[IEventHook]]s
+   * @returns an array of matched [[RegisteredHook]]s
    */
-  public getMatchingHooks(hookType: TransitionHookType, treeChanges: TreeChanges): IEventHook[] {
+  public getMatchingHooks(hookType: TransitionHookType, treeChanges: TreeChanges): RegisteredHook[] {
     let isCreate = hookType.hookPhase === TransitionHookPhase.CREATE;
 
     // Instance and Global hook registries
@@ -117,12 +118,12 @@ export class HookBuilder {
 
     return registries.map((reg: IHookRegistry) => reg.getHooks(hookType.name))    // Get named hooks from registries
         .filter(assertPredicate(isArray, `broken event named: ${hookType.name}`)) // Sanity check
-        .reduce(unnestR, [])                                                      // Un-nest IEventHook[][] to IEventHook[] array
+        .reduce(unnestR, [])                                                      // Un-nest RegisteredHook[][] to RegisteredHook[] array
         .filter(hook => hook.matches(treeChanges));                               // Only those satisfying matchCriteria
   }
 }
 
-interface HookTuple { hook: IEventHook, node: PathNode, transitionHook: TransitionHook }
+interface HookTuple { hook: RegisteredHook, node: PathNode, transitionHook: TransitionHook }
 
 /**
  * A factory for a sort function for HookTuples.

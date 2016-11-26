@@ -6,6 +6,7 @@ import {Transition} from "./transition";
 import {State} from "../state/stateObject";
 import {PathNode} from "../path/node";
 import {TargetState} from "../state/targetState";
+import {RegisteredHook} from "./hookRegistry";
 
 /**
  * The TransitionOptions object can be used to change the behavior of a transition.
@@ -86,8 +87,6 @@ export interface TransitionOptions {
 
 /** @internalapi */
 export interface TransitionHookOptions {
-  async               ?: boolean;
-  rejectIfSuperseded  ?: boolean;
   current             ?: () => Transition;  //path?
   transition          ?: Transition;
   hookType            ?: string;
@@ -694,7 +693,7 @@ export interface IHookRegistry {
    * $transitions.getHooks("onEnter")
    * ```
    */
-  getHooks(hookName: string): IEventHook[];
+  getHooks(hookName: string): RegisteredHook[];
 }
 
 /** A predicate type which takes a [[State]] and returns a boolean */
@@ -790,15 +789,6 @@ export interface IMatchingNodes {
  * Or, `true` to always match
  */
 export type HookMatchCriterion = (string|IStateMatch|boolean)
-
-/** @hidden */
-export interface IEventHook {
-  callback: HookFn;
-  priority?: number;
-  bind?: any;
-  matches:  (treeChanges: TreeChanges) => IMatchingNodes;
-  _deregistered: boolean;
-}
 
 export enum TransitionHookPhase { CREATE, BEFORE, ASYNC, SUCCESS, ERROR }
 export enum TransitionHookScope { TRANSITION, STATE }

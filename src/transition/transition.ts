@@ -11,14 +11,14 @@ import { prop, propEq, val, not } from "../common/hof";
 
 import {StateDeclaration, StateOrName} from "../state/interface";
 import {
-    TransitionOptions, TreeChanges, IHookRegistry, IEventHook, TransitionHookPhase,
+    TransitionOptions, TreeChanges, IHookRegistry, TransitionHookPhase,
     TransitionCreateHookFn
 } from "./interface";
 
 import { TransitionStateHookFn, TransitionHookFn } from "./interface"; // has or is using
 
 import {TransitionHook} from "./transitionHook";
-import {matchState, IEventHooks, makeHookRegistrationFn} from "./hookRegistry";
+import {matchState, RegisteredHooks, makeHookRegistrationFn, RegisteredHook} from "./hookRegistry";
 import {HookBuilder} from "./hookBuilder";
 import {PathNode} from "../path/node";
 import {PathFactory} from "../path/pathFactory";
@@ -86,7 +86,7 @@ export class Transition implements IHookRegistry {
   private _error: any;
 
   /** @hidden Holds the hook registration functions such as those passed to Transition.onStart() */
-  private _transitionHooks: IEventHooks = { };
+  private _transitionHooks: RegisteredHooks = { };
 
   /** @hidden */
   private _options: TransitionOptions;
@@ -120,11 +120,11 @@ export class Transition implements IHookRegistry {
   private createTransitionHookRegFns() {
     this.router.transitionService.getTransitionHookTypes()
         .filter(type => type.hookPhase !== TransitionHookPhase.CREATE)
-        .forEach(type => this[type.name] =  makeHookRegistrationFn(this._transitionHooks, type.name));
+        .forEach(type => this[type.name] =  makeHookRegistrationFn(this._transitionHooks, type));
   }
 
   /** @hidden @internalapi */
-  getHooks(hookName: string): IEventHook[] {
+  getHooks(hookName: string): RegisteredHook[] {
     return this._transitionHooks[hookName];
   }
 

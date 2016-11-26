@@ -12,37 +12,19 @@ import {GetErrorHandler, GetResultHandler, TransitionHook} from "./transitionHoo
  */
 export class TransitionHookType {
 
-  public name: string;
-  public hookPhase: TransitionHookPhase;
-  public hookScope: TransitionHookScope;
-  public hookOrder: number;
-  public criteriaMatchPath: string;
   public resolvePath: (trans: Transition) => PathNode[];
-  public reverseSort: boolean;
-  public errorHandler: GetErrorHandler;
-  public resultHandler: GetResultHandler;
-  public rejectIfSuperseded: boolean;
 
-  constructor(name:               string,
-              hookPhase:          TransitionHookPhase,
-              hookScope:          TransitionHookScope,
-              hookOrder:          number,
-              criteriaMatchPath:  string,
+  constructor(public name:               string,
+              public hookPhase:          TransitionHookPhase,
+              public hookScope:          TransitionHookScope,
+              public hookOrder:          number,
+              public criteriaMatchPath:  string,
               resolvePath:        ((trans: Transition) => PathNode[]) | string,
-              reverseSort:        boolean = false,
-              resultHandler:      GetResultHandler = TransitionHook.HANDLE_RESULT,
-              errorHandler:       GetErrorHandler = TransitionHook.REJECT_ERROR,
-              rejectIfSuperseded: boolean = true,
+              public reverseSort:        boolean = false,
+              public getResultHandler:      GetResultHandler = TransitionHook.HANDLE_RESULT,
+              public getErrorHandler:       GetErrorHandler = TransitionHook.REJECT_ERROR,
+              public rejectIfSuperseded: boolean = true,
   ) {
-    this.name = name;
-    this.hookScope = hookScope;
-    this.hookPhase = hookPhase;
-    this.hookOrder = hookOrder;
-    this.criteriaMatchPath = criteriaMatchPath;
     this.resolvePath = isString(resolvePath) ? (trans: Transition) => trans.treeChanges(resolvePath) : resolvePath;
-    this.reverseSort = reverseSort;
-    this.resultHandler = resultHandler;
-    this.errorHandler = errorHandler;
-    this.rejectIfSuperseded = rejectIfSuperseded;
   }
 }

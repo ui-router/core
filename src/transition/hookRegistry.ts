@@ -5,11 +5,12 @@ import {PathNode} from "../path/node";
 import {TransitionStateHookFn, TransitionHookFn} from "./interface"; // has or is using
 
 import {
-    HookRegOptions, HookMatchCriteria, IEventHook, IHookRegistry, IHookRegistration, TreeChanges,
+    HookRegOptions, HookMatchCriteria, IHookRegistration, TreeChanges,
     HookMatchCriterion, IMatchingNodes, HookFn
 } from "./interface";
 import {Glob} from "../common/glob";
 import {State} from "../state/stateObject";
+import {TransitionHookType} from "./transitionHookType";
 
 /**
  * Determines if the given state matches the matchCriteria
@@ -43,15 +44,23 @@ export function matchState(state: State, criterion: HookMatchCriterion) {
   return !!matchFn(state);
 }
 
-/** @hidden */
-export class EventHook implements IEventHook {
+/**
+ * @hidden
+ * The registration data for a registered transition hook
+ */
+export class RegisteredHook implements RegisteredHook {
+  hookType: TransitionHookType;
   callback: HookFn;
   matchCriteria: HookMatchCriteria;
   priority: number;
   bind: any;
   _deregistered: boolean;
 
-  constructor(matchCriteria: HookMatchCriteria, callback: HookFn, options: HookRegOptions = <any>{}) {
+  constructor(hookType: TransitionHookType,
+              matchCriteria: HookMatchCriteria,
+              callback: HookFn,
+              options: HookRegOptions = <any>{}) {
+    this.hookType = hookType;
     this.callback = callback;
     this.matchCriteria = extend({ to: true, from: true, exiting: true, retained: true, entering: true }, matchCriteria);
     this.priority = options.priority || 0;
@@ -72,7 +81,7 @@ export class EventHook implements IEventHook {
    * are the matching [[PathNode]]s for each [[HookMatchCriterion]] (to, from, exiting, retained, entering)
    */
   matches(treeChanges: TreeChanges): IMatchingNodes {
-    let mc = this.matchCriteria, _matchingNodes = EventHook._matchingNodes;
+    let mc = this.matchCriteria, _matchingNodes = RegisteredHook._matchingNodes;
 
     let matches: IMatchingNodes = {
       to:       _matchingNodes([tail(treeChanges.to)], mc.to),
@@ -92,20 +101,22 @@ export class EventHook implements IEventHook {
 }
 
 /** @hidden */
-export interface IEventHooks {
-  [key: string]: IEventHook[];
+export interface RegisteredHooks {
+  [key: string]: RegisteredHook[];
 }
 
 /** @hidden Return a registration function of the requested type. */
-export function makeHookRegistrationFn(hooks: IEventHooks, name:string): IHookRegistration {
-  hooks[name] = [];
+export function makeHookRegistrationFn(registeredHooks: RegisteredHooks, type: TransitionHookType): IHookRegistration {
+  let name = type.name;
+  registeredHooks[name] = [];
+
   return function (matchObject, callback, options = {}) {
-    let eventHook = new EventHook(matchObject, callback, options);
-    hooks[name].push(eventHook);
+    let registeredHook = new RegisteredHook(type, matchObject, callback, options);
+    registeredHooks[name].push(registeredHook);
 
     return function deregisterEventHook() {
-      eventHook._deregistered = true;
-      removeFrom(hooks[name])(eventHook);
+      registeredHook._deregistered = true;
+      removeFrom(registeredHooks[name])(registeredHook);
     };
   };
 }

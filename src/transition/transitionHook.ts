@@ -1,5 +1,5 @@
 /** @coreapi @module transition */ /** for typedoc */
-import {TransitionHookOptions, IEventHook, HookResult} from "./interface";
+import {TransitionHookOptions, HookResult} from "./interface";
 import {defaults, noop, identity} from "../common/common";
 import {fnToString, maxLength} from "../common/strings";
 import {isPromise} from "../common/predicates";
@@ -11,12 +11,11 @@ import {Rejection} from "./rejectFactory";
 import {TargetState} from "../state/targetState";
 import {Transition} from "./transition";
 import {State} from "../state/stateObject";
+import {TransitionHookType} from "./transitionHookType";
 import {StateService} from "../state/stateService"; // has or is using
-import {TransitionHookType} from "./transitionHookType"; // has or is using
+import {RegisteredHook} from "./hookRegistry"; // has or is using
 
 let defaultOptions: TransitionHookOptions = {
-  async: true,
-  rejectIfSuperseded: true,
   current: noop,
   transition: null,
   traceData: {},
@@ -33,8 +32,7 @@ export type ErrorHandler  = (error)              => Promise<any>;
 export class TransitionHook {
   constructor(private transition: Transition,
               private stateContext: State,
-              private eventHook: IEventHook,
-              private hookType: TransitionHookType,
+              private registeredHook: RegisteredHook,
               private options: TransitionHookOptions) {
     this.options = defaults(options, defaultOptions);
   }
@@ -59,43 +57,40 @@ export class TransitionHook {
   static THROW_ERROR: GetErrorHandler = (hook: TransitionHook) =>
       undefined;
 
-  private rejectForSuperseded = () =>
-      this.hookType.rejectIfSuperseded && this.options.current() !== this.options.transition;
+  private rejectIfSuperseded = () =>
+      this.registeredHook.hookType.rejectIfSuperseded && this.options.current() !== this.options.transition;
 
   invokeHook(): Promise<HookResult> {
-    if (this.eventHook._deregistered) return;
+    let hook = this.registeredHook;
+    if (hook._deregistered) return;
 
     let options = this.options;
     trace.traceHookInvocation(this, options);
 
-    if (this.rejectForSuperseded()) {
+    if (this.rejectIfSuperseded()) {
       return Rejection.superseded(options.current()).toPromise();
     }
 
-    let errorHandler  = this.hookType.errorHandler(this);
-    let resultHandler = this.hookType.resultHandler(this);
-
-    return this._invokeCallback(resultHandler, errorHandler);
-  }
-  
-  private _invokeCallback(resultHandler: ResultHandler, errorHandler: ErrorHandler): Promise<HookResult> {
-    let cb = this.eventHook.callback;
+    let cb = hook.callback;
     let bind = this.options.bind;
     let trans = this.transition;
     let state = this.stateContext;
+
+    let errorHandler  = hook.hookType.getErrorHandler(this);
+    let resultHandler = hook.hookType.getResultHandler(this);
     resultHandler = resultHandler || identity;
 
     if (!errorHandler) {
       return resultHandler(cb.call(bind, trans, state));
-    } 
-    
+    }
+
     try {
       return resultHandler(cb.call(bind, trans, state));
     } catch (error) {
       return errorHandler(error);
     }
   }
-
+  
   /**
    * This method handles the return value of a Transition Hook.
    *
@@ -108,7 +103,7 @@ export class TransitionHook {
   handleHookResult(result: HookResult): Promise<HookResult> {
     // This transition is no longer current.
     // Another transition started while this hook was still running.
-    if (this.rejectForSuperseded()) {
+    if (this.rejectIfSuperseded()) {
       // Abort this transition
       return Rejection.superseded(this.options.current()).toPromise();
     }
@@ -136,10 +131,10 @@ export class TransitionHook {
   }
 
   toString() {
-    let { options, eventHook } = this;
+    let { options, registeredHook } = this;
     let event = parse("traceData.hookType")(options) || "internal",
         context = parse("traceData.context.state.name")(options) || parse("traceData.context")(options) || "unknown",
-        name = fnToString(eventHook.callback);
+        name = fnToString(registeredHook.callback);
     return `${event} context: ${context}, ${maxLength(200, name)}`;
   }
 

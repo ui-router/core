@@ -9,10 +9,9 @@ import {
 } from "./interface"; // has or is using
 
 import {Transition} from "./transition";
-import {IEventHooks, makeHookRegistrationFn} from "./hookRegistry";
+import {RegisteredHooks, makeHookRegistrationFn, RegisteredHook} from "./hookRegistry";
 import {TargetState} from "../state/targetState";
 import {PathNode} from "../path/node";
-import {IEventHook} from "./interface";
 import {ViewService} from "../view/view";
 import {UIRouter} from "../router";
 
@@ -101,7 +100,7 @@ export class TransitionService implements IHookRegistry {
   /** @hidden The transition hook types, such as `onEnter`, `onStart`, etc */
   private _transitionHookTypes: TransitionHookType[] = [];
   /** @hidden The registered transition hooks */
-  private _transitionHooks: IEventHooks = { };
+  private _transitionHooks: RegisteredHooks = { };
 
   /**
    * This object has hook de-registration functions for the built-in hooks.
@@ -179,7 +178,7 @@ export class TransitionService implements IHookRegistry {
    */
   registerTransitionHookType(hookType: TransitionHookType) {
     this._transitionHookTypes.push(hookType);
-    return makeHookRegistrationFn(this._transitionHooks, hookType.name);
+    return makeHookRegistrationFn(this._transitionHooks, hookType);
   }
 
   getTransitionHookTypes(phase?: TransitionHookPhase): TransitionHookType[] {
@@ -194,7 +193,7 @@ export class TransitionService implements IHookRegistry {
   }
 
   /** @hidden */
-  getHooks(hookName: string): IEventHook[] {
+  getHooks(hookName: string): RegisteredHook[] {
     return this._transitionHooks[hookName];
   }
 
