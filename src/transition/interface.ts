@@ -158,9 +158,6 @@ export interface TreeChanges {
   entering: PathNode[];
 }
 
-export type IErrorHandler = (error: Error) => void;
-
-export type IHookGetter = (hookName: string) => IEventHook[];
 export type IHookRegistration = (matchCriteria: HookMatchCriteria, callback: HookFn, options?: HookRegOptions) => Function;
 
 /**
@@ -214,7 +211,20 @@ export interface TransitionStateHookFn {
   (transition: Transition, state: State) : HookResult
 }
 
-export type HookFn = (TransitionHookFn|TransitionStateHookFn);
+/**
+ * The signature for Transition onCreate Hooks.
+ *
+ * Transition onCreate Hooks are callbacks that allow customization or preprocessing of
+ * a Transition before it is returned from [[TransitionService.create]]
+ *
+ * @param transition the [[Transition]] that was just created
+ * @return a [[Transition]] which will then be returned from [[TransitionService.create]]
+ */
+export interface TransitionCreateHookFn {
+  (transition: Transition): void
+}
+
+export type HookFn = (TransitionHookFn|TransitionStateHookFn|TransitionCreateHookFn);
 
 /**
  * The return value of a [[TransitionHookFn]] or [[TransitionStateHookFn]]

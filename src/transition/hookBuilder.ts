@@ -70,7 +70,7 @@ export class HookBuilder {
    */
   buildHooks(hookType: TransitionHookType): TransitionHook[] {
     // Find all the matching registered hooks for a given hook type
-    let matchingHooks = this._matchingHooks(hookType.name, this.treeChanges);
+    let matchingHooks = this.getMatchingHooks(hookType, this.treeChanges);
     if (!matchingHooks) return [];
 
      const makeTransitionHooks = (hook: IEventHook) => {
@@ -87,7 +87,7 @@ export class HookBuilder {
          }, this.baseHookOptions);
 
          let state = hookType.hookScope === TransitionHookScope.STATE ? node.state : null;
-         let transitionHook = new TransitionHook(this.transition, state, hook, _options);
+         let transitionHook = new TransitionHook(this.transition, state, hook, hookType, _options);
          return <HookTuple> { hook, node, transitionHook };
        });
     };
@@ -109,12 +109,16 @@ export class HookBuilder {
    *
    * @returns an array of matched [[IEventHook]]s
    */
-  private _matchingHooks(hookName: string, treeChanges: TreeChanges): IEventHook[] {
-    return [ this.transition, this.$transitions ]                             // Instance and Global hook registries
-        .map((reg: IHookRegistry) => reg.getHooks(hookName))                  // Get named hooks from registries
-        .filter(assertPredicate(isArray, `broken event named: ${hookName}`))  // Sanity check
-        .reduce(unnestR, [])                                                  // Un-nest IEventHook[][] to IEventHook[] array
-        .filter(hook => hook.matches(treeChanges));                           // Only those satisfying matchCriteria
+  public getMatchingHooks(hookType: TransitionHookType, treeChanges: TreeChanges): IEventHook[] {
+    let isCreate = hookType.hookPhase === TransitionHookPhase.CREATE;
+
+    // Instance and Global hook registries
+    let registries = isCreate ? [ this.$transitions ] : [ this.transition, this.$transitions ];
+
+    return registries.map((reg: IHookRegistry) => reg.getHooks(hookType.name))    // Get named hooks from registries
+        .filter(assertPredicate(isArray, `broken event named: ${hookType.name}`)) // Sanity check
+        .reduce(unnestR, [])                                                      // Un-nest IEventHook[][] to IEventHook[] array
+        .filter(hook => hook.matches(treeChanges));                               // Only those satisfying matchCriteria
   }
 }
 

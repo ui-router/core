@@ -34,7 +34,7 @@ module.exports = function (karma) {
     ],
 
     webpack: {
-      devtool: 'source-map',
+      devtool: 'inline-source-map',
 
       resolve: {
         modulesDirectories: ['node_modules'],

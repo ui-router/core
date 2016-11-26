@@ -10,7 +10,10 @@ import { isObject, isArray } from "../common/predicates";
 import { prop, propEq, val, not } from "../common/hof";
 
 import {StateDeclaration, StateOrName} from "../state/interface";
-import { TransitionOptions, TreeChanges, IHookRegistry, IEventHook, TransitionHookPhase } from "./interface";
+import {
+    TransitionOptions, TreeChanges, IHookRegistry, IEventHook, TransitionHookPhase,
+    TransitionCreateHookFn
+} from "./interface";
 
 import { TransitionStateHookFn, TransitionHookFn } from "./interface"; // has or is using
 
@@ -150,9 +153,21 @@ export class Transition implements IHookRegistry {
     this.$id = transitionCount++;
     let toPath = PathFactory.buildToPath(fromPath, targetState);
     this._treeChanges = PathFactory.treeChanges(fromPath, toPath, this._options.reloadState);
+    this.createTransitionHookRegFns();
+
+    let onCreateHooks = this.hookBuilder().buildHooksForPhase(TransitionHookPhase.CREATE);
+    TransitionHook.runAllHooks(onCreateHooks);
+
+    this.applyViewConfigs(router);
+    this.applyRootResolvables(router);
+  }
+
+  private applyViewConfigs(router: UIRouter) {
     let enteringStates = this._treeChanges.entering.map(node => node.state);
     PathFactory.applyViewConfigs(router.transitionService.$view, this._treeChanges.to, enteringStates);
+  }
 
+  private applyRootResolvables(router: UIRouter) {
     let rootResolvables: Resolvable[] = [
       new Resolvable(UIRouter, () => router, [], undefined, router),
       new Resolvable(Transition, () => this, [], undefined, this),
@@ -163,8 +178,6 @@ export class Transition implements IHookRegistry {
     let rootNode: PathNode = this._treeChanges.to[0];
     let context = new ResolveContext(this._treeChanges.to);
     context.addResolvables(rootResolvables, rootNode.state);
-
-    this.createTransitionHookRegFns();
   }
 
   /**
@@ -548,14 +561,13 @@ export class Transition implements IHookRegistry {
    * @returns a promise for a successful transition.
    */
   run(): Promise<any> {
-    let runSynchronousHooks = TransitionHook.runSynchronousHooks;
     let runAllHooks = TransitionHook.runAllHooks;
     let hookBuilder = this.hookBuilder();
     let globals = <Globals> this.router.globals;
     globals.transitionHistory.enqueue(this);
 
     let onBeforeHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.BEFORE);
-    let syncResult = runSynchronousHooks(onBeforeHooks);
+    let syncResult = TransitionHook.runOnBeforeHooks(onBeforeHooks);
 
     if (Rejection.isTransitionRejectionPromise(syncResult)) {
       syncResult.catch(() => 0); // issue #2676
@@ -601,7 +613,7 @@ export class Transition implements IHookRegistry {
         prev.then(() => nextHook.invokeHook());
 
     // Run the hooks, then resolve or reject the overall deferred in the .then() handler
-    let asyncHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.ASYNC)
+    let asyncHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.ASYNC);
 
     asyncHooks.reduce(appendHookToChain, syncResult)
         .then(transitionSuccess, transitionError);

@@ -1,9 +1,9 @@
 /** @coreapi @module transition */ /** for typedoc */
 import {TransitionHookOptions, IEventHook, HookResult} from "./interface";
-import {defaults, noop} from "../common/common";
+import {defaults, noop, identity} from "../common/common";
 import {fnToString, maxLength} from "../common/strings";
 import {isPromise} from "../common/predicates";
-import {val, is, parse } from "../common/hof";
+import {val, is, parse} from "../common/hof";
 import {trace} from "../common/trace";
 import {services} from "../common/coreservices";
 
@@ -11,6 +11,8 @@ import {Rejection} from "./rejectFactory";
 import {TargetState} from "../state/targetState";
 import {Transition} from "./transition";
 import {State} from "../state/stateObject";
+import {StateService} from "../state/stateService"; // has or is using
+import {TransitionHookType} from "./transitionHookType"; // has or is using
 
 let defaultOptions: TransitionHookOptions = {
   async: true,
@@ -21,30 +23,77 @@ let defaultOptions: TransitionHookOptions = {
   bind: null
 };
 
+export type GetResultHandler = (hook: TransitionHook) => ResultHandler;
+export type GetErrorHandler  = (hook: TransitionHook) => ErrorHandler;
+
+export type ResultHandler = (result: HookResult) => Promise<HookResult>;
+export type ErrorHandler  = (error)              => Promise<any>;
+
 /** @hidden */
 export class TransitionHook {
   constructor(private transition: Transition,
               private stateContext: State,
               private eventHook: IEventHook,
+              private hookType: TransitionHookType,
               private options: TransitionHookOptions) {
     this.options = defaults(options, defaultOptions);
   }
 
-  private isSuperseded = () =>
-    this.options.current() !== this.options.transition;
+  stateService = () => this.transition.router.stateService;
+
+  static HANDLE_RESULT: GetResultHandler = (hook: TransitionHook) =>
+      (result: HookResult) =>
+          hook.handleHookResult(result);
+
+  static IGNORE_RESULT: GetResultHandler = (hook: TransitionHook) =>
+      (result: HookResult) => undefined;
+
+  static LOG_ERROR: GetErrorHandler = (hook: TransitionHook) =>
+      (error) =>
+          (hook.stateService().defaultErrorHandler()(error), undefined);
+
+  static REJECT_ERROR: GetErrorHandler = (hook: TransitionHook) =>
+      (error) =>
+          Rejection.errored(error).toPromise();
+
+  static THROW_ERROR: GetErrorHandler = (hook: TransitionHook) =>
+      undefined;
+
+  private rejectForSuperseded = () =>
+      this.hookType.rejectIfSuperseded && this.options.current() !== this.options.transition;
 
   invokeHook(): Promise<HookResult> {
-    let { options, eventHook } = this;
+    if (this.eventHook._deregistered) return;
+
+    let options = this.options;
     trace.traceHookInvocation(this, options);
-    if (options.rejectIfSuperseded && this.isSuperseded()) {
+
+    if (this.rejectForSuperseded()) {
       return Rejection.superseded(options.current()).toPromise();
     }
 
-    let synchronousHookResult = !eventHook._deregistered
-      ? eventHook.callback.call(options.bind, this.transition, this.stateContext)
-      : undefined;
+    let errorHandler  = this.hookType.errorHandler(this);
+    let resultHandler = this.hookType.resultHandler(this);
 
-    return this.handleHookResult(synchronousHookResult);
+    return this._invokeCallback(resultHandler, errorHandler);
+  }
+  
+  private _invokeCallback(resultHandler: ResultHandler, errorHandler: ErrorHandler): Promise<HookResult> {
+    let cb = this.eventHook.callback;
+    let bind = this.options.bind;
+    let trans = this.transition;
+    let state = this.stateContext;
+    resultHandler = resultHandler || identity;
+
+    if (!errorHandler) {
+      return resultHandler(cb.call(bind, trans, state));
+    } 
+    
+    try {
+      return resultHandler(cb.call(bind, trans, state));
+    } catch (error) {
+      return errorHandler(error);
+    }
   }
 
   /**
@@ -56,10 +105,10 @@ export class TransitionHook {
    * This also handles "transition superseded" -- when a new transition
    * was started while the hook was still running
    */
-  handleHookResult(result: HookResult): Promise<any> {
+  handleHookResult(result: HookResult): Promise<HookResult> {
     // This transition is no longer current.
     // Another transition started while this hook was still running.
-    if (this.isSuperseded()) {
+    if (this.rejectForSuperseded()) {
       // Abort this transition
       return Rejection.superseded(this.options.current()).toPromise();
     }
@@ -98,14 +147,7 @@ export class TransitionHook {
    * Run all TransitionHooks, ignoring their return value.
    */
   static runAllHooks(hooks: TransitionHook[]): void {
-    hooks.forEach(hook => {
-      try {
-        hook.invokeHook();
-      } catch (exception) {
-        let errorHandler = hook.transition.router.stateService.defaultErrorHandler();
-        errorHandler(exception);
-      }
-    });
+    hooks.forEach(hook => hook.invokeHook());
   }
 
   /**
@@ -114,22 +156,18 @@ export class TransitionHook {
    *
    * Returns a promise chain composed of any promises returned from each hook.invokeStep() call
    */
-  static runSynchronousHooks(hooks: TransitionHook[]): Promise<any> {
+  static runOnBeforeHooks(hooks: TransitionHook[]): Promise<any> {
     let results: Promise<HookResult>[] = [];
 
     for (let hook of hooks) {
-      try {
-        let hookResult = hook.invokeHook();
-        
-        if (Rejection.isTransitionRejectionPromise(hookResult)) {
-          // Break on first thrown error or false/TargetState
-          return hookResult;
-        }
+      let hookResult = hook.invokeHook();
 
-        results.push(hookResult);
-      } catch (exception) {
-        return Rejection.errored(exception).toPromise();
+      if (Rejection.isTransitionRejectionPromise(hookResult)) {
+        // Break on first thrown error or false/TargetState
+        return hookResult;
       }
+
+      results.push(hookResult);
     }
 
     return results

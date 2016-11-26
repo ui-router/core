@@ -85,7 +85,9 @@ describe('transition', function () {
             .then(goFail("", "third"))
             .then(() => {
               expect(result.called()).toEqual({resolve: false, reject: true, complete: true});
-              expect(result.get().reject.message).toEqual("transition failed");
+              expect(result.get().reject instanceof Rejection).toBeTruthy();
+              expect(result.get().reject.message).toEqual("The transition errored");
+              expect(result.get().reject.detail.message).toEqual("transition failed");
             })
             .then(done);
       });
@@ -102,6 +104,8 @@ describe('transition', function () {
             .then(goFail("", "third"))
             .then(() => {
               expect(result.called()).toEqual({ resolve: false, reject: true, complete: true });
+              expect(result.get().reject instanceof Rejection).toBeTruthy();
+              expect(result.get().reject.message).toEqual("The transition errored");
               expect(result.get().reject.detail.message).toEqual("transition failed");
             })
             .then(done);
@@ -143,6 +147,52 @@ describe('transition', function () {
           done();
         }), 20);
       }));
+
+      describe('.onCreate()', function() {
+        beforeEach(() => $state.defaultErrorHandler(() => {}));
+
+        it('should pass the transition', () => {
+          let log = "";
+          $transitions.onCreate({}, t => log += `${t.from().name};${t.to().name};`);
+
+          log += "create;";
+          let trans = makeTransition('first', 'second');
+          log += "created;";
+
+          expect(log).toBe('create;first;second;created;');
+        });
+
+        it('should run in priority order', (() => {
+          let log = "";
+          $transitions.onCreate({}, t => (log += "2;", null), { priority: 2 });
+          $transitions.onCreate({}, t => (log += "3;", null), { priority: 3 });
+          $transitions.onCreate({}, t => (log += "1;", null), { priority: 1 });
+
+          log += "create;";
+          let trans = makeTransition('first', 'second');
+          log += "created;";
+
+          expect(log).toBe('create;3;2;1;created;');
+        }));
+
+        it('should ignore return values', ((done) => {
+          let log = "";
+          $transitions.onCreate({}, t => false);
+          $transitions.onCreate({}, t => new Promise(resolve => resolve(false)));
+
+          let trans = makeTransition('first', 'second');
+          trans.run().then(() => {
+            expect($state.current.name).toBe('second');
+            done();
+          });
+        }));
+
+        it('should fail on error', () => {
+          let log = "";
+          $transitions.onCreate({}, () => { throw "doh" });
+          expect(() => makeTransition('first', 'second')).toThrow();
+        });
+      });
 
       describe('.onBefore()', function() {
         beforeEach(() => $state.defaultErrorHandler(() => {}));
@@ -470,7 +520,7 @@ describe('transition', function () {
 
         Promise.resolve()
             .then(goFail("A", "D"))
-            .then(() => expect(transError).toBe(error))
+            .then(() => expect(transError.detail).toBe(error))
             .then(done);
       }));
 
