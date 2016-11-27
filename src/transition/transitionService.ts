@@ -148,24 +148,19 @@ export class TransitionService implements IHookRegistry {
     const Phase = TransitionHookPhase;
     const TH = TransitionHook;
 
-    const to = (transition: Transition) =>
-        transition.treeChanges('to');
-    const from = (transition: Transition) =>
-        transition.treeChanges('from');
-
     let hookTypes = [
-      new TransitionHookType("onCreate",  Phase.CREATE,  Scope.TRANSITION,  0,  "to",       to,   false, TH.IGNORE_RESULT, TH.THROW_ERROR, false),
+      new TransitionHookType("onCreate",  Phase.CREATE,  Scope.TRANSITION,  0,  "to", false, TH.IGNORE_RESULT, TH.THROW_ERROR, false),
 
-      new TransitionHookType("onBefore",  Phase.BEFORE,  Scope.TRANSITION,  0,  "to",       to,   false, TH.HANDLE_RESULT),
+      new TransitionHookType("onBefore",  Phase.BEFORE,  Scope.TRANSITION,  0,  "to", false, TH.HANDLE_RESULT),
 
-      new TransitionHookType("onStart",   Phase.ASYNC,   Scope.TRANSITION,  0,  "to",       to),
-      new TransitionHookType("onExit",    Phase.ASYNC,   Scope.STATE,       10, "exiting",  from, true),
-      new TransitionHookType("onRetain",  Phase.ASYNC,   Scope.STATE,       20, "retained", to),
-      new TransitionHookType("onEnter",   Phase.ASYNC,   Scope.STATE,       30, "entering", to),
-      new TransitionHookType("onFinish",  Phase.ASYNC,   Scope.TRANSITION,  40, "to",       to),
+      new TransitionHookType("onStart",   Phase.ASYNC,   Scope.TRANSITION,  0,  "to"),
+      new TransitionHookType("onExit",    Phase.ASYNC,   Scope.STATE,       10, "exiting", true),
+      new TransitionHookType("onRetain",  Phase.ASYNC,   Scope.STATE,       20, "retained"),
+      new TransitionHookType("onEnter",   Phase.ASYNC,   Scope.STATE,       30, "entering"),
+      new TransitionHookType("onFinish",  Phase.ASYNC,   Scope.TRANSITION,  40, "to"),
 
-      new TransitionHookType("onSuccess", Phase.SUCCESS, Scope.TRANSITION,  0,  "to",       to,   false, TH.IGNORE_RESULT, TH.LOG_ERROR, false),
-      new TransitionHookType("onError",   Phase.ERROR,   Scope.TRANSITION,  0,  "to",       to,   false, TH.IGNORE_RESULT, TH.LOG_ERROR, false),
+      new TransitionHookType("onSuccess", Phase.SUCCESS, Scope.TRANSITION,  0,  "to", false, TH.IGNORE_RESULT, TH.LOG_ERROR, false),
+      new TransitionHookType("onError",   Phase.ERROR,   Scope.TRANSITION,  0,  "to", false, TH.IGNORE_RESULT, TH.LOG_ERROR, false),
     ];
 
     hookTypes.forEach(type => this[type.name] = this.registerTransitionHookType(type))

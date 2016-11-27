@@ -12,19 +12,14 @@ import {GetErrorHandler, GetResultHandler, TransitionHook} from "./transitionHoo
  */
 export class TransitionHookType {
 
-  public resolvePath: (trans: Transition) => PathNode[];
-
   constructor(public name:               string,
               public hookPhase:          TransitionHookPhase,
               public hookScope:          TransitionHookScope,
               public hookOrder:          number,
               public criteriaMatchPath:  string,
-              resolvePath:        ((trans: Transition) => PathNode[]) | string,
               public reverseSort:        boolean = false,
               public getResultHandler:      GetResultHandler = TransitionHook.HANDLE_RESULT,
               public getErrorHandler:       GetErrorHandler = TransitionHook.REJECT_ERROR,
               public rejectIfSuperseded: boolean = true,
-  ) {
-    this.resolvePath = isString(resolvePath) ? (trans: Transition) => trans.treeChanges(resolvePath) : resolvePath;
-  }
+  ) { }
 }
