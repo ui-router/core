@@ -147,10 +147,14 @@ export class ViewService {
     // Given a depth function, returns a compare function which can return either ascending or descending order
     const depthCompare = curry((depthFn, posNeg, left, right) => posNeg * (depthFn(left) - depthFn(right)));
 
-    const matchingConfigPair = uiView => {
+    const matchingConfigPair = (uiView: ActiveUIView) => {
       let matchingConfigs = this.viewConfigs.filter(matches(uiView));
-      if (matchingConfigs.length > 1)
+      if (matchingConfigs.length > 1) {
+        // This is OK.  Child states can target a ui-view that the parent state also targets (the child wins)
+        // Sort by depth and return the match from the deepest child
+        // console.log(`Multiple matching view configs for ${uiView.fqn}`, matchingConfigs);
         matchingConfigs.sort(depthCompare(viewConfigDepth, -1)); // descending
+      }
       return [uiView, matchingConfigs[0]];
     };
 
