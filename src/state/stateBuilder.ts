@@ -40,8 +40,6 @@ interface Builders {
 
 
 function nameBuilder(state: State) {
-  if (state.lazyLoad)
-    state.name = state.self.name + ".**";
   return state.name;
 }
 
@@ -61,7 +59,9 @@ const getUrlBuilder = ($urlMatcherFactoryProvider: UrlMatcherFactory, root: () =
 function urlBuilder(state: State) {
   let stateDec: StateDeclaration = <any> state;
 
-  if (stateDec && stateDec.url && stateDec.lazyLoad) {
+  // For future states, i.e., states whose name ends with `.**`,
+  // match anything that starts with the url prefix
+  if (stateDec && stateDec.url && stateDec.name && stateDec.name.match(/\.\*\*$/)) {
     stateDec.url += "{remainder:any}"; // match any path (.*)
   }
 

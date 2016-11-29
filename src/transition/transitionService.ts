@@ -20,7 +20,7 @@ import {registerLoadEnteringViews, registerActivateViews} from "../hooks/views";
 import {registerUpdateUrl} from "../hooks/url";
 import {registerRedirectToHook} from "../hooks/redirectTo";
 import {registerOnExitHook, registerOnRetainHook, registerOnEnterHook} from "../hooks/onEnterExitRetain";
-import {registerLazyLoadHook} from "../hooks/lazyLoadStates";
+import {registerLazyLoadHook} from "../hooks/lazyLoad";
 import {TransitionHookType} from "./transitionHookType";
 import {TransitionHook} from "./transitionHook";
 import {isDefined} from "../common/predicates";

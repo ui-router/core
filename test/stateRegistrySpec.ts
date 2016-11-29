@@ -150,6 +150,5 @@ describe("StateRegistry", () => {
       registry.register({name: 'A3'});
       expect(log).toEqual("2: [registered:A3,A3.B]");
     });
-
   });
 });

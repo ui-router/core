@@ -12,7 +12,7 @@ import {defaultTransOpts} from "../transition/transitionService";
 import {Rejection, RejectType} from "../transition/rejectFactory";
 import {Transition} from "../transition/transition";
 
-import {StateOrName, StateDeclaration, TransitionPromise} from "./interface";
+import {StateOrName, StateDeclaration, TransitionPromise, LazyLoadResult} from "./interface";
 import {State} from "./stateObject";
 import {TargetState} from "./targetState";
 
@@ -27,7 +27,8 @@ import {Globals} from "../globals";
 import {UIRouter} from "../router";
 import {UIInjector} from "../interface";
 import {ResolveContext} from "../resolve/resolveContext";
-import {StateParams} from "../params/stateParams"; // has or is using
+import {StateParams} from "../params/stateParams";
+import {lazyLoadState} from "../hooks/lazyLoad"; // has or is using
 
 export type OnInvalidCallback =
     (toState?: TargetState, fromState?: TargetState, injector?: UIInjector) => HookResult;
@@ -282,6 +283,13 @@ export class StateService {
     return new TargetState(identifier, stateDefinition, params, options);
   };
 
+  private getCurrentPath(): PathNode[] {
+    let globals = <Globals> this.router.globals;
+    let latestSuccess: Transition = globals.successfulTransitions.peekTail();
+    const rootPath = () => [ new PathNode(this.router.stateRegistry.root()) ];
+    return latestSuccess ? latestSuccess.treeChanges().to : rootPath();
+  }
+
   /**
    * Low-level method for transitioning to a new state.
    *
@@ -313,9 +321,7 @@ export class StateService {
     options = extend(options, { current: transHistory.peekTail.bind(transHistory)});
 
     let ref: TargetState = this.target(to, toParams, options);
-    let latestSuccess: Transition = globals.successfulTransitions.peekTail();
-    const rootPath = () => [ new PathNode(this.router.stateRegistry.root()) ];
-    let currentPath: PathNode[] = latestSuccess ? latestSuccess.treeChanges().to : rootPath();
+    let currentPath = this.getCurrentPath();
 
     if (!ref.exists())
       return this._handleInvalidTargetState(currentPath, ref);
@@ -571,5 +577,28 @@ export class StateService {
     let reg = this.router.stateRegistry;
     if (arguments.length === 0) return reg.get();
     return reg.get(stateOrName, base || this.$current);
+  }
+
+  /**
+   * Lazy loads a state
+   *
+   * Explicitly runs a state's [[StateDeclaration.lazyLoad]] function.
+   *
+   * @param stateOrName the state that should be lazy loaded
+   * @param transition the optional Transition context to use (if the lazyLoad function requires an injector, etc)
+   * Note: If no transition is provided, a noop transition is created using the from the current state to the current state.
+   * This noop transition is not actually run.
+   *
+   * @returns a promise to lazy load
+   */
+  lazyLoad(stateOrName: StateOrName, transition?: Transition): Promise<LazyLoadResult> {
+    let state: StateDeclaration = this.get(stateOrName);
+    if (!state || !state.lazyLoad) throw new Error("Can not lazy load " + stateOrName);
+
+    let currentPath = this.getCurrentPath();
+    let target = PathFactory.makeTargetState(currentPath);
+    transition = transition || this.router.transitionService.create(currentPath, target);
+
+    return lazyLoadState(transition, state);
   }
 }

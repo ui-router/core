@@ -15,6 +15,7 @@ export class StateQueueManager {
 
   constructor(
       public states: { [key: string]: State; },
+      public $registry: StateRegistry,
       public builder: StateBuilder,
       public $urlRouterProvider: UrlRouterProvider,
       public listeners: StateRegistryListener[]) {
@@ -55,8 +56,17 @@ export class StateQueueManager {
       let orphanIdx: number = orphans.indexOf(state);
 
       if (result) {
-        if (states.hasOwnProperty(state.name))
+        let existingState = this.$registry.get(state.name);
+
+        if (existingState && existingState.name === state.name) {
           throw new Error(`State '${state.name}' is already defined`);
+        }
+
+        if (existingState && existingState.name === state.name + ".**") {
+          // Remove future state of the same name
+          this.$registry.deregister(existingState);
+        }
+
         states[state.name] = state;
         this.attachRoute($state, state);
         if (orphanIdx >= 0) orphans.splice(orphanIdx, 1);

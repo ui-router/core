@@ -34,7 +34,7 @@ export class StateRegistry {
   constructor(urlMatcherFactory: UrlMatcherFactory, private urlRouterProvider: UrlRouterProvider) {
     this.matcher = new StateMatcher(this.states);
     this.builder = new StateBuilder(this.matcher, urlMatcherFactory);
-    this.stateQueue = new StateQueueManager(this.states, this.builder, urlRouterProvider, this.listeners);
+    this.stateQueue = new StateQueueManager(this.states, this, this.builder, urlRouterProvider, this.listeners);
 
     let rootStateDef: StateDeclaration = {
       name: '',
