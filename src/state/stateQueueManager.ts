@@ -1,5 +1,5 @@
 /** @module state */ /** for typedoc */
-import {extend, inherit, pluck, equalForKeys} from "../common/common";
+import {extend, inherit, pluck} from "../common/common";
 import {isString} from "../common/predicates";
 import {StateDeclaration} from "./interface";
 import {State} from "./stateObject";
@@ -8,6 +8,7 @@ import {StateService} from "./stateService";
 import {UrlRouterProvider} from "../url/urlRouter";
 import {RawParams} from "../params/interface";
 import {StateRegistry, StateRegistryListener} from "./stateRegistry";
+import { Param } from "../params/param";
 
 export class StateQueueManager {
   queue: State[];
@@ -105,7 +106,12 @@ export class StateQueueManager {
     if (state.abstract || !state.url) return;
 
     $urlRouterProvider.when(state.url, ['$match', '$stateParams', function ($match: RawParams, $stateParams: RawParams) {
-      if ($state.$current.navigable !== state || !equalForKeys($match, $stateParams)) {
+      function matchedParamsEqual() {
+        let schema: Param[] = state.parameters({ inherit: true, matchingKeys: $match });
+        return Param.equals(schema, Param.values(schema, $match), $stateParams);
+      }
+
+      if ($state.$current.navigable !== state || !matchedParamsEqual()) {
         $state.transitionTo(state, $match, { inherit: true, source: "url" });
       }
     }], (rule) => state._urlRule = rule);

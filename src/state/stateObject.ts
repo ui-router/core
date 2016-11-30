@@ -140,13 +140,15 @@ export class State {
    *
    * Gets [[Param]] information that is owned by the state.
    * If `opts.inherit` is true, it also includes the ancestor states' [[Param]] information.
+   * If `opts.matchingKeys` exists, returns only `Param`s whose `id` is a key on the `matchingKeys` object
    *
    * @param opts options
    */
-  parameters(opts?: { inherit?: boolean }): Param[] {
-    opts = defaults(opts, { inherit: true });
+  parameters(opts?: { inherit?: boolean, matchingKeys?: any }): Param[] {
+    opts = defaults(opts, { inherit: true, matchingKeys: null });
     let inherited = opts.inherit && this.parent && this.parent.parameters() || [];
-    return inherited.concat(values(this.params));
+    return inherited.concat(values(this.params))
+        .filter(param => !opts.matchingKeys || opts.matchingKeys.hasOwnProperty(param.id));
   }
 
   /**

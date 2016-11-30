@@ -20,7 +20,6 @@ import {RawParams} from "../params/interface";
 import {ParamsOrArray} from "../params/interface";
 import {Param} from "../params/param";
 import {Glob} from "../common/glob";
-import {equalForKeys} from "../common/common";
 import {HrefOptions} from "./interface";
 import {bindFunctions} from "../common/common";
 import {Globals} from "../globals";
@@ -412,7 +411,7 @@ export class StateService {
     if (this.$current !== state) return false;
     if (!params) return true;
 
-    let schema: Param[] = state.parameters({ inherit: true }).filter(param => params.hasOwnProperty(param.id));
+    let schema: Param[] = state.parameters({ inherit: true, matchingKeys: params });
     return Param.equals(schema, Param.values(schema, params), this.params);
   };
 
@@ -468,7 +467,7 @@ export class StateService {
     if (!isDefined(include[state.name])) return false;
     if (!params) return true;
 
-    let schema: Param[] = state.parameters({ inherit: true }).filter(param => params.hasOwnProperty(param.id));
+    let schema: Param[] = state.parameters({ inherit: true, matchingKeys: params });
     return Param.equals(schema, Param.values(schema, params), this.params);
   };
 

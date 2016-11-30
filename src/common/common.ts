@@ -179,23 +179,6 @@ export function ancestors(first: State, second: State) {
   return path;
 }
 
-/**
- * Performs a non-strict comparison of the subset of two objects, defined by a list of keys.
- *
- * @param {Object} a The first object.
- * @param {Object} b The second object.
- * @param {Array} keys The list of keys within each object to compare. If the list is empty or not specified,
- *                     it defaults to the list of keys in `a`.
- * @return {Boolean} Returns `true` if the keys match, otherwise `false`.
- */
-export function equalForKeys(a: Obj, b: Obj, keys: string[] = Object.keys(a)) {
-  for (var i = 0; i < keys.length; i++) {
-    let k = keys[i];
-    if (a[k] != b[k]) return false; // Not '===', values aren't necessarily normalized
-  }
-  return true;
-}
-
 type PickOmitPredicate = (keys: string[], key: string) => boolean;
 function pickOmitImpl(predicate: PickOmitPredicate, obj: Obj, ...keys: string[]) {
   let objCopy = {};
