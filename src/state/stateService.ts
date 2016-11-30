@@ -410,7 +410,10 @@ export class StateService {
     let state = this.router.stateRegistry.matcher.find(stateOrName, options.relative);
     if (!isDefined(state)) return undefined;
     if (this.$current !== state) return false;
-    return isDefined(params) && params !== null ? Param.equals(state.parameters(), this.params, params) : true;
+    if (!params) return true;
+
+    let schema: Param[] = state.parameters({ inherit: true }).filter(param => params.hasOwnProperty(param.id));
+    return Param.equals(schema, Param.values(schema, params), this.params);
   };
 
   /**
@@ -463,8 +466,10 @@ export class StateService {
 
     if (!isDefined(state)) return undefined;
     if (!isDefined(include[state.name])) return false;
-    // @TODO Replace with Param.equals() ?
-    return params ? equalForKeys(Param.values(state.parameters(), params), this.params, Object.keys(params)) : true;
+    if (!params) return true;
+
+    let schema: Param[] = state.parameters({ inherit: true }).filter(param => params.hasOwnProperty(param.id));
+    return Param.equals(schema, Param.values(schema, params), this.params);
   };
 
 
