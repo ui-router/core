@@ -28,8 +28,8 @@ describe('stateService', function () {
 
   beforeEach(() => {
     router = new UIRouter();
-    router.plugin(vanilla.services);
-    router.plugin(vanilla.hashLocation);
+    router.plugin(vanilla.servicesPlugin);
+    router.plugin(vanilla.hashLocationPlugin);
     $loc = services.location;
     $state = router.stateService;
     $registry = router.stateRegistry;

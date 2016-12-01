@@ -10,8 +10,8 @@ describe('hashHistory implementation', () => {
 
   beforeEach(() => {
     router = new UIRouter();
-    router.plugin(vanilla.services);
-    router.plugin(vanilla.hashLocation);
+    router.plugin(vanilla.servicesPlugin);
+    router.plugin(vanilla.hashLocationPlugin);
     $state = router.stateService;
     router.stateRegistry.stateQueue.autoFlush($state);
 

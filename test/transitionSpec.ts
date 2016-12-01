@@ -30,8 +30,8 @@ describe('transition', function () {
 
   beforeEach(() => {
     router = new UIRouter();
-    router.plugin(vanilla.services);
-    router.plugin(vanilla.hashLocation);
+    router.plugin(vanilla.servicesPlugin);
+    router.plugin(vanilla.hashLocationPlugin);
     $state = router.stateService;
     $transitions = router.transitionService;
     router.stateRegistry.stateQueue.autoFlush($state);

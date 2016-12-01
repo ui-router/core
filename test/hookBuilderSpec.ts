@@ -16,8 +16,8 @@ describe('HookBuilder:', function() {
   beforeEach(() => {
     log = "";
     uiRouter = new UIRouter();
-    uiRouter.plugin(vanilla.services);
-    uiRouter.plugin(vanilla.hashLocation);
+    uiRouter.plugin(vanilla.servicesPlugin);
+    uiRouter.plugin(vanilla.hashLocationPlugin);
 
     $trans = uiRouter.transitionService;
     $state = uiRouter.stateService;

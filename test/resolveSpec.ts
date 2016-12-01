@@ -63,8 +63,8 @@ function getStates() {
 
 beforeEach(function () {
   router = new UIRouter();
-  router.plugin(vanilla.services);
-  router.plugin(vanilla.hashLocation);
+  router.plugin(vanilla.servicesPlugin);
+  router.plugin(vanilla.hashLocationPlugin);
   router.stateRegistry.stateQueue.autoFlush(router.stateService);
 
   counts = { _J: 0, _J2: 0, _K: 0, _L: 0, _M: 0, _Q: 0 };

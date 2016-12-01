@@ -1,12 +1,11 @@
 import {services, isDefined} from '../common/module';
 import {LocationConfig, LocationServices} from '../common/coreservices';
-import {HistoryImplementation} from './interface';
 import {splitHash, splitQuery, trimHashVal, getParams} from './utils';
 
 let hashPrefix: string = '';
 let baseHref: string = '';
 
-const locationServiceConfig: LocationConfig = {
+export const hashLocationConfig: LocationConfig = {
   port: () =>
     parseInt(location.port),
   protocol: () =>
@@ -23,9 +22,9 @@ const locationServiceConfig: LocationConfig = {
     }
     return hashPrefix;
   }
-}
+};
 
-const locationService: LocationServices = {
+export const hashLocationService: LocationServices = {
   hash: () =>
       splitHash(trimHashVal(location.hash))[1],
   path: () =>
@@ -36,9 +35,4 @@ const locationService: LocationServices = {
     if (url) location.hash = url;
   },
   onChange: (cb: EventListener) => window.addEventListener("hashchange", cb, false) as any
-}
-
-export const hashHistory: HistoryImplementation = {
-  service: locationService,
-  configuration: locationServiceConfig
-}
+};

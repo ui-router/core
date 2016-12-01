@@ -20,8 +20,8 @@ describe('future state', function () {
 
   beforeEach(() => {
     router = new UIRouter();
-    router.plugin(vanilla.services);
-    router.plugin(vanilla.hashLocation);
+    router.plugin(vanilla.servicesPlugin);
+    router.plugin(vanilla.hashLocationPlugin);
     $registry = router.stateRegistry;
     $state = router.stateService;
     $transitions = router.transitionService;

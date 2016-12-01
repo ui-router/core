@@ -1,38 +1,37 @@
 /**
  * Naive, pure JS implementation of core ui-router services
  *
- * @module vanilla
+ * @internalapi @module vanilla
  */ /** */
 import { UIRouter } from "../router";
 
-import { services as coreservices } from "../common/coreservices";
+import { services, LocationServices, LocationConfig } from "../common/coreservices";
+import { LocationPlugin, ServicesPlugin } from "./interface";
+import { extend } from "../common/common";
+import { hashLocationService, hashLocationConfig } from "./hashLocation";
+import { pushStateLocationService, pushStateLocationConfig } from "./pushStateLocation";
 import { $q } from "./$q";
 import { $injector } from "./$injector";
-import { hashHistory } from "./hashHistory";
-import { browserHistory } from "./browserHistory";
-import { HistoryImplementationPlugin, ServicesPlugin, HistoryImplementation } from "./interface";
-import { extend } from "../common/common";
 
-export { $q, $injector, hashHistory, browserHistory };
+export { $q, $injector };
 
-export function services(router: UIRouter): ServicesPlugin {
-  coreservices.$injector = $injector;
-  coreservices.$q = $q;
+export function servicesPlugin(router: UIRouter): ServicesPlugin {
+  services.$injector = $injector;
+  services.$q = $q;
   
   return { name: "vanilla.services", $q, $injector };
 }
 
-const HistoryImplementationPluginFactory = (name: string, historyImpl: HistoryImplementation) =>
+const locationPluginFactory = (name: string, service: LocationServices, configuration: LocationConfig) =>
     (router: UIRouter) => {
-      const { service, configuration } = historyImpl;
-      extend(coreservices.location, service);
-      extend(coreservices.locationConfig, configuration);
-
+      extend(services.location, service);
+      extend(services.locationConfig, configuration);
       return { name, service, configuration };
     };
 
-export const hashLocation: (router: UIRouter) => HistoryImplementationPlugin =
-    HistoryImplementationPluginFactory("vanilla.hashBangLocation", hashHistory);
-export const pushStateLocation: (router: UIRouter) => HistoryImplementationPlugin =
-    HistoryImplementationPluginFactory("vanilla.pushStateLocation", browserHistory);
+export const hashLocationPlugin: (router: UIRouter) => LocationPlugin =
+    locationPluginFactory("vanilla.hashBangLocation", hashLocationService, hashLocationConfig);
+
+export const pushStateLocationPlugin: (router: UIRouter) => LocationPlugin =
+    locationPluginFactory("vanilla.pushStateLocation", pushStateLocationService, pushStateLocationConfig);
 
