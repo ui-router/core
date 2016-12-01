@@ -69,8 +69,9 @@ export class UIRouter {
    *
    * #### Example:
    * ```js
-   * export class MyAuthPlugin {
+   * export class MyAuthPlugin implements UIRouterPlugin {
    *   constructor(router: UIRouter, options: any) {
+   *     this.name = "MyAuthPlugin";
    *     let $transitions = router.transitionService;
    *     let $state = router.stateService;
    *
@@ -90,12 +91,20 @@ export class UIRouter {
    * }
    * ```
    *
-   * @param pluginFactory a function which accepts a [[UIRouter]] instance and returns a UI-Router Plugin instance
-   * @param options options to pass to the plugin
-   * @returns {T}
+   * @param plugin one of:
+   *        - a plugin class which implements [[UIRouterPlugin]]
+   *        - a constructor function for a [[UIRouterPlugin]] which accepts a [[UIRouter]] instance
+   *        - a factory function which accepts a [[UIRouter]] instance and returns a [[UIRouterPlugin]] instance
+   * @param options options to pass to the plugin class/factory
+   * @returns the registered plugin instance
    */
-  plugin<T extends UIRouterPlugin>(pluginFactory: PluginFactory<T>, options: any = {}): T {
-    let pluginInstance = pluginFactory(this, options);
+  plugin<T extends UIRouterPlugin>(plugin: { new(router: UIRouter, options?: any): T }, options?: any): T;
+  /** Allow javascript constructor function */
+  plugin<T extends UIRouterPlugin>(plugin: { (router: UIRouter, options?: any): void }, options?: any): T;
+  /** Allow javascript factory function */
+  plugin<T extends UIRouterPlugin>(plugin: PluginFactory<T>, options?: any): T;
+  plugin<T extends UIRouterPlugin>(plugin: any, options: any = {}): T {
+    let pluginInstance = new plugin(this, options);
     if (!pluginInstance.name) throw new Error("Required property `name` missing on plugin: " + pluginInstance);
     return this._plugins[pluginInstance.name] = pluginInstance;
   }

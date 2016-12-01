@@ -22,15 +22,37 @@ describe('plugin api', function () {
     router.stateRegistry.stateQueue.autoFlush($state);
   });
 
-  class FancyPlugin implements UIRouterPlugin {
+  class FancyPluginClass implements UIRouterPlugin {
     constructor(public router: UIRouter) { }
     name = "fancyplugin"
   }
 
+  function FancyPluginConstructor(router: UIRouter, options: any) {
+    this.name = "fancyplugin";
+  }
+
   describe('initialization', () => {
+    it('should accept a plugin class', () => {
+      let plugin = router.plugin(FancyPluginClass);
+      expect(plugin instanceof FancyPluginClass).toBeTruthy();
+    });
+
+    it('should accept a constructor function', () => {
+      let plugin = router.plugin(FancyPluginConstructor);
+      expect(plugin instanceof FancyPluginConstructor).toBeTruthy();
+    });
+
+    it('should accept a factory function', () => {
+      function factoryFn(router: UIRouter, options: any) {
+        return new FancyPluginClass(router);
+      }
+      let plugin = router.plugin(factoryFn);
+      expect(plugin instanceof FancyPluginClass).toBeTruthy();
+    });
+
     it('should return an instance of the plugin', () => {
-      let plugin = router.plugin(() => new FancyPlugin(router));
-      expect(plugin instanceof FancyPlugin).toBeTruthy();
+      let plugin = router.plugin(() => new FancyPluginClass(router));
+      expect(plugin instanceof FancyPluginClass).toBeTruthy();
     });
 
     it('should pass the router instance to the plugin constructor', () => {
@@ -55,9 +77,9 @@ describe('plugin api', function () {
 
   describe('getPlugin', () => {
     it('should return the plugin instance', () => {
-      router.plugin(() => new FancyPlugin(router));
+      router.plugin(() => new FancyPluginClass(router));
       let plugin = router.getPlugin('fancyplugin');
-      expect(plugin instanceof FancyPlugin).toBeTruthy();
+      expect(plugin instanceof FancyPluginClass).toBeTruthy();
     });
   })
 });
