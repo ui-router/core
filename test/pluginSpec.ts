@@ -3,6 +3,7 @@ import * as vanilla from "../src/vanilla";
 import { StateRegistry } from "../src/state/stateRegistry";
 import { UrlRouter } from "../src/url/urlRouter";
 import {UIRouterPlugin} from "../src/interface";
+import { isArray } from "../src/common/predicates";
 
 describe('plugin api', function () {
   let router: UIRouter;
@@ -23,23 +24,25 @@ describe('plugin api', function () {
   });
 
   class FancyPluginClass implements UIRouterPlugin {
+    name = "fancypluginclass";
     constructor(public router: UIRouter) { }
-    name = "fancyplugin"
   }
 
   function FancyPluginConstructor(router: UIRouter, options: any) {
-    this.name = "fancyplugin";
+    this.name = "fancypluginconstructor";
   }
 
   describe('initialization', () => {
     it('should accept a plugin class', () => {
       let plugin = router.plugin(FancyPluginClass);
       expect(plugin instanceof FancyPluginClass).toBeTruthy();
+      expect(plugin.name).toBe('fancypluginclass');
     });
 
     it('should accept a constructor function', () => {
       let plugin = router.plugin(FancyPluginConstructor);
       expect(plugin instanceof FancyPluginConstructor).toBeTruthy();
+      expect(plugin.name).toBe('fancypluginconstructor');
     });
 
     it('should accept a factory function', () => {
@@ -48,6 +51,7 @@ describe('plugin api', function () {
       }
       let plugin = router.plugin(factoryFn);
       expect(plugin instanceof FancyPluginClass).toBeTruthy();
+      expect(plugin.name).toBe('fancypluginclass');
     });
 
     it('should return an instance of the plugin', () => {
@@ -77,9 +81,24 @@ describe('plugin api', function () {
 
   describe('getPlugin', () => {
     it('should return the plugin instance', () => {
-      router.plugin(() => new FancyPluginClass(router));
-      let plugin = router.getPlugin('fancyplugin');
+      router.plugin(FancyPluginClass);
+      let plugin = router.getPlugin('fancypluginclass');
       expect(plugin instanceof FancyPluginClass).toBeTruthy();
+    });
+
+    it('should return undefined if no pluginName is registered', () => {
+      router.plugin(FancyPluginClass);
+      let plugin = router.getPlugin('notexists');
+      expect(plugin).toBeUndefined();
+    });
+
+    it('should return all registered plugins when no pluginName is specified', () => {
+      router.plugin(FancyPluginClass);
+      router.plugin(FancyPluginConstructor);
+      let plugins = router.getPlugin();
+      expect(isArray(plugins)).toBeTruthy();
+      expect(plugins.pop() instanceof FancyPluginConstructor).toBeTruthy();
+      expect(plugins.pop() instanceof FancyPluginClass).toBeTruthy();
     });
   })
 });

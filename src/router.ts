@@ -1,13 +1,14 @@
 /** @coreapi @module core */ /** */
-import {UrlMatcherFactory} from "./url/urlMatcherFactory";
-import {UrlRouterProvider} from "./url/urlRouter";
-import {UrlRouter} from "./url/urlRouter";
-import {TransitionService} from "./transition/transitionService";
-import {ViewService} from "./view/view";
-import {StateRegistry} from "./state/stateRegistry";
-import {StateService} from "./state/stateService";
-import {UIRouterGlobals, Globals} from "./globals";
-import {UIRouterPlugin} from "./interface";
+import { UrlMatcherFactory } from "./url/urlMatcherFactory";
+import { UrlRouterProvider } from "./url/urlRouter";
+import { UrlRouter } from "./url/urlRouter";
+import { TransitionService } from "./transition/transitionService";
+import { ViewService } from "./view/view";
+import { StateRegistry } from "./state/stateRegistry";
+import { StateService } from "./state/stateService";
+import { UIRouterGlobals, Globals } from "./globals";
+import { UIRouterPlugin } from "./interface";
+import { values } from "./common/common";
 
 /**
  * The master class used to instantiate an instance of UI-Router.
@@ -103,14 +104,26 @@ export class UIRouter {
   plugin<T extends UIRouterPlugin>(plugin: { (router: UIRouter, options?: any): void }, options?: any): T;
   /** Allow javascript factory function */
   plugin<T extends UIRouterPlugin>(plugin: PluginFactory<T>, options?: any): T;
+  /** Allow javascript factory function */
   plugin<T extends UIRouterPlugin>(plugin: any, options: any = {}): T {
     let pluginInstance = new plugin(this, options);
     if (!pluginInstance.name) throw new Error("Required property `name` missing on plugin: " + pluginInstance);
     return this._plugins[pluginInstance.name] = pluginInstance;
   }
 
-  getPlugin(pluginName: string): UIRouterPlugin {
-    return this._plugins[pluginName];
+  /**
+   * Returns registered plugins
+   *
+   * Returns the registered plugin of the given `pluginName`.
+   * If no `pluginName` is given, returns all registered plugins
+   *
+   * @param pluginName (optional) the name of the plugin to get
+   * @return the named plugin (undefined if not found), or all plugins (if `pluginName` is omitted)
+   */
+  getPlugin(): UIRouterPlugin[];
+  getPlugin(pluginName?: string): UIRouterPlugin;
+  getPlugin(pluginName?: string): UIRouterPlugin|UIRouterPlugin[] {
+    return pluginName ? this._plugins[pluginName] : values(this._plugins);
   }
 }
 
