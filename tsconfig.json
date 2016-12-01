@@ -13,6 +13,6 @@
     "sourceMap": true
   },
   "files": [
-    "src/index.ts", "src/justjs.ts"
+    "src/index.ts", "src/vanilla.ts"
   ]
 }

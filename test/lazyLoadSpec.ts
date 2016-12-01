@@ -1,5 +1,6 @@
 import { UIRouter, TransitionService, StateService } from "../src/index";
-import "../src/justjs";
+import * as vanilla from "../src/vanilla";
+
 import { StateRegistry } from "../src/state/stateRegistry";
 import { services } from "../src/common/coreservices";
 import { UrlRouter } from "../src/url/urlRouter";
@@ -19,6 +20,8 @@ describe('future state', function () {
 
   beforeEach(() => {
     router = new UIRouter();
+    router.plugin(vanilla.services);
+    router.plugin(vanilla.hashLocation);
     $registry = router.stateRegistry;
     $state = router.stateService;
     $transitions = router.transitionService;

@@ -1,7 +1,7 @@
 import { UIRouter, TransitionService, StateService, State, PathNode } from "../src/index";
 import { tree2Array } from "./_testUtils";
-import "../src/justjs";
-import {TransitionHookPhase} from "../src/transition/interface";
+import { TransitionHookPhase } from "../src/transition/interface";
+import * as vanilla from "../src/vanilla/index";
 
 describe('HookBuilder:', function() {
   let uiRouter: UIRouter = null;
@@ -16,6 +16,9 @@ describe('HookBuilder:', function() {
   beforeEach(() => {
     log = "";
     uiRouter = new UIRouter();
+    uiRouter.plugin(vanilla.services);
+    uiRouter.plugin(vanilla.hashLocation);
+
     $trans = uiRouter.transitionService;
     $state = uiRouter.stateService;
     root = uiRouter.stateRegistry.root();

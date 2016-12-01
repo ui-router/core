@@ -1,5 +1,6 @@
 import { ResolveContext, State, PathNode, Resolvable, copy } from "../src/index";
 import { services } from "../src/common/coreservices";
+import * as vanilla from "../src/vanilla";
 import { tree2Array } from "./_testUtils";
 import { UIRouter } from "../src/router";
 
@@ -62,6 +63,8 @@ function getStates() {
 
 beforeEach(function () {
   router = new UIRouter();
+  router.plugin(vanilla.services);
+  router.plugin(vanilla.hashLocation);
   router.stateRegistry.stateQueue.autoFlush(router.stateService);
 
   counts = { _J: 0, _J2: 0, _K: 0, _L: 0, _M: 0, _Q: 0 };

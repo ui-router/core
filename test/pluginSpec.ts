@@ -1,5 +1,5 @@
 import { UIRouter, TransitionService, StateService } from "../src/index";
-import "../src/justjs";
+import * as vanilla from "../src/vanilla";
 import { StateRegistry } from "../src/state/stateRegistry";
 import { UrlRouter } from "../src/url/urlRouter";
 import {UIRouterPlugin} from "../src/interface";
@@ -13,6 +13,8 @@ describe('plugin api', function () {
 
   beforeEach(() => {
     router = new UIRouter();
+    router.plugin(vanilla.services);
+    router.plugin(vanilla.hashLocation);
     $registry = router.stateRegistry;
     $state = router.stateService;
     $transitions = router.transitionService;
@@ -20,42 +22,40 @@ describe('plugin api', function () {
     router.stateRegistry.stateQueue.autoFlush($state);
   });
 
-  class FancyPlugin extends UIRouterPlugin {
-    constructor(public router: UIRouter) {
-      super();
-
-    }
-    name() { return "fancyplugin" }
+  class FancyPlugin implements UIRouterPlugin {
+    constructor(public router: UIRouter) { }
+    name = "fancyplugin"
   }
 
   describe('initialization', () => {
     it('should return an instance of the plugin', () => {
-      let plugin = router.addPlugin(FancyPlugin);
+      let plugin = router.plugin(() => new FancyPlugin(router));
       expect(plugin instanceof FancyPlugin).toBeTruthy();
     });
 
     it('should pass the router instance to the plugin constructor', () => {
       let pluginRouterInstance = undefined;
-      function Plugin(router) {
+      function PluginFactory(router) {
         pluginRouterInstance = router;
-        this.name = () => "plugin";
+        return { name: 'plugin' }
       }
 
-      router.addPlugin(<any> Plugin);
+      router.plugin(PluginFactory);
       expect(pluginRouterInstance).toBe(router);
     });
 
     it('should throw if the plugin constructor returns an object without name() getter', () => {
-      function Plugin(router) {
+      function PluginFactory(router) {
+        return { }
       }
 
-      expect(() => router.addPlugin(<any> Plugin)).toThrow()
+      expect(() => router.plugin(<any> PluginFactory)).toThrow()
     });
   });
 
   describe('getPlugin', () => {
     it('should return the plugin instance', () => {
-      router.addPlugin(FancyPlugin);
+      router.plugin(() => new FancyPlugin(router));
       let plugin = router.getPlugin('fancyplugin');
       expect(plugin instanceof FancyPlugin).toBeTruthy();
     });

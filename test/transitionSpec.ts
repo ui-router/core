@@ -2,7 +2,7 @@ import { PathNode } from "../src/path/node";
 import {
     UIRouter, RejectType, Rejection, pluck, services, TransitionService, StateService, Resolvable, Transition
 } from "../src/index";
-import "../src/justjs";
+import * as vanilla from "../src/vanilla";
 import { tree2Array, PromiseResult } from "./_testUtils";
 
 describe('transition', function () {
@@ -30,6 +30,8 @@ describe('transition', function () {
 
   beforeEach(() => {
     router = new UIRouter();
+    router.plugin(vanilla.services);
+    router.plugin(vanilla.hashLocation);
     $state = router.stateService;
     $transitions = router.transitionService;
     router.stateRegistry.stateQueue.autoFlush($state);
@@ -229,17 +231,17 @@ describe('transition', function () {
 
           Promise.resolve()
             .then(goFail('A', 'first'))
-            .then((res) => {
+            .then((res: any) => {
               expect(res.type).toBe(RejectType.ERROR);
               expect(current).toBe(null);
             })
             .then(goFail('A', 'second'))
-            .then((res) => {
+            .then((res: any) => {
               expect(res.type).toBe(RejectType.ABORTED);
               expect(current).toBe(null);
             })
             .then(goFail('A', 'third'))
-            .then((res) => {
+            .then((res: any) => {
               expect(res.type).toBe(RejectType.SUPERSEDED);
               expect(current).toBe(null);
             })
