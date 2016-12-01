@@ -7,9 +7,6 @@ import {UrlMatcherFactory} from "./urlMatcherFactory";
 import {StateParams} from "../params/stateParams";
 import {RawParams} from "../params/interface";
 
-/** @hidden */
-let $location = services.location;
-
 /** @hidden Returns a string that is a prefix of all strings matching the RegExp */
 function regExpPrefix(re: RegExp) {
   let prefix = /^\^((?:\\[^a-zA-Z0-9]|[^\\\[\]\^$*+?.()|{}]+)*)/.exec(re.source);
@@ -43,13 +40,14 @@ function appendBasePath(url: string, isHtml5: boolean, absolute: boolean): strin
 /** @hidden */
 function update(rules: Function[], otherwiseFn: Function, evt?: any) {
   if (evt && evt.defaultPrevented) return;
+  let $loc = services.location;
 
   function check(rule: Function) {
-    let handled = rule(services.$injector, $location);
+    let handled = rule(services.$injector, $loc);
 
     if (!handled) return false;
     if (isString(handled)) {
-      $location.setUrl(handled, true);
+      $loc.setUrl(handled, true);
     }
     return true;
   }
@@ -214,6 +212,7 @@ export class UrlRouterProvider {
     if (!handlerIsString && !isFunction(handler) && !isArray(handler))
       throw new Error("invalid 'handler' in when()");
 
+    let $loc = services.location;
     let strategies = {
       matcher: function (_what, _handler) {
         if (handlerIsString) {
@@ -221,7 +220,7 @@ export class UrlRouterProvider {
           _handler = ['$match', redirect.format.bind(redirect)];
         }
         return extend(function () {
-          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($location.path(), $location.search(), $location.hash()));
+          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($loc.path(), $loc.search(), $loc.hash()));
         }, {
           prefix: isString(_what.prefix) ? _what.prefix : ''
         });
@@ -234,7 +233,7 @@ export class UrlRouterProvider {
           _handler = ['$match', ($match) => interpolate(redirect, $match)];
         }
         return extend(function () {
-          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($location.path()));
+          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($loc.path()));
         }, {
           prefix: regExpPrefix(_what)
         });
@@ -342,20 +341,21 @@ export class UrlRouter {
    * This causes [[UrlRouter]] to start listening for changes to the URL, if it wasn't already listening.
    */
   listen(): Function {
-    return this.listener = this.listener || $location.onChange(evt => update(this.urlRouterProvider.rules, this.urlRouterProvider.otherwiseFn, evt));
+    return this.listener = this.listener || services.location.onChange(evt => update(this.urlRouterProvider.rules, this.urlRouterProvider.otherwiseFn, evt));
   }
 
   /**
    * Internal API.
    */
   update(read?: boolean) {
+    let $loc = services.location;
     if (read) {
-      this.location = $location.path();
+      this.location = $loc.path();
       return;
     }
-    if ($location.path() === this.location) return;
+    if ($loc.path() === this.location) return;
 
-    $location.setUrl(this.location, true);
+    $loc.setUrl(this.location, true);
   }
 
   /**
@@ -369,7 +369,7 @@ export class UrlRouter {
    */
   push(urlMatcher: UrlMatcher, params: StateParams, options: { replace?: (string|boolean) }) {
     let replace = options && !!options.replace;
-    $location.setUrl(urlMatcher.format(params || {}), replace);
+    services.location.setUrl(urlMatcher.format(params || {}), replace);
   }
 
   /**
