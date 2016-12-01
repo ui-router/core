@@ -9,6 +9,14 @@ describe('browserHistory implementation', () => {
   let makeMatcher;
   let locationProvider = services.location;
 
+  // for phantomJS
+  function mockHistoryObject() {
+    (window as any).history = {
+      replaceState: () => null,
+      pushState: () => null
+    };
+  }
+
   beforeEach(() => {
     router = new UIRouter();
     router.plugin(vanilla.services);
@@ -25,6 +33,7 @@ describe('browserHistory implementation', () => {
   });
 
   it('uses history.pushState when setting a url', () => {
+    mockHistoryObject();
     expect(services.locationConfig.html5Mode()).toBe(true);
     let stub = spyOn(history, 'pushState');
     router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' });
@@ -32,6 +41,7 @@ describe('browserHistory implementation', () => {
   });
 
   it('uses history.replaceState when setting a url with replace', () => {
+    mockHistoryObject();
     let stub = spyOn(history, 'replaceState');
     router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' }, { replace: true });
     expect(stub.calls.first().args[2]).toBe('/hello/world');
