@@ -83,6 +83,10 @@ export interface UIInjector {
   getNative<T>(token: any): T;
 }
 
-export abstract class UIRouterPlugin {
-  abstract name(): string;
+export interface UIRouterPlugin {
+  name: string;
+}
+
+export abstract class UIRouterPluginBase implements UIRouterPlugin {
+  abstract name: string;
 }

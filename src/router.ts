@@ -90,17 +90,19 @@ export class UIRouter {
    * }
    * ```
    *
-   * @param PluginClass a UI-Router Plugin class (or constructor function).
+   * @param pluginFactory a function which accepts a [[UIRouter]] instance and returns a UI-Router Plugin instance
    * @param options options to pass to the plugin
    * @returns {T}
    */
-  addPlugin<T extends UIRouterPlugin>(PluginClass: { new(router: UIRouter, options?: any): T }, options: any = {}): T {
-    let pluginInstance = new PluginClass(this, options);
-    var pluginName = pluginInstance.name();
-    return this._plugins[pluginName] = pluginInstance;
+  plugin<T extends UIRouterPlugin>(pluginFactory: PluginFactory<T>, options: any = {}): T {
+    let pluginInstance = pluginFactory(this, options);
+    if (!pluginInstance.name) throw new Error("Required property `name` missing on plugin: " + pluginInstance);
+    return this._plugins[pluginInstance.name] = pluginInstance;
   }
 
   getPlugin(pluginName: string): UIRouterPlugin {
     return this._plugins[pluginName];
   }
 }
+
+export type PluginFactory<T> = (router: UIRouter, options?: any) => T;
