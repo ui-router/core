@@ -1,3 +1,4 @@
+/** @internalapi @module vanilla */ /** */
 import { services, isDefined } from '../common/module';
 import { LocationConfig, LocationServices } from '../common/coreservices';
 import { splitQuery, trimHashVal, getParams, locationPluginFactory } from './utils';
@@ -7,6 +8,8 @@ import { UIRouter } from "../router";
 let hashPrefix: string = '';
 let baseHref: string = '';
 
+/** A `LocationConfig` mock that gets/sets all config from the location
+ * TODO: Merge with LocationConfig impl in hasLocation.ts */
 export const pushStateLocationConfig: LocationConfig = {
   port: () =>
       parseInt(location.port),
@@ -26,6 +29,11 @@ export const pushStateLocationConfig: LocationConfig = {
   }
 };
 
+/**
+ * A `LocationServices` that gets/sets the current location using the browser's `location` and `history` apis
+ *
+ * Uses `history.pushState` and `history.replaceState`
+ */
 export const pushStateLocationService: LocationServices = {
   hash: () =>
       trimHashVal(location.hash),
@@ -50,6 +58,7 @@ export const pushStateLocationService: LocationServices = {
   }
 };
 
+/** A `UIRouterPlugin` that gets/sets the current location using the browser's `location` and `history` apis */
 export const pushStateLocationPlugin: (router: UIRouter) => LocationPlugin =
     locationPluginFactory("vanilla.pushStateLocation", pushStateLocationService, pushStateLocationConfig);
 

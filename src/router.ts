@@ -69,9 +69,9 @@ export class UIRouter {
     this.disposable(this.urlRouterProvider);
     this.disposable(this.urlRouter);
     this.disposable(this.stateRegistry);
-
   }
 
+  /** @hidden */
   private _plugins: { [key: string]: UIRouterPlugin } = {};
 
   /**

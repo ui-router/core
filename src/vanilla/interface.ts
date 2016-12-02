@@ -1,3 +1,4 @@
+/** @internalapi @module vanilla */ /** */
 import { LocationConfig, LocationServices } from '../common/coreservices';
 import { UIRouterPlugin } from "../interface";
 import { $InjectorLike, $QLike } from "../common/module";

@@ -1,3 +1,4 @@
+/** @internalapi @module vanilla */ /** */
 import { isDefined } from '../common/module';
 import { LocationConfig, LocationServices } from '../common/coreservices';
 import { splitHash, splitQuery, trimHashVal, getParams, locationPluginFactory } from './utils';
@@ -7,6 +8,7 @@ import { LocationPlugin } from "./interface";
 let hashPrefix: string = '';
 let baseHref: string = '';
 
+/** A `LocationConfig` that delegates to the browser's `location` object */
 export const hashLocationConfig: LocationConfig = {
   port: () =>
     parseInt(location.port),
@@ -26,6 +28,7 @@ export const hashLocationConfig: LocationConfig = {
   }
 };
 
+/** A `LocationServices` that uses the browser hash "#" to get/set the current location */
 export const hashLocationService: LocationServices = {
   hash: () =>
       splitHash(trimHashVal(location.hash))[1],
@@ -42,5 +45,6 @@ export const hashLocationService: LocationServices = {
   }
 };
 
+/** A `UIRouterPlugin` uses the browser hash to get/set the current location */
 export const hashLocationPlugin: (router: UIRouter) => LocationPlugin =
     locationPluginFactory('vanilla.hashBangLocation', hashLocationService, hashLocationConfig);

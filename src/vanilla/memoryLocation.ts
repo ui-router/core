@@ -1,3 +1,4 @@
+/** @internalapi @module vanilla */ /** */
 import { services, isDefined } from '../common/module';
 import { LocationConfig, LocationServices } from '../common/coreservices';
 import { splitQuery, trimHashVal, getParams, splitHash, locationPluginFactory } from './utils';
@@ -7,6 +8,7 @@ import { LocationPlugin } from "./interface";
 import { isArray } from "../common/predicates";
 
 var mlc;
+/** A `LocationConfig` mock that gets/sets all config from an in-memory object */
 export const memoryLocationConfig: LocationConfig = mlc = {
   _hashPrefix: '',
   _baseHref: '',
@@ -28,6 +30,7 @@ export const memoryLocationConfig: LocationConfig = mlc = {
 };
 
 var mls;
+/** A `LocationServices` that gets/sets the current location from an in-memory object */
 export const memoryLocationService: LocationServices = mls = {
   _listeners: [],
   _url: {
@@ -71,5 +74,6 @@ export const memoryLocationService: LocationServices = mls = {
   onChange: (cb: EventListener) => (mls._listeners.push(cb), () => removeFrom(mls._listeners, cb))
 };
 
+/** A `UIRouterPlugin` that gets/sets the current location from an in-memory object */
 export const memoryLocationPlugin: (router: UIRouter) => LocationPlugin =
     locationPluginFactory("vanilla.memoryLocation", memoryLocationService, memoryLocationConfig);
