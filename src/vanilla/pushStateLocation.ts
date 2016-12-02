@@ -1,6 +1,8 @@
 import { services, isDefined } from '../common/module';
 import { LocationConfig, LocationServices } from '../common/coreservices';
-import { splitQuery, trimHashVal, getParams } from './utils';
+import { splitQuery, trimHashVal, getParams, locationPluginFactory } from './utils';
+import { LocationPlugin } from "./interface";
+import { UIRouter } from "../router";
 
 let hashPrefix: string = '';
 let baseHref: string = '';
@@ -42,5 +44,12 @@ export const pushStateLocationService: LocationServices = {
       else history.pushState(null, null, services.locationConfig.baseHref() + url);
     }
   },
-  onChange: (cb: EventListener) => window.addEventListener("popstate", cb, false) as any
+  onChange: (cb: EventListener) => {
+    window.addEventListener("popstate", cb, false);
+    return () => window.removeEventListener("popstate", cb);
+  }
 };
+
+export const pushStateLocationPlugin: (router: UIRouter) => LocationPlugin =
+    locationPluginFactory("vanilla.pushStateLocation", pushStateLocationService, pushStateLocationConfig);
+

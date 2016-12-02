@@ -5,6 +5,7 @@ import { tree2Array } from "./_testUtils";
 import { UIRouter } from "../src/router";
 
 import Spy = jasmine.Spy;
+import { TestingPlugin } from "./_testingPlugin";
 
 ///////////////////////////////////////////////
 
@@ -61,21 +62,6 @@ function getStates() {
   };
 }
 
-beforeEach(function () {
-  router = new UIRouter();
-  router.plugin(vanilla.servicesPlugin);
-  router.plugin(vanilla.hashLocationPlugin);
-  router.stateRegistry.stateQueue.autoFlush(router.stateService);
-
-  counts = { _J: 0, _J2: 0, _K: 0, _L: 0, _M: 0, _Q: 0 };
-  vals = { _Q: null };
-  expectCounts = copy(counts);
-
-  tree2Array(getStates(), false).forEach(state => router.stateRegistry.register(state));
-  statesMap = router.stateRegistry.get()
-      .reduce((acc, state) => (acc[state.name] = state.$$state(), acc), statesMap);
-});
-
 function makePath(names: string[]): PathNode[] {
   return names.map(name => new PathNode(statesMap[name]));
 }
@@ -86,8 +72,22 @@ function getResolvedData(pathContext: ResolveContext) {
       .reduce((acc, resolvable) => { acc[resolvable.token] = resolvable.data; return acc; }, {});
 }
 
-
 describe('Resolvables system:', function () {
+
+  afterEach(() => router.dispose());
+  beforeEach(function () {
+    router = new UIRouter();
+    router.plugin(TestingPlugin);
+
+    counts = { _J: 0, _J2: 0, _K: 0, _L: 0, _M: 0, _Q: 0 };
+    vals = { _Q: null };
+    expectCounts = copy(counts);
+
+    tree2Array(getStates(), false).forEach(state => router.stateRegistry.register(state));
+    statesMap = router.stateRegistry.get()
+        .reduce((acc, state) => (acc[state.name] = state.$$state(), acc), statesMap);
+  });
+
   describe('Path.getResolvables', function () {
     it('should return Resolvables from the deepest element and all ancestors', () => {
       let path = makePath([ "A", "B", "C" ]);

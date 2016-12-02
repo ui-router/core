@@ -26,6 +26,7 @@ describe('plugin api', function () {
   class FancyPluginClass implements UIRouterPlugin {
     name = "fancypluginclass";
     constructor(public router: UIRouter) { }
+    dispose() {}
   }
 
   function FancyPluginConstructor(router: UIRouter, options: any) {

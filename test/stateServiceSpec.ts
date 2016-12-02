@@ -1,6 +1,5 @@
 import { UIRouter, TransitionService, StateService } from "../src/index";
-import * as vanilla from "../src/vanilla";
-import { tree2Array } from "./_testUtils";
+import { tree2Array, awaitTransition } from "./_testUtils";
 import "./_matchers";
 import { TransitionOptions } from "../src/transition/interface";
 import { LocationServices, services } from "../src/common/coreservices";
@@ -10,6 +9,7 @@ import { State } from "../src/state/stateObject";
 import { Transition } from "../src/transition/transition";
 import { Param } from "../src/params/param";
 import { RejectType } from "../src/transition/rejectFactory";
+import { TestingPlugin } from "./_testingPlugin";
 
 describe('stateService', function () {
   let router: UIRouter;
@@ -19,22 +19,23 @@ describe('stateService', function () {
   let $loc: LocationServices;
 
   const wait = (val?) =>
-      new Promise((resolve) => setTimeout(() => resolve(val)));
+      new Promise((resolve) => setTimeout(() => resolve(val), 50));
 
   async function initStateTo(state, params = {}) {
     await $state.transitionTo(state, params);
     expect($state.current).toBe(state);
   }
 
+  afterEach(() => router.dispose());
+
   beforeEach(() => {
     router = new UIRouter();
-    router.plugin(vanilla.servicesPlugin);
-    router.plugin(vanilla.hashLocationPlugin);
+    router.plugin(TestingPlugin);
+
     $loc = services.location;
     $state = router.stateService;
     $registry = router.stateRegistry;
     $transitions = router.transitionService;
-    router.stateRegistry.stateQueue.autoFlush($state);
   });
 
   describe('transitionTo', () => {
@@ -62,18 +63,22 @@ describe('stateService', function () {
     });
 
     it("should handle redirects", ((done) => {
-      $transitions.onStart({ to: 'D'}, trans => (log.push('redirect'), trans.router.stateService.target('C')));
+      $transitions.onStart({ to: 'D'}, trans => {
+        log.push('redirect');
+        return trans.router.stateService.target('C');
+      });
       $transitions.onStart({ to: 'C'}, trans => { cOpts = trans.options(); });
 
-      var log = [], transition = $state.go("D").transition;
+      var log = [], promise = $state.go("D");
       var cOpts: TransitionOptions = {};
 
-      wait().then(() => {
+      promise.then(() => {
         expect(log).toEqual(['redirect']);
-        expect(cOpts.redirectedFrom).toBe(transition);
+        expect(cOpts.redirectedFrom).toBe(promise.transition);
         expect(cOpts.source).toBe("redirect");
-      })
-      .then(done, done);
+
+        done();
+      });
     }));
 
     it('should error after 20+ async redirects', (done) => {
@@ -170,12 +175,10 @@ describe('stateService', function () {
     describe("dynamic transitions", function () {
       var dynlog, paramsChangedLog;
       var dynamicstate, childWithParam, childNoParam;
-      var cleanup;
 
       beforeEach(async function (done) {
         $loc.setUrl("asdfasfdasf");
         dynlog = paramsChangedLog = "";
-        cleanup = [];
         dynamicstate = {
           name: 'dyn',
           url: '^/dynstate/:path/:pathDyn?search&searchDyn',
@@ -203,26 +206,28 @@ describe('stateService', function () {
         router.stateRegistry.register(childWithParam);
         router.stateRegistry.register(childNoParam);
 
-        const logChangedParams = (prefix, suffix) =>
-            (trans: Transition, state: State) => {
-              trans.promise.then(() => {
-                let changed = Param.changed(state.parameters({ inherit: true }), trans.params("to"), trans.params("from"))
-                    .map(param => param.id + "=" + trans.params("to")[param.id])
-                    .join(",");
-                if (changed) {
-                  dynlog += prefix + changed + suffix + ";";
-                }
-              });
-            };
+        function logChangedParams(prefix, suffix) {
+          return (trans: Transition, state: State) => {
+            trans.onSuccess({}, () => {
+              let changed = Param.changed(state.parameters({ inherit: true }), trans.params("to"), trans.params("from"))
+                  .map(param => param.id + "=" + trans.params("to")[param.id])
+                  .join(",");
+              if (changed) {
+                dynlog += prefix + changed + suffix + ";";
+              }
+            });
+          };
+        }
 
-        cleanup.push($transitions.onEnter({}, (trans, state) => dynlog += 'enter:' + state.name + ";"));
-        cleanup.push($transitions.onExit({}, (trans, state) => dynlog += 'exit:' + state.name + ";"));
-        cleanup.push($transitions.onSuccess({}, () => dynlog += 'success;'));
-        cleanup.push($transitions.onRetain({retained: 'dyn'},          logChangedParams('[', ']')));
-        cleanup.push($transitions.onRetain({retained: 'dyn.child'},    logChangedParams('{', '}')));
-        cleanup.push($transitions.onRetain({retained: 'dyn.noparams'}, logChangedParams('(', ')')));
+        $transitions.onEnter({}, (trans, state) => dynlog += 'enter:' + state.name + ";");
+        $transitions.onExit({}, (trans, state) => dynlog += 'exit:' + state.name + ";");
+        $transitions.onSuccess({}, () => dynlog += 'success;', { priority: 1 });
+        $transitions.onRetain({ retained: 'dyn' }, logChangedParams('[', ']'));
+        $transitions.onRetain({ retained: 'dyn.child' }, logChangedParams('{', '}'));
+        $transitions.onRetain({ retained: 'dyn.noparams' }, logChangedParams('(', ')'));
 
         await initStateTo(dynamicstate, { path: 'p1', pathDyn: 'pd1', search: 's1', searchDyn: 'sd1' });
+
         expect(dynlog).toBe('enter:dyn;success;');
         expect($state.params).toEqualValues({ '#': null, path: 'p1', pathDyn: 'pd1', search: 's1', searchDyn: 'sd1' });
         expect($loc.path()).toEqual('/dynstate/p1/pd1');
@@ -233,7 +238,6 @@ describe('stateService', function () {
       });
 
       afterEach((done) => {
-        cleanup.forEach(fn => fn());
         if (router.globals.transition) {
           router.globals.transition.promise.then(done, done)
         } else {
@@ -359,23 +363,23 @@ describe('stateService', function () {
           done();
         });
 
-        // it('does not exit nor enter a state when only dynamic params change (triggered via url)', async (done) => {
-        //   $loc.search({ search: 's1', searchDyn: 'sd2' });
-        //   $rootScope.$broadcast("$locationChangeSuccess");
-        //   $q.flush();
-        //   expect(dynlog).toBe('success;[searchDyn=sd2];')
-        //
-        //   done();
-        // });
+        it('does not exit nor enter a state when only dynamic params change (triggered via url)', (done) => {
+          awaitTransition(router).then(() => {
+            expect(dynlog).toBe('success;[searchDyn=sd2];');
+            done();
+          });
 
-        // it('exits and enters a state when any non-dynamic params change (triggered via url)', async (done) => {
-        //   $location.search({ search: 's2', searchDyn: 'sd2' });
-        //   $rootScope.$broadcast("$locationChangeSuccess");
-        //   $q.flush();
-        //   expect(dynlog).toBe('exit:dyn;enter:dyn;success;')
-        //
-        //   done();
-        // });
+          $loc.setUrl('/dynstate/p1/pd1?search=s1&searchDyn=sd2');
+        });
+
+        it('exits and enters a state when any non-dynamic params change (triggered via url)', (done) => {
+          awaitTransition(router).then(() => {
+            expect(dynlog).toBe('exit:dyn;enter:dyn;success;');
+            done();
+          });
+
+          $loc.setUrl('/dynstate/p1/pd1?search=s2&searchDyn=sd2');
+        });
 
         it('does not exit nor enter a state when only dynamic params change (triggered via $state transition)', async (done) => {
           await $state.go('.', {searchDyn: 'sd2'}, { inherit: true });
@@ -393,14 +397,22 @@ describe('stateService', function () {
           done();
         });
 
-        // it('updates $stateParams and $location.search when only dynamic params change (triggered via url)', function () {
-        //   $location.search({search: 's1', searchDyn: 'sd2'});
-        //   $rootScope.$broadcast("$locationChangeSuccess");
-        //   $q.flush();
-        //   expect($stateParams.search).toBe('s1');
-        //   expect($stateParams.searchDyn).toBe('sd2');
-        //   expect($location.search()).toEqual({search: 's1', searchDyn: 'sd2'});
-        // });
+        it('updates $stateParams and $location.search when only dynamic params change (triggered via url)', async (done) => {
+          let dereg = $transitions.onBefore({}, (trans) => {
+            trans.promise.then(expects, expects);
+
+            function expects() {
+              expect($state.params['search']).toBe('s1');
+              expect($state.params['searchDyn']).toBe('sd2');
+              expect($loc.search()).toEqual({search: 's1', searchDyn: 'sd2'});
+
+              dereg();
+              done();
+            }
+          });
+
+          $loc.setUrl('/dynstate/p1/pd1?search=s1&searchDyn=sd2'); // {search: 's1', searchDyn: 'sd2'});
+        });
 
         it('updates $stateParams and $location.search when only dynamic params change (triggered via $state transition)', async (done) => {
           await $state.go('.', {searchDyn: 'sd2'});
@@ -413,70 +425,6 @@ describe('stateService', function () {
           done();
         });
       });
-    //
-    //   describe('[ uiOnParamsChanged ]', function() {
-    //     it('should be called when dynamic parameter values change', function() {
-    //       $state.go('.', { searchDyn: 'sd2' }); $q.flush();
-    //       expect(paramsChangedLog).toBe('searchDyn;');
-    //     });
-    //
-    //     it('should not be called if a non-dynamic parameter changes (causing the controller\'s state to exit/enter)', function() {
-    //       $state.go('.', { search: 's2', searchDyn: 'sd2' }); $q.flush();
-    //       expect(paramsChangedLog).toBe('');
-    //     });
-    //
-    //     it('should not be called, when entering a new state, if no parameter values change', function() {
-    //       $state.go(childNoParam); $q.flush();
-    //       expect(paramsChangedLog).toBe('');
-    //     });
-    //
-    //     it('should be called, when entering a new state, if any dynamic parameter value changed', function() {
-    //       $state.go(childNoParam, { searchDyn: 'sd2' }); $q.flush();
-    //       expect(paramsChangedLog).toBe('searchDyn;');
-    //     });
-    //
-    //     it('should be called, when entering a new state, if a new parameter value is added', function() {
-    //       $state.go(childWithParam, { config: 'c2' }); $q.flush();
-    //       expect(paramsChangedLog).toBe('config,configDyn;');
-    //     });
-    //
-    //     it('should be called, when reactivating the uiOnParamsChanged state, if a dynamic parameter changed', function() {
-    //       initStateTo(childNoParam, { path: 'p1', pathDyn: 'pd1', search: 's1', searchDyn: 'sd1' });
-    //       dynlog = paramsChangedLog = "";
-    //
-    //       $state.go(dynamicstate, { pathDyn: 'pd2' }); $q.flush();
-    //       expect(paramsChangedLog).toBe('pathDyn;');
-    //     });
-    //
-    //     it('should not be called, when reactivating the uiOnParamsChanged state "dyn", if any of dyns non-dynamic parameters changed', function() {
-    //       initStateTo(childNoParam, { path: 'p1', pathDyn: 'pd1', search: 's1', searchDyn: 'sd1' });
-    //       dynlog = paramsChangedLog = "";
-    //
-    //       $state.go(dynamicstate, { path: 'p2' }); $q.flush();
-    //       expect(paramsChangedLog).toBe('');
-    //     });
-    //
-    //     it('should be called with an object containing only the changed params', function() {
-    //       $state.go(dynamicstate, { pathDyn: 'pd2' }); $q.flush();
-    //       expect(dynlog).toBe('success;[pathDyn=pd2];');
-    //
-    //       $state.go(dynamicstate, { pathDyn: 'pd3', searchDyn: 'sd2' }); $q.flush();
-    //       expect(dynlog).toBe('success;[pathDyn=pd2];success;[pathDyn=pd3,searchDyn=sd2];');
-    //     });
-    //
-    //     it('should be called on all active controllers that have a uiOnParamsChanged', function() {
-    //       initStateTo(childWithParam, { path: 'p1', pathDyn: 'pd1', search: 's1', searchDyn: 'sd1', config: 'p1', configDyn: 'c1' });
-    //       dynlog = paramsChangedLog = "";
-    //
-    //       $state.go(childWithParam, { pathDyn: 'pd2' }); $q.flush();
-    //       expect(dynlog).toBe('success;[pathDyn=pd2];{pathDyn=pd2};');
-    //
-    //       dynlog = paramsChangedLog = "";
-    //       $state.go(childWithParam, { pathDyn: 'pd2', searchDyn: 'sd2', configDyn: 'cd2' }); $q.flush();
-    //       expect(dynlog).toBe('success;[configDyn=cd2,searchDyn=sd2];{configDyn=cd2,searchDyn=sd2};');
-    //     });
-    //   });
-
     });
 
     describe("(with dynamic params because reloadOnSearch=false)", function () {
@@ -495,13 +443,14 @@ describe('stateService', function () {
           $transitions.onEnter({entering: 'RS'}, function () { entered = true });
         });
 
-        // it('doesn\'t re-enter state (triggered by url change)', function () {
-        //   $location.search({term: 'hello'});
-        //   $rootScope.$broadcast("$locationChangeSuccess");
-        //   $q.flush();
-        //   expect($location.search()).toEqual({term: 'hello'});
-        //   expect(entered).toBeFalsy();
-        // });
+        it('doesn\'t re-enter state (triggered by url change)', function (done) {
+          $loc.setUrl($loc.path() + "?term=hello");
+          awaitTransition(router).then(() => {
+            expect($loc.search()).toEqual({term: 'hello'});
+            expect(entered).toBeFalsy();
+            done();
+          })
+        });
 
         it('doesn\'t re-enter state (triggered by $state transition)', async (done) => {
           var promise = $state.go($state.current, {term: "hello"});
@@ -675,18 +624,6 @@ describe('stateService', function () {
 
       done();
     });
-
-    // it('uses the templateProvider to get template dynamically', ((done) =>{
-    //   $state.transitionTo('dynamicTemplate', { type: "Acme" });
-    //   $q.flush();
-    //   expect(template).toEqual("AcmeFooTemplate");
-    // }));
-
-    // it('uses the controllerProvider to get controller dynamically', ((done) =>{
-    //   $state.transitionTo('dynamicController', { type: "Acme" });
-    //   $q.flush();
-    //   expect(ctrlName).toEqual("AcmeController");
-    // }));
 
     it('updates the location #fragment, if specified', async(done) => {
       await $state.transitionTo('DD', { '#': 'frag' });

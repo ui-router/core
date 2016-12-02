@@ -1,6 +1,8 @@
-import {services, isDefined} from '../common/module';
-import {LocationConfig, LocationServices} from '../common/coreservices';
-import {splitHash, splitQuery, trimHashVal, getParams} from './utils';
+import { isDefined } from '../common/module';
+import { LocationConfig, LocationServices } from '../common/coreservices';
+import { splitHash, splitQuery, trimHashVal, getParams, locationPluginFactory } from './utils';
+import { UIRouter } from '../router';
+import { LocationPlugin } from "./interface";
 
 let hashPrefix: string = '';
 let baseHref: string = '';
@@ -34,5 +36,11 @@ export const hashLocationService: LocationServices = {
   setUrl: (url: string, replace: boolean = true) => {
     if (url) location.hash = url;
   },
-  onChange: (cb: EventListener) => window.addEventListener("hashchange", cb, false) as any
+  onChange: (cb: EventListener) => {
+    window.addEventListener('hashchange', cb, false);
+    return () => window.removeEventListener('hashchange', cb);
+  }
 };
+
+export const hashLocationPlugin: (router: UIRouter) => LocationPlugin =
+    locationPluginFactory('vanilla.hashBangLocation', hashLocationService, hashLocationConfig);

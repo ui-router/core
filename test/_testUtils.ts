@@ -1,5 +1,5 @@
-import {pick, forEach, omit} from "../src/index";
-import {map} from "../src/common/common";
+import { pick, forEach, omit } from "../src/index";
+import { map } from "../src/common/common";
 
 let stateProps = ["resolve", "resolvePolicy", "data", "template", "templateUrl", "url", "name", "params"];
 
@@ -59,4 +59,9 @@ export function PromiseResult(promise?) {
   }
 }
 
-
+export const awaitTransition = (router) => new Promise(resolve => {
+  let dereg = router.transitionService.onSuccess({}, (trans) => {
+    dereg();
+    resolve(trans);
+  });
+});
