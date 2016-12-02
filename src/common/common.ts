@@ -136,6 +136,10 @@ export const removeFrom = curry((array: any[], obj: any) => {
   return array;
 });
 
+/** pushes a values to an array and returns the value */
+export const pushTo = <T> (arr: T[], val: T) =>
+    (arr.push(val), val);
+
 /**
  * Applies a set of defaults to an options object.  The options object is filtered
  * to only those properties of the objects in the defaultsList.

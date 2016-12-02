@@ -7,6 +7,7 @@ import {matcherConfig} from "./urlMatcherConfig";
 import {Param} from "../params/param";
 import {ParamTypes} from "../params/paramTypes";
 import {ParamTypeDefinition} from "../params/interface";
+import { Disposable } from "../interface";
 
 /** @hidden */
 function getDefaultConfig() {
@@ -22,7 +23,7 @@ function getDefaultConfig() {
  * The factory is available to ng1 services as
  * `$urlMatcherFactor` or ng1 providers as `$urlMatcherFactoryProvider`.
  */
-export class UrlMatcherFactory {
+export class UrlMatcherFactory implements Disposable {
   paramTypes = new ParamTypes();
 
   constructor() {
@@ -123,4 +124,9 @@ export class UrlMatcherFactory {
     this.paramTypes._flushTypeQueue();
     return this;
   };
+
+  /** @internalapi */
+  dispose() {
+    this.paramTypes.dispose();
+  }
 }

@@ -1,5 +1,5 @@
 /** @coreapi @module state */ /** */
-import {extend, defaults, silentRejection, silenceUncaughtInPromise, removeFrom} from "../common/common";
+import { extend, defaults, silentRejection, silenceUncaughtInPromise, removeFrom, noop } from "../common/common";
 import {isDefined, isObject, isString} from "../common/predicates";
 import {Queue} from "../common/queue";
 import {services} from "../common/coreservices";
@@ -72,6 +72,12 @@ export class StateService {
     let getters = ['current', '$current', 'params', 'transition'];
     let boundFns = Object.keys(StateService.prototype).filter(key => getters.indexOf(key) === -1);
     bindFunctions(StateService.prototype, this, this, boundFns);
+  }
+
+  /** @internalapi */
+  dispose() {
+    this.defaultErrorHandler(noop);
+    this.invalidCallbacks = [];
   }
 
   /**

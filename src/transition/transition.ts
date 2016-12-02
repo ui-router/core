@@ -35,8 +35,6 @@ import {UIInjector} from "../interface";
 import {RawParams} from "../params/interface";
 
 /** @hidden */
-let transitionCount = 0;
-/** @hidden */
 const stateSelf: (_state: State) => StateDeclaration = prop("self");
 
 /**
@@ -150,7 +148,7 @@ export class Transition implements IHookRegistry {
 
     // current() is assumed to come from targetState.options, but provide a naive implementation otherwise.
     this._options = extend({ current: val(this) }, targetState.options());
-    this.$id = transitionCount++;
+    this.$id = router.transitionService._transitionCount++;
     let toPath = PathFactory.buildToPath(fromPath, targetState);
     this._treeChanges = PathFactory.treeChanges(fromPath, toPath, this._options.reloadState);
     this.createTransitionHookRegFns();

@@ -9,8 +9,9 @@ import {UrlRouterProvider} from "../url/urlRouter";
 import {RawParams} from "../params/interface";
 import {StateRegistry, StateRegistryListener} from "./stateRegistry";
 import { Param } from "../params/param";
+import { Disposable } from "../interface";
 
-export class StateQueueManager {
+export class StateQueueManager implements Disposable {
   queue: State[];
   private $state: StateService;
 
@@ -20,6 +21,11 @@ export class StateQueueManager {
       public builder: StateBuilder,
       public $urlRouterProvider: UrlRouterProvider,
       public listeners: StateRegistryListener[]) {
+    this.queue = [];
+  }
+
+  /** @internalapi */
+  dispose() {
     this.queue = [];
   }
 

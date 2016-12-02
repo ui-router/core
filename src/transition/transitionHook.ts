@@ -65,7 +65,7 @@ export class TransitionHook {
     if (hook._deregistered) return;
 
     let options = this.options;
-    trace.traceHookInvocation(this, options);
+    trace.traceHookInvocation(this, this.transition, options);
 
     if (this.rejectIfSuperseded()) {
       return Rejection.superseded(options.current()).toPromise();
@@ -114,7 +114,7 @@ export class TransitionHook {
       return result.then(this.handleHookResult.bind(this));
     }
 
-    trace.traceHookResult(result, this.options);
+    trace.traceHookResult(result, this.transition, this.options);
 
     // Hook returned false
     if (result === false) {

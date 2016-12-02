@@ -1,15 +1,15 @@
 /** @coreapi @module state */ /** for typedoc */
 
-import {State} from "./stateObject";
-import {StateMatcher} from "./stateMatcher";
-import {StateBuilder} from "./stateBuilder";
-import {StateQueueManager} from "./stateQueueManager";
-import {UrlMatcherFactory} from "../url/urlMatcherFactory";
-import {StateDeclaration} from "./interface";
-import {BuilderFunction} from "./stateBuilder";
-import {StateOrName} from "./interface";
-import {UrlRouterProvider} from "../url/urlRouter";
-import {removeFrom} from "../common/common";
+import { State } from "./stateObject";
+import { StateMatcher } from "./stateMatcher";
+import { StateBuilder } from "./stateBuilder";
+import { StateQueueManager } from "./stateQueueManager";
+import { UrlMatcherFactory } from "../url/urlMatcherFactory";
+import { StateDeclaration } from "./interface";
+import { BuilderFunction } from "./stateBuilder";
+import { StateOrName } from "./interface";
+import { UrlRouterProvider } from "../url/urlRouter";
+import { removeFrom } from "../common/common";
 
 /**
  * The signature for the callback function provided to [[StateRegistry.onStateRegistryEvent]].
@@ -48,6 +48,13 @@ export class StateRegistry {
 
     let _root = this._root = this.stateQueue.register(rootStateDef);
     _root.navigable = null;
+  }
+
+  /** @internalapi */
+  dispose() {
+    this.stateQueue.dispose();
+    this.listeners = [];
+    this.get().forEach(state => this.get(state) && this.deregister(state));
   }
 
   /**

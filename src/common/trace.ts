@@ -144,12 +144,12 @@ export class Trace {
   }
 
   /** @internalapi called by ui-router code */
-  traceTransitionStart(transition: Transition) {
+  traceTransitionStart(trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
-    let tid = transition.$id,
+    let tid = trans.$id,
         digest = this.approximateDigests,
-        transitionStr = stringify(transition);
-    console.log(`Transition #${tid} Digest #${digest}: Started  -> ${transitionStr}`);
+        transitionStr = stringify(trans);
+    console.log(`Transition #${tid} r${trans.router.$id}: Started  -> ${transitionStr}`);
   }
 
   /** @internalapi called by ui-router code */
@@ -158,27 +158,27 @@ export class Trace {
     let tid = trans && trans.$id,
         digest = this.approximateDigests,
         transitionStr = stringify(trans);
-    console.log(`Transition #${tid} Digest #${digest}: Ignored  <> ${transitionStr}`);
+    console.log(`Transition #${tid} r${trans.router.$id}: Ignored  <> ${transitionStr}`);
   }
 
   /** @internalapi called by ui-router code */
-  traceHookInvocation(step: TransitionHook, options: any) {
+  traceHookInvocation(step: TransitionHook, trans: Transition, options: any) {
     if (!this.enabled(Category.HOOK)) return;
     let tid = parse("transition.$id")(options),
         digest = this.approximateDigests,
         event = parse("traceData.hookType")(options) || "internal",
         context = parse("traceData.context.state.name")(options) || parse("traceData.context")(options) || "unknown",
         name = functionToString((step as any).registeredHook.callback);
-    console.log(`Transition #${tid} Digest #${digest}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
+    console.log(`Transition #${tid} r${trans.router.$id}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
   }
 
   /** @internalapi called by ui-router code */
-  traceHookResult(hookResult: HookResult, transitionOptions: any) {
+  traceHookResult(hookResult: HookResult, trans: Transition, transitionOptions: any) {
     if (!this.enabled(Category.HOOK)) return;
     let tid = parse("transition.$id")(transitionOptions),
         digest = this.approximateDigests,
         hookResultStr = stringify(hookResult);
-    console.log(`Transition #${tid} Digest #${digest}:   <- Hook returned: ${maxLength(200, hookResultStr)}`);
+    console.log(`Transition #${tid} r${trans.router.$id}:   <- Hook returned: ${maxLength(200, hookResultStr)}`);
   }
 
   /** @internalapi called by ui-router code */
@@ -187,7 +187,7 @@ export class Trace {
     let tid = trans && trans.$id,
         digest = this.approximateDigests,
         pathStr = path && path.toString();
-    console.log(`Transition #${tid} Digest #${digest}:         Resolving ${pathStr} (${when})`);
+    console.log(`Transition #${tid} r${trans.router.$id}:         Resolving ${pathStr} (${when})`);
   }
 
   /** @internalapi called by ui-router code */
@@ -197,7 +197,7 @@ export class Trace {
         digest = this.approximateDigests,
         resolvableStr = resolvable && resolvable.toString(),
         result = stringify(resolvable.data);
-    console.log(`Transition #${tid} Digest #${digest}:               <- Resolved  ${resolvableStr} to: ${maxLength(200, result)}`);
+    console.log(`Transition #${tid} r${trans.router.$id}:               <- Resolved  ${resolvableStr} to: ${maxLength(200, result)}`);
   }
 
   /** @internalapi called by ui-router code */
@@ -206,7 +206,7 @@ export class Trace {
     let tid = trans && trans.$id,
         digest = this.approximateDigests,
         transitionStr = stringify(trans);
-    console.log(`Transition #${tid} Digest #${digest}: <- Rejected ${transitionStr}, reason: ${reason}`);
+    console.log(`Transition #${tid} r${trans.router.$id}: <- Rejected ${transitionStr}, reason: ${reason}`);
   }
 
   /** @internalapi called by ui-router code */
@@ -216,7 +216,7 @@ export class Trace {
         digest = this.approximateDigests,
         state = finalState.name,
         transitionStr = stringify(trans);
-    console.log(`Transition #${tid} Digest #${digest}: <- Success  ${transitionStr}, final state: ${state}`);
+    console.log(`Transition #${tid} r${trans.router.$id}: <- Success  ${transitionStr}, final state: ${state}`);
   }
 
   /** @internalapi called by ui-router code */

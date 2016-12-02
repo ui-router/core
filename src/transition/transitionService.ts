@@ -24,6 +24,8 @@ import {registerLazyLoadHook} from "../hooks/lazyLoad";
 import {TransitionHookType} from "./transitionHookType";
 import {TransitionHook} from "./transitionHook";
 import {isDefined} from "../common/predicates";
+import { removeFrom, values } from "../common/common";
+import { Disposable } from "../interface";
 
 /**
  * The default [[Transition]] options.
@@ -52,7 +54,9 @@ export let defaultTransOpts: TransitionOptions = {
  *
  * At bootstrap, [[UIRouter]] creates a single instance (singleton) of this class.
  */
-export class TransitionService implements IHookRegistry {
+export class TransitionService implements IHookRegistry, Disposable {
+  /** @hidden */
+  _transitionCount = 0;
 
   /**
    * Registers a [[TransitionHookFn]], called *while a transition is being constructed*.
@@ -126,6 +130,16 @@ export class TransitionService implements IHookRegistry {
     this._deregisterHookFns = <any> {};
     this.registerTransitionHookTypes();
     this.registerTransitionHooks();
+  }
+
+  /** @internalapi */
+  dispose() {
+    delete this._router.globals.transition;
+
+    values(this._transitionHooks).forEach(hooksArray => hooksArray.forEach(hook => {
+      hook._deregistered = true;
+      removeFrom(hooksArray, hook);
+    }));
   }
 
   /**

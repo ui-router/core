@@ -7,8 +7,11 @@ import { ViewService } from "./view/view";
 import { StateRegistry } from "./state/stateRegistry";
 import { StateService } from "./state/stateService";
 import { UIRouterGlobals, Globals } from "./globals";
-import { UIRouterPlugin } from "./interface";
-import { values } from "./common/common";
+import { UIRouterPlugin, Disposable } from "./interface";
+import { values, removeFrom } from "./common/common";
+
+/** @hidden */
+let _routerInstance = 0;
 
 /**
  * The master class used to instantiate an instance of UI-Router.
@@ -22,6 +25,9 @@ import { values } from "./common/common";
  * Tell UI-Router to monitor the URL by calling `uiRouter.urlRouter.listen()` ([[UrlRouter.listen]])
  */
 export class UIRouter {
+  /** @hidden */
+  $id: number = _routerInstance++;
+
   viewService = new ViewService();
 
   transitionService: TransitionService = new TransitionService(this);
@@ -38,10 +44,32 @@ export class UIRouter {
 
   stateService = new StateService(this);
 
+  private _disposables: Disposable[] = [];
+
+  /** Registers an object to be notified when the router is disposed */
+  disposable(disposable: Disposable) {
+    this._disposables.push(disposable);
+  }
+
+  dispose() {
+    this._disposables.slice().forEach(d => {
+      try {
+        typeof d.dispose === 'function' && d.dispose(this);
+        removeFrom(this._disposables, d);
+      } catch (ignored) {}
+    });
+  }
+
   constructor() {
     this.viewService.rootContext(this.stateRegistry.root());
     this.globals.$current = this.stateRegistry.root();
     this.globals.current = this.globals.$current.self;
+
+    this.disposable(this.transitionService);
+    this.disposable(this.urlRouterProvider);
+    this.disposable(this.urlRouter);
+    this.disposable(this.stateRegistry);
+
   }
 
   private _plugins: { [key: string]: UIRouterPlugin } = {};
@@ -108,6 +136,7 @@ export class UIRouter {
   plugin<T extends UIRouterPlugin>(plugin: any, options: any = {}): T {
     let pluginInstance = new plugin(this, options);
     if (!pluginInstance.name) throw new Error("Required property `name` missing on plugin: " + pluginInstance);
+    this._disposables.push(pluginInstance);
     return this._plugins[pluginInstance.name] = pluginInstance;
   }
 

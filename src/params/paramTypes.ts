@@ -86,6 +86,11 @@ export class ParamTypes {
     this.types = inherit(map(this.defaultTypes, makeType), {});
   }
 
+  /** @internalapi */
+  dispose() {
+    this.types = {};
+  }
+
   type(name: string, definition?: ParamTypeDefinition, definitionFn?: () => ParamTypeDefinition) {
     if (!isDefined(definition)) return this.types[name];
     if (this.types.hasOwnProperty(name)) throw new Error(`A type named '${name}' has already been defined.`);

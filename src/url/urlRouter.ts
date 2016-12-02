@@ -6,6 +6,7 @@ import {services, $InjectorLike, LocationServices} from "../common/coreservices"
 import {UrlMatcherFactory} from "./urlMatcherFactory";
 import {StateParams} from "../params/stateParams";
 import {RawParams} from "../params/interface";
+import { Disposable } from "../interface";
 
 /** @hidden Returns a string that is a prefix of all strings matching the RegExp */
 function regExpPrefix(re: RegExp) {
@@ -66,7 +67,7 @@ function update(rules: Function[], otherwiseFn: Function, evt?: any) {
  *
  * This class manages the router rules for what to do when the URL changes.
  */
-export class UrlRouterProvider {
+export class UrlRouterProvider implements Disposable {
   /** @hidden */
   rules: Function[] = [];
   /** @hidden */
@@ -82,6 +83,12 @@ export class UrlRouterProvider {
   constructor($urlMatcherFactory: UrlMatcherFactory, $stateParams: StateParams) {
     this.$urlMatcherFactory = $urlMatcherFactory;
     this.$stateParams = $stateParams;
+  }
+
+  /** @internalapi */
+  dispose() {
+    this.rules = [];
+    delete this.otherwiseFn;
   }
 
   /**
@@ -292,7 +299,7 @@ export class UrlRouterProvider {
   };
 }
 
-export class UrlRouter {
+export class UrlRouter implements Disposable {
   /** @hidden */
   private location: string;
   /** @hidden */
@@ -305,6 +312,12 @@ export class UrlRouter {
   constructor(urlRouterProvider: UrlRouterProvider) {
     this.urlRouterProvider = urlRouterProvider;
     bindFunctions(UrlRouter.prototype, this, this);
+  }
+
+  /** @internalapi */
+  dispose() {
+    this.listener && this.listener();
+    delete this.listener;
   }
 
   /**
