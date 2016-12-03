@@ -1,7 +1,7 @@
 /** @internalapi @module vanilla */ /** */
 import {
     extend, assertPredicate, isFunction, isArray, isInjectable, $InjectorLike, IInjectable
-} from "../common/module";
+} from "../common/index";
 
 // globally available injectables
 let globals = {};

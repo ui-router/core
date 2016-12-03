@@ -8,7 +8,7 @@
 import {IInjectable, Obj} from "./common";
 
 let notImplemented = (fnname: string) => () => {
-  throw new Error(`${fnname}(): No coreservices implementation for UI-Router is loaded. You should include one of: ['angular1.js']`);
+  throw new Error(`${fnname}(): No coreservices implementation for UI-Router is loaded.`);
 };
 
 let services: CoreServices = {

@@ -20,6 +20,10 @@ if (!readlineSync.keyInYN('Did you push all changes back to origin?')) {
   process.exit(1);
 }
 
+if (!readlineSync.keyInYN('Ready to publish?')) {
+  process.exit(1);
+}
+
 util.ensureCleanMaster('master');
 _exec(`npm publish`);
 _exec(`git tag ${version}`);

@@ -1,13 +1,13 @@
 /** @coreapi @module common */ /** */
 
-export * from "./common/module";
-export * from "./params/module";
-export * from "./path/module";
-export * from "./resolve/module";
-export * from "./state/module";
-export * from "./transition/module";
-export * from "./url/module";
-export * from "./view/module";
+export * from "./common/index";
+export * from "./params/index";
+export * from "./path/index";
+export * from "./resolve/index";
+export * from "./state/index";
+export * from "./transition/index";
+export * from "./url/index";
+export * from "./view/index";
 export * from "./globals";
 
 export * from "./router";

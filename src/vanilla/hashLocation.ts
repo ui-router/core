@@ -1,5 +1,5 @@
 /** @internalapi @module vanilla */ /** */
-import { isDefined } from "../common/module";
+import { isDefined } from "../common/index";
 import { LocationServices } from "../common/coreservices";
 import { splitHash, splitQuery, trimHashVal, getParams, locationPluginFactory } from "./utils";
 import { UIRouter } from "../router";

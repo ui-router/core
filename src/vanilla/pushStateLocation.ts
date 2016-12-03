@@ -1,5 +1,5 @@
 /** @internalapi @module vanilla */ /** */
-import { services, isDefined } from "../common/module";
+import { services, isDefined } from "../common/index";
 import { LocationServices } from "../common/coreservices";
 import { splitQuery, trimHashVal, getParams, locationPluginFactory } from "./utils";
 import { LocationPlugin } from "./interface";
