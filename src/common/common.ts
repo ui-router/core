@@ -140,6 +140,12 @@ export const removeFrom = curry((array: any[], obj: any) => {
 export const pushTo = <T> (arr: T[], val: T) =>
     (arr.push(val), val);
 
+/** Given an array of (deregistration) functions, calls all functions and removes each one from the source array */
+export const deregAll = (functions: Function[]) =>
+    functions.slice().forEach(fn => {
+      typeof fn === 'function' && fn();
+      removeFrom(functions, fn);
+    });
 /**
  * Applies a set of defaults to an options object.  The options object is filtered
  * to only those properties of the objects in the defaultsList.

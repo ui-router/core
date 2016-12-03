@@ -133,10 +133,10 @@ export class TransitionService implements IHookRegistry, Disposable {
   }
 
   /** @internalapi */
-  dispose() {
-    delete this._router.globals.transition;
+  dispose(router: UIRouter) {
+    delete router.globals.transition;
 
-    values(this._transitionHooks).forEach(hooksArray => hooksArray.forEach(hook => {
+    values(this._transitionHooks).forEach((hooksArray: RegisteredHook[]) => hooksArray.forEach(hook => {
       hook._deregistered = true;
       removeFrom(hooksArray, hook);
     }));

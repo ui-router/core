@@ -116,7 +116,6 @@ describe('stateService', function () {
     it("should not update the URL in response to synchronizing URL", ((done) => {
       $loc.setUrl('/a/b/c');
       var setUrl = spyOn($loc, 'setUrl').and.callThrough();
-      router.urlRouter.sync();
 
       wait().then(() => {
         expect($state.current.name).toBe('C');
@@ -132,7 +131,6 @@ describe('stateService', function () {
 
       $loc.setUrl('/a/b/c');
       var setUrl = spyOn($loc, 'setUrl').and.callThrough();
-      router.urlRouter.sync();
 
       wait().then(() => {
         expect($state.current.name).toBe('D');

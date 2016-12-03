@@ -5,16 +5,20 @@ import * as vanilla from "../src/vanilla"
 
 describe('browserHistory implementation', () => {
 
-  let router;
+  let router: UIRouter;
   let makeMatcher;
   let locationProvider = services.location;
 
-  // for phantomJS
+  // Replace the `history` reference because PhantomJS does not support spying on it.
   function mockHistoryObject() {
-    (window as any).history = {
+    let plugin: any = router.getPlugin('vanilla.pushStateLocation');
+
+    plugin.service._history = {
       replaceState: () => null,
       pushState: () => null
     };
+
+    return plugin.service;
   }
 
   beforeEach(() => {
@@ -33,22 +37,22 @@ describe('browserHistory implementation', () => {
   });
 
   it('uses history.pushState when setting a url', () => {
-    mockHistoryObject();
-    expect(services.locationConfig.html5Mode()).toBe(true);
-    let stub = spyOn(history, 'pushState');
-    router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' });
+    let service = mockHistoryObject();
+    expect(services.location.html5Mode()).toBe(true);
+    let stub = spyOn(service._history, 'pushState');
+    router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' }, {});
     expect(stub.calls.first().args[2]).toBe('/hello/world');
   });
 
   it('uses history.replaceState when setting a url with replace', () => {
-    mockHistoryObject();
-    let stub = spyOn(history, 'replaceState');
+    let service = mockHistoryObject();
+    let stub = spyOn(service._history, 'replaceState');
     router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' }, { replace: true });
     expect(stub.calls.first().args[2]).toBe('/hello/world');
   });
 
   it('returns the correct url query', () => {
-    expect(services.locationConfig.html5Mode()).toBe(true);
+    expect(services.location.html5Mode()).toBe(true);
     return router.stateService.go('path', {urlParam: 'bar'}).then(() => {
       expect(window.location.toString().includes('/path/bar')).toBe(true);
       expect(window.location.toString().includes('/#/path/bar')).toBe(false);

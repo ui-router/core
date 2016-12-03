@@ -380,7 +380,7 @@ export class UrlRouter implements Disposable {
    * @param params
    * @param options
    */
-  push(urlMatcher: UrlMatcher, params: StateParams, options: { replace?: (string|boolean) }) {
+  push(urlMatcher: UrlMatcher, params: RawParams, options: { replace?: (string|boolean) }) {
     let replace = options && !!options.replace;
     services.location.setUrl(urlMatcher.format(params || {}), replace);
   }
@@ -411,9 +411,10 @@ export class UrlRouter implements Disposable {
     options = options || { absolute: false };
 
     let cfg = services.locationConfig;
-    let isHtml5 = cfg.html5Mode();
+    let loc = services.location;
+    let isHtml5 = loc.html5Mode();
     if (!isHtml5 && url !== null) {
-      url = "#" + cfg.hashPrefix() + url;
+      url = "#" + loc.hashPrefix() + url;
     }
     url = appendBasePath(url, isHtml5, options.absolute);
 

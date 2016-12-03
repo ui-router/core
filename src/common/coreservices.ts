@@ -61,9 +61,12 @@ export interface CoreServices {
 export interface LocationServices {
   setUrl(newurl: string, replace?: boolean): void;
   path(): string;
-  search(): string;
+  search(): { [key: string]: any };
   hash(): string;
   onChange(callback: Function): Function;
+  html5Mode(): boolean;
+  hashPrefix(): string;
+  hashPrefix(newprefix: string): string;
 }
 
 export interface LocationConfig {
@@ -72,9 +75,6 @@ export interface LocationConfig {
   host(): string;
 
   baseHref(): string;
-  html5Mode(): boolean;
-  hashPrefix(): string;
-  hashPrefix(newprefix: string): string;
 }
 
 export interface TemplateServices {

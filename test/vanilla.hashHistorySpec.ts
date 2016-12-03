@@ -26,7 +26,7 @@ describe('hashHistory implementation', () => {
   });
 
   it('reports html5Mode to be false', () => {
-    expect(services.locationConfig.html5Mode()).toBe(false);
+    expect(services.location.html5Mode()).toBe(false);
   });
 
   it('returns the correct url query', (done) => {

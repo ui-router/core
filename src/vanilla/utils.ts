@@ -2,7 +2,7 @@
 import {isArray} from "../common/module";
 import { LocationServices, LocationConfig, services } from "../common/coreservices";
 import { UIRouter } from "../router";
-import { extend, pushTo, removeFrom } from "../common/common";
+import { extend, bindFunctions } from "../common/common";
 
 const beforeAfterSubstr = (char: string) => (str: string): string[] => {
   if (!str) return ["", ""];
@@ -30,20 +30,23 @@ export const keyValsToObjectR = (accum, [key, val]) => {
 export const getParams = (queryString: string): any =>
   queryString.split("&").map(splitEqual).reduce(keyValsToObjectR, {});
 
-export function locationPluginFactory(name: string, service: LocationServices, configuration: LocationConfig) {
-  let deregFns: Function[] = [];
-  function dispose() {
-    deregFns.forEach(fn => {
-      typeof fn === 'function' && fn();
-      removeFrom(deregFns, fn);
-    });
-  }
-
+export function locationPluginFactory(
+    name: string,
+    serviceClass: { new(router?: UIRouter): LocationServices },
+    configurationClass: { new(router?: UIRouter): LocationConfig }
+) {
   return function(router: UIRouter) {
-    extend(services.locationConfig, configuration);
-    extend(services.location, service);
-    services.location.onChange = (cb: Function) =>
-        pushTo(deregFns, service.onChange(cb));
+    let service = new serviceClass(router);
+    let configuration = new configurationClass(router);
+
+    function dispose(router: UIRouter) {
+      router.dispose(service);
+      router.dispose(configuration);
+    }
+
+    bindFunctions(serviceClass.prototype, services.location, service);
+    bindFunctions(configurationClass.prototype, services.locationConfig, configuration);
+
     return { name, service, configuration, dispose };
   };
 }

@@ -9,6 +9,7 @@ import { StateService } from "./state/stateService";
 import { UIRouterGlobals, Globals } from "./globals";
 import { UIRouterPlugin, Disposable } from "./interface";
 import { values, removeFrom } from "./common/common";
+import { isFunction } from "./common/predicates";
 
 /** @hidden */
 let _routerInstance = 0;
@@ -51,7 +52,22 @@ export class UIRouter {
     this._disposables.push(disposable);
   }
 
-  dispose() {
+  /**
+   * Disposes this router instance
+   *
+   * When called, clears resources retained by the router by calling `dispose(this)` on all
+   * registered [[disposable]] objects.
+   *
+   * Or, if a `disposable` object is provided, calls `dispose(this)` on that object only.
+   *
+   * @param disposable (optional) the disposable to dispose
+   */
+  dispose(disposable?: any): void {
+    if (disposable && isFunction(disposable.dispose)) {
+      disposable.dispose(this);
+      return undefined;
+    }
+
     this._disposables.slice().forEach(d => {
       try {
         typeof d.dispose === 'function' && d.dispose(this);
