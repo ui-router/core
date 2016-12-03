@@ -17,9 +17,10 @@ import {TransitionService} from "../transition/transitionService";
  * In angular 1, this includes loading the templates.
  */
 const loadEnteringViews: TransitionHookFn = (transition: Transition) => {
+  let $q = services.$q;
   let enteringViews = transition.views("entering");
   if (!enteringViews.length) return;
-  return services.$q.all(enteringViews.map(view => view.load())).then(noop);
+  return $q.all(enteringViews.map(view => $q.when(view.load()))).then(noop);
 };
 
 export const registerLoadEnteringViews = (transitionService: TransitionService) =>
