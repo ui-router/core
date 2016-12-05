@@ -25,7 +25,7 @@ describe("hooks", () => {
       states.forEach(state => router.stateRegistry.register(state));
       router.stateRegistry.stateQueue.autoFlush($state);
     }
-  })
+  });
 
   describe('redirectTo:', () => {
     it("should redirect to a state by name from the redirectTo: string", (done) => {
@@ -33,31 +33,31 @@ describe("hooks", () => {
       init();
 
       $state.go('A').then(() => {
-        expect(router.globals.current.name).toBe('AAA')
+        expect(router.globals.current.name).toBe('AAA');
         done()
       })
-    })
+    });
 
     it("should redirect to a state by name from the redirectTo: object", (done) => {
-      find(states, s => s.name === 'A').redirectTo = { state: "AAA" }
+      find(states, s => s.name === 'A').redirectTo = { state: "AAA" };
       init();
 
       $state.go('A').then(() => {
-        expect(router.globals.current.name).toBe('AAA')
+        expect(router.globals.current.name).toBe('AAA');
         done()
       })
-    })
+    });
 
     it("should redirect to a state and params by name from the redirectTo: object", (done) => {
       find(states, s => s.name === 'A').redirectTo = { state: "AAA", params: { fooId: 'abc'} };
       init();
 
       $state.go('A').then(() => {
-        expect(router.globals.current.name).toBe('AAA')
-        expect(router.globals.params.fooId).toBe('abc')
+        expect(router.globals.current.name).toBe('AAA');
+        expect(router.globals.params.fooId).toBe('abc');
         done()
       })
-    })
+    });
 
     it("should redirect to a TargetState returned from the redirectTo: function", (done) => {
       find(states, s => s.name === 'A').redirectTo =
@@ -65,10 +65,10 @@ describe("hooks", () => {
       init();
 
       $state.go('A').then(() => {
-        expect(router.globals.current.name).toBe('AAA')
+        expect(router.globals.current.name).toBe('AAA');
         done()
       })
-    })
+    });
 
     it("should redirect after waiting for a promise for a state name returned from the redirectTo: function", (done) => {
       find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
@@ -80,7 +80,7 @@ describe("hooks", () => {
         expect(router.globals.current.name).toBe('AAA');
         done()
       })
-    })
+    });
 
     it("should redirect after waiting for a promise for a {state, params} returned from the redirectTo: function", (done) => {
       find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
@@ -93,7 +93,7 @@ describe("hooks", () => {
         expect(router.globals.params.fooId).toBe('FOO');
         done()
       })
-    })
+    });
 
     it("should redirect after waiting for a promise for a TargetState returned from the redirectTo: function", (done) => {
       find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
@@ -105,7 +105,7 @@ describe("hooks", () => {
         expect(router.globals.current.name).toBe('AAA');
         done()
       })
-    })
+    });
 
     // Test for #3117
     it("should not redirect if the redirectTo: function returns undefined", (done) => {
@@ -116,7 +116,7 @@ describe("hooks", () => {
         expect(router.globals.current.name).toBe('A');
         done()
       })
-    })
+    });
 
     it("should not redirect if the redirectTo: function returns something other than a string, { state, params}, TargetState (or promise for)", (done) => {
       find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
