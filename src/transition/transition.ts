@@ -508,8 +508,11 @@ export class Transition implements IHookRegistry {
 
   /** @hidden If a transition doesn't exit/enter any states, returns any [[Param]] whose value changed */
   private _changedParams(): Param[] {
-    let {to, from} = this._treeChanges;
-    if (this._options.reload || tail(to).state !== tail(from).state) return undefined;
+    let tc = this._treeChanges;
+    let to = tc.to;
+    let from = tc.from;
+
+    if (this._options.reload || tc.entering.length || tc.exiting.length) return undefined;
 
     let nodeSchemas: Param[][] = to.map((node: PathNode) => node.paramSchema);
     let [toValues, fromValues] = [to, from].map(path => path.map(x => x.paramValues));
