@@ -425,12 +425,31 @@ export const flatten   = (arr: any[]) => arr.reduce(flattenR, []);
  * oneString.filter(assertPredicate(isNumber, "Not all numbers")); // throws Error(""Not all numbers"");
  * ```
  */
-export function assertPredicate<T>(predicate: Predicate<T>, errMsg: (string|Function) = "assert failure"): Predicate<T> {
-  return (obj: T) => {
-    if (!predicate(obj)) {
+export const assertPredicate: <T> (predicate: Predicate<T>, errMsg: (string|Function)) => Predicate<T> = assertFn;
+/**
+ * Given a .map function, builds a .map function which throws an error if any mapped elements do not pass a truthyness test.
+ * @example
+ * ```
+ *
+ * var data = { foo: 1, bar: 2 };
+ *
+ * let keys = [ 'foo', 'bar' ]
+ * let values = keys.map(assertMap(key => data[key], "Key not found"));
+ * // values is [1, 2]
+ *
+ * let keys = [ 'foo', 'bar', 'baz' ]
+ * let values = keys.map(assertMap(key => data[key], "Key not found"));
+ * // throws Error("Key not found")
+ * ```
+ */
+export const assertMap: <T, U> (mapFn: (t: T) => U, errMsg: (string|Function)) => (t: T) => U = assertFn;
+export function assertFn(predicateOrMap: Function, errMsg: (string|Function) = "assert failure"): any {
+  return (obj) => {
+    let result = predicateOrMap(obj);
+    if (!result) {
       throw new Error(isFunction(errMsg) ? (<Function> errMsg)(obj) : errMsg);
     }
-    return true;
+    return result;
   };
 }
 
