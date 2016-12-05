@@ -3,6 +3,8 @@ import { tree2Array } from "./_testUtils";
 import { find } from "../src/common/common";
 import { StateService } from "../src/state/stateService";
 import { StateDeclaration } from "../src/state/interface";
+import { TestingPlugin } from "./_testingPlugin";
+import { TransitionService } from "../src/transition/transitionService";
 
 
 let statetree = {
@@ -12,19 +14,25 @@ let statetree = {
         url: "/:fooId", params: { fooId: "" }
       }
     }
-  }
+  },
+  B: {}
 };
 
 describe("hooks", () => {
-  let router, $state: StateService, states: StateDeclaration[], init;
+  let router;
+  let $state: StateService;
+  let $transitions: TransitionService;
+  let states: StateDeclaration[];
+  let init: Function;
+
   beforeEach(() => {
     router = new UIRouter();
+    router.plugin(TestingPlugin);
+
     $state = router.stateService;
+    $transitions = router.transitionService;
     states = tree2Array(statetree, false);
-    init = () => {
-      states.forEach(state => router.stateRegistry.register(state));
-      router.stateRegistry.stateQueue.autoFlush($state);
-    }
+    init = () => states.forEach(state => router.stateRegistry.register(state));
   });
 
   describe('redirectTo:', () => {
@@ -129,6 +137,46 @@ describe("hooks", () => {
         done()
       })
     })
-  })
+  });
+
+  describe('onEnter:', () => {
+    it("should enter states from shallow to deep states", (done) => {
+      init();
+      let log = [];
+      $transitions.onEnter({}, (trans, state) => log.push(state));
+
+      $state.go('B')
+          .then(() => expect(router.globals.current.name).toBe('B'))
+          .then(() => {
+            log = [];
+            return $state.go('AAA')
+          })
+          .then(() => {
+            expect(router.globals.current.name).toBe('AAA');
+            expect(log.map(x=>x.name)).toEqual(['A','AA','AAA']);
+          })
+          .then(done);
+    })
+  });
+
+  describe('onExit:', () => {
+    it("should exit states from deep to shallow states", (done) => {
+      init();
+      let log = [];
+      $transitions.onExit({}, (trans, state) => log.push(state));
+
+      $state.go('AAA')
+          .then(() => expect(router.globals.current.name).toBe('AAA'))
+          .then(() => {
+            log = [];
+            return $state.go('B')
+          })
+          .then(() => {
+            expect(router.globals.current.name).toBe('B');
+            expect(log.map(x=>x.name)).toEqual(['AAA','AA','A']);
+          })
+          .then(done);
+    })
+  });
 
 });
