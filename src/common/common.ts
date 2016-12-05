@@ -137,8 +137,8 @@ export const removeFrom = curry((array: any[], obj: any) => {
 });
 
 /** pushes a values to an array and returns the value */
-export const pushTo = <T> (arr: T[], val: T) =>
-    (arr.push(val), val);
+export const pushTo = curry((arr: any[], val: any) =>
+    (arr.push(val), val));
 
 /** Given an array of (deregistration) functions, calls all functions and removes each one from the source array */
 export const deregAll = (functions: Function[]) =>
