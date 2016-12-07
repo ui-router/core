@@ -694,6 +694,9 @@ export interface IHookRegistry {
    * ```
    */
   getHooks(hookName: string): RegisteredHook[];
+
+  /** @hidden place to store the hooks */
+  _registeredHooks: { [key: string]: RegisteredHook[] }
 }
 
 /** A predicate type which takes a [[State]] and returns a boolean */

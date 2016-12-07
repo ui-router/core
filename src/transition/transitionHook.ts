@@ -11,7 +11,7 @@ import {Rejection} from "./rejectFactory";
 import {TargetState} from "../state/targetState";
 import {Transition} from "./transition";
 import {State} from "../state/stateObject";
-import {TransitionHookType} from "./transitionHookType";
+import {TransitionEventType} from "./transitionEventType";
 import {StateService} from "../state/stateService"; // has or is using
 import {RegisteredHook} from "./hookRegistry"; // has or is using
 
@@ -58,7 +58,7 @@ export class TransitionHook {
       undefined;
 
   private rejectIfSuperseded = () =>
-      this.registeredHook.hookType.rejectIfSuperseded && this.options.current() !== this.options.transition;
+      this.registeredHook.eventType.rejectIfSuperseded && this.options.current() !== this.options.transition;
 
   invokeHook(): Promise<HookResult> {
     let hook = this.registeredHook;
@@ -76,8 +76,8 @@ export class TransitionHook {
     let trans = this.transition;
     let state = this.stateContext;
 
-    let errorHandler  = hook.hookType.getErrorHandler(this);
-    let resultHandler = hook.hookType.getResultHandler(this);
+    let errorHandler  = hook.eventType.getErrorHandler(this);
+    let resultHandler = hook.eventType.getResultHandler(this);
     resultHandler = resultHandler || identity;
 
     if (!errorHandler) {

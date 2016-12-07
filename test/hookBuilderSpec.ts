@@ -163,7 +163,7 @@ describe('HookBuilder:', function() {
 
     describe('should have the correct state context', function() {
       const hookTypeByName = name =>
-          $trans.getTransitionHookTypes().filter(type => type.name === name)[0];
+          $trans._pluginapi.getTransitionEventTypes().filter(type => type.name === name)[0];
 
       const context = hook =>
           hook.stateContext && hook.stateContext.name;

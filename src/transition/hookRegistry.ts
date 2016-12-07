@@ -1,8 +1,10 @@
 /** @coreapi @module transition */ /** for typedoc */
-import {extend, removeFrom, allTrueR, tail} from "../common/common";
+import { extend, removeFrom, allTrueR, tail, uniqR, pushTo, equals, values, identity } from "../common/common";
 import {isString, isFunction} from "../common/predicates";
 import {PathNode} from "../path/node";
-import {TransitionStateHookFn, TransitionHookFn} from "./interface"; // has or is using
+import {
+    TransitionStateHookFn, TransitionHookFn, TransitionHookPhase, TransitionHookScope, IHookRegistry
+} from "./interface"; // has or is using
 
 import {
     HookRegOptions, HookMatchCriteria, IHookRegistration, TreeChanges,
@@ -10,7 +12,8 @@ import {
 } from "./interface";
 import {Glob} from "../common/glob";
 import {State} from "../state/stateObject";
-import {TransitionHookType} from "./transitionHookType";
+import {TransitionEventType} from "./transitionEventType";
+import { TransitionService } from "./transitionService";
 
 /**
  * Determines if the given state matches the matchCriteria
@@ -49,29 +52,87 @@ export function matchState(state: State, criterion: HookMatchCriterion) {
  * The registration data for a registered transition hook
  */
 export class RegisteredHook implements RegisteredHook {
-  hookType: TransitionHookType;
-  callback: HookFn;
   matchCriteria: HookMatchCriteria;
   priority: number;
   bind: any;
   _deregistered: boolean;
 
-  constructor(hookType: TransitionHookType,
+  constructor(public tranSvc: TransitionService,
+              public eventType: TransitionEventType,
+              public callback: HookFn,
               matchCriteria: HookMatchCriteria,
-              callback: HookFn,
-              options: HookRegOptions = <any>{}) {
-    this.hookType = hookType;
-    this.callback = callback;
-    this.matchCriteria = extend({ to: true, from: true, exiting: true, retained: true, entering: true }, matchCriteria);
+              options: HookRegOptions = {} as any) {
+    this.matchCriteria = extend(this._getDefaultMatchCriteria(), matchCriteria);
     this.priority = options.priority || 0;
     this.bind = options.bind || null;
     this._deregistered = false;
   }
 
-  private static _matchingNodes(nodes: PathNode[], criterion: HookMatchCriterion): PathNode[] {
+  /**
+   * Given an array of PathNodes, and a HookMatchCriteria, returns an array containing
+   * the PathNodes that the criteria matches, or null if there were no matching nodes.
+   *
+   * Returning null is significant to distinguish between the default
+   * "match-all criterion value" of `true` compared to a () => true,
+   * when the nodes is an empty array.
+   *
+   * This is useful to allow a transition match criteria of `entering: true`
+   * to still match a transition, even when `entering === []`.  Contrast that
+   * with `entering: (state) => true` which only matches when a state is actually
+   * being entered.
+   */
+  private _matchingNodes(nodes: PathNode[], criterion: HookMatchCriterion): PathNode[] {
     if (criterion === true) return nodes;
     let matching = nodes.filter(node => matchState(node.state, criterion));
     return matching.length ? matching : null;
+  }
+
+  /**
+   * Returns an object which has all the criteria match paths as keys and `true` as values, i.e.:
+   *
+   * { to: true, from: true, entering: true, exiting: true, retained: true }
+   */
+  private _getDefaultMatchCriteria(): HookMatchCriteria {
+    return this.tranSvc._pluginapi.getTransitionEventTypes()
+        .map(type => type.criteriaMatchPath)
+        .reduce<any[]>(uniqR, [])
+        .reduce((acc, path) => (acc[path] = true, acc), {});
+  }
+
+  /**
+   * For all the criteria match paths in all TransitionHookTypes,
+   * return an object where: keys are pathname, vals are TransitionHookScope
+   */
+  private _getPathScopes(): { [key: string]: TransitionHookScope } {
+    return this.tranSvc._pluginapi.getTransitionEventTypes().reduce((paths, type) => {
+      paths[type.criteriaMatchPath] = type.hookScope;
+      return paths
+    }, {});
+  }
+
+  /**
+   * Create a IMatchingNodes object from the TransitionHookTypes that basically looks like this:
+   *
+   * let matches: IMatchingNodes = {
+   *   to:       _matchingNodes([tail(treeChanges.to)],   mc.to),
+   *   from:     _matchingNodes([tail(treeChanges.from)], mc.from),
+   *   exiting:  _matchingNodes(treeChanges.exiting,      mc.exiting),
+   *   retained: _matchingNodes(treeChanges.retained,     mc.retained),
+   *   entering: _matchingNodes(treeChanges.entering,     mc.entering),
+   * };
+   */
+  private _getMatchingNodes(treeChanges: TreeChanges): IMatchingNodes {
+    let pathScopes: { [key: string]: TransitionHookScope } = this._getPathScopes();
+
+    return Object.keys(pathScopes).reduce((mn: IMatchingNodes, pathName: string) => {
+      // STATE scope criteria matches against every node in the path.
+      // TRANSITION scope criteria matches against only the last node in the path
+      let isStateHook = pathScopes[pathName] === TransitionHookScope.STATE;
+      let nodes: PathNode[] = isStateHook ? treeChanges[pathName] : [tail(treeChanges[pathName])];
+
+      mn[pathName] = this._matchingNodes(nodes, this.matchCriteria[pathName]);
+      return mn;
+    }, {} as IMatchingNodes);
   }
 
   /**
@@ -81,21 +142,10 @@ export class RegisteredHook implements RegisteredHook {
    * are the matching [[PathNode]]s for each [[HookMatchCriterion]] (to, from, exiting, retained, entering)
    */
   matches(treeChanges: TreeChanges): IMatchingNodes {
-    let mc = this.matchCriteria, _matchingNodes = RegisteredHook._matchingNodes;
-
-    let matches: IMatchingNodes = {
-      to:       _matchingNodes([tail(treeChanges.to)], mc.to),
-      from:     _matchingNodes([tail(treeChanges.from)], mc.from),
-      exiting:  _matchingNodes(treeChanges.exiting, mc.exiting),
-      retained: _matchingNodes(treeChanges.retained, mc.retained),
-      entering: _matchingNodes(treeChanges.entering, mc.entering),
-    };
+    let matches = this._getMatchingNodes(treeChanges);
 
     // Check if all the criteria matched the TreeChanges object
-    let allMatched: boolean = ["to", "from", "exiting", "retained", "entering"]
-        .map(prop => matches[prop])
-        .reduce(allTrueR, true);
-
+    let allMatched = values(matches).every(identity);
     return allMatched ? matches : null;
   }
 }
@@ -106,17 +156,23 @@ export interface RegisteredHooks {
 }
 
 /** @hidden Return a registration function of the requested type. */
-export function makeHookRegistrationFn(registeredHooks: RegisteredHooks, type: TransitionHookType): IHookRegistration {
-  let name = type.name;
-  registeredHooks[name] = [];
+export function makeEvent(registry: IHookRegistry, transitionService: TransitionService, eventType: TransitionEventType) {
+  // Create the object which holds the registered transition hooks.
+  let _registeredHooks = registry._registeredHooks = (registry._registeredHooks || {});
+  let hooks = _registeredHooks[eventType.name] = [];
 
-  return function (matchObject, callback, options = {}) {
-    let registeredHook = new RegisteredHook(type, matchObject, callback, options);
-    registeredHooks[name].push(registeredHook);
+  // Create hook registration function on the IHookRegistry for the event
+  registry[eventType.name] = hookRegistrationFn;
+
+  function hookRegistrationFn(matchObject, callback, options = {}) {
+    let registeredHook = new RegisteredHook(transitionService, eventType, callback, matchObject, options);
+    hooks.push(registeredHook);
 
     return function deregisterEventHook() {
       registeredHook._deregistered = true;
-      removeFrom(registeredHooks[name])(registeredHook);
+      removeFrom(hooks)(registeredHook);
     };
-  };
+  }
+
+  return hookRegistrationFn;
 }

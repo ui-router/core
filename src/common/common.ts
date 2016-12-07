@@ -86,9 +86,10 @@ export interface Obj extends Object {
  * @param bindTo The object which the functions will be bound to
  * @param fnNames The function names which will be bound (Defaults to all the functions found on the 'from' object)
  */
-export function bindFunctions(from: Obj, to: Obj, bindTo: Obj, fnNames: string[] = Object.keys(from)) {
-  return fnNames.filter(name => typeof from[name] === 'function')
+export function bindFunctions(from: Obj, to: Obj, bindTo: Obj, fnNames: string[] = Object.keys(from)): Obj {
+  fnNames.filter(name => typeof from[name] === 'function')
       .forEach(name => to[name] = from[name].bind(bindTo));
+  return to;
 }
 
 

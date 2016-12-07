@@ -13,7 +13,7 @@ import {TransitionHook} from "./transitionHook";
 import {State} from "../state/stateObject";
 import {PathNode} from "../path/node";
 import {TransitionService} from "./transitionService";
-import {TransitionHookType} from "./transitionHookType";
+import {TransitionEventType} from "./transitionEventType";
 import {RegisteredHook} from "./hookRegistry";
 
 /**
@@ -54,7 +54,7 @@ export class HookBuilder {
   }
 
   buildHooksForPhase(phase: TransitionHookPhase): TransitionHook[] {
-    return this.$transitions.getTransitionHookTypes(phase)
+    return this.$transitions._pluginapi.getTransitionEventTypes(phase)
         .map(type => this.buildHooks(type))
         .reduce(unnestR, [])
         .filter(identity);
@@ -69,7 +69,7 @@ export class HookBuilder {
    *
    * @param hookType the type of the hook registration function, e.g., 'onEnter', 'onFinish'.
    */
-  buildHooks(hookType: TransitionHookType): TransitionHook[] {
+  buildHooks(hookType: TransitionEventType): TransitionHook[] {
     // Find all the matching registered hooks for a given hook type
     let matchingHooks = this.getMatchingHooks(hookType, this.treeChanges);
     if (!matchingHooks) return [];
@@ -110,7 +110,7 @@ export class HookBuilder {
    *
    * @returns an array of matched [[RegisteredHook]]s
    */
-  public getMatchingHooks(hookType: TransitionHookType, treeChanges: TreeChanges): RegisteredHook[] {
+  public getMatchingHooks(hookType: TransitionEventType, treeChanges: TreeChanges): RegisteredHook[] {
     let isCreate = hookType.hookPhase === TransitionHookPhase.CREATE;
 
     // Instance and Global hook registries

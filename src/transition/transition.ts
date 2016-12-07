@@ -18,7 +18,7 @@ import {
 import { TransitionStateHookFn, TransitionHookFn } from "./interface"; // has or is using
 
 import {TransitionHook} from "./transitionHook";
-import {matchState, RegisteredHooks, makeHookRegistrationFn, RegisteredHook} from "./hookRegistry";
+import {matchState, RegisteredHooks, makeEvent, RegisteredHook} from "./hookRegistry";
 import {HookBuilder} from "./hookBuilder";
 import {PathNode} from "../path/node";
 import {PathFactory} from "../path/pathFactory";
@@ -84,7 +84,7 @@ export class Transition implements IHookRegistry {
   private _error: any;
 
   /** @hidden Holds the hook registration functions such as those passed to Transition.onStart() */
-  private _transitionHooks: RegisteredHooks = { };
+  _registeredHooks: RegisteredHooks = { };
 
   /** @hidden */
   private _options: TransitionOptions;
@@ -116,14 +116,14 @@ export class Transition implements IHookRegistry {
    * (which can then be used to register hooks)
    */
   private createTransitionHookRegFns() {
-    this.router.transitionService.getTransitionHookTypes()
+    this.router.transitionService._pluginapi.getTransitionEventTypes()
         .filter(type => type.hookPhase !== TransitionHookPhase.CREATE)
-        .forEach(type => this[type.name] =  makeHookRegistrationFn(this._transitionHooks, type));
+        .forEach(type => makeEvent(this, this.router.transitionService, type));
   }
 
   /** @hidden @internalapi */
   getHooks(hookName: string): RegisteredHook[] {
-    return this._transitionHooks[hookName];
+    return this._registeredHooks[hookName];
   }
 
   /**
@@ -509,13 +509,23 @@ export class Transition implements IHookRegistry {
   /** @hidden If a transition doesn't exit/enter any states, returns any [[Param]] whose value changed */
   private _changedParams(): Param[] {
     let tc = this._treeChanges;
-    let to = tc.to;
-    let from = tc.from;
 
-    if (this._options.reload || tc.entering.length || tc.exiting.length) return undefined;
+    /** Return undefined if it's not a "dynamic" transition, for the following reasons */
+    // If user explicitly wants a reload
+    if (this._options.reload) return undefined;
+    // If any states are exiting or entering
+    if (tc.exiting.length || tc.entering.length) return undefined;
+    // If to/from path lengths differ
+    if (tc.to.length !== tc.from.length) return undefined;
+    // If the to/from paths are different
+    let pathsDiffer: boolean = arrayTuples(tc.to, tc.from)
+        .map(tuple => tuple[0].state !== tuple[1].state)
+        .reduce(anyTrueR, false);
+    if (pathsDiffer) return undefined;
 
-    let nodeSchemas: Param[][] = to.map((node: PathNode) => node.paramSchema);
-    let [toValues, fromValues] = [to, from].map(path => path.map(x => x.paramValues));
+    // Find any parameter values that differ
+    let nodeSchemas: Param[][] = tc.to.map((node: PathNode) => node.paramSchema);
+    let [toValues, fromValues] = [tc.to, tc.from].map(path => path.map(x => x.paramValues));
     let tuples = arrayTuples(nodeSchemas, toValues, fromValues);
 
     return tuples.map(([schema, toVals, fromVals]) => Param.changed(schema, toVals, fromVals)).reduce(unnestR, []);

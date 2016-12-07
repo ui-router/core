@@ -10,7 +10,7 @@ import {GetErrorHandler, GetResultHandler, TransitionHook} from "./transitionHoo
  * @interalapi
  * @module transition
  */
-export class TransitionHookType {
+export class TransitionEventType {
 
   constructor(public name:               string,
               public hookPhase:          TransitionHookPhase,
@@ -18,8 +18,8 @@ export class TransitionHookType {
               public hookOrder:          number,
               public criteriaMatchPath:  string,
               public reverseSort:        boolean = false,
-              public getResultHandler:      GetResultHandler = TransitionHook.HANDLE_RESULT,
-              public getErrorHandler:       GetErrorHandler = TransitionHook.REJECT_ERROR,
+              public getResultHandler:   GetResultHandler = TransitionHook.HANDLE_RESULT,
+              public getErrorHandler:    GetErrorHandler = TransitionHook.REJECT_ERROR,
               public rejectIfSuperseded: boolean = true,
   ) { }
 }
