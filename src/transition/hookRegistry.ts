@@ -1,5 +1,5 @@
 /** @coreapi @module transition */ /** for typedoc */
-import { extend, removeFrom, allTrueR, tail, uniqR, pushTo, equals, values, identity } from "../common/common";
+import { extend, removeFrom, tail, values, identity, map } from "../common/common";
 import {isString, isFunction} from "../common/predicates";
 import {PathNode} from "../path/node";
 import {
@@ -7,7 +7,7 @@ import {
 } from "./interface"; // has or is using
 
 import {
-    HookRegOptions, HookMatchCriteria, IHookRegistration, TreeChanges,
+    HookRegOptions, HookMatchCriteria, TreeChanges,
     HookMatchCriterion, IMatchingNodes, HookFn
 } from "./interface";
 import {Glob} from "../common/glob";
@@ -51,7 +51,7 @@ export function matchState(state: State, criterion: HookMatchCriterion) {
  * @hidden
  * The registration data for a registered transition hook
  */
-export class RegisteredHook implements RegisteredHook {
+export class RegisteredHook {
   matchCriteria: HookMatchCriteria;
   priority: number;
   bind: any;
@@ -93,21 +93,7 @@ export class RegisteredHook implements RegisteredHook {
    * { to: true, from: true, entering: true, exiting: true, retained: true }
    */
   private _getDefaultMatchCriteria(): HookMatchCriteria {
-    return this.tranSvc._pluginapi.getTransitionEventTypes()
-        .map(type => type.criteriaMatchPath)
-        .reduce<any[]>(uniqR, [])
-        .reduce((acc, path) => (acc[path] = true, acc), {});
-  }
-
-  /**
-   * For all the criteria match paths in all TransitionHookTypes,
-   * return an object where: keys are pathname, vals are TransitionHookScope
-   */
-  private _getPathScopes(): { [key: string]: TransitionHookScope } {
-    return this.tranSvc._pluginapi.getTransitionEventTypes().reduce((paths, type) => {
-      paths[type.criteriaMatchPath] = type.hookScope;
-      return paths
-    }, {});
+    return map(this.tranSvc._pluginapi._getPaths(), () => true);
   }
 
   /**
@@ -122,15 +108,15 @@ export class RegisteredHook implements RegisteredHook {
    * };
    */
   private _getMatchingNodes(treeChanges: TreeChanges): IMatchingNodes {
-    let pathScopes: { [key: string]: TransitionHookScope } = this._getPathScopes();
+    let paths: PathType[] = values(this.tranSvc._pluginapi._getPaths());
 
-    return Object.keys(pathScopes).reduce((mn: IMatchingNodes, pathName: string) => {
+    return paths.reduce((mn: IMatchingNodes, path: PathType) => {
       // STATE scope criteria matches against every node in the path.
       // TRANSITION scope criteria matches against only the last node in the path
-      let isStateHook = pathScopes[pathName] === TransitionHookScope.STATE;
-      let nodes: PathNode[] = isStateHook ? treeChanges[pathName] : [tail(treeChanges[pathName])];
+      let name = path.name, isStateHook = path.scope === TransitionHookScope.STATE;
+      let nodes: PathNode[] = isStateHook ? treeChanges[name] : [tail(treeChanges[name])];
 
-      mn[pathName] = this._matchingNodes(nodes, this.matchCriteria[pathName]);
+      mn[name] = this._matchingNodes(nodes, this.matchCriteria[name]);
       return mn;
     }, {} as IMatchingNodes);
   }
@@ -153,6 +139,23 @@ export class RegisteredHook implements RegisteredHook {
 /** @hidden */
 export interface RegisteredHooks {
   [key: string]: RegisteredHook[];
+}
+
+/** @hidden */
+export interface PathTypes {
+  [key: string]: PathType
+
+  to: PathType
+  from: PathType
+  exiting: PathType
+  retained: PathType
+  entering: PathType
+}
+
+/** @hidden */
+export interface PathType {
+  name: string;
+  scope: TransitionHookScope;
 }
 
 /** @hidden Return a registration function of the requested type. */

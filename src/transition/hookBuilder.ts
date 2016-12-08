@@ -54,7 +54,7 @@ export class HookBuilder {
   }
 
   buildHooksForPhase(phase: TransitionHookPhase): TransitionHook[] {
-    return this.$transitions._pluginapi.getTransitionEventTypes(phase)
+    return this.$transitions._pluginapi._getEvents(phase)
         .map(type => this.buildHooks(type))
         .reduce(unnestR, [])
         .filter(identity);
@@ -78,7 +78,7 @@ export class HookBuilder {
        // Fetch the Nodes that caused this hook to match.
        let matches: IMatchingNodes = hook.matches(this.treeChanges);
        // Select the PathNode[] that will be used as TransitionHook context objects
-       let matchingNodes: PathNode[] = matches[hookType.criteriaMatchPath];
+       let matchingNodes: PathNode[] = matches[hookType.criteriaMatchPath.name];
 
        // Return an array of HookTuples
        return matchingNodes.map(node => {
@@ -87,7 +87,7 @@ export class HookBuilder {
            traceData: { hookType: hookType.name, context: node}
          }, this.baseHookOptions);
 
-         let state = hookType.hookScope === TransitionHookScope.STATE ? node.state : null;
+         let state = hookType.criteriaMatchPath.scope === TransitionHookScope.STATE ? node.state : null;
          let transitionHook = new TransitionHook(this.transition, state, hook, _options);
          return <HookTuple> { hook, node, transitionHook };
        });

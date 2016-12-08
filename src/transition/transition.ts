@@ -116,7 +116,7 @@ export class Transition implements IHookRegistry {
    * (which can then be used to register hooks)
    */
   private createTransitionHookRegFns() {
-    this.router.transitionService._pluginapi.getTransitionEventTypes()
+    this.router.transitionService._pluginapi._getEvents()
         .filter(type => type.hookPhase !== TransitionHookPhase.CREATE)
         .forEach(type => makeEvent(this, this.router.transitionService, type));
   }
