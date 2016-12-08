@@ -93,7 +93,7 @@ export class RegisteredHook {
    * { to: true, from: true, entering: true, exiting: true, retained: true }
    */
   private _getDefaultMatchCriteria(): HookMatchCriteria {
-    return map(this.tranSvc._pluginapi._getPaths(), () => true);
+    return map(this.tranSvc._pluginapi._getPathTypes(), () => true);
   }
 
   /**
@@ -108,7 +108,7 @@ export class RegisteredHook {
    * };
    */
   private _getMatchingNodes(treeChanges: TreeChanges): IMatchingNodes {
-    let paths: PathType[] = values(this.tranSvc._pluginapi._getPaths());
+    let paths: PathType[] = values(this.tranSvc._pluginapi._getPathTypes());
 
     return paths.reduce((mn: IMatchingNodes, path: PathType) => {
       // STATE scope criteria matches against every node in the path.

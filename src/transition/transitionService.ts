@@ -41,9 +41,16 @@ export let defaultTransOpts: TransitionOptions = {
 
 
 export interface TransitionServicePluginAPI {
-  _definePath(name: string, hookScope: TransitionHookScope);
-  _getPaths(): PathTypes;
-  _defineEvent(hookType: TransitionEventType): void;
+  _definePathTypes(name: string, hookScope: TransitionHookScope);
+  _getPathTypes(): PathTypes;
+  _defineEvent(name: string,
+               hookPhase: TransitionHookPhase,
+               hookOrder: number,
+               criteriaMatchPath: PathType,
+               reverseSort?: boolean,
+               getResultHandler?: GetResultHandler,
+               getErrorHandler?: GetErrorHandler,
+               rejectIfSuperseded?: boolean);
   _getEvents(phase?: TransitionHookPhase): TransitionEventType[];
   getHooks(hookName: string): RegisteredHook[];
 }
@@ -112,9 +119,9 @@ export class TransitionService implements IHookRegistry, Disposable {
   private _criteriaPaths = { } as PathTypes;
 
   _pluginapi = <TransitionServicePluginAPI> bindFunctions(this, {}, this, [
-    '_definePath',
+    '_definePathType',
     '_defineEvent',
-    '_getPaths',
+    '_getPathTypes',
     '_getEvents',
     'getHooks',
   ]);
@@ -196,11 +203,11 @@ export class TransitionService implements IHookRegistry, Disposable {
   private _defineDefaultPaths() {
     const { STATE, TRANSITION } = TransitionHookScope;
 
-    this._definePath("to", TRANSITION);
-    this._definePath("from", TRANSITION);
-    this._definePath("exiting", STATE);
-    this._definePath("retained", STATE);
-    this._definePath("entering", STATE);
+    this._definePathType("to", TRANSITION);
+    this._definePathType("from", TRANSITION);
+    this._definePathType("exiting", STATE);
+    this._definePathType("retained", STATE);
+    this._definePathType("entering", STATE);
   }
 
   /**
@@ -252,7 +259,7 @@ export class TransitionService implements IHookRegistry, Disposable {
    *
    * @internalapi
    */
-  private _definePath(name: string, hookScope: TransitionHookScope) {
+  private _definePathType(name: string, hookScope: TransitionHookScope) {
     this._criteriaPaths[name] = { name, scope: hookScope };
   }
 
@@ -261,7 +268,7 @@ export class TransitionService implements IHookRegistry, Disposable {
    *
    * @internalapi
    */
-  private _getPaths(): PathTypes {
+  private _getPathTypes(): PathTypes {
     return this._criteriaPaths;
   }
 
