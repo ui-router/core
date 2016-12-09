@@ -781,6 +781,28 @@ export interface IMatchingNodes {
   entering: PathNode[];
 }
 
+/** @hidden */
+export interface RegisteredHooks {
+  [key: string]: RegisteredHook[];
+}
+
+/** @hidden */
+export interface PathTypes {
+  [key: string]: PathType
+
+  to: PathType
+  from: PathType
+  exiting: PathType
+  retained: PathType
+  entering: PathType
+}
+
+/** @hidden */
+export interface PathType {
+  name: string;
+  scope: TransitionHookScope;
+}
+
 /**
  * Hook Criterion used to match a transition.
  *

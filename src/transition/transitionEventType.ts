@@ -1,6 +1,5 @@
-import { TransitionHookPhase } from "./interface";
+import { TransitionHookPhase, PathType } from "./interface";
 import { GetErrorHandler, GetResultHandler, TransitionHook } from "./transitionHook";
-import { PathType } from "./hookRegistry";
 /**
  * This class defines a type of hook, such as `onBefore` or `onEnter`.
  * Plugins can define custom hook types, such as sticky states does for `onInactive`.

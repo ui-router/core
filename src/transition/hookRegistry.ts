@@ -3,7 +3,7 @@ import { extend, removeFrom, tail, values, identity, map } from "../common/commo
 import {isString, isFunction} from "../common/predicates";
 import {PathNode} from "../path/node";
 import {
-    TransitionStateHookFn, TransitionHookFn, TransitionHookPhase, TransitionHookScope, IHookRegistry
+    TransitionStateHookFn, TransitionHookFn, TransitionHookPhase, TransitionHookScope, IHookRegistry, PathType
 } from "./interface"; // has or is using
 
 import {
@@ -52,7 +52,6 @@ export function matchState(state: State, criterion: HookMatchCriterion) {
  * The registration data for a registered transition hook
  */
 export class RegisteredHook {
-  matchCriteria: HookMatchCriteria;
   priority: number;
   bind: any;
   _deregistered: boolean;
@@ -60,9 +59,8 @@ export class RegisteredHook {
   constructor(public tranSvc: TransitionService,
               public eventType: TransitionEventType,
               public callback: HookFn,
-              matchCriteria: HookMatchCriteria,
+              public matchCriteria: HookMatchCriteria,
               options: HookRegOptions = {} as any) {
-    this.matchCriteria = extend(this._getDefaultMatchCriteria(), matchCriteria);
     this.priority = options.priority || 0;
     this.bind = options.bind || null;
     this._deregistered = false;
@@ -108,6 +106,7 @@ export class RegisteredHook {
    * };
    */
   private _getMatchingNodes(treeChanges: TreeChanges): IMatchingNodes {
+    let criteria = extend(this._getDefaultMatchCriteria(), this.matchCriteria);
     let paths: PathType[] = values(this.tranSvc._pluginapi._getPathTypes());
 
     return paths.reduce((mn: IMatchingNodes, path: PathType) => {
@@ -116,7 +115,7 @@ export class RegisteredHook {
       let name = path.name, isStateHook = path.scope === TransitionHookScope.STATE;
       let nodes: PathNode[] = isStateHook ? treeChanges[name] : [tail(treeChanges[name])];
 
-      mn[name] = this._matchingNodes(nodes, this.matchCriteria[name]);
+      mn[name] = this._matchingNodes(nodes, criteria[name]);
       return mn;
     }, {} as IMatchingNodes);
   }
@@ -134,28 +133,6 @@ export class RegisteredHook {
     let allMatched = values(matches).every(identity);
     return allMatched ? matches : null;
   }
-}
-
-/** @hidden */
-export interface RegisteredHooks {
-  [key: string]: RegisteredHook[];
-}
-
-/** @hidden */
-export interface PathTypes {
-  [key: string]: PathType
-
-  to: PathType
-  from: PathType
-  exiting: PathType
-  retained: PathType
-  entering: PathType
-}
-
-/** @hidden */
-export interface PathType {
-  name: string;
-  scope: TransitionHookScope;
 }
 
 /** @hidden Return a registration function of the requested type. */

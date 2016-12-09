@@ -12,13 +12,13 @@ import { prop, propEq, val, not } from "../common/hof";
 import {StateDeclaration, StateOrName} from "../state/interface";
 import {
     TransitionOptions, TreeChanges, IHookRegistry, TransitionHookPhase,
-    TransitionCreateHookFn
+    TransitionCreateHookFn, RegisteredHooks
 } from "./interface";
 
 import { TransitionStateHookFn, TransitionHookFn } from "./interface"; // has or is using
 
 import {TransitionHook} from "./transitionHook";
-import {matchState, RegisteredHooks, makeEvent, RegisteredHook} from "./hookRegistry";
+import {matchState, makeEvent, RegisteredHook} from "./hookRegistry";
 import {HookBuilder} from "./hookBuilder";
 import {PathNode} from "../path/node";
 import {PathFactory} from "../path/pathFactory";

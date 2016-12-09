@@ -1,10 +1,10 @@
 /** @coreapi @module transition */ /** for typedoc */
 import {
     IHookRegistry, TransitionOptions, TransitionHookScope, TransitionHookPhase, TransitionCreateHookFn,
-    HookMatchCriteria, HookRegOptions
+    HookMatchCriteria, HookRegOptions, PathTypes, PathType, RegisteredHooks
 } from "./interface";
 import { Transition } from "./transition";
-import { RegisteredHooks, makeEvent, RegisteredHook, PathTypes, PathType } from "./hookRegistry";
+import { makeEvent, RegisteredHook } from "./hookRegistry";
 import { TargetState } from "../state/targetState";
 import { PathNode } from "../path/node";
 import { ViewService } from "../view/view";
@@ -41,7 +41,7 @@ export let defaultTransOpts: TransitionOptions = {
 
 
 export interface TransitionServicePluginAPI {
-  _definePathTypes(name: string, hookScope: TransitionHookScope);
+  _definePathType(name: string, hookScope: TransitionHookScope);
   _getPathTypes(): PathTypes;
   _defineEvent(name: string,
                hookPhase: TransitionHookPhase,
