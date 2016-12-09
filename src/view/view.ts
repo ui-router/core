@@ -10,22 +10,49 @@ import {_ViewDeclaration} from "../state/interface";
 
 export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig|ViewConfig[];
 
+export interface ViewServicePluginAPI {
+  _rootViewContext(context?: ViewContext): ViewContext;
+  _viewConfigFactory(viewType: string, factory: ViewConfigFactory);
+  _registeredUIViews(): ActiveUIView[];
+  _activeViewConfigs(): ViewConfig[];
+}
+
 /**
  * The View service
+ *
+ * This service pairs existing `ui-view` components (which live in the DOM)
+ * with view configs (from the state declaration objects: [[StateDeclaration.views]]).
+ *
+ * - After a successful Transition, the views from the newly entered states are activated via [[activateViewConfig]].
+ *   The views from exited states are deactivated via [[deactivateViewConfig]].
+ *   (See: the [[registerActivateViews]] Transition Hook)
+ *
+ * - As `ui-view` components pop in and out of existence, they register themselves using [[registerUIView]].
+ *
+ * - When the [[sync]] function is called, the registered `ui-view`(s) ([[UIViewConfig]]
+ * are configured with the matching `ViewConfig`(s)  ([[ActiveUIView]]).
+ *
  */
 export class ViewService {
-  private uiViews: ActiveUIView[] = [];
-  private viewConfigs: ViewConfig[] = [];
+  private _uiViews: ActiveUIView[] = [];
+  private _viewConfigs: ViewConfig[] = [];
   private _rootContext: ViewContext;
   private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
 
   constructor() { }
 
-  rootContext(context?: ViewContext): ViewContext {
+  public _pluginapi: ViewServicePluginAPI = {
+    _rootViewContext: this._rootViewContext.bind(this),
+    _viewConfigFactory: this._viewConfigFactory.bind(this),
+    _registeredUIViews: () => this._uiViews,
+    _activeViewConfigs: () => this._viewConfigs,
+  };
+
+  private _rootViewContext(context?: ViewContext): ViewContext {
     return this._rootContext = context || this._rootContext;
   };
 
-  viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
+  private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
     this._viewConfigFactories[viewType] = factory;
   }
 
@@ -37,23 +64,26 @@ export class ViewService {
   }
   
   /**
-   * De-registers a ViewConfig.
+   * Deactivates a ViewConfig.
+   *
+   * This function deactivates a `ViewConfig`.
+   * After calling [[sync]], it will un-pair from any `ui-view` with which it is currently paired.
    *
    * @param viewConfig The ViewConfig view to deregister.
    */
   deactivateViewConfig(viewConfig: ViewConfig) {
     trace.traceViewServiceEvent("<- Removing", viewConfig);
-    removeFrom(this.viewConfigs, viewConfig);
-  };
+    removeFrom(this._viewConfigs, viewConfig);
+  }
 
   activateViewConfig(viewConfig: ViewConfig) {
     trace.traceViewServiceEvent("-> Registering", <any> viewConfig);
-    this.viewConfigs.push(viewConfig);
-  };
+    this._viewConfigs.push(viewConfig);
+  }
 
-  sync = () => {
+  sync() {
     let uiViewsByFqn: TypedMap<ActiveUIView> =
-        this.uiViews.map(uiv => [uiv.fqn, uiv]).reduce(applyPairs, <any> {});
+        this._uiViews.map(uiv => [uiv.fqn, uiv]).reduce(applyPairs, <any> {});
 
     /**
      * Given a ui-view and a ViewConfig, determines if they "match".
@@ -148,7 +178,7 @@ export class ViewService {
     const depthCompare = curry((depthFn, posNeg, left, right) => posNeg * (depthFn(left) - depthFn(right)));
 
     const matchingConfigPair = (uiView: ActiveUIView) => {
-      let matchingConfigs = this.viewConfigs.filter(matches(uiView));
+      let matchingConfigs = this._viewConfigs.filter(matches(uiView));
       if (matchingConfigs.length > 1) {
         // This is OK.  Child states can target a ui-view that the parent state also targets (the child wins)
         // Sort by depth and return the match from the deepest child
@@ -161,25 +191,31 @@ export class ViewService {
     const configureUIView = ([uiView, viewConfig]) => {
       // If a parent ui-view is reconfigured, it could destroy child ui-views.
       // Before configuring a child ui-view, make sure it's still in the active uiViews array.
-      if (this.uiViews.indexOf(uiView) !== -1)
+      if (this._uiViews.indexOf(uiView) !== -1)
         uiView.configUpdated(viewConfig);
     };
 
-    this.uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair).forEach(configureUIView);
+    this._uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair).forEach(configureUIView);
   };
 
   /**
-   * Allows a `ui-view` element to register its canonical name with a callback that allows it to
-   * be updated with a template, controller, and local variables.
+   * Registers a `ui-view` component
    *
-   * @param {String} name The fully-qualified name of the `ui-view` object being registered.
-   * @param {Function} configUpdatedCallback A callback that receives updates to the content & configuration
-   *                   of the view.
-   * @return {Function} Returns a de-registration function used when the view is destroyed.
+   * When a `ui-view` component is created, it uses this method to register itself.
+   * After registration the [[sync]] method is used to ensure all `ui-view` are configured with the proper [[ViewConfig]].
+   *
+   * Note: the `ui-view` component uses the `ViewConfig` to determine what view should be loaded inside the `ui-view`,
+   * and what the view's state context is.
+   *
+   * Note: There is no corresponding `deregisterUIView`.
+   *       A `ui-view` should hang on to the return value of `registerUIView` and invoke it to deregister itself.
+   *
+   * @param uiView The metadata for a UIView
+   * @return a de-registration function used when the view is destroyed.
    */
   registerUIView(uiView: ActiveUIView) {
     trace.traceViewServiceUIViewEvent("-> Registering", uiView);
-    let uiViews = this.uiViews;
+    let uiViews = this._uiViews;
     const fqnMatches = uiv => uiv.fqn === uiView.fqn;
     if (uiViews.filter(fqnMatches).length)
       trace.traceViewServiceUIViewEvent("!!!! duplicate uiView named:", uiView);
@@ -204,7 +240,7 @@ export class ViewService {
    * @return {Array} Returns an array of fully-qualified view names.
    */
   available() {
-    return this.uiViews.map(prop("fqn"));
+    return this._uiViews.map(prop("fqn"));
   }
 
   /**
@@ -213,7 +249,7 @@ export class ViewService {
    * @return {Array} Returns an array of fully-qualified view names.
    */
   active() {
-    return this.uiViews.filter(prop("$config")).map(prop("name"));
+    return this._uiViews.filter(prop("$config")).map(prop("name"));
   }
 
   /**

@@ -77,7 +77,7 @@ export class UIRouter {
   }
 
   constructor() {
-    this.viewService.rootContext(this.stateRegistry.root());
+    this.viewService._pluginapi._rootViewContext(this.stateRegistry.root());
     this.globals.$current = this.stateRegistry.root();
     this.globals.current = this.globals.$current.self;
 
