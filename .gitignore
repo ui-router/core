@@ -2,7 +2,6 @@
 build
 build_packages
 site
-yarn.lock
 
 # common
 **/.*
