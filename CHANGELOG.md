@@ -1,3 +1,67 @@
+### ui-router-core changes
+# [2.0.0](https://github.com/ui-router/core/compare/1.0.1...2.0.0) (2016-12-09)
+
+
+### Bug Fixes
+
+* **lazyLoad:** Sync by URL after nested lazy load triggered by URL ([1c6220c](https://github.com/ui-router/core/commit/1c6220c))
+* **redirect:** Do not allow `onBefore` hooks to cause infinite redirect loops ([5c5f7eb](https://github.com/ui-router/core/commit/5c5f7eb)), closes [#6](https://github.com/ui-router/core/issues/6)
+* **redirectTo:** Do not puke when redirectTo returns undefined ([bde9c0f](https://github.com/ui-router/core/commit/bde9c0f))
+* **redirectTo:** fix TS type signature of `redirectTo` ([2c059c4](https://github.com/ui-router/core/commit/2c059c4))
+* **StateQueueManager:** Compare parsed url parameters using typed parameters ([beca1f5](https://github.com/ui-router/core/commit/beca1f5))
+* **StateRegistry:** Fix error message: State '' is already defined ([f5bd96b](https://github.com/ui-router/core/commit/f5bd96b))
+* **StateService:** Compare typed parameters in .is() and .includes() ([b1a5155](https://github.com/ui-router/core/commit/b1a5155))
+* **TargetState:** Narrow `name()` return type to `String` ([a02f4a7](https://github.com/ui-router/core/commit/a02f4a7))
+* **typescript:** Emit TS 1.8 compatible .d.ts files ([65badf4](https://github.com/ui-router/core/commit/65badf4))
+* **view:** Load view prerequisites in `onFinish` ([cc85e76](https://github.com/ui-router/core/commit/cc85e76))
+* **view.load:** Allow view.load to return synchronously ([8619cf9](https://github.com/ui-router/core/commit/8619cf9))
+
+
+### Features
+
+* Create router.dispose() to dispose a router instance and resources. ([0690917](https://github.com/ui-router/core/commit/0690917))
+* **assertMap:** Add a [].map() helper that asserts that each element is truthy ([f044f53](https://github.com/ui-router/core/commit/f044f53))
+* **futureState:** States with a `.**` name suffix (i.e., `foo.**`) are considered future states ([ec50da4](https://github.com/ui-router/core/commit/ec50da4)), closes [#8](https://github.com/ui-router/core/issues/8) [#4](https://github.com/ui-router/core/issues/4)
+* **HookBuilder:** Allow custom hook types (to be defined by a plugin) ([3f146e6](https://github.com/ui-router/core/commit/3f146e6))
+* **onCreate:** Add onCreate transition hook ([f486ced](https://github.com/ui-router/core/commit/f486ced))
+* **plugin:** Allow all plugins to be gotted. ([e324973](https://github.com/ui-router/core/commit/e324973))
+* **plugin:** Allow registration by ES6 class, JS constructor fn, JS factory fn ([b9f4541](https://github.com/ui-router/core/commit/b9f4541))
+* **plugin:** Create plugin API ([36a5215](https://github.com/ui-router/core/commit/36a5215)), closes [#7](https://github.com/ui-router/core/issues/7)
+* **Transition:** Support treechange paths in API for Resolve+transition ([beedc82](https://github.com/ui-router/core/commit/beedc82))
+* **vanilla:** Implement in-memory-only location api ([f64aace](https://github.com/ui-router/core/commit/f64aace))
+
+
+### BREAKING CHANGES
+
+* **typescript:** move `ViewService.viewConfigFactory` and `rootContext`  to `_pluginapi.*`
+This BC happened in commit 6c42285
+
+* **futureState:** Previously, a state with a `lazyLoad` function was considered a future state.
+Now, a state whose name ends with `.**` (i.e., a glob pattern which matches all children) is a future state.
+
+### All future states should be given a name that ends in `.**`.
+
+Change your future states from:
+```
+{ name: 'future', url: '/future', lazyLoad: () => ... }
+```
+to:
+```
+{ name: 'future.**', url: '/future', lazyLoad: () => ... }
+```
+
+* **onCreate:** Hook errors are all normalized to a "Rejection" type.  To access the  detail of the error thrown (`throw "Error 123"`), use `.detail`, i.e.:
+### Before
+```js
+$state.go('foo').catch(err => { if (err === "Error 123") .. });
+```
+### New way
+```js
+$state.go('foo').catch(err => { if (err.detail === "Error 123") .. });
+```
+
+
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://github.com/ui-router/core/compare/1.0.0...v1.0.1) (2016-10-24)
 
