@@ -109,13 +109,14 @@ export class RegisteredHook {
     let criteria = extend(this._getDefaultMatchCriteria(), this.matchCriteria);
     let paths: PathType[] = values(this.tranSvc._pluginapi._getPathTypes());
 
-    return paths.reduce((mn: IMatchingNodes, path: PathType) => {
+    return paths.reduce((mn: IMatchingNodes, pathtype: PathType) => {
       // STATE scope criteria matches against every node in the path.
       // TRANSITION scope criteria matches against only the last node in the path
-      let name = path.name, isStateHook = path.scope === TransitionHookScope.STATE;
-      let nodes: PathNode[] = isStateHook ? treeChanges[name] : [tail(treeChanges[name])];
+      let isStateHook = pathtype.scope === TransitionHookScope.STATE;
+      let path = treeChanges[pathtype.name] || [];
+      let nodes: PathNode[] = isStateHook ? path : [tail(path)];
 
-      mn[name] = this._matchingNodes(nodes, criteria[name]);
+      mn[pathtype.name] = this._matchingNodes(nodes, criteria[pathtype.name]);
       return mn;
     }, {} as IMatchingNodes);
   }
