@@ -217,9 +217,9 @@ describe('stateService', function () {
           };
         }
 
-        $transitions.onEnter({}, (trans, state) => dynlog += 'enter:' + state.name + ";");
-        $transitions.onExit({}, (trans, state) => dynlog += 'exit:' + state.name + ";");
-        $transitions.onSuccess({}, () => dynlog += 'success;', { priority: 1 });
+        $transitions.onEnter({}, (trans, state) => { dynlog += 'enter:' + state.name + ";" });
+        $transitions.onExit({}, (trans, state) => { dynlog += 'exit:' + state.name + ";" });
+        $transitions.onSuccess({}, () => { dynlog += 'success;' }, { priority: 1 });
         $transitions.onRetain({ retained: 'dyn' }, logChangedParams('[', ']'));
         $transitions.onRetain({ retained: 'dyn.child' }, logChangedParams('{', '}'));
         $transitions.onRetain({ retained: 'dyn.noparams' }, logChangedParams('(', ')'));
@@ -497,7 +497,7 @@ describe('stateService', function () {
 
     it('is a no-op when passing the current state and identical parameters', async(done) => {
       let enterlog = "";
-      $transitions.onEnter({ entering: 'A'}, (trans, state) => enterlog += state.name + ";");
+      $transitions.onEnter({ entering: 'A'}, (trans, state) => { enterlog += state.name + ";" });
       await initStateTo(A);
       expect(enterlog).toBe('A;');
 
@@ -559,9 +559,9 @@ describe('stateService', function () {
     it('triggers onEnter and onExit callbacks', async(done) => {
       var log = "";
       await initStateTo(A);
-      $transitions.onSuccess({}, (trans) =>       log += trans.to().name + ";");
-      $transitions.onEnter({}, (trans, state) =>  log += state.name + ".onEnter;");
-      $transitions.onExit({}, (trans, state) =>   log += state.name + ".onExit;");
+      $transitions.onSuccess({}, (trans) =>       { log += trans.to().name + ";" });
+      $transitions.onEnter({}, (trans, state) =>  { log += state.name + ".onEnter;" });
+      $transitions.onExit({}, (trans, state) =>   { log += state.name + ".onExit;" });
 
       await $state.transitionTo(D, {});
       await $state.transitionTo(DD, {});

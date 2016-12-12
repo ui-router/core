@@ -1,4 +1,7 @@
-/** @internalapi @module vanilla */ /** */
+/**
+ * @internalapi
+ * @module vanilla
+ */ /** */
 
 import { isDefined } from "../common/predicates";
 import { LocationConfig } from "../common/coreservices";

@@ -1,4 +1,7 @@
-/** @internalapi @module vanilla */ /** */
+/**
+ * @internalapi
+ * @module vanilla
+ */ /** */
 import {isArray} from "../common/index";
 import { LocationServices, LocationConfig, services } from "../common/coreservices";
 import { UIRouter } from "../router";

@@ -1,4 +1,7 @@
-/** @coreapi @module transition */ /** for typedoc */
+/**
+ * @coreapi
+ * @module transition
+ */ /** for typedoc */
 
 import {extend, tail, assertPredicate, unnestR, identity} from "../common/common";
 import {isArray} from "../common/predicates";

@@ -1,7 +1,11 @@
-/** @coreapi @module transition */ /** for typedoc */
+/**
+ * @coreapi
+ * @module transition
+ */ /** for typedoc */
 import {
     IHookRegistry, TransitionOptions, TransitionHookScope, TransitionHookPhase, TransitionCreateHookFn,
-    HookMatchCriteria, HookRegOptions, PathTypes, PathType, RegisteredHooks
+    HookMatchCriteria, HookRegOptions, PathTypes, PathType, RegisteredHooks, IHookRegistration, TransitionHookFn,
+    TransitionStateHookFn
 } from "./interface";
 import { Transition } from "./transition";
 import { makeEvent, RegisteredHook } from "./hookRegistry";
@@ -79,34 +83,35 @@ export class TransitionService implements IHookRegistry, Disposable {
    *
    * ### Lifecycle
    *
-   * `onBefore` hooks are invoked *while a transition is being constructed*.
+   * `onCreate` hooks are invoked *while a transition is being constructed*.
    *
    * ### Return value
    *
    * The hook's return value is ignored
    *
    * @internalapi
-   * @param matchCriteria defines which Transitions the Hook should be invoked for.
+   * @param criteria defines which Transitions the Hook should be invoked for.
    * @param callback the hook function which will be invoked.
+   * @param options the registration options
    * @returns a function which deregisters the hook.
    */
-  onCreate: (criteria: HookMatchCriteria, callback: TransitionCreateHookFn, options?: HookRegOptions) => Function;
+  onCreate(criteria: HookMatchCriteria, callback: TransitionCreateHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onBefore;
+  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onStart;
+  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onExit;
+  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onRetain;
+  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onEnter;
+  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onFinish;
+  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onSuccess;
+  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onError;
+  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
 
   /** @hidden */
   public $view: ViewService;
@@ -118,13 +123,8 @@ export class TransitionService implements IHookRegistry, Disposable {
   /** @hidden The  paths on a criteria object */
   private _criteriaPaths = { } as PathTypes;
 
-  _pluginapi = <TransitionServicePluginAPI> bindFunctions(this, {}, this, [
-    '_definePathType',
-    '_defineEvent',
-    '_getPathTypes',
-    '_getEvents',
-    'getHooks',
-  ]);
+  /** @internalapi */
+  _pluginapi: TransitionServicePluginAPI;
 
   /**
    * This object has hook de-registration functions for the built-in hooks.
@@ -145,9 +145,17 @@ export class TransitionService implements IHookRegistry, Disposable {
     lazyLoad: Function;
   };
 
+  /** @hidden */
   constructor(private _router: UIRouter) {
     this.$view = _router.viewService;
     this._deregisterHookFns = <any> {};
+    this._pluginapi = <TransitionServicePluginAPI> bindFunctions(this, {}, this, [
+      '_definePathType',
+      '_defineEvent',
+      '_getPathTypes',
+      '_getEvents',
+      'getHooks',
+    ]);
 
     this._defineDefaultPaths();
     this._defineDefaultEvents();

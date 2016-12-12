@@ -1,4 +1,7 @@
-/** @coreapi @module transition */ /** for typedoc */
+/**
+ * @coreapi
+ * @module transition
+ */ /** for typedoc */
 import {TransitionHookOptions, HookResult} from "./interface";
 import {defaults, noop, identity} from "../common/common";
 import {fnToString, maxLength} from "../common/strings";

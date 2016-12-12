@@ -1,4 +1,7 @@
-/** @coreapi @module url */ /** for typedoc */
+/**
+ * @coreapi
+ * @module url
+ */ /** for typedoc */
 import {forEach, extend} from "../common/common";
 import {isObject, isDefined, isFunction} from "../common/predicates";
 

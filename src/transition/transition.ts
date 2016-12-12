@@ -1,4 +1,7 @@
-/** @coreapi @module transition */ /** for typedoc */
+/**
+ * @coreapi
+ * @module transition
+ */ /** for typedoc */
 import {stringify} from "../common/strings";
 import {trace} from "../common/trace";
 import {services} from "../common/coreservices";
@@ -12,7 +15,7 @@ import { prop, propEq, val, not } from "../common/hof";
 import {StateDeclaration, StateOrName} from "../state/interface";
 import {
     TransitionOptions, TreeChanges, IHookRegistry, TransitionHookPhase,
-    TransitionCreateHookFn, RegisteredHooks
+    RegisteredHooks, HookRegOptions, HookMatchCriteria
 } from "./interface";
 
 import { TransitionStateHookFn, TransitionHookFn } from "./interface"; // has or is using
@@ -95,21 +98,21 @@ export class Transition implements IHookRegistry {
 
 
   /** @hidden */
-  onBefore;
+  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onStart;
+  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onExit;
+  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onRetain;
+  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onEnter;
+  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onFinish;
+  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onSuccess;
+  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
   /** @inheritdoc */
-  onError;
+  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
 
   /** @hidden
    * Creates the transition-level hook registration functions
@@ -121,7 +124,7 @@ export class Transition implements IHookRegistry {
         .forEach(type => makeEvent(this, this.router.transitionService, type));
   }
 
-  /** @hidden @internalapi */
+  /** @internalapi */
   getHooks(hookName: string): RegisteredHook[] {
     return this._registeredHooks[hookName];
   }

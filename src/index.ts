@@ -1,4 +1,7 @@
-/** @coreapi @module common */ /** */
+/**
+ * @coreapi
+ * @module common
+ */ /** */
 
 export * from "./common/index";
 export * from "./params/index";

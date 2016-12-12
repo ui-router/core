@@ -1,7 +1,9 @@
 /**
  * Naive, pure JS implementation of core ui-router services
  *
- * @internalapi @module vanilla
+ *
+ * @internalapi
+ * @module vanilla
  */ /** */
 import { UIRouter } from "../router";
 

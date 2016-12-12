@@ -1,4 +1,7 @@
-/** @coreapi @module state */ /** for typedoc */
+/**
+ * @coreapi
+ * @module state
+ */ /** for typedoc */
 
 import {StateDeclaration, StateOrName} from "./interface";
 import {ParamsOrArray} from "../params/interface";

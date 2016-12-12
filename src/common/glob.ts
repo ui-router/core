@@ -1,4 +1,7 @@
-/** @coreapi @module core */
+/**
+ * @coreapi
+ * @module core
+ */
 /** 
  * Matches state names using glob-like pattern strings.
  *

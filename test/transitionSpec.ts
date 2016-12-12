@@ -599,7 +599,7 @@ describe('transition', function () {
         $transitions.onEnter({ from: "*", entering: "*" }, function(trans, state) {
           log.push("#"+state.name);
 
-          return new Promise((resolve) =>
+          return new Promise<void>((resolve) =>
               setTimeout(() => {
                 log.push("^" + state.name);
                 resolve();

@@ -143,7 +143,7 @@ describe("hooks", () => {
     it("should enter states from shallow to deep states", (done) => {
       init();
       let log = [];
-      $transitions.onEnter({}, (trans, state) => log.push(state));
+      $transitions.onEnter({}, (trans, state) => { log.push(state) });
 
       $state.go('B')
           .then(() => expect(router.globals.current.name).toBe('B'))
@@ -163,7 +163,7 @@ describe("hooks", () => {
     it("should exit states from deep to shallow states", (done) => {
       init();
       let log = [];
-      $transitions.onExit({}, (trans, state) => log.push(state));
+      $transitions.onExit({}, (trans, state) => { log.push(state) });
 
       $state.go('AAA')
           .then(() => expect(router.globals.current.name).toBe('AAA'))

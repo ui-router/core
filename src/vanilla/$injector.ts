@@ -1,4 +1,7 @@
-/** @internalapi @module vanilla */ /** */
+/**
+ * @internalapi
+ * @module vanilla
+ */ /** */
 import {
     extend, assertPredicate, isFunction, isArray, isInjectable, $InjectorLike, IInjectable
 } from "../common/index";

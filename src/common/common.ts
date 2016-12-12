@@ -3,7 +3,8 @@
  *
  * These functions are exported, but are subject to change without notice.
  *
- * @preferred @module common
+ * @preferred
+ * @module common
  */ /** for typedoc */
 
 import {isFunction, isString, isArray, isRegExp, isDate} from "./predicates";

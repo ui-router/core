@@ -1,4 +1,7 @@
-/** @coreapi @module transition */ /** for typedoc */
+/**
+ * @coreapi
+ * @module transition
+ */ /** for typedoc */
 import { extend, removeFrom, tail, values, identity, map } from "../common/common";
 import {isString, isFunction} from "../common/predicates";
 import {PathNode} from "../path/node";

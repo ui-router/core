@@ -1,4 +1,7 @@
-/** @coreapi @module transition */ /** for typedoc */
+/**
+ * @coreapi
+ * @module transition
+ */ /** for typedoc */
 "use strict";
 import {extend, silentRejection} from "../common/common";
 import {stringify} from "../common/strings";

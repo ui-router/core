@@ -1,4 +1,7 @@
-/** @coreapi @module state */ /** */
+/**
+ * @coreapi
+ * @module state
+ */ /** */
 import { extend, defaults, silentRejection, silenceUncaughtInPromise, removeFrom, noop } from "../common/common";
 import {isDefined, isObject, isString} from "../common/predicates";
 import {Queue} from "../common/queue";

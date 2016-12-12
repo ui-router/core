@@ -1,4 +1,7 @@
-/** @coreapi @module view */ /** for typedoc */
+/**
+ * @coreapi
+ * @module view
+ */ /** for typedoc */
 import {equals, applyPairs, removeFrom, TypedMap} from "../common/common";
 import {curry, prop} from "../common/hof";
 import {isString, isArray} from "../common/predicates";
