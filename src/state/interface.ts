@@ -459,10 +459,12 @@ export interface StateDeclaration {
    * ```
    *
    * Note: The above `onEnter` on the state declaration is effectively sugar for:
-   * ```
+   *
+   * ```js
    * transitionService.onEnter({ entering: 'mystate' }, function(trans, state) {
    *   console.log("Entering " + state.name);
    * });
+   * ```
    */
   onEnter?: TransitionStateHookFn;
   /**
@@ -479,10 +481,12 @@ export interface StateDeclaration {
    * ```
    *
    * Note: The above `onRetain` on the state declaration is effectively sugar for:
-   * ```
+   *
+   * ```js
    * transitionService.onRetain({ retained: 'mystate' }, function(trans, state) {
    *   console.log(state.name + " is still active!");
    * });
+   * ```
    */
   onRetain?: TransitionStateHookFn;
   /**
@@ -499,10 +503,12 @@ export interface StateDeclaration {
    * ```
    *
    * Note: The above `onRetain` on the state declaration is effectively sugar for:
-   * ```
+   *
+   * ```js
    * transitionService.onExit({ exiting: 'mystate' }, function(trans, state) {
    *   console.log("Leaving " + state.name);
    * });
+   * ```
    */
   onExit?: TransitionStateHookFn;
 
