@@ -4,17 +4,17 @@ import { TestingPlugin } from "./_testingPlugin";
 import { LocationPlugin } from "../src/vanilla/interface";
 
 var router: UIRouter;
-var provider: UrlMatcherFactory;
+var $urlMatcherFactory: UrlMatcherFactory;
 var $location: LocationServices;
 
 function makeMatcher(url, config?) {
-  return new UrlMatcher(url, provider.paramTypes, config);
+  return new UrlMatcher(url, $urlMatcherFactory.paramTypes, config);
 }
 
 beforeEach(function() {
   router = new UIRouter();
   router.plugin(TestingPlugin);
-  provider = router.urlMatcherFactory;
+  $urlMatcherFactory = router.urlMatcherFactory;
   let locationPlugin = router.getPlugin('vanilla.memoryLocation') as LocationPlugin;
   $location = locationPlugin.service;
 });
@@ -24,25 +24,25 @@ describe("UrlMatcher", function () {
   describe("provider", function () {
 
     it("should factory matchers with correct configuration", function () {
-      provider.caseInsensitive(false);
-      expect(provider.compile('/hello').exec('/HELLO')).toBeNull();
+      $urlMatcherFactory.caseInsensitive(false);
+      expect($urlMatcherFactory.compile('/hello').exec('/HELLO')).toBeNull();
 
-      provider.caseInsensitive(true);
-      expect(provider.compile('/hello').exec('/HELLO')).toEqual({});
+      $urlMatcherFactory.caseInsensitive(true);
+      expect($urlMatcherFactory.compile('/hello').exec('/HELLO')).toEqual({});
 
-      provider.strictMode(true);
-      expect(provider.compile('/hello').exec('/hello/')).toBeNull();
+      $urlMatcherFactory.strictMode(true);
+      expect($urlMatcherFactory.compile('/hello').exec('/hello/')).toBeNull();
 
-      provider.strictMode(false);
-      expect(provider.compile('/hello').exec('/hello/')).toEqual({});
+      $urlMatcherFactory.strictMode(false);
+      expect($urlMatcherFactory.compile('/hello').exec('/hello/')).toEqual({});
     });
 
     it("should correctly validate UrlMatcher interface", function () {
       var m = makeMatcher("/");
-      expect(provider.isMatcher(m)).toBe(true);
+      expect($urlMatcherFactory.isMatcher(m)).toBe(true);
 
       m = extend({}, m, { validates: null });
-      expect(provider.isMatcher(m)).toBe(false);
+      expect($urlMatcherFactory.isMatcher(m)).toBe(false);
     });
   });
 
@@ -268,24 +268,24 @@ describe("UrlMatcher", function () {
 
     it("should respect $urlMatcherFactoryProvider.strictMode", function() {
       var m = makeMatcher('/');
-      provider.strictMode(false);
-      m = m.append(provider.compile("foo"));
+      $urlMatcherFactory.strictMode(false);
+      m = m.append($urlMatcherFactory.compile("foo"));
       expect(m.exec("/foo")).toEqual({});
       expect(m.exec("/foo/")).toEqual({})
     });
 
     it("should respect $urlMatcherFactoryProvider.caseInsensitive", function() {
       var m = makeMatcher('/');
-      provider.caseInsensitive(true);
-      m = m.append(provider.compile("foo"));
+      $urlMatcherFactory.caseInsensitive(true);
+      m = m.append($urlMatcherFactory.compile("foo"));
       expect(m.exec("/foo")).toEqual({});
       expect(m.exec("/FOO")).toEqual({});
     });
 
     it("should respect $urlMatcherFactoryProvider.caseInsensitive when validating regex params", function() {
       var m = makeMatcher('/');
-      provider.caseInsensitive(true);
-      m = m.append(provider.compile("foo/{param:bar}"));
+      $urlMatcherFactory.caseInsensitive(true);
+      m = m.append($urlMatcherFactory.compile("foo/{param:bar}"));
       expect(m.validates({ param: 'BAR' })).toEqual(true);
     });
 
@@ -555,7 +555,7 @@ describe("urlMatcherFactoryProvider", function () {
   describe(".type()", function () {
     var m;
     beforeEach(function() {
-      provider.type("myType", {} as any, function() {
+      $urlMatcherFactory.type("myType", {} as any, function() {
         return {
           decode: function() { return { status: 'decoded' }; },
           is: isObject
@@ -572,19 +572,19 @@ describe("urlMatcherFactoryProvider", function () {
 
   // TODO: Fix object pollution between tests for urlMatcherConfig
   afterEach(function () {
-    provider.caseInsensitive(false);
+    $urlMatcherFactory.caseInsensitive(false);
   });
 });
 
 describe("urlMatcherFactory", function () {
 
   it("compiles patterns", function () {
-    var matcher = provider.compile('/hello/world');
+    var matcher = $urlMatcherFactory.compile('/hello/world');
     expect(matcher instanceof UrlMatcher).toBe(true);
   });
 
   it("recognizes matchers", function () {
-    expect(provider.isMatcher(makeMatcher('/'))).toBe(true);
+    expect($urlMatcherFactory.isMatcher(makeMatcher('/'))).toBe(true);
 
     var custom = {
       format:     noop,
@@ -595,28 +595,28 @@ describe("urlMatcherFactory", function () {
       parameters: noop,
       parameter:  noop
     };
-    expect(provider.isMatcher(custom)).toBe(true);
+    expect($urlMatcherFactory.isMatcher(custom)).toBe(true);
   });
 
   it("should handle case sensitive URL by default", function () {
-    expect(provider.compile('/hello/world').exec('/heLLo/WORLD')).toBeNull();
+    expect($urlMatcherFactory.compile('/hello/world').exec('/heLLo/WORLD')).toBeNull();
   });
 
   it("should handle case insensitive URL", function () {
-    provider.caseInsensitive(true);
-    expect(provider.compile('/hello/world').exec('/heLLo/WORLD')).toEqual({});
+    $urlMatcherFactory.caseInsensitive(true);
+    expect($urlMatcherFactory.compile('/hello/world').exec('/heLLo/WORLD')).toEqual({});
   });
 
   describe("typed parameters", function() {
     it("should accept object definitions", function () {
       var type = { encode: function() {}, decode: function() {} };
-      provider.type("myType1", type as any);
-      expect(provider.type("myType1").encode).toBe(type.encode);
+      $urlMatcherFactory.type("myType1", type as any);
+      expect($urlMatcherFactory.type("myType1").encode).toBe(type.encode);
     });
 
     it("should reject duplicate definitions", function () {
-      provider.type("myType2", { encode: function () {}, decode: function () {} } as any);
-      expect(function() { provider.type("myType2", {} as any); }).toThrowError("A type named 'myType2' has already been defined.");
+      $urlMatcherFactory.type("myType2", { encode: function () {}, decode: function () {} } as any);
+      expect(function() { $urlMatcherFactory.type("myType2", {} as any); }).toThrowError("A type named 'myType2' has already been defined.");
     });
 
     // consider if this feature should remain or be removed
@@ -729,7 +729,7 @@ describe("urlMatcherFactory", function () {
     }));
 
     it("should allow custom types to handle multiple search param values manually", (function() {
-      provider.type("custArray", {
+      $urlMatcherFactory.type("custArray", {
         encode: function(array)  { return array.join("-"); },
         decode: function(val) { return isArray(val) ? val : val.split(/-/); },
         equals: equals,
