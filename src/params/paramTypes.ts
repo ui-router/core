@@ -1,10 +1,10 @@
 /** @module params */ /** for typedoc */
-import {fromJson, toJson, identity, equals, inherit, map, extend} from "../common/common";
-import {isDefined} from "../common/predicates";
-import {is, val} from "../common/hof";
-import {services} from "../common/coreservices";
-import {ParamType} from "./type";
-import {ParamTypeDefinition} from "./interface";
+import { fromJson, toJson, identity, equals, inherit, map, extend } from "../common/common";
+import { isDefined, isNullOrUndefined } from "../common/predicates";
+import { is } from "../common/hof";
+import { services } from "../common/coreservices";
+import { ParamType } from "./type";
+import { ParamTypeDefinition } from "./interface";
 
 // Use tildes to pre-encode slashes.
 // If the slashes are simply URLEncoded, the browser can choose to pre-decode them,
@@ -35,7 +35,7 @@ export class ParamTypes {
     "int": {
       encode: valToString,
       decode(val: string) { return parseInt(val, 10); },
-      is(val: any) { return isDefined(val) && this.decode(val.toString()) === val; },
+      is(val: any) { return !isNullOrUndefined(val) && this.decode(val.toString()) === val; },
       pattern: /-?\d+/
     },
     "bool": {
