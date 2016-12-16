@@ -19,6 +19,7 @@ export class TestingPlugin extends UIRouterPluginBase {
 
   startRouter() {
     this.router.stateRegistry.stateQueue.autoFlush(this.router.stateService);
+    this.router.urlMatcherFactory.$get();
     this.router.urlRouter.listen();
   }
 
