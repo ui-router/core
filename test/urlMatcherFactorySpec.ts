@@ -658,6 +658,15 @@ describe("urlMatcherFactory", function () {
       expect(m.format({ foo: 5, flag: true })).toBe("/5/1");
     });
 
+    it("should not throw on null value", function () {
+      var m = makeMatcher("/{foo:int}");
+      expect(m.exec("/1138")).toEqual({ foo: 1138 });
+      expect(m.format({ foo: null })).toBe(null);
+
+      m = makeMatcher("/{foo:int}", { params: { foo: { value: 1 } } });
+      expect(m.format({ foo: null })).toBe("/1");
+    });
+
     it("should match types named only in params", function () {
       var m = makeMatcher("/{foo}/{flag}", {
         params: {
