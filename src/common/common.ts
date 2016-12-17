@@ -33,15 +33,15 @@ export interface Obj extends Object {
 }
 
 /**
- * Binds and copies functions onto an object
+ * Builds proxy functions on the `to` object which pass through to the `from` object.
  *
- * Takes functions from the 'from' object, binds those functions to the _this object, and puts the bound functions
- * on the 'to' object.
+ * For each key in `fnNames`, creates a proxy function on the `to` object.
+ * The proxy function calls the real function on the `from` object.
  *
+ *
+ * #### Example:
  * This example creates an new class instance whose functions are prebound to the new'd object.
- * @example
- * ```
- *
+ * ```js
  * class Foo {
  *   constructor(data) {
  *     // Binds all functions from Foo.prototype to 'this',
@@ -60,8 +60,8 @@ export interface Obj extends Object {
  * logit(); // logs [1, 2, 3] from the myFoo 'this' instance
  * ```
  *
+ * #### Example:
  * This example creates a bound version of a service function, and copies it to another object
- * @example
  * ```
  *
  * var SomeService = {
@@ -82,15 +82,18 @@ export interface Obj extends Object {
  * myOtherThing.log(); // logs [3, 4, 5] from SomeService's 'this'
  * ```
  *
- * @param from The object which contains the functions to be bound
+ * @param from The object (or a function that returns the from object) which contains the functions to be bound
  * @param to The object which will receive the bound functions
- * @param bindTo The object which the functions will be bound to
+ * @param bind The object (or a function that returns the object) which the functions will be bound to
  * @param fnNames The function names which will be bound (Defaults to all the functions found on the 'from' object)
  */
-export function bindFunctions(from: Obj, to: Obj, bindTo: Obj, fnNames: string[] = Object.keys(from)): Obj {
-  fnNames.filter(name => typeof from[name] === 'function')
-      .forEach(name => to[name] = from[name].bind(bindTo));
-  return to;
+export function createProxyFunctions(from: Obj|Function, to: Obj, bind: Obj|Function, fnNames: string[] = Object.keys(from)): Obj {
+  const _from = isFunction(from) ? from : () => from;
+  const _bind = isFunction(bind) ? bind : () => bind;
+  const makePassthrough = fnName => function proxyFnCall() {
+    return _from()[fnName].apply(_bind(), arguments);
+  };
+  return fnNames.reduce((acc, name) => (acc[name] = makePassthrough(name), acc), to);
 }
 
 
