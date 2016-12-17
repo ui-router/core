@@ -6,8 +6,8 @@ import * as vanilla from "../src/vanilla"
 describe('browserHistory implementation', () => {
 
   let router: UIRouter;
+  let locationProvider;
   let makeMatcher;
-  let locationProvider = services.location;
 
   // Replace the `history` reference because PhantomJS does not support spying on it.
   function mockHistoryObject() {
@@ -26,6 +26,7 @@ describe('browserHistory implementation', () => {
     router.plugin(vanilla.servicesPlugin);
     router.plugin(vanilla.pushStateLocationPlugin);
     router.stateRegistry.stateQueue.autoFlush(router.stateService);
+    locationProvider = router.urlService;
     makeMatcher = (url, config?) => {
       return new UrlMatcher(url, router.urlMatcherFactory.paramTypes, config)
     };
@@ -38,7 +39,7 @@ describe('browserHistory implementation', () => {
 
   it('uses history.pushState when setting a url', () => {
     let service = mockHistoryObject();
-    expect(services.location.html5Mode()).toBe(true);
+    expect(router.urlService.html5Mode()).toBe(true);
     let stub = spyOn(service._history, 'pushState');
     router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' }, {});
     expect(stub.calls.first().args[2]).toBe('/hello/world');
@@ -52,7 +53,7 @@ describe('browserHistory implementation', () => {
   });
 
   it('returns the correct url query', () => {
-    expect(services.location.html5Mode()).toBe(true);
+    expect(router.urlService.html5Mode()).toBe(true);
     return router.stateService.go('path', {urlParam: 'bar'}).then(() => {
       expect(window.location.toString().includes('/path/bar')).toBe(true);
       expect(window.location.toString().includes('/#/path/bar')).toBe(false);

@@ -5,8 +5,8 @@ describe('hashHistory implementation', () => {
 
   let router;
   let $state;
+  let locationProvider;
   let makeMatcher;
-  let locationProvider = services.location;
 
   beforeEach(() => {
     router = new UIRouter();
@@ -14,6 +14,7 @@ describe('hashHistory implementation', () => {
     router.plugin(vanilla.hashLocationPlugin);
     $state = router.stateService;
     router.stateRegistry.stateQueue.autoFlush($state);
+    locationProvider = router.urlService;
 
     makeMatcher = (url, config?) => {
       return new UrlMatcher(url, router.urlMatcherFactory.paramTypes, config)
@@ -26,7 +27,7 @@ describe('hashHistory implementation', () => {
   });
 
   it('reports html5Mode to be false', () => {
-    expect(services.location.html5Mode()).toBe(false);
+    expect(router.urlService.html5Mode()).toBe(false);
   });
 
   it('returns the correct url query', (done) => {

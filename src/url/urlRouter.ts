@@ -178,8 +178,10 @@ export class UrlRouterProvider implements Disposable {
    * Note: the handler may also invoke arbitrary code, such as `$state.go()`
    */
   when(what: (RegExp|UrlMatcher|string), handler: string|IInjectable, ruleCallback = function(rule) {}) {
-    let $urlMatcherFactory = this.router.urlMatcherFactory;
-    let $stateParams = this.router.globals.params;
+    let router = this.router;
+    let $urlMatcherFactory = router.urlMatcherFactory;
+    let $stateParams = router.globals.params;
+    let $loc = router.urlService;
     let redirect, handlerIsString = isString(handler);
 
     // @todo Queue this
@@ -188,7 +190,6 @@ export class UrlRouterProvider implements Disposable {
     if (!handlerIsString && !isFunction(handler) && !isArray(handler))
       throw new Error("invalid 'handler' in when()");
 
-    let $loc = services.location;
     let strategies = {
       matcher: function (_what, _handler) {
         if (handlerIsString) {
@@ -341,7 +342,7 @@ export class UrlRouter implements Disposable {
    * This causes [[UrlRouter]] to start listening for changes to the URL, if it wasn't already listening.
    */
   listen(): Function {
-    return this.listener = this.listener || services.location.onChange(evt => this.sync(evt));
+    return this.listener = this.listener || this.router.urlService.onChange(evt => this.sync(evt));
   }
 
   /**

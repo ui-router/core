@@ -2,7 +2,7 @@
  * @internalapi
  * @module vanilla
  */ /** */
-import { services, isDefined } from "../common/index";
+import { isDefined } from "../common/index";
 import { LocationServices } from "../common/coreservices";
 import { splitQuery, trimHashVal, getParams, locationPluginFactory } from "./utils";
 import { LocationPlugin } from "./interface";
@@ -22,7 +22,7 @@ export class PushStateLocationService implements LocationServices, Disposable {
   private _location: Location;
   private _history: History;
 
-  constructor() {
+  constructor(public router: UIRouter) {
     this._location = location;
     this._history = history;
   };
@@ -32,7 +32,7 @@ export class PushStateLocationService implements LocationServices, Disposable {
   }
 
   path() {
-    let base = services.locationConfig.baseHref();
+    let base = this.router.urlConfig.baseHref();
     let path = this._location.pathname;
     let idx = path.indexOf(base);
     if (idx !== 0) throw new Error(`current url: ${path} does not start with <base> tag ${base}`);
@@ -40,13 +40,14 @@ export class PushStateLocationService implements LocationServices, Disposable {
   }
 
   search() {
-      return getParams(splitQuery(this._location.search)[1]);
+    return getParams(splitQuery(this._location.search)[1]);
   }
 
   setUrl(url: string, replace: boolean = false) {
     if (isDefined(url)) {
-      if (replace) this._history.replaceState(null, null, services.locationConfig.baseHref() + url);
-      else this._history.pushState(null, null, services.locationConfig.baseHref() + url);
+      let fullUrl = this.router.urlConfig.baseHref() + url;
+      if (replace) this._history.replaceState(null, null, fullUrl);
+      else this._history.pushState(null, null, fullUrl);
     }
   }
 

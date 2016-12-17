@@ -32,9 +32,9 @@ describe('stateService', function () {
     router = new UIRouter();
     router.plugin(TestingPlugin);
 
-    $loc = services.location;
-    $state = router.stateService;
-    $registry = router.stateRegistry;
+    $loc         = router.urlService;
+    $state       = router.stateService;
+    $registry    = router.stateRegistry;
     $transitions = router.transitionService;
   });
 
