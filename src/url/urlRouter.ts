@@ -2,14 +2,13 @@
  * @coreapi
  * @module url
  */ /** for typedoc */
-import {extend, bindFunctions, IInjectable, removeFrom} from "../common/common";
-import {isFunction, isString, isDefined, isArray} from "../common/predicates";
-import {UrlMatcher} from "./urlMatcher";
-import {services, $InjectorLike, LocationServices} from "../common/coreservices";
-import {UrlMatcherFactory} from "./urlMatcherFactory";
-import {StateParams} from "../params/stateParams";
-import {RawParams} from "../params/interface";
+import { extend, bindFunctions, IInjectable, removeFrom } from "../common/common";
+import { isFunction, isString, isDefined, isArray } from "../common/predicates";
+import { UrlMatcher } from "./urlMatcher";
+import { services, $InjectorLike, LocationServices } from "../common/coreservices";
+import { RawParams } from "../params/interface";
 import { Disposable } from "../interface";
+import { UIRouter } from "../router";
 
 /** @hidden Returns a string that is a prefix of all strings matching the RegExp */
 function regExpPrefix(re: RegExp) {
@@ -32,8 +31,7 @@ function handleIfMatch($injector: $InjectorLike, $stateParams: RawParams, handle
 }
 
 /** @hidden */
-function appendBasePath(url: string, isHtml5: boolean, absolute: boolean): string {
-  let baseHref = services.locationConfig.baseHref();
+function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHref: string): string {
   if (baseHref === '/') return url;
   if (isHtml5) return baseHref.slice(0, -1) + url;
   if (absolute) return baseHref.slice(1) + url;
@@ -53,15 +51,7 @@ export class UrlRouterProvider implements Disposable {
   /** @hidden */
   interceptDeferred = false;
 
-  /** @hidden */
-  private $urlMatcherFactory: UrlMatcherFactory;
-  /** @hidden */
-  private $stateParams: StateParams;
-
-  constructor($urlMatcherFactory: UrlMatcherFactory, $stateParams: StateParams) {
-    this.$urlMatcherFactory = $urlMatcherFactory;
-    this.$stateParams = $stateParams;
-  }
+  constructor(public router: UIRouter) { }
 
   /** @internalapi */
   dispose() {
@@ -188,7 +178,8 @@ export class UrlRouterProvider implements Disposable {
    * Note: the handler may also invoke arbitrary code, such as `$state.go()`
    */
   when(what: (RegExp|UrlMatcher|string), handler: string|IInjectable, ruleCallback = function(rule) {}) {
-    let {$urlMatcherFactory, $stateParams} = this;
+    let $urlMatcherFactory = this.router.urlMatcherFactory;
+    let $stateParams = this.router.globals.params;
     let redirect, handlerIsString = isString(handler);
 
     // @todo Queue this
@@ -282,13 +273,9 @@ export class UrlRouter implements Disposable {
   private location: string;
   /** @hidden */
   private listener: Function;
-  /** @hidden */
-  private urlRouterProvider: UrlRouterProvider;
-
 
   /** @hidden */
-  constructor(urlRouterProvider: UrlRouterProvider) {
-    this.urlRouterProvider = urlRouterProvider;
+  constructor(public router: UIRouter) {
     bindFunctions(UrlRouter.prototype, this, this);
   }
 
@@ -323,9 +310,11 @@ export class UrlRouter implements Disposable {
    */
   sync(evt?) {
     if (evt && evt.defaultPrevented) return;
-    let $loc = services.location;
-    let rules = this.urlRouterProvider.rules;
-    let otherwiseFn = this.urlRouterProvider.otherwiseFn;
+
+    let router = this.router;
+    let $loc = router.urlService;
+    let rules = router.urlRouterProvider.rules;
+    let otherwiseFn = router.urlRouterProvider.otherwiseFn;
 
     function check(rule: Function) {
       let handled = rule(services.$injector, $loc);
@@ -359,7 +348,7 @@ export class UrlRouter implements Disposable {
    * Internal API.
    */
   update(read?: boolean) {
-    let $loc = services.location;
+    let $loc = this.router.urlService;
     if (read) {
       this.location = $loc.path();
       return;
@@ -380,7 +369,7 @@ export class UrlRouter implements Disposable {
    */
   push(urlMatcher: UrlMatcher, params: RawParams, options: { replace?: (string|boolean) }) {
     let replace = options && !!options.replace;
-    services.location.setUrl(urlMatcher.format(params || {}), replace);
+    this.router.urlService.setUrl(urlMatcher.format(params || {}), replace);
   }
 
   /**
@@ -408,13 +397,13 @@ export class UrlRouter implements Disposable {
     let url = urlMatcher.format(params);
     options = options || { absolute: false };
 
-    let cfg = services.locationConfig;
-    let loc = services.location;
+    let cfg = this.router.urlConfig;
+    let loc = this.router.urlService;
     let isHtml5 = loc.html5Mode();
     if (!isHtml5 && url !== null) {
       url = "#" + loc.hashPrefix() + url;
     }
-    url = appendBasePath(url, isHtml5, options.absolute);
+    url = appendBasePath(url, isHtml5, options.absolute, cfg.baseHref());
 
     if (!options.absolute || !url) {
       return url;

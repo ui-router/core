@@ -42,9 +42,9 @@ export class UIRouter {
 
   urlMatcherFactory: UrlMatcherFactory = new UrlMatcherFactory();
 
-  urlRouterProvider: UrlRouterProvider = new UrlRouterProvider(this.urlMatcherFactory, this.globals.params);
+  urlRouterProvider: UrlRouterProvider = new UrlRouterProvider(this);
 
-  urlRouter: UrlRouter = new UrlRouter(this.urlRouterProvider);
+  urlRouter: UrlRouter = new UrlRouter(this);
 
   stateRegistry: StateRegistry = new StateRegistry(this.urlMatcherFactory, this.urlRouterProvider);
 
