@@ -22,7 +22,7 @@ import { registerLazyLoadHook } from "../hooks/lazyLoad";
 import { TransitionEventType } from "./transitionEventType";
 import { TransitionHook, GetResultHandler, GetErrorHandler } from "./transitionHook";
 import { isDefined } from "../common/predicates";
-import { removeFrom, values, bindFunctions } from "../common/common";
+import { removeFrom, values, createProxyFunctions } from "../common/common";
 import { Disposable } from "../interface"; // has or is using
 
 /**
@@ -149,7 +149,7 @@ export class TransitionService implements IHookRegistry, Disposable {
   constructor(private _router: UIRouter) {
     this.$view = _router.viewService;
     this._deregisterHookFns = <any> {};
-    this._pluginapi = <TransitionServicePluginAPI> bindFunctions(this, {}, this, [
+    this._pluginapi = <TransitionServicePluginAPI> createProxyFunctions(this, {}, this, [
       '_definePathType',
       '_defineEvent',
       '_getPathTypes',

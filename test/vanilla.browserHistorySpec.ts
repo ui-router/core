@@ -39,7 +39,7 @@ describe('browserHistory implementation', () => {
 
   it('uses history.pushState when setting a url', () => {
     let service = mockHistoryObject();
-    expect(router.urlService.html5Mode()).toBe(true);
+    expect(router.urlService.config.html5Mode()).toBe(true);
     let stub = spyOn(service._history, 'pushState');
     router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' }, {});
     expect(stub.calls.first().args[2]).toBe('/hello/world');
@@ -53,7 +53,7 @@ describe('browserHistory implementation', () => {
   });
 
   it('returns the correct url query', () => {
-    expect(router.urlService.html5Mode()).toBe(true);
+    expect(router.urlService.config.html5Mode()).toBe(true);
     return router.stateService.go('path', {urlParam: 'bar'}).then(() => {
       expect(window.location.toString().includes('/path/bar')).toBe(true);
       expect(window.location.toString().includes('/#/path/bar')).toBe(false);

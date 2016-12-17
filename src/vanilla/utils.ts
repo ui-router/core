@@ -5,7 +5,6 @@
 import {isArray} from "../common/index";
 import { LocationServices, LocationConfig, services } from "../common/coreservices";
 import { UIRouter } from "../router";
-import { extend, bindFunctions } from "../common/common";
 
 const beforeAfterSubstr = (char: string) => (str: string): string[] => {
   if (!str) return ["", ""];
@@ -35,20 +34,18 @@ export const getParams = (queryString: string): any =>
 
 export function locationPluginFactory(
     name: string,
+    isHtml5: boolean,
     serviceClass: { new(router?: UIRouter): LocationServices },
-    configurationClass: { new(router?: UIRouter): LocationConfig }
+    configurationClass: { new(router?: UIRouter, isHtml5?: boolean): LocationConfig }
 ) {
   return function(router: UIRouter) {
-    let service = new serviceClass(router);
-    let configuration = new configurationClass(router);
+    let service       = router.locationService = new serviceClass(router);
+    let configuration = router.locationConfig  = new configurationClass(router, isHtml5);
 
     function dispose(router: UIRouter) {
       router.dispose(service);
       router.dispose(configuration);
     }
-
-    bindFunctions(serviceClass.prototype, services.location, service);
-    bindFunctions(configurationClass.prototype, services.locationConfig, configuration);
 
     return { name, service, configuration, dispose };
   };

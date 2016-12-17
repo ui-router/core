@@ -2,7 +2,7 @@
  * @coreapi
  * @module url
  */ /** for typedoc */
-import { extend, bindFunctions, IInjectable, removeFrom } from "../common/common";
+import { extend, IInjectable, removeFrom, createProxyFunctions } from "../common/common";
 import { isFunction, isString, isDefined, isArray } from "../common/predicates";
 import { UrlMatcher } from "./urlMatcher";
 import { services, $InjectorLike, LocationServices } from "../common/coreservices";
@@ -260,10 +260,10 @@ export class UrlRouterProvider implements Disposable {
    * });
    * ```
    *
-   * @param defer Indicates whether to defer location change interception. Passing
-   *        no parameter is equivalent to `true`.
+   * @param defer Indicates whether to defer location change interception.
+   *        Passing no parameter is equivalent to `true`.
    */
-  deferIntercept(defer) {
+  deferIntercept(defer?: boolean) {
     if (defer === undefined) defer = true;
     this.interceptDeferred = defer;
   };
@@ -277,7 +277,7 @@ export class UrlRouter implements Disposable {
 
   /** @hidden */
   constructor(public router: UIRouter) {
-    bindFunctions(UrlRouter.prototype, this, this);
+    createProxyFunctions(UrlRouter.prototype, this, this);
   }
 
   /** @internalapi */
@@ -398,11 +398,10 @@ export class UrlRouter implements Disposable {
     let url = urlMatcher.format(params);
     options = options || { absolute: false };
 
-    let cfg = this.router.urlConfig;
-    let loc = this.router.urlService;
-    let isHtml5 = loc.html5Mode();
+    let cfg = this.router.urlService.config;
+    let isHtml5 = cfg.html5Mode();
     if (!isHtml5 && url !== null) {
-      url = "#" + loc.hashPrefix() + url;
+      url = "#" + cfg.hashPrefix() + url;
     }
     url = appendBasePath(url, isHtml5, options.absolute, cfg.baseHref());
 

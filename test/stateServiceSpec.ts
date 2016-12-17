@@ -29,6 +29,7 @@ describe('stateService', function () {
   afterEach(() => router.dispose());
 
   beforeEach(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
     router = new UIRouter();
     router.plugin(TestingPlugin);
 

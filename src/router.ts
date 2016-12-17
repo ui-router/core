@@ -3,8 +3,7 @@
  * @module core
  */ /** */
 import { UrlMatcherFactory } from "./url/urlMatcherFactory";
-import { UrlRouterProvider } from "./url/urlRouter";
-import { UrlRouter } from "./url/urlRouter";
+import { UrlRouterProvider, UrlRouter } from "./url/urlRouter";
 import { TransitionService } from "./transition/transitionService";
 import { ViewService } from "./view/view";
 import { StateRegistry } from "./state/stateRegistry";
@@ -14,7 +13,7 @@ import { UIRouterPlugin, Disposable } from "./interface";
 import { values, removeFrom } from "./common/common";
 import { isFunction } from "./common/predicates";
 import { UrlService } from "./url/urlService";
-import { services, LocationServices, LocationConfig } from "./common/coreservices";
+import { LocationServices, LocationConfig } from "./common/coreservices";
 
 /** @hidden */
 let _routerInstance = 0;
@@ -50,13 +49,7 @@ export class UIRouter {
 
   stateService = new StateService(this);
 
-  get urlService(): LocationServices {
-    return services.location;
-  }
-
-  get urlConfig(): LocationConfig {
-    return services.locationConfig;
-  }
+  urlService: UrlService = new UrlService(this);
 
   private _disposables: Disposable[] = [];
 
@@ -89,7 +82,11 @@ export class UIRouter {
     });
   }
 
-  constructor() {
+  constructor(
+      public locationService: LocationServices = UrlService.locationServiceStub,
+      public locationConfig: LocationConfig = UrlService.locationConfigStub
+  ) {
+
     this.viewService._pluginapi._rootViewContext(this.stateRegistry.root());
     this.globals.$current = this.stateRegistry.root();
     this.globals.current = this.globals.$current.self;
@@ -98,6 +95,8 @@ export class UIRouter {
     this.disposable(this.urlRouterProvider);
     this.disposable(this.urlRouter);
     this.disposable(this.stateRegistry);
+    this.disposable(locationService);
+    this.disposable(locationConfig);
   }
 
   /** @hidden */

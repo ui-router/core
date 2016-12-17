@@ -1,7 +1,7 @@
 import { UIRouter } from "../src/router";
 import { tree2Array } from "./_testUtils";
 import { StateRegistry } from "../src/state/stateRegistry";
-import { services } from "../src/common/coreservices";
+import { TestingPlugin } from "./_testingPlugin";
 
 let router: UIRouter = null;
 let registry: StateRegistry = null;
@@ -20,6 +20,7 @@ let statetree = {
 describe("StateRegistry", () => {
   beforeEach(() => {
     router = new UIRouter();
+    router.plugin(TestingPlugin);
     registry = router.stateRegistry;
     tree2Array(statetree, true).forEach(state => registry.register(state));
     registry.stateQueue.autoFlush(router.stateService);

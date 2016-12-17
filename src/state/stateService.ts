@@ -2,7 +2,9 @@
  * @coreapi
  * @module state
  */ /** */
-import { extend, defaults, silentRejection, silenceUncaughtInPromise, removeFrom, noop } from "../common/common";
+import {
+    extend, defaults, silentRejection, silenceUncaughtInPromise, removeFrom, noop, createProxyFunctions
+} from "../common/common";
 import {isDefined, isObject, isString} from "../common/predicates";
 import {Queue} from "../common/queue";
 import {services} from "../common/coreservices";
@@ -24,7 +26,6 @@ import {ParamsOrArray} from "../params/interface";
 import {Param} from "../params/param";
 import {Glob} from "../common/glob";
 import {HrefOptions} from "./interface";
-import {bindFunctions} from "../common/common";
 import {Globals} from "../globals";
 import {UIRouter} from "../router";
 import {UIInjector} from "../interface";
@@ -74,7 +75,7 @@ export class StateService {
   constructor(private router: UIRouter) {
     let getters = ['current', '$current', 'params', 'transition'];
     let boundFns = Object.keys(StateService.prototype).filter(key => getters.indexOf(key) === -1);
-    bindFunctions(StateService.prototype, this, this, boundFns);
+    createProxyFunctions(StateService.prototype, this, this, boundFns);
   }
 
   /** @internalapi */
