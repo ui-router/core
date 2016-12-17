@@ -5,7 +5,7 @@
 import { isDefined } from "../common/index";
 import { LocationConfig, LocationServices } from "../common/coreservices";
 import { splitQuery, getParams, splitHash, locationPluginFactory } from "./utils";
-import { removeFrom, unnestR, deregAll } from "../common/common";
+import { removeFrom, unnestR, deregAll, noop } from "../common/common";
 import { UIRouter } from "../router";
 import { LocationPlugin } from "./interface";
 import { isArray } from "../common/predicates";
@@ -17,17 +17,20 @@ export class MemoryLocationConfig implements LocationConfig {
   _port = 80;
   _protocol = "http";
   _host = "localhost";
+  _hashPrefix = "";
 
   port = () => this._port;
   protocol = () => this._protocol;
   host = () => this._host;
   baseHref = () => this._baseHref;
+  html5Mode = () => false;
+  hashPrefix = (newval?) => isDefined(newval) ? this._hashPrefix = newval : this._hashPrefix;
+  dispose = noop;
 }
 
 /** A `LocationServices` that gets/sets the current location from an in-memory object */
 export class MemoryLocationService implements LocationServices, Disposable {
   _listeners: Function[] = [];
-  _hashPrefix = "";
   _url = {
     path: '',
     search: {},
@@ -65,14 +68,6 @@ export class MemoryLocationService implements LocationServices, Disposable {
     return this._url.search;
   }
 
-  html5Mode() {
-    return false;
-  }
-
-  hashPrefix(newprefix?: string): string {
-    return isDefined(newprefix) ? this._hashPrefix = newprefix : this._hashPrefix;
-  }
-
   setUrl(url: string, replace: boolean = false) {
     if (isDefined(url)) {
       let path = splitHash(splitQuery(url)[0])[0];
@@ -98,4 +93,4 @@ export class MemoryLocationService implements LocationServices, Disposable {
 
 /** A `UIRouterPlugin` that gets/sets the current location from an in-memory object */
 export const memoryLocationPlugin: (router: UIRouter) => LocationPlugin =
-    locationPluginFactory("vanilla.memoryLocation", MemoryLocationService, MemoryLocationConfig);
+    locationPluginFactory("vanilla.memoryLocation", false, MemoryLocationService, MemoryLocationConfig);

@@ -3,7 +3,7 @@
  * @module vanilla
  */ /** */
 import { isDefined } from "../common/index";
-import { LocationServices } from "../common/coreservices";
+import { LocationServices, LocationConfig } from "../common/coreservices";
 import { splitQuery, trimHashVal, getParams, locationPluginFactory } from "./utils";
 import { LocationPlugin } from "./interface";
 import { UIRouter } from "../router";
@@ -18,13 +18,14 @@ import { BrowserLocationConfig } from "./browserLocationConfig";
  */
 export class PushStateLocationService implements LocationServices, Disposable {
   private _listeners: Function[] = [];
-  private _hashPrefix = "";
   private _location: Location;
   private _history: History;
+  private _config: LocationConfig;
 
-  constructor(public router: UIRouter) {
+  constructor(router: UIRouter) {
     this._location = location;
     this._history = history;
+    this._config = router.urlService.config;
   };
 
   hash() {
@@ -32,7 +33,7 @@ export class PushStateLocationService implements LocationServices, Disposable {
   }
 
   path() {
-    let base = this.router.urlConfig.baseHref();
+    let base = this._config.baseHref();
     let path = this._location.pathname;
     let idx = path.indexOf(base);
     if (idx !== 0) throw new Error(`current url: ${path} does not start with <base> tag ${base}`);
@@ -45,7 +46,7 @@ export class PushStateLocationService implements LocationServices, Disposable {
 
   setUrl(url: string, replace: boolean = false) {
     if (isDefined(url)) {
-      let fullUrl = this.router.urlConfig.baseHref() + url;
+      let fullUrl = this._config.baseHref() + url;
       if (replace) this._history.replaceState(null, null, fullUrl);
       else this._history.pushState(null, null, fullUrl);
     }
@@ -56,23 +57,12 @@ export class PushStateLocationService implements LocationServices, Disposable {
     return pushTo(this._listeners, () => window.removeEventListener("popstate", cb));
   }
 
-  html5Mode() {
-    return true;
-  }
-
-  hashPrefix(newprefix?: string): string {
-    if(isDefined(newprefix)) {
-      this._hashPrefix = newprefix;
-    }
-    return this._hashPrefix;
-  }
-
   dispose(router: UIRouter) {
     deregAll(this._listeners);
   }
-};
+}
 
 /** A `UIRouterPlugin` that gets/sets the current location using the browser's `location` and `history` apis */
 export const pushStateLocationPlugin: (router: UIRouter) => LocationPlugin =
-    locationPluginFactory("vanilla.pushStateLocation", PushStateLocationService, BrowserLocationConfig);
+    locationPluginFactory("vanilla.pushStateLocation", true, PushStateLocationService, BrowserLocationConfig);
 

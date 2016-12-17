@@ -14,7 +14,6 @@ import { BrowserLocationConfig } from "./browserLocationConfig";
 /** A `LocationServices` that uses the browser hash "#" to get/set the current location */
 export class HashLocationService implements LocationServices, Disposable {
   private _listeners: Function[] = [];
-  private _hashPrefix = "";
 
   hash() {
       return splitHash(trimHashVal(location.hash))[1];
@@ -37,17 +36,6 @@ export class HashLocationService implements LocationServices, Disposable {
     return pushTo(this._listeners, () => window.removeEventListener('hashchange', cb));
   }
 
-  html5Mode() {
-    return false;
-  }
-
-  hashPrefix(newprefix?: string): string {
-    if(isDefined(newprefix)) {
-      this._hashPrefix = newprefix;
-    }
-    return this._hashPrefix;
-  }
-
   dispose() {
     deregAll(this._listeners);
   }
@@ -55,4 +43,4 @@ export class HashLocationService implements LocationServices, Disposable {
 
 /** A `UIRouterPlugin` uses the browser hash to get/set the current location */
 export const hashLocationPlugin: (router: UIRouter) => LocationPlugin =
-    locationPluginFactory('vanilla.hashBangLocation', HashLocationService, BrowserLocationConfig);
+    locationPluginFactory('vanilla.hashBangLocation', false, HashLocationService, BrowserLocationConfig);

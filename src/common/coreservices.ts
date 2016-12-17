@@ -6,6 +6,7 @@
  */
 /** for typedoc */
 import {IInjectable, Obj} from "./common";
+import { Disposable } from "../interface";
 
 export let notImplemented = (fnname: string) => () => {
   throw new Error(`${fnname}(): No coreservices implementation for UI-Router is loaded.`);
@@ -14,16 +15,8 @@ export let notImplemented = (fnname: string) => () => {
 let services: CoreServices = {
   $q: undefined,
   $injector: undefined,
-  location: <any> {},
-  locationConfig: <any> {},
   template: <any> {}
 };
-
-["setUrl", "path", "search", "hash", "onChange"]
-    .forEach(key => services.location[key] = notImplemented(key));
-
-["port", "protocol", "host", "baseHref", "html5Mode", "hashPrefix" ]
-    .forEach(key => services.locationConfig[key] = notImplemented(key));
 
 export interface $QLikeDeferred {
   resolve: (val?: any) => void;
@@ -51,30 +44,25 @@ export interface $InjectorLike {
 export interface CoreServices {
   $q: $QLike;
   $injector: $InjectorLike;
-  /** Services related to getting or setting the browser location (url) */
-  location: LocationServices;
-  /** Retrieves configuration for how to construct a URL. */
-  locationConfig: LocationConfig;
   template: TemplateServices;
 }
 
-export interface LocationServices {
+export interface LocationServices extends Disposable {
   setUrl(newurl: string, replace?: boolean): void;
   path(): string;
   search(): { [key: string]: any };
   hash(): string;
   onChange(callback: Function): Function;
-  html5Mode(): boolean;
-  hashPrefix(): string;
-  hashPrefix(newprefix: string): string;
 }
 
-export interface LocationConfig {
+export interface LocationConfig extends Disposable {
   port(): number;
   protocol(): string;
   host(): string;
-
   baseHref(): string;
+  html5Mode(): boolean;
+  hashPrefix(): string;
+  hashPrefix(newprefix: string): string;
 }
 
 export interface TemplateServices {
