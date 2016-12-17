@@ -13,6 +13,8 @@ import { UIRouterGlobals, Globals } from "./globals";
 import { UIRouterPlugin, Disposable } from "./interface";
 import { values, removeFrom } from "./common/common";
 import { isFunction } from "./common/predicates";
+import { UrlService } from "./url/urlService";
+import { services, LocationServices, LocationConfig } from "./common/coreservices";
 
 /** @hidden */
 let _routerInstance = 0;
@@ -47,6 +49,14 @@ export class UIRouter {
   stateRegistry: StateRegistry = new StateRegistry(this.urlMatcherFactory, this.urlRouterProvider);
 
   stateService = new StateService(this);
+
+  get urlService(): LocationServices {
+    return services.location;
+  }
+
+  get urlConfig(): LocationConfig {
+    return services.locationConfig;
+  }
 
   private _disposables: Disposable[] = [];
 

@@ -36,7 +36,8 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
 
   function retryOriginalTransition() {
     if (transitionSource(transition) === 'url') {
-      let $loc = services.location,
+      let $loc = transition.router.urlService,
+          $reg = transition.router.stateRegistry,
           path = $loc.path(),
           search = $loc.search(),
           hash = $loc.hash();
@@ -44,7 +45,7 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
       let matchState = state =>
           [state, state.url && state.url.exec(path, search, hash)];
 
-      let matches = transition.router.stateRegistry.get()
+      let matches = $reg.get()
           .map(s => s.$$state())
           .map(matchState)
           .filter(([state, params]) => !!params);

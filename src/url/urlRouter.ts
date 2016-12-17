@@ -40,31 +40,6 @@ function appendBasePath(url: string, isHtml5: boolean, absolute: boolean): strin
   return url;
 }
 
-// TODO: Optimize groups of rules with non-empty prefix into some sort of decision tree
-/** @hidden */
-function update(rules: Function[], otherwiseFn: Function, evt?: any) {
-  if (evt && evt.defaultPrevented) return;
-  let $loc = services.location;
-
-  function check(rule: Function) {
-    let handled = rule(services.$injector, $loc);
-
-    if (!handled) return false;
-    if (isString(handled)) {
-      $loc.setUrl(handled, true);
-    }
-    return true;
-  }
-  let n = rules.length;
-
-  for (let i = 0; i < n; i++) {
-    if (check(rules[i])) return;
-  }
-  // always check otherwise last to allow dynamic updates to the set of rules
-  if (otherwiseFn) check(otherwiseFn);
-}
-
-
 /**
  * Manages rules for client-side URL
  *
@@ -346,8 +321,28 @@ export class UrlRouter implements Disposable {
    * });
    * ```
    */
-  sync() {
-    update(this.urlRouterProvider.rules, this.urlRouterProvider.otherwiseFn);
+  sync(evt?) {
+    if (evt && evt.defaultPrevented) return;
+    let $loc = services.location;
+    let rules = this.urlRouterProvider.rules;
+    let otherwiseFn = this.urlRouterProvider.otherwiseFn;
+
+    function check(rule: Function) {
+      let handled = rule(services.$injector, $loc);
+
+      if (!handled) return false;
+      if (isString(handled)) {
+        $loc.setUrl(handled, true);
+      }
+      return true;
+    }
+    let n = rules.length;
+
+    for (let i = 0; i < n; i++) {
+      if (check(rules[i])) return;
+    }
+    // always check otherwise last to allow dynamic updates to the set of rules
+    if (otherwiseFn) check(otherwiseFn);
   }
 
   /**
@@ -357,7 +352,7 @@ export class UrlRouter implements Disposable {
    * This causes [[UrlRouter]] to start listening for changes to the URL, if it wasn't already listening.
    */
   listen(): Function {
-    return this.listener = this.listener || services.location.onChange(evt => update(this.urlRouterProvider.rules, this.urlRouterProvider.otherwiseFn, evt));
+    return this.listener = this.listener || services.location.onChange(evt => this.sync(evt));
   }
 
   /**

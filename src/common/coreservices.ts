@@ -7,7 +7,7 @@
 /** for typedoc */
 import {IInjectable, Obj} from "./common";
 
-let notImplemented = (fnname: string) => () => {
+export let notImplemented = (fnname: string) => () => {
   throw new Error(`${fnname}(): No coreservices implementation for UI-Router is loaded.`);
 };
 
