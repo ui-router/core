@@ -56,15 +56,14 @@ const memoizeTo = (obj: Obj, prop: string, fn: Function) =>
  * (`/somePath/{param:[a-zA-Z0-9]+}`) in a curly brace placeholder.
  * The regexp must match for the url to be matched.
  * Should the regexp itself contain curly braces, they must be in matched pairs or escaped with a backslash.
- * Note that a RegExp parameter will encode its value with `string` ParamType encoding: "/" as "~2F", and "~" as "~~". 
- * When matching these characters, use the encoded versions in the regexp.
- * See issue [#2540](https://github.com/angular-ui/ui-router/issues/2540) for more information.
  *
- * - *Custom parameter types* may also be specified after a colon (`/somePath/{param:int}`)
- * in curly brace parameters.  See [[UrlMatcherFactory.type]] for more information.
+ * Note: a RegExp parameter will encode its value using either [[ParamTypes.path]] or [[ParamTypes.query]].
  *
- * - *Catch-all parameters* are defined using an asterisk placeholder (`/somepath/*catchallparam`).  A catch-all
- * parameter value will contain the remainder of the URL.
+ * - *Custom parameter types* may also be specified after a colon (`/somePath/{param:int}`) in curly brace parameters.
+ *   See [[UrlMatcherFactory.type]] for more information.
+ *
+ * - *Catch-all parameters* are defined using an asterisk placeholder (`/somepath/*catchallparam`).
+ *   A catch-all * parameter value will contain the remainder of the URL.
  *
  * ---
  *
@@ -158,18 +157,21 @@ export class UrlMatcher {
     // The number of segments is always 1 more than the number of parameters.
     const matchDetails = (m: RegExpExecArray, isSearch: boolean) => {
       // IE[78] returns '' for unmatched groups instead of null
-      let id = m[2] || m[3], regexp = isSearch ? m[4] : m[4] || (m[1] === '*' ? '.*' : null);
+      let id = m[2] || m[3];
+      let regexp = isSearch ? m[4] : m[4] || (m[1] === '*' ? '.*' : null);
+
+      const makeRegexpType = (regexp) => inherit(paramTypes.type(isSearch ? "query" : "path"), {
+        pattern: new RegExp(regexp, this.config.caseInsensitive ? 'i' : undefined)
+      });
 
       return {
         id,
         regexp,
         cfg:     this.config.params[id],
         segment: pattern.substring(last, m.index),
-        type:    !regexp ? null : paramTypes.type(regexp || "string") || inherit(paramTypes.type("string"), {
-          pattern: new RegExp(regexp, this.config.caseInsensitive ? 'i' : undefined)
-        })
+        type:    !regexp ? null : paramTypes.type(regexp) || makeRegexpType(regexp)
       };
-    }
+    };
 
     let p: any, segment: string;
 

@@ -1,3 +1,4 @@
+/** @module transition */ /** */
 import { TransitionHookPhase, PathType } from "./interface";
 import { GetErrorHandler, GetResultHandler, TransitionHook } from "./transitionHook";
 /**
@@ -5,7 +6,6 @@ import { GetErrorHandler, GetResultHandler, TransitionHook } from "./transitionH
  * Plugins can define custom hook types, such as sticky states does for `onInactive`.
  *
  * @interalapi
- * @module transition
  */
 export class TransitionEventType {
 

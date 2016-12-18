@@ -24,42 +24,49 @@ export interface RawParams {
 export type ParamsOrArray = (RawParams|RawParams[]);
 
 /**
- * Inside a [[StateDeclaration.params]]:
+ * Configuration for a single Parameter
  *
- * A ParamDeclaration object defines how a single State Parameter should work.
+ * In a [[StateDeclaration.params]], each `ParamDeclaration`
+ * defines how a single State Parameter should work.
  *
- * @example
- * ```
- *
+ * #### Example:
+ * ```js
  * var mystate = {
  *   template: '<div ui-view/>',
  *   controller: function() {}
- *   url: '/mystate/:param1',
+ *   url: '/mystate/:start?{count:int}',
  *   params: {
- *     param1: "index", // <-- Default value for 'param1'
- *                      // (shorthand ParamDeclaration)
+ *     start: { // <-- ParamDeclaration for `start`
+ *       type: 'date',
+ *       value: new Date(), // <-- Default value
+ *       squash: true,
+ *     },
  *
  *     nonUrlParam: { // <-- ParamDeclaration for 'nonUrlParam'
  *      type: "int",
  *      array: true,
  *      value: []
- *     }
+ *     },
+ *
+ *     count: 0, // <-- Default value for 'param1'
+ *               // (shorthand ParamDeclaration.value)
  *   }
  * }
  * ```
  */
 export interface ParamDeclaration {
   /**
-   * A property of [[ParamDeclaration]]:
+   * The default value for this parameter.
    *
-   * Specifies the default value for this parameter. This implicitly sets this parameter as optional.
+   * Specifies the default value for this parameter.
+   * This implicitly sets this parameter as optional.
    *
    * When UI-Router routes to a state and no value is specified for this parameter in the URL or transition,
-   * the default value will be used instead. If value is a function, it will be injected and invoked, and the
-   * return value used.
+   * the default value will be used instead.
+   * If value is a function, it will be injected and invoked, and the return value used.
    *
-   * Note:  `value: undefined` is treated as though no default value was specified, while `value: null` is treated
-   * as "the default value is null".
+   * Note:  `value: undefined` is treated as though **no default value was specified**, while `value: null` is treated
+   * as **"the default value is null"**.
    *
    * ```
    * // define default values for param1 and param2
@@ -74,43 +81,48 @@ export interface ParamDeclaration {
    * ```
    *
    * ### Shorthand Declaration
+   *
    * If you only want to set the default value of the parameter, you may use a shorthand syntax.
    * In the params map, instead mapping the param name to a full parameter configuration object, simply set map it
    * to the default parameter value, e.g.:
    * ```
-   * // define a parameter's default value
+   * // Normal (non-shorthand) default value syntax
    * params: {
    *   param1: {
    *     value: "defaultValue"
    *   },
    *   param2: {
-   *     value: "param2Default;
+   *     value: "param2Default"
    *   }
    * }
    *
-   * // shorthand default values
+   * // Shorthand default value syntax
    * params: {
    *   param1: "defaultValue",
    *   param2: "param2Default"
    * }
    * ```
    *
-   * This defines a default value for the parameter.  If the parameter value is `undefined`, this value will be used instead
+   * This defines a default value for the parameter.
+   * If a parameter value is `undefined`, this default value will be used instead
    */
   value?: any;
 
   /**
-   * A property of [[ParamDeclaration]]:
+   * The parameter's type
    *
    * Specifies the [[ParamType]] of the parameter.
+   * Parameter types can be used to customize the encoding/decoding of parameter values.
    *
-   * Set this property to the name of parameter's type.   The type may be either one of the
-   * built in types, or a custom type that has been registered with the [[$urlMatcherFactory]]
+   * Set this property to the name of parameter's type.
+   * The type may be either one of the built in types, or a custom type that has been registered with the [[UrlMatcherFactory]].
+   *
+   * See [[ParamTypes]] for the list of built in types.
    */
   type: (string|ParamType);
 
   /**
-   * A property of [[ParamDeclaration]]:
+   * The parameter's `array` mode
    *
    * Explicitly specifies the array mode of a URL parameter
    *
@@ -124,9 +136,8 @@ export interface ParamDeclaration {
    * If you specified a [[type]] for the parameter, the value will be treated as an array
    * of the specified [[ParamType]].
    *
-   * @example
-   * ```
-   *
+   * #### Example:
+   * ```js
    * {
    *   name: 'foo',
    *   url: '/foo/{arrayParam:int}`,
@@ -144,8 +155,9 @@ export interface ParamDeclaration {
    * @default `true` if the parameter name ends in `[]`, such as `url: '/foo/{implicitArrayParam:int[]}'`
    */
   array: boolean;
+
   /**
-   * A property of [[ParamDeclaration]]:
+   * Squash mode: omit default parameter values in URL
    *
    * Configures how a default parameter value is represented in the URL when the current parameter value
    * is the same as the default value.
@@ -153,15 +165,14 @@ export interface ParamDeclaration {
    * There are three squash settings:
    *
    * - `false`: The parameter's default value is not squashed. It is encoded and included in the URL
-   * - `true`: The parameter's default value is omitted from the URL. If the parameter is preceeded
-   *    and followed by slashes in the state's url declaration, then one of those slashes are omitted.
+   * - `true`: The parameter's default value is omitted from the URL.
+   *    If the parameter is preceeded and followed by slashes in the state's url declaration, then one of those slashes are omitted.
    *    This can allow for cleaner looking URLs.
    * - `"&lt;arbitrary string&gt;"`: The parameter's default value is replaced with an arbitrary
    *    placeholder of your choice.
    *
-   * @example
-   * ```
-   *
+   * #### Example:
+   * ```js
    * {
    *   name: 'mystate',
    *   url: '/mystate/:myparam',
@@ -178,9 +189,8 @@ export interface ParamDeclaration {
    * $state.go('mystate', { myparam: 'someOtherValue' });
    * ```
    *
-   * @example
-   * ```
-   *
+   * #### Example:
+   * ```js
    * {
    *   name: 'mystate2',
    *   url: '/mystate2/:myparam2',
@@ -200,6 +210,7 @@ export interface ParamDeclaration {
    * If squash is not set, it uses the configured default squash policy. (See [[defaultSquashPolicy]]())
    */
   squash: (boolean|string);
+
   /**
    * @internalapi
    *
@@ -218,6 +229,7 @@ export interface ParamDeclaration {
    * ```
    */
   replace: Replace[];
+
   /**
    * @hidden
    * @internalapi
@@ -225,14 +237,50 @@ export interface ParamDeclaration {
    * This is not part of the declaration; it is a calculated value depending on if a default value was specified or not.
    */
   isOptional: boolean;
+
   /**
    * Dynamic flag
    *
    * When `dynamic` is `true`, changes to the parameter value will not cause the state to be entered/exited.
+   * The resolves will not be re-fetched, nor will views be reloaded.
    *
-   * The resolves will not be re-fetched, nor will views be recreated.
+   * Normally, if a parameter value changes, the state which declared that the parameter will be reloaded (entered/exited).
+   * When a parameter is `dynamic`, a transition still occurs, but it does not cause the state to exit/enter.
+   *
+   * This can be useful to build UI where the component updates itself when the param values change.
+   * A common scenario where this is useful is searching/paging/sorting.
    */
   dynamic: boolean;
+
+  /**
+   * Disables url-encoding of parameter values
+   *
+   * When `true`, parameter values are not url-encoded.
+   * This is commonly used to allow "slug" urls, with a parameter value including non-semantic slashes.
+   *
+   * #### Example:
+   * ```js
+   * url: '/product/:slug',
+   * params: {
+   *   slug: { type: 'string', raw: true }
+   * }
+   * ```
+   *
+   * This allows a URL parameter of `{ slug: 'camping/tents/awesome_tent' }`
+   * to serialize to `/product/camping/tents/awesome_tent`
+   * instead of `/product/camping%2Ftents%2Fawesome_tent`.
+   *
+   * ### Decoding warning
+   *
+   * The decoding behavior of raw parameters is not defined.
+   * For example, given a url template such as `/:raw1/:raw2`
+   * the url `/foo/bar/baz/qux/`, there is no way to determine which slashes belong to which params.
+   *
+   * It's generally safe to use a raw parameter at the end of a path, like '/product/:slug'.
+   * However, beware of the characters you allow in your raw parameter values.
+   * Avoid unencoded characters that could disrupt normal URL parsing, such as `?` and `#`.
+   */
+  raw: boolean;
 }
 
 export interface Replace {
@@ -240,9 +288,10 @@ export interface Replace {
   to: string;
 }
 
-
 /**
- * Definition for a custom [[ParamType]]
+ * Describes a custom [[ParamType]]
+ *
+ * See: [[UrlMatcherFactory.type]]
  *
  * A developer can create a custom parameter type definition to customize the encoding and decoding of parameter values.
  * The definition should implement all the methods of this interface.
@@ -254,11 +303,10 @@ export interface Replace {
  * - date
  * - array of <integer/date/string>
  * - custom object
- * - some custom string representation
+ * - some internal string representation
  *
  * Typed parameter definitions control how parameter values are encoded (to the URL) and decoded (from the URL).
- * UI-Router always provides the decoded parameter values to the user from methods such as [[Transition.params]].
- *
+ * UI-Router always provides the decoded parameter values to the user (from methods such as [[Transition.params]])).
  *
  * For example, if a state has a url of `/foo/{fooId:int}` (the `fooId` parameter is of the `int` ParamType)
  * and if the browser is at `/foo/123`, then the 123 is parsed as an integer:
@@ -358,13 +406,17 @@ export interface ParamTypeDefinition {
    * If your custom type encodes the parameter to a specific type, check for that type here.
    * For example, if your custom type decodes the URL parameter value as an array of ints, return true if the
    * input is an array of ints:
-   * `(val) => Array.isArray(val) && array.reduce((acc, x) => acc && parseInt(val, 10) === val, true)`.
+   *
+   * ```
+   * is: (val) => Array.isArray(val) && array.reduce((acc, x) => acc && parseInt(val, 10) === val, true)
+   * ```
+   *
    * If your type decodes the URL parameter value to a custom string, check that the string matches
    * the pattern (don't use an arrow fn if you need `this`): `function (val) { return !!this.pattern.exec(val) }`
    *
    * Note: This method is _not used to check if the URL matches_.
-   * It's used to check if a _decoded value is this type_.
-   * Use [[pattern]] to check the URL.
+   * It's used to check if a _decoded value *is* this type_.
+   * Use [[pattern]] to check the encoded value in the URL.
    *
    * @param val The value to check.
    * @param key If the type check is happening in the context of a specific [[UrlMatcher]]  object,
@@ -377,11 +429,14 @@ export interface ParamTypeDefinition {
   /**
    * Encodes a custom/native type value to a string that can be embedded in a URL.
    *
-   * Note that the return value does *not* need to be URL-safe (i.e. passed through `encodeURIComponent()`), it
-   * only needs to be a representation of `val` that has been encoded as a string.
+   * Note that the return value does *not* need to be URL-safe (i.e. passed through `encodeURIComponent()`).
+   * It only needs to be a representation of `val` that has been encoded as a string.
    *
-   * For example, if your type decodes to an array of ints, then encode the array of ints as a string here:
-   * `(intarray) => intarray.join("-")`
+   * For example, if your custom type decodes to an array of ints, then encode the array of ints to a string here:
+   *
+   * ```js
+   * encode: (intarray) => intarray.join("-")
+   * ```
    *
    * Note: in general, [[encode]] and [[decode]] should be symmetrical.  That is, `encode(decode(str)) === str`
    *
@@ -395,7 +450,9 @@ export interface ParamTypeDefinition {
    * Decodes a parameter value string (from URL string or transition param) to a custom/native value.
    *
    * For example, if your type decodes to an array of ints, then decode the string as an array of ints here:
-   * `(str) => str.split("-").map(str => parseInt(str, 10))`
+   * ```js
+   * decode: (str) => str.split("-").map(str => parseInt(str, 10))
+   * ```
    *
    * Note: in general, [[encode]] and [[decode]] should be symmetrical.  That is, `encode(decode(str)) === str`
    *
@@ -409,7 +466,9 @@ export interface ParamTypeDefinition {
    * Determines whether two decoded values are equivalent.
    *
    * For example, if your type decodes to an array of ints, then check if the arrays are equal:
-   * `(a, b) => a.length === b.length && a.reduce((acc, x, idx) => acc && x === b[idx], true)`
+   * ```js
+   * equals: (a, b) => a.length === b.length && a.reduce((acc, x, idx) => acc && x === b[idx], true)
+   * ```
    *
    * @param a A value to compare against.
    * @param b A value to compare against.
@@ -420,7 +479,7 @@ export interface ParamTypeDefinition {
   /**
    * A regular expression that matches the encoded parameter type
    *
-   * This regular expression is used to match the parameter type in the URL.
+   * This regular expression is used to match an encoded parameter value **in the URL**.
    *
    * For example, if your type encodes as a dash-separated numbers, match that here:
    * `new RegExp("[0-9]+(?:-[0-9]+)*")`.

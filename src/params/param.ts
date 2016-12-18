@@ -28,7 +28,12 @@ function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, i
   if (cfg.type && urlType && urlType.name !== 'string') throw new Error(`Param '${id}' has two type configurations.`);
   if (cfg.type && urlType && urlType.name === 'string' && paramTypes.type(cfg.type as string)) return paramTypes.type(cfg.type as string);
   if (urlType) return urlType;
-  if (!cfg.type) return (location === DefType.CONFIG ? paramTypes.type("any") : paramTypes.type("string"));
+  if (!cfg.type) {
+    let type = location === DefType.CONFIG ? "any" :
+        location === DefType.PATH ? "path" :
+        location === DefType.SEARCH ? "query" : "string";
+    return paramTypes.type(type);
+  }
   return cfg.type instanceof ParamType ? cfg.type : paramTypes.type(cfg.type as string);
 }
 

@@ -5,6 +5,7 @@ import {ParamTypeDefinition} from "./interface";
 
 /**
  * Wraps up a `ParamType` object to handle array values.
+ * @internapi
  */
 function ArrayType(type: ParamType, mode: (boolean|"auto")) {
   // Wrap non-array value as array
@@ -59,25 +60,28 @@ function ArrayType(type: ParamType, mode: (boolean|"auto")) {
 }
 
 /**
- * A class that implements Custom Parameter Type functionality.
+ * An internal class which implements [[ParamTypeDefinition]].
+ *
+ * A [[ParamTypeDefinition]] is a plain javascript object used to register custom parameter types.
+ * When a param type definition is registered, an instance of this class is created internally.
  *
  * This class has naive implementations for all the [[ParamTypeDefinition]] methods.
  *
- * An instance of this class is created when a custom [[ParamTypeDefinition]] object is registered with the [[UrlMatcherFactory.type]].
- *
  * Used by [[UrlMatcher]] when matching or formatting URLs, or comparing and validating parameter values.
  *
- * @example
- * ```
- *
- * {
+ * #### Example:
+ * ```js
+ * var paramTypeDef = {
  *   decode: function(val) { return parseInt(val, 10); },
  *   encode: function(val) { return val && val.toString(); },
  *   equals: function(a, b) { return this.is(a) && a === b; },
  *   is: function(val) { return angular.isNumber(val) && isFinite(val) && val % 1 === 0; },
  *   pattern: /\d+/
  * }
+ *
+ * var paramType = new ParamType(paramTypeDef);
  * ```
+ * @internalapi
  */
 export class ParamType implements ParamTypeDefinition {
   pattern: RegExp = /.*/;
