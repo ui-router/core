@@ -432,7 +432,7 @@ export class UrlMatcher {
       // If this parameter value is an array, encode the value using encodeDashes
       if (isArray(encoded)) return acc + map(<string[]> encoded, UrlMatcher.encodeDashes).join("-");
       // If the parameter type is "raw", then do not encodeURIComponent
-      if (param.type.raw) return acc + encoded;
+      if (param.raw) return acc + encoded;
       // Encode the value
       return acc + encodeURIComponent(<string> encoded);
     }, "");
@@ -444,7 +444,7 @@ export class UrlMatcher {
       if (encoded == null || (isDefaultValue && squash !== false)) return;
       if (!isArray(encoded)) encoded = [<string> encoded];
       if (encoded.length === 0) return;
-      if (!param.type.raw) encoded = map(<string[]> encoded, encodeURIComponent);
+      if (!param.raw) encoded = map(<string[]> encoded, encodeURIComponent);
 
       return (<string[]> encoded).map(val => `${param.id}=${val}`);
     }).filter(identity).reduce(unnestR, []).join("&");

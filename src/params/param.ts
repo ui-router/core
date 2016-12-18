@@ -1,4 +1,7 @@
-/** @module params */ /** for typedoc */
+/**
+ * @internalapi
+ * @module params
+ */ /** for typedoc */
 import {extend, filter, map, applyPairs, allTrueR} from "../common/common";
 import {prop, propEq} from "../common/hof";
 import {isInjectable, isDefined, isString, isArray} from "../common/predicates";
@@ -69,6 +72,7 @@ export class Param {
   replace: any;
   isOptional: boolean;
   dynamic: boolean;
+  raw: boolean;
   config: any;
 
   constructor(id: string, type: ParamType, config: ParamDeclaration, location: DefType, paramTypes: ParamTypes) {
@@ -78,6 +82,7 @@ export class Param {
     type = arrayMode ? type.$asArray(arrayMode, location === DefType.SEARCH) : type;
     let isOptional = config.value !== undefined;
     let dynamic = isDefined(config.dynamic) ? !!config.dynamic : !!type.dynamic;
+    let raw = isDefined(config.raw) ? !!config.raw : !!type.raw;
     let squash = getSquashPolicy(config, isOptional);
     let replace = getReplace(config, arrayMode, isOptional, squash);
 
@@ -88,7 +93,7 @@ export class Param {
       return extend(arrayDefaults, arrayParamNomenclature, config).array;
     }
 
-    extend(this, {id, type, location, squash, replace, isOptional, dynamic, config, array: arrayMode});
+    extend(this, {id, type, location, squash, replace, isOptional, dynamic, raw, config, array: arrayMode});
   }
 
   isDefaultValue(value: any): boolean {

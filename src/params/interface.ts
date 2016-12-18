@@ -249,6 +249,10 @@ export interface ParamDeclaration {
    *
    * This can be useful to build UI where the component updates itself when the param values change.
    * A common scenario where this is useful is searching/paging/sorting.
+   *
+   * ---
+   *
+   * Note: this value overrides the `dynamic` value on a custom parameter type ([[ParamTypeDefinition.dynamic]]).
    */
   dynamic: boolean;
 
@@ -269,6 +273,10 @@ export interface ParamDeclaration {
    * This allows a URL parameter of `{ slug: 'camping/tents/awesome_tent' }`
    * to serialize to `/product/camping/tents/awesome_tent`
    * instead of `/product/camping%2Ftents%2Fawesome_tent`.
+   *
+   * ---
+   *
+   * Note: this value overrides the `raw` value on a custom parameter type ([[ParamTypeDefinition.raw]]).
    *
    * ### Decoding warning
    *
@@ -491,5 +499,19 @@ export interface ParamTypeDefinition {
    * - No start-of-string or end-of-string: `/^foo$/`
    */
   pattern: RegExp;
+
+
+  /**
+   * Disables url-encoding of parameter values
+   *
+   * If a parameter type is declared `raw`, it will not be url-encoded.
+   * Custom encoding can still be applied in the [[encode]] function.
+   *
+   * ### Decoding warning
+   *
+   * The decoding behavior of raw parameters is not defined.
+   * See: [[ParamDeclaration.raw]] for details
+   */
+  raw: boolean;
 }
 
