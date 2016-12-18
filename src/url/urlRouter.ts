@@ -50,8 +50,12 @@ export class UrlRouterProvider implements Disposable {
   otherwiseFn: ($injector: $InjectorLike, $location: LocationServices) => string;
   /** @hidden */
   interceptDeferred = false;
+  /** @hidden */
+  _router: UIRouter;
 
-  constructor(public router: UIRouter) { }
+  constructor(router: UIRouter) {
+    this._router = router;
+  }
 
   /** @internalapi */
   dispose() {
@@ -178,10 +182,10 @@ export class UrlRouterProvider implements Disposable {
    * Note: the handler may also invoke arbitrary code, such as `$state.go()`
    */
   when(what: (RegExp|UrlMatcher|string), handler: string|IInjectable, ruleCallback = function(rule) {}) {
-    let router = this.router;
+    let router = this._router;
     let $urlMatcherFactory = router.urlMatcherFactory;
     let $stateParams = router.globals.params;
-    let $loc = router.urlService;
+    let $url = router.urlService;
     let redirect, handlerIsString = isString(handler);
 
     // @todo Queue this
@@ -197,7 +201,7 @@ export class UrlRouterProvider implements Disposable {
           _handler = ['$match', redirect.format.bind(redirect)];
         }
         return extend(function () {
-          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($loc.path(), $loc.search(), $loc.hash()));
+          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($url.path(), $url.search(), $url.hash()));
         }, {
           prefix: isString(_what.prefix) ? _what.prefix : ''
         });
@@ -210,7 +214,7 @@ export class UrlRouterProvider implements Disposable {
           _handler = ['$match', ($match) => interpolate(redirect, $match)];
         }
         return extend(function () {
-          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($loc.path()));
+          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($url.path()));
         }, {
           prefix: regExpPrefix(_what)
         });
@@ -274,9 +278,12 @@ export class UrlRouter implements Disposable {
   private location: string;
   /** @hidden */
   private listener: Function;
+  /** @hidden */
+  private _router: UIRouter;
 
   /** @hidden */
-  constructor(public router: UIRouter) {
+  constructor(router: UIRouter) {
+    this._router = router;
     createProxyFunctions(UrlRouter.prototype, this, this);
   }
 
@@ -312,17 +319,17 @@ export class UrlRouter implements Disposable {
   sync(evt?) {
     if (evt && evt.defaultPrevented) return;
 
-    let router = this.router;
-    let $loc = router.urlService;
+    let router = this._router;
+    let $url = router.urlService;
     let rules = router.urlRouterProvider.rules;
     let otherwiseFn = router.urlRouterProvider.otherwiseFn;
 
     function check(rule: Function) {
-      let handled = rule(services.$injector, $loc);
+      let handled = rule(services.$injector, $url);
 
       if (!handled) return false;
       if (isString(handled)) {
-        $loc.setUrl(handled, true);
+        $url.setUrl(handled, true);
       }
       return true;
     }
@@ -342,21 +349,21 @@ export class UrlRouter implements Disposable {
    * This causes [[UrlRouter]] to start listening for changes to the URL, if it wasn't already listening.
    */
   listen(): Function {
-    return this.listener = this.listener || this.router.urlService.onChange(evt => this.sync(evt));
+    return this.listener = this.listener || this._router.urlService.onChange(evt => this.sync(evt));
   }
 
   /**
    * Internal API.
    */
   update(read?: boolean) {
-    let $loc = this.router.urlService;
+    let $url = this._router.urlService;
     if (read) {
-      this.location = $loc.path();
+      this.location = $url.path();
       return;
     }
-    if ($loc.path() === this.location) return;
+    if ($url.path() === this.location) return;
 
-    $loc.setUrl(this.location, true);
+    $url.setUrl(this.location, true);
   }
 
   /**
@@ -370,7 +377,7 @@ export class UrlRouter implements Disposable {
    */
   push(urlMatcher: UrlMatcher, params: RawParams, options: { replace?: (string|boolean) }) {
     let replace = options && !!options.replace;
-    this.router.urlService.setUrl(urlMatcher.format(params || {}), replace);
+    this._router.urlService.setUrl(urlMatcher.format(params || {}), replace);
   }
 
   /**
@@ -398,7 +405,7 @@ export class UrlRouter implements Disposable {
     let url = urlMatcher.format(params);
     options = options || { absolute: false };
 
-    let cfg = this.router.urlService.config;
+    let cfg = this._router.urlService.config;
     let isHtml5 = cfg.html5Mode();
     if (!isHtml5 && url !== null) {
       url = "#" + cfg.hashPrefix() + url;
