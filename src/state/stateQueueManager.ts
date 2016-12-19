@@ -11,6 +11,7 @@ import {StateRegistry, StateRegistryListener} from "./stateRegistry";
 import { Param } from "../params/param";
 import { Disposable } from "../interface";
 
+/** @internalapi */
 export class StateQueueManager implements Disposable {
   queue: State[];
   private $state: StateService;
@@ -112,12 +113,10 @@ export class StateQueueManager implements Disposable {
     if (state.abstract || !state.url) return;
 
     $urlRouterProvider.when(state.url, ['$match', '$stateParams', function ($match: RawParams, $stateParams: RawParams) {
-      function matchedParamsEqual() {
-        let schema: Param[] = state.parameters({ inherit: true, matchingKeys: $match });
-        return Param.equals(schema, Param.values(schema, $match), $stateParams);
-      }
+      let currentStateUrl = $state.href($state.current, $stateParams);
+      let newUrl = $state.href(state, $match);
 
-      if ($state.$current.navigable !== state || !matchedParamsEqual()) {
+      if (currentStateUrl !== newUrl) {
         $state.transitionTo(state, $match, { inherit: true, source: "url" });
       }
     }], (rule) => state._urlRule = rule);
