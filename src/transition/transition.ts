@@ -259,7 +259,8 @@ export class Transition implements IHookRegistry {
    *
    * @returns transition parameter values for the desired path.
    */
-  params(pathname: string = "to"): { [key: string]: any } {
+  params<T>(pathname?: string): T;
+  params(pathname: string = "to"): any {
     return this._treeChanges[pathname].map(prop("paramValues")).reduce(mergeR, {});
   }
 
