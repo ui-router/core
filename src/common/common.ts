@@ -82,18 +82,18 @@ export interface Obj extends Object {
  * myOtherThing.log(); // logs [3, 4, 5] from SomeService's 'this'
  * ```
  *
- * @param from The object (or a function that returns the from object) which contains the functions to be bound
- * @param to The object which will receive the bound functions
- * @param bind The object (or a function that returns the object) which the functions will be bound to
+ * @param source A function that returns the source object which contains the original functions to be bound
+ * @param target A function that returns the target object which will receive the bound functions
+ * @param bind A function that returns the object which the functions will be bound to
  * @param fnNames The function names which will be bound (Defaults to all the functions found on the 'from' object)
  */
-export function createProxyFunctions(from: Obj|Function, to: Obj, bind: Obj|Function, fnNames: string[] = Object.keys(from)): Obj {
-  const _from = isFunction(from) ? from : () => from;
-  const _bind = isFunction(bind) ? bind : () => bind;
-  const makePassthrough = fnName => function proxyFnCall() {
-    return _from()[fnName].apply(_bind(), arguments);
+export function createProxyFunctions(source: Function, target: Obj, bind: Function, fnNames?: string[]): Obj {
+  const makeProxy = fnName => function proxyFnCall() {
+    let _source = source(), _bind = bind();
+    return _source[fnName].apply(_bind, arguments);
   };
-  return fnNames.reduce((acc, name) => (acc[name] = makePassthrough(name), acc), to);
+  fnNames = fnNames || Object.keys(source());
+  return fnNames.reduce((acc, name) => (acc[name] = makeProxy(name), acc), target);
 }
 
 
@@ -131,19 +131,33 @@ const restArgs = (args: IArguments, idx = 0) =>
     Array.prototype.concat.apply(Array.prototype, Array.prototype.slice.call(args, idx));
 
 /** Given an array, returns true if the object is found in the array, (using indexOf) */
-export const inArray = (array: any[], obj: any) =>
-    array.indexOf(obj) !== -1;
+export const inArray: typeof _inArray = curry(_inArray) as any;
+export function _inArray(array: any[], obj: any): boolean;
+export function _inArray(array: any[]): (obj: any) => boolean;
+export function _inArray(array, obj?): any {
+  return array.indexOf(obj) !== -1;
+}
 
-/** Given an array, and an item, if the item is found in the array, it removes it (in-place).  The same array is returned */
-export const removeFrom = curry((array: any[], obj: any) => {
+/**
+ * Given an array, and an item, if the item is found in the array, it removes it (in-place).
+ * The same array is returned
+ */
+export const removeFrom: typeof _removeFrom = curry(_removeFrom) as any;
+export function _removeFrom<T>(array: T[], obj: T): T[];
+export function _removeFrom<T>(array: T[]): (obj: T) => T[];
+export function _removeFrom(array, obj?) {
   let idx = array.indexOf(obj);
   if (idx >= 0) array.splice(idx, 1);
   return array;
-});
+}
 
 /** pushes a values to an array and returns the value */
-export const pushTo = curry((arr: any[], val: any) =>
-    (arr.push(val), val));
+export const pushTo: typeof _pushTo = curry(_pushTo) as any;
+export function _pushTo<T>(arr: any[], val: T): T ;
+export function _pushTo<T>(arr: any[]): (val: T) => T ;
+export function _pushTo(arr, val?): any {
+  return (arr.push(val), val);
+}
 
 /** Given an array of (deregistration) functions, calls all functions and removes each one from the source array */
 export const deregAll = (functions: Function[]) =>

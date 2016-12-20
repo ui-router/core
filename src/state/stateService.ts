@@ -3,7 +3,7 @@
  * @module state
  */ /** */
 import {
-    extend, defaults, silentRejection, silenceUncaughtInPromise, removeFrom, noop, createProxyFunctions
+    extend, defaults, silentRejection, silenceUncaughtInPromise, removeFrom, noop, createProxyFunctions, inArray
 } from "../common/common";
 import {isDefined, isObject, isString} from "../common/predicates";
 import {Queue} from "../common/queue";
@@ -30,8 +30,9 @@ import {Globals} from "../globals";
 import {UIRouter} from "../router";
 import {UIInjector} from "../interface";
 import {ResolveContext} from "../resolve/resolveContext";
-import {StateParams} from "../params/stateParams";
-import {lazyLoadState} from "../hooks/lazyLoad"; // has or is using
+import {StateParams} from "../params/stateParams"; // has or is using
+import {lazyLoadState} from "../hooks/lazyLoad";
+import { val, not } from "../common/hof";
 
 export type OnInvalidCallback =
     (toState?: TargetState, fromState?: TargetState, injector?: UIInjector) => HookResult;
@@ -74,8 +75,8 @@ export class StateService {
   /** @internalapi */
   constructor(private router: UIRouter) {
     let getters = ['current', '$current', 'params', 'transition'];
-    let boundFns = Object.keys(StateService.prototype).filter(key => getters.indexOf(key) === -1);
-    createProxyFunctions(StateService.prototype, this, this, boundFns);
+    let boundFns = Object.keys(StateService.prototype).filter(not(inArray(getters)));
+    createProxyFunctions(val(StateService.prototype), this, val(this), boundFns);
   }
 
   /** @internalapi */

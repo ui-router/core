@@ -9,6 +9,7 @@ import { services, $InjectorLike, LocationServices } from "../common/coreservice
 import { RawParams } from "../params/interface";
 import { Disposable } from "../interface";
 import { UIRouter } from "../router";
+import { is, pattern, val } from "../common/hof";
 
 /** @hidden Returns a string that is a prefix of all strings matching the RegExp */
 function regExpPrefix(re: RegExp) {
@@ -284,7 +285,7 @@ export class UrlRouter implements Disposable {
   /** @hidden */
   constructor(router: UIRouter) {
     this._router = router;
-    createProxyFunctions(UrlRouter.prototype, this, this);
+    createProxyFunctions(val(UrlRouter.prototype), this, val(this));
   }
 
   /** @internalapi */

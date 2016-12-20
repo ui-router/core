@@ -24,6 +24,7 @@ import { TransitionHook, GetResultHandler, GetErrorHandler } from "./transitionH
 import { isDefined } from "../common/predicates";
 import { removeFrom, values, createProxyFunctions } from "../common/common";
 import { Disposable } from "../interface"; // has or is using
+import { val } from "../common/hof";
 
 /**
  * The default [[Transition]] options.
@@ -149,7 +150,7 @@ export class TransitionService implements IHookRegistry, Disposable {
   constructor(private _router: UIRouter) {
     this.$view = _router.viewService;
     this._deregisterHookFns = <any> {};
-    this._pluginapi = <TransitionServicePluginAPI> createProxyFunctions(this, {}, this, [
+    this._pluginapi = <TransitionServicePluginAPI> createProxyFunctions(val(this), {}, val(this), [
       '_definePathType',
       '_defineEvent',
       '_getPathTypes',
