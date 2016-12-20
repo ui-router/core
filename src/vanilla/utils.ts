@@ -5,6 +5,7 @@
 import {isArray} from "../common/index";
 import { LocationServices, LocationConfig, services } from "../common/coreservices";
 import { UIRouter } from "../router";
+import { identity } from "../common/common";
 
 const beforeAfterSubstr = (char: string) => (str: string): string[] => {
   if (!str) return ["", ""];
@@ -30,7 +31,7 @@ export const keyValsToObjectR = (accum, [key, val]) => {
 };
 
 export const getParams = (queryString: string): any =>
-  queryString.split("&").map(splitEqual).reduce(keyValsToObjectR, {});
+  queryString.split("&").filter(identity).map(splitEqual).reduce(keyValsToObjectR, {});
 
 export function locationPluginFactory(
     name: string,

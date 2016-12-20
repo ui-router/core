@@ -1,22 +1,42 @@
-
-import {services, UrlMatcher} from '../src/index';
+import { UrlMatcher } from "../src/index";
 import { UIRouter } from "../src/router";
-import * as vanilla from "../src/vanilla"
+import { UrlService } from "../src/url/urlService";
+import * as vanilla from "../src/vanilla";
 
 describe('browserHistory implementation', () => {
 
   let router: UIRouter;
-  let locationProvider;
+  let urlService: UrlService;
   let makeMatcher;
 
-  // Replace the `history` reference because PhantomJS does not support spying on it.
-  function mockHistoryObject() {
-    let plugin: any = router.getPlugin('vanilla.pushStateLocation');
+  let mockHistory, mockLocation;
 
-    plugin.service._history = {
-      replaceState: () => null,
-      pushState: () => null
+  // Replace the history and location
+  function mockPushState(_router) {
+    let plugin: any = _router.getPlugin('vanilla.pushStateLocation');
+
+    mockHistory = {
+      replaceState: (a, b, url) => mockLocation.href = url,
+      pushState: (a, b, url) => mockLocation.href = url
     };
+
+    mockLocation = {
+      _href: "/",
+      pathname: "/",
+      search: "",
+      get href() {
+        return this._href
+      },
+      set href(val) {
+        this._href = val;
+        var [pathname, search] = val.split("?");
+        this.pathname = pathname;
+        this.search = search ? "?" + search : "";
+      }
+    };
+
+    plugin.service._history = mockHistory;
+    plugin.service._location = mockLocation;
 
     return plugin.service;
   }
@@ -26,7 +46,7 @@ describe('browserHistory implementation', () => {
     router.plugin(vanilla.servicesPlugin);
     router.plugin(vanilla.pushStateLocationPlugin);
     router.stateRegistry.stateQueue.autoFlush(router.stateService);
-    locationProvider = router.urlService;
+    urlService = router.urlService;
     makeMatcher = (url, config?) => {
       return new UrlMatcher(url, router.urlMatcherFactory.paramTypes, config)
     };
@@ -38,7 +58,7 @@ describe('browserHistory implementation', () => {
   });
 
   it('uses history.pushState when setting a url', () => {
-    let service = mockHistoryObject();
+    let service = mockPushState(router);
     expect(router.urlService.config.html5Mode()).toBe(true);
     let stub = spyOn(service._history, 'pushState');
     router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' }, {});
@@ -46,26 +66,33 @@ describe('browserHistory implementation', () => {
   });
 
   it('uses history.replaceState when setting a url with replace', () => {
-    let service = mockHistoryObject();
+    let service = mockPushState(router);
     let stub = spyOn(service._history, 'replaceState');
     router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' }, { replace: true });
     expect(stub.calls.first().args[2]).toBe('/hello/world');
   });
 
-  it('returns the correct url query', () => {
+  it('returns the correct url query', async(done) => {
+    let service = mockPushState(router);
     expect(router.urlService.config.html5Mode()).toBe(true);
-    return router.stateService.go('path', {urlParam: 'bar'}).then(() => {
-      expect(window.location.toString().includes('/path/bar')).toBe(true);
-      expect(window.location.toString().includes('/#/path/bar')).toBe(false);
-      expect(locationProvider.path()).toBe('/path/bar');
-      expect(locationProvider.search()).toEqual({'':''});
-      return router.stateService.go('path', {urlParam: 'bar', queryParam: 'query'});
-    }).then(() => {
-      expect(window.location.toString().includes('/path/bar?queryParam=query')).toBe(true);
-      expect(window.location.toString().includes('/#/path/bar?queryParam=query')).toBe(false);
-      expect(locationProvider.path()).toBe('/path/bar');
-      expect(locationProvider.search()).toEqual({queryParam:'query'});
-    });
+
+    await router.stateService.go('path', { urlParam: 'bar' });
+
+    expect(mockLocation.href.includes('/path/bar')).toBe(true);
+    expect(mockLocation.href.includes('#')).toBe(false);
+
+    expect(urlService.path()).toBe('/path/bar');
+    expect(urlService.search()).toEqual({});
+
+    await router.stateService.go('path', { urlParam: 'bar', queryParam: 'query' });
+
+    expect(mockLocation.href.includes('/path/bar?queryParam=query')).toBe(true);
+    expect(mockLocation.href.includes('#')).toBe(false);
+
+    expect(urlService.path()).toBe('/path/bar');
+    expect(urlService.search()).toEqual({ queryParam: 'query' });
+
+    done();
   });
 
 });
