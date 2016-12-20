@@ -408,6 +408,10 @@ export interface StateDeclaration {
    *   - The return value is processed using the previously mentioned rules.
    *   - If the return value is a promise, the promise is waited for, then the resolved async value is processed using the same rules.
    *
+   * Note: `redirectTo` is processed as an `onStart` hook, before `LAZY` resolves.
+   * If your redirect function relies on resolve data, get the [[Transition.injector]] and get a
+   * promise for the resolve data using [[UIInjector.getAsync]].
+   *
    * #### Example:
    * ```js
    * // a string
@@ -439,6 +443,15 @@ export interface StateDeclaration {
    *     let svc = trans.injector().get('SomeAsyncService')
    *     let promise = svc.getAsyncRedirectTo(trans.params.foo);
    *     return promise;
+   *   }
+   * })
+   *
+   * // a fn that fetches resolve data
+   * .state('G', {
+   *   redirectTo: (trans) => {
+   *     // getAsync tells the resolve to load
+   *     let resolvePromise = trans.injector().getAsync('SomeResolve')
+   *     return resolvePromise.then(resolveData => resolveData === 'login' ? 'login' : null);
    *   }
    * })
    * ```
