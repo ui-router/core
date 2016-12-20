@@ -104,14 +104,6 @@ export class UrlMatcher {
   /** @hidden */
   private _compiled: string[]     = [];
 
-  /**
-   * A static prefix of this pattern.
-   *
-   * The matcher guarantees that any
-   *   URL matching this matcher (i.e. any string for which {@link ui.router.util.type:UrlMatcher#methods_exec exec()} returns
-   *   non-null) will start with this prefix.
-   */
-  public prefix: string;
   /** The pattern that was passed into the constructor */
   public pattern: string;
 
@@ -208,11 +200,7 @@ export class UrlMatcher {
     }
 
     this._segments.push(segment);
-
-    extend(this, {
-      _compiled: patterns.map(pattern => quoteRegExp.apply(null, pattern)).concat(quoteRegExp(segment)),
-      prefix: this._segments[0]
-    });
+    this._compiled = patterns.map(pattern => quoteRegExp.apply(null, pattern)).concat(quoteRegExp(segment));
 
     Object.freeze(this);
   }

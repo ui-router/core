@@ -11,12 +11,6 @@ import { Disposable } from "../interface";
 import { UIRouter } from "../router";
 import { is, pattern, val } from "../common/hof";
 
-/** @hidden Returns a string that is a prefix of all strings matching the RegExp */
-function regExpPrefix(re: RegExp) {
-  let prefix = /^\^((?:\\[^a-zA-Z0-9]|[^\\\[\]\^$*+?.()|{}]+)*)/.exec(re.source);
-  return (prefix != null) ? prefix[1].replace(/\\(.)/g, "$1") : '';
-}
-
 /** @hidden Interpolates matched values into a String.replace()-style pattern */
 function interpolate(pattern: string, match: RegExpExecArray) {
   return pattern.replace(/\$(\$|\d{1,2})/, function (m, what) {
@@ -182,7 +176,7 @@ export class UrlRouterProvider implements Disposable {
    *
    * Note: the handler may also invoke arbitrary code, such as `$state.go()`
    */
-  when(what: (RegExp|UrlMatcher|string), handler: string|IInjectable, ruleCallback = function(rule) {}) {
+  when(what: (RegExp|UrlMatcher|string), handler: string|IInjectable, ruleCallback?) {
     let router = this._router;
     let $urlMatcherFactory = router.urlMatcherFactory;
     let $stateParams = router.globals.params;
@@ -196,46 +190,37 @@ export class UrlRouterProvider implements Disposable {
       throw new Error("invalid 'handler' in when()");
 
     let strategies = {
-      matcher: function (_what, _handler) {
+      matcher: function (_what: UrlMatcher, _handler) {
         if (handlerIsString) {
           redirect = $urlMatcherFactory.compile(_handler);
-          _handler = ['$match', redirect.format.bind(redirect)];
+          _handler = ['$match', ($match) => redirect.format($match)];
         }
-        return extend(function () {
-          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($url.path(), $url.search(), $url.hash()));
-        }, {
-          prefix: isString(_what.prefix) ? _what.prefix : ''
-        });
+
+        return () => handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($url.path(), $url.search(), $url.hash()));
       },
-      regex: function (_what, _handler) {
+      regex: function (_what: RegExp, _handler) {
         if (_what.global || _what.sticky) throw new Error("when() RegExp must not be global or sticky");
 
         if (handlerIsString) {
           redirect = _handler;
           _handler = ['$match', ($match) => interpolate(redirect, $match)];
         }
-        return extend(function () {
-          return handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($url.path()));
-        }, {
-          prefix: regExpPrefix(_what)
-        });
+
+        return () => handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($url.path()));
       }
     };
 
-    let check = {
-      matcher: $urlMatcherFactory.isMatcher(what),
-      regex: what instanceof RegExp
-    };
+    const getRule = pattern([
+      [is(UrlMatcher), (_what: UrlMatcher) => strategies.matcher(_what, handler)],
+      [is(RegExp),     (_what: RegExp)     => strategies.regex(_what, handler)],
+    ]);
 
-    for (var n in check) {
-      if (check[n]) {
-        let rule = strategies[n](what, handler);
-        ruleCallback(rule);
-        return this.rule(rule);
-      }
-    }
+    let rule = getRule(what);
 
-    throw new Error("invalid 'what' in when()");
+    if (!rule) throw new Error("invalid 'what' in when()");
+
+    ruleCallback && ruleCallback(rule);
+    return this.rule(rule);
   };
 
   /**
