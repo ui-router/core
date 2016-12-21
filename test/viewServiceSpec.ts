@@ -36,7 +36,6 @@ describe("View Service", () => {
     registry = router.stateRegistry;
     $view = router.viewService;
     tree2Array(statetree, true).forEach(state => registry.register(state));
-    registry.stateQueue.autoFlush(router.stateService);
   });
 
   describe('registerUIView', () => {

@@ -34,7 +34,6 @@ describe('transition', function () {
     router.plugin(vanilla.hashLocationPlugin);
     $state = router.stateService;
     $transitions = router.transitionService;
-    router.stateRegistry.stateQueue.autoFlush($state);
 
     var stateTree = {
       first: {},

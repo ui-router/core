@@ -20,7 +20,6 @@ describe('plugin api', function () {
     $state = router.stateService;
     $transitions = router.transitionService;
     $urlRouter = router.urlRouter;
-    router.stateRegistry.stateQueue.autoFlush($state);
   });
 
   class FancyPluginClass implements UIRouterPlugin {

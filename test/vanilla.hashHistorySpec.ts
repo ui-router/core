@@ -13,7 +13,6 @@ describe('hashHistory implementation', () => {
     router.plugin(vanilla.servicesPlugin);
     router.plugin(vanilla.hashLocationPlugin);
     $state = router.stateService;
-    router.stateRegistry.stateQueue.autoFlush($state);
     locationProvider = router.urlService;
 
     makeMatcher = (url, config?) => {

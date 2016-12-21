@@ -1,20 +1,17 @@
 /** @module state */ /** for typedoc */
-import {extend, inherit, pluck} from "../common/common";
-import {isString} from "../common/predicates";
-import {StateDeclaration} from "./interface";
-import {State} from "./stateObject";
-import {StateBuilder} from "./stateBuilder";
-import {StateService} from "./stateService";
-import {UrlRouterProvider} from "../url/urlRouter";
-import {RawParams} from "../params/interface";
-import {StateRegistry, StateRegistryListener} from "./stateRegistry";
-import { Param } from "../params/param";
+import { extend, inherit, pluck } from "../common/common";
+import { isString } from "../common/predicates";
+import { StateDeclaration } from "./interface";
+import { State } from "./stateObject";
+import { StateBuilder } from "./stateBuilder";
+import { UrlRouterProvider } from "../url/urlRouter";
+import { StateRegistry, StateRegistryListener } from "./stateRegistry";
 import { Disposable } from "../interface";
+import { UrlRuleFactory } from "../url/urlRule";
 
 /** @internalapi */
 export class StateQueueManager implements Disposable {
   queue: State[];
-  private $state: StateService;
 
   constructor(
       public states: { [key: string]: State; },
@@ -31,7 +28,7 @@ export class StateQueueManager implements Disposable {
   }
 
   register(config: StateDeclaration) {
-    let {states, queue, $state} = this;
+    let {states, queue} = this;
     // Wrap a new object around the state so we can store our private details easily.
     // @TODO: state = new State(extend({}, config, { ... }))
     let state = inherit(new State(), extend({}, config, {
@@ -45,17 +42,15 @@ export class StateQueueManager implements Disposable {
       throw new Error(`State '${state.name}' is already defined`);
 
     queue.push(state);
+    this.flush();
 
-    if (this.$state) {
-      this.flush($state);
-    }
     return state;
   }
 
-  flush($state: StateService) {
+  flush() {
     let {queue, states, builder} = this;
     let registered: State[] = [], // states that got registered
-        orphans: State[] = [], // states that dodn't yet have a parent registered
+        orphans: State[] = [], // states that don't yet have a parent registered
         previousQueueLength = {}; // keep track of how long the queue when an orphan was first encountered
 
     while (queue.length > 0) {
@@ -76,7 +71,7 @@ export class StateQueueManager implements Disposable {
         }
 
         states[state.name] = state;
-        this.attachRoute($state, state);
+        this.attachRoute(state);
         if (orphanIdx >= 0) orphans.splice(orphanIdx, 1);
         registered.push(state);
         continue;
@@ -103,22 +98,9 @@ export class StateQueueManager implements Disposable {
     return states;
   }
 
-  autoFlush($state: StateService) {
-    this.$state = $state;
-    this.flush($state);
-  }
-
-  attachRoute($state: StateService, state: State) {
-    let {$urlRouterProvider} = this;
+  attachRoute(state: State) {
     if (state.abstract || !state.url) return;
-
-    $urlRouterProvider.when(state.url, ['$match', '$stateParams', function ($match: RawParams, $stateParams: RawParams) {
-      let currentStateUrl = $state.href($state.current, $stateParams);
-      let newUrl = $state.href(state, $match);
-
-      if (currentStateUrl !== newUrl) {
-        $state.transitionTo(state, $match, { inherit: true, source: "url" });
-      }
-    }], (rule) => state._urlRule = rule);
+    state._urlRule = new UrlRuleFactory(this.$urlRouterProvider._router).fromState(state);
+    this.$urlRouterProvider.addRule(state._urlRule);
   }
 }

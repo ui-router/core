@@ -26,7 +26,6 @@ describe('future state', function () {
     $state = router.stateService;
     $transitions = router.transitionService;
     $urlRouter = router.urlRouter;
-    router.stateRegistry.stateQueue.autoFlush($state);
   });
 
   describe('registry', () => {

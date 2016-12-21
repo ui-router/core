@@ -2,28 +2,15 @@
  * @coreapi
  * @module url
  */ /** for typedoc */
-import { extend, IInjectable, removeFrom, createProxyFunctions } from "../common/common";
-import { isFunction, isString, isDefined, isArray } from "../common/predicates";
+import { IInjectable, removeFrom, createProxyFunctions } from "../common/common";
+import { isFunction, isString, isArray } from "../common/predicates";
 import { UrlMatcher } from "./urlMatcher";
 import { services, $InjectorLike, LocationServices } from "../common/coreservices";
 import { RawParams } from "../params/interface";
 import { Disposable } from "../interface";
 import { UIRouter } from "../router";
-import { is, pattern, val } from "../common/hof";
-
-/** @hidden Interpolates matched values into a String.replace()-style pattern */
-function interpolate(pattern: string, match: RegExpExecArray) {
-  return pattern.replace(/\$(\$|\d{1,2})/, function (m, what) {
-    return match[what === '$' ? 0 : Number(what)];
-  });
-}
-
-/** @hidden */
-function handleIfMatch($injector: $InjectorLike, $stateParams: RawParams, handler: IInjectable, match: RawParams) {
-  if (!match) return false;
-  let result = $injector.invoke(handler, handler, { $match: match, $stateParams: $stateParams });
-  return isDefined(result) ? result : true;
-}
+import { val } from "../common/hof";
+import { UrlRuleFactory, UrlRule, RawNg1UrlRule } from "./urlRule";
 
 /** @hidden */
 function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHref: string): string {
@@ -40,7 +27,7 @@ function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHr
  */
 export class UrlRouterProvider implements Disposable {
   /** @hidden */
-  rules: Function[] = [];
+  rules: UrlRule[] = [];
   /** @hidden */
   otherwiseFn: ($injector: $InjectorLike, $location: LocationServices) => string;
   /** @hidden */
@@ -83,17 +70,23 @@ export class UrlRouterProvider implements Disposable {
    * });
    * ```
    *
-   * @param rule
+   * @param ruleFn
    * Handler function that takes `$injector` and `$location` services as arguments.
    * You can use them to detect a url and return a different url as a string.
    *
    * @return [[$urlRouterProvider]] (`this`)
    */
-  rule(rule: ($injector: $InjectorLike, $location: LocationServices) => string|void): UrlRouterProvider {
-    if (!isFunction(rule)) throw new Error("'rule' must be a function");
-    this.rules.push(rule);
+  rule(ruleFn: ($injector: $InjectorLike, $location: LocationServices) => string|void): UrlRouterProvider {
+    if (!isFunction(ruleFn)) throw new Error("'rule' must be a function");
+    let rule = new RawNg1UrlRule(ruleFn, this._router);
+    this.addRule(rule);
     return this;
   };
+
+  addRule(rule: UrlRule) {
+    this.rules.push(rule);
+    return () => this.removeRule(rule);
+  }
 
   /**
    * Remove a rule previously registered
@@ -177,51 +170,23 @@ export class UrlRouterProvider implements Disposable {
    * Note: the handler may also invoke arbitrary code, such as `$state.go()`
    */
   when(what: (RegExp|UrlMatcher|string), handler: string|IInjectable, ruleCallback?) {
-    let router = this._router;
-    let $urlMatcherFactory = router.urlMatcherFactory;
-    let $stateParams = router.globals.params;
-    let $url = router.urlService;
-    let redirect, handlerIsString = isString(handler);
+    let rule: UrlRule, ruleFactory = new UrlRuleFactory(this._router);
 
-    // @todo Queue this
-    if (isString(what)) what = $urlMatcherFactory.compile(<string> what);
+    if (isArray(handler) || isFunction(handler)) {
+      handler = UrlRouterProvider.injectableHandler(this._router, handler);
+    }
 
-    if (!handlerIsString && !isFunction(handler) && !isArray(handler))
-      throw new Error("invalid 'handler' in when()");
-
-    let strategies = {
-      matcher: function (_what: UrlMatcher, _handler) {
-        if (handlerIsString) {
-          redirect = $urlMatcherFactory.compile(_handler);
-          _handler = ['$match', ($match) => redirect.format($match)];
-        }
-
-        return () => handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($url.path(), $url.search(), $url.hash()));
-      },
-      regex: function (_what: RegExp, _handler) {
-        if (_what.global || _what.sticky) throw new Error("when() RegExp must not be global or sticky");
-
-        if (handlerIsString) {
-          redirect = _handler;
-          _handler = ['$match', ($match) => interpolate(redirect, $match)];
-        }
-
-        return () => handleIfMatch(services.$injector, $stateParams, _handler, _what.exec($url.path()));
-      }
-    };
-
-    const getRule = pattern([
-      [is(UrlMatcher), (_what: UrlMatcher) => strategies.matcher(_what, handler)],
-      [is(RegExp),     (_what: RegExp)     => strategies.regex(_what, handler)],
-    ]);
-
-    let rule = getRule(what);
-
-    if (!rule) throw new Error("invalid 'what' in when()");
-
+    rule = ruleFactory.create(what, handler);
     ruleCallback && ruleCallback(rule);
-    return this.rule(rule);
+    this.addRule(rule);
+    return this;
   };
+
+  static injectableHandler(router: UIRouter, handler): IInjectable {
+    return (match: any, path: string, search: any, hash: string) => {
+      services.$injector.invoke(handler, null, { $match: match, $stateParams: router.globals.params });
+    }
+  }
 
   /**
    * Disables monitoring of the URL.
@@ -305,27 +270,31 @@ export class UrlRouter implements Disposable {
   sync(evt?) {
     if (evt && evt.defaultPrevented) return;
 
-    let router = this._router;
-    let $url = router.urlService;
-    let rules = router.urlRouterProvider.rules;
-    let otherwiseFn = router.urlRouterProvider.otherwiseFn;
+    let router = this._router,
+        $url = router.urlService,
+        rules = router.urlRouterProvider.rules,
+        otherwiseFn = router.urlRouterProvider.otherwiseFn;
 
-    function check(rule: Function) {
-      let handled = rule(services.$injector, $url);
+    let path = $url.path(),
+        search = $url.search(),
+        hash = $url.hash();
 
-      if (!handled) return false;
-      if (isString(handled)) {
-        $url.setUrl(handled, true);
+    function check(rule: UrlRule) {
+      let match = rule.match(path, search, hash);
+      if (!match) return false;
+
+      let result = match && rule.handler(match, path, search, hash);
+      if (isString(result)) {
+        $url.setUrl(result, true);
       }
       return true;
     }
-    let n = rules.length;
 
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < rules.length; i++) {
       if (check(rules[i])) return;
     }
     // always check otherwise last to allow dynamic updates to the set of rules
-    if (otherwiseFn) check(otherwiseFn);
+    if (otherwiseFn) check(<any> { match: val(true), handler: otherwiseFn });
   }
 
   /**
@@ -340,9 +309,10 @@ export class UrlRouter implements Disposable {
 
   /**
    * Internal API.
+   * @internalapi
    */
   update(read?: boolean) {
-    let $url = this._router.urlService;
+    let $url = this._router.locationService;
     if (read) {
       this.location = $url.path();
       return;
@@ -357,6 +327,7 @@ export class UrlRouter implements Disposable {
    *
    * Pushes a new location to the browser history.
    *
+   * @internalapi
    * @param urlMatcher
    * @param params
    * @param options

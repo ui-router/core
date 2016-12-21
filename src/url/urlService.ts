@@ -51,13 +51,13 @@ export class UrlService implements LocationServices {
    */
   config: LocationConfig;
 
-  constructor(router: UIRouter) {
+  constructor(private router: UIRouter) {
     this.config = {} as any;
     // proxy function calls from UrlService to the LocationService/LocationConfig
-    const svc = () => router.locationService;
-    createProxyFunctions(svc, this, svc, locationServicesFns);
+    const locationServices = () => router.locationService;
+    createProxyFunctions(locationServices, this, locationServices, locationServicesFns, true);
 
-    const cfg = () => router.locationConfig;
-    createProxyFunctions(cfg, this.config, cfg, locationConfigFns);
+    const locationConfig = () => router.locationConfig;
+    createProxyFunctions(locationConfig, this.config, locationConfig, locationConfigFns, true);
   }
 }

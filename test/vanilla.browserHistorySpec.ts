@@ -45,7 +45,6 @@ describe('browserHistory implementation', () => {
     router = new UIRouter();
     router.plugin(vanilla.servicesPlugin);
     router.plugin(vanilla.pushStateLocationPlugin);
-    router.stateRegistry.stateQueue.autoFlush(router.stateService);
     urlService = router.urlService;
     makeMatcher = (url, config?) => {
       return new UrlMatcher(url, router.urlMatcherFactory.paramTypes, config)

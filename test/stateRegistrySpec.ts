@@ -23,7 +23,6 @@ describe("StateRegistry", () => {
     router.plugin(TestingPlugin);
     registry = router.stateRegistry;
     tree2Array(statetree, true).forEach(state => registry.register(state));
-    registry.stateQueue.autoFlush(router.stateService);
   });
 
   describe('register', () => {
