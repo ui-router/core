@@ -156,8 +156,9 @@ export const any = (fn1: Predicate<any>) =>
     (arr: any[]) => arr.reduce((b, x) => b || !!fn1(x), false) as boolean;
 
 /** Given a class, returns a Predicate function that returns true if the object is of that class */
-export const is = (ctor: Function): Predicate<any> => obj => 
-    (obj != null && obj.constructor === ctor || obj instanceof ctor);
+export const is = <T> (ctor: { new(...args): T }) =>
+    (obj: any): obj is T =>
+        (obj != null && obj.constructor === ctor || obj instanceof ctor);
 
 /** Given a value, returns a Predicate function that returns true if another value is === equal to the original value */
 export const eq: (comp: any) => Predicate<any> = (val: any) => (other: any) =>

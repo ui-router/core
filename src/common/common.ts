@@ -86,14 +86,23 @@ export interface Obj extends Object {
  * @param target A function that returns the target object which will receive the bound functions
  * @param bind A function that returns the object which the functions will be bound to
  * @param fnNames The function names which will be bound (Defaults to all the functions found on the 'from' object)
+ * @param latebind If true, the binding of the function is delayed until the first time it's invoked
  */
-export function createProxyFunctions(source: Function, target: Obj, bind: Function, fnNames?: string[]): Obj {
-  const makeProxy = fnName => function proxyFnCall() {
-    let _source = source(), _bind = bind();
-    return _source[fnName].apply(_bind, arguments);
+export function createProxyFunctions(source: Function, target: Obj, bind: Function, fnNames?: string[], latebind = false): Obj {
+  const bindFunction = (fnName) =>
+      source()[fnName].bind(bind());
+
+  const makeLateRebindFn = fnName => function lateRebindFunction() {
+    target[fnName] = bindFunction(fnName);
+    return target[fnName].apply(null, arguments);
   };
+
   fnNames = fnNames || Object.keys(source());
-  return fnNames.reduce((acc, name) => (acc[name] = makeProxy(name), acc), target);
+
+  return fnNames.reduce((acc, name) => {
+    acc[name] = latebind ? makeLateRebindFn(name) : bindFunction(name);
+    return acc;
+  }, target);
 }
 
 
@@ -153,8 +162,8 @@ export function _removeFrom(array, obj?) {
 
 /** pushes a values to an array and returns the value */
 export const pushTo: typeof _pushTo = curry(_pushTo) as any;
-export function _pushTo<T>(arr: any[], val: T): T ;
-export function _pushTo<T>(arr: any[]): (val: T) => T ;
+export function _pushTo<T>(arr: T[], val: T): T ;
+export function _pushTo<T>(arr: T[]): (val: T) => T ;
 export function _pushTo(arr, val?): any {
   return (arr.push(val), val);
 }
