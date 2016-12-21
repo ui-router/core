@@ -243,19 +243,21 @@ export class ParamTypes {
 
 /** @hidden */
 function initDefaultTypes() {
-  const valToString = (val: any) =>
-      val != null ? val.toString() : val;
 
-  const defaultTypeBase = {
-    encode: valToString,
-    decode: valToString,
-    is: is(String),
-    pattern: /.*/,
-    equals: (a: any, b: any) => a == b, // allow coersion for null/undefined/""
+  const makeDefaultType = (def) => {
+    const valToString = (val: any) =>
+        val != null ? val.toString() : val;
+
+    const defaultTypeBase = {
+      encode: valToString,
+      decode: valToString,
+      is: is(String),
+      pattern: /.*/,
+      equals: (a: any, b: any) => a == b, // allow coersion for null/undefined/""
+    };
+
+    return extend({}, defaultTypeBase, def) as ParamTypeDefinition;
   };
-
-  const makeDefaultType = (def) =>
-      extend({}, defaultTypeBase, def) as ParamTypeDefinition;
 
   // Default Parameter Type Definitions
   extend(ParamTypes.prototype, {
