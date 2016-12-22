@@ -2,12 +2,13 @@ import { UrlMatcher } from "../src/index";
 import { UIRouter } from "../src/router";
 import { UrlService } from "../src/url/urlService";
 import * as vanilla from "../src/vanilla";
+import { UrlMatcherFactory } from "../src/url/urlMatcherFactory";
 
 describe('browserHistory implementation', () => {
 
   let router: UIRouter;
-  let urlService: UrlService;
-  let makeMatcher;
+  let $url: UrlService;
+  let $umf: UrlMatcherFactory;
 
   let mockHistory, mockLocation;
 
@@ -45,10 +46,8 @@ describe('browserHistory implementation', () => {
     router = new UIRouter();
     router.plugin(vanilla.servicesPlugin);
     router.plugin(vanilla.pushStateLocationPlugin);
-    urlService = router.urlService;
-    makeMatcher = (url, config?) => {
-      return new UrlMatcher(url, router.urlMatcherFactory.paramTypes, config)
-    };
+    $umf = router.urlMatcherFactory;
+    $url = router.urlService;
 
     router.stateRegistry.register({
       url: '/path/:urlParam?queryParam',
@@ -60,14 +59,14 @@ describe('browserHistory implementation', () => {
     let service = mockPushState(router);
     expect(router.urlService.config.html5Mode()).toBe(true);
     let stub = spyOn(service._history, 'pushState');
-    router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' }, {});
+    router.urlRouter.push($umf.compile('/hello/:name'), { name: 'world' }, {});
     expect(stub.calls.first().args[2]).toBe('/hello/world');
   });
 
   it('uses history.replaceState when setting a url with replace', () => {
     let service = mockPushState(router);
     let stub = spyOn(service._history, 'replaceState');
-    router.urlRouter.push(makeMatcher('/hello/:name'), { name: 'world' }, { replace: true });
+    router.urlRouter.push($umf.compile('/hello/:name'), { name: 'world' }, { replace: true });
     expect(stub.calls.first().args[2]).toBe('/hello/world');
   });
 
@@ -80,16 +79,16 @@ describe('browserHistory implementation', () => {
     expect(mockLocation.href.includes('/path/bar')).toBe(true);
     expect(mockLocation.href.includes('#')).toBe(false);
 
-    expect(urlService.path()).toBe('/path/bar');
-    expect(urlService.search()).toEqual({});
+    expect($url.path()).toBe('/path/bar');
+    expect($url.search()).toEqual({});
 
     await router.stateService.go('path', { urlParam: 'bar', queryParam: 'query' });
 
     expect(mockLocation.href.includes('/path/bar?queryParam=query')).toBe(true);
     expect(mockLocation.href.includes('#')).toBe(false);
 
-    expect(urlService.path()).toBe('/path/bar');
-    expect(urlService.search()).toEqual({ queryParam: 'query' });
+    expect($url.path()).toBe('/path/bar');
+    expect($url.search()).toEqual({ queryParam: 'query' });
 
     done();
   });

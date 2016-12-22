@@ -141,9 +141,9 @@ export class UrlRouter implements Disposable {
    *
    * #### Example:
    * ```js
-   * $bob = $urlRouter.href(new UrlMatcher("/about/:person"), {
-   *   person: "bob"
-   * });
+   * matcher = $umf.compile("/about/:person");
+   * params = { person: "bob" };
+   * $bob = $urlRouter.href(matcher, params);
    * // $bob == "/about/bob";
    * ```
    *

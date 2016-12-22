@@ -130,7 +130,7 @@ describe('state helpers', function() {
       });
 
       it('should compile a UrlMatcher for ^ URLs', function() {
-        var url = new UrlMatcher('/', paramTypes);
+        var url = new UrlMatcher('/', paramTypes, null);
         spyOn(urlMatcherFactoryProvider, 'compile').and.returnValue(url);
         spyOn(urlMatcherFactoryProvider, 'isMatcher').and.returnValue(true);
 
@@ -158,7 +158,7 @@ describe('state helpers', function() {
 
       it('should pass through custom UrlMatchers', function() {
         var root = states[''] = { url: { append: function() {} } };
-        var url = new UrlMatcher("/", paramTypes);
+        var url = new UrlMatcher("/", paramTypes, null);
         spyOn(urlMatcherFactoryProvider, 'isMatcher').and.returnValue(true);
         spyOn(root.url, 'append').and.returnValue(url);
         expect(builder.builder('url')({ url: url })).toBe(url);

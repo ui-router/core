@@ -2,23 +2,15 @@
  * @coreapi
  * @module url
  */ /** for typedoc */
-import {forEach, extend} from "../common/common";
-import {isObject, isDefined, isFunction} from "../common/predicates";
-
-import {UrlMatcher} from "./urlMatcher";
-import {matcherConfig} from "./urlMatcherConfig";
-import {Param} from "../params/param";
-import {ParamTypes} from "../params/paramTypes";
-import {ParamTypeDefinition} from "../params/interface";
+import { forEach, extend } from "../common/common";
+import { isObject, isDefined, isFunction, isString } from "../common/predicates";
+import { UrlMatcher } from "./urlMatcher";
+import { Param, DefType } from "../params/param";
+import { ParamTypes } from "../params/paramTypes";
+import { ParamTypeDefinition } from "../params/interface";
 import { Disposable } from "../interface";
-
-/** @hidden */
-function getDefaultConfig() {
-  return {
-    strict: matcherConfig.strictMode(),
-    caseInsensitive: matcherConfig.caseInsensitive()
-  };
-}
+import { ParamType } from "../params/type";
+import { ParamFactory } from "./interface";
 
 /**
  * Factory for [[UrlMatcher]] instances.
@@ -27,7 +19,10 @@ function getDefaultConfig() {
  * `$urlMatcherFactor` or ng1 providers as `$urlMatcherFactoryProvider`.
  */
 export class UrlMatcherFactory implements Disposable {
-  paramTypes = new ParamTypes();
+  /** @hidden */ paramTypes = new ParamTypes();
+  /** @hidden */ _isCaseInsensitive: boolean = false;
+  /** @hidden */ _isStrictMode: boolean = true;
+  /** @hidden */ _defaultSquashPolicy: (boolean|string) = false;
 
   constructor() {
     extend(this, { UrlMatcher, Param });
@@ -39,8 +34,8 @@ export class UrlMatcherFactory implements Disposable {
    * @param value `false` to match URL in a case sensitive manner; otherwise `true`;
    * @returns the current value of caseInsensitive
    */
-  caseInsensitive(value: boolean) {
-    return matcherConfig.caseInsensitive(value);
+  caseInsensitive(value?: boolean): boolean {
+    return this._isCaseInsensitive = isDefined(value) ? value : this._isCaseInsensitive;
   }
 
   /**
@@ -49,8 +44,8 @@ export class UrlMatcherFactory implements Disposable {
    * @param value `false` to match trailing slashes in URLs, otherwise `true`.
    * @returns the current value of strictMode
    */
-  strictMode(value: boolean) {
-    return matcherConfig.strictMode(value);
+  strictMode(value?: boolean): boolean {
+    return this._isStrictMode = isDefined(value) ? value : this._isStrictMode;
   }
 
   /**
@@ -64,9 +59,15 @@ export class UrlMatcherFactory implements Disposable {
    *             the parameter value from the URL and replace it with this string.
    * @returns the current value of defaultSquashPolicy
    */
-  defaultSquashPolicy(value: string) {
-    return matcherConfig.defaultSquashPolicy(value);
+  defaultSquashPolicy(value?: (boolean|string)) {
+    if (isDefined(value) && value !== true && value !== false && !isString(value))
+      throw new Error(`Invalid squash policy: ${value}. Valid policies: false, true, arbitrary-string`);
+    return this._defaultSquashPolicy = isDefined(value) ? value : this._defaultSquashPolicy;
   }
+
+  /** @hidden */
+  private _getConfig = (config) =>
+      extend({ strict: this._isStrictMode, caseInsensitive: this._isCaseInsensitive }, config);
 
   /**
    * Creates a [[UrlMatcher]] for the specified pattern.
@@ -76,7 +77,7 @@ export class UrlMatcherFactory implements Disposable {
    * @returns The UrlMatcher.
    */
   compile(pattern: string, config?: { [key: string]: any }) {
-    return new UrlMatcher(pattern, this.paramTypes, extend(getDefaultConfig(), config));
+    return new UrlMatcher(pattern, this.paramTypes, this.paramFactory, this._getConfig(config));
   }
 
   /**
@@ -86,7 +87,7 @@ export class UrlMatcherFactory implements Disposable {
    * @returns `true` if the object matches the `UrlMatcher` interface, by
    *          implementing all the same methods.
    */
-  isMatcher(object: any) {
+  isMatcher(object: any): boolean {
     // TODO: typeof?
     if (!isObject(object)) return false;
     let result = true;
@@ -126,6 +127,21 @@ export class UrlMatcherFactory implements Disposable {
     this.paramTypes.enqueue = false;
     this.paramTypes._flushTypeQueue();
     return this;
+  };
+
+  /** @internalapi Creates a new [[Param]] for a given location (DefType) */
+  paramFactory: ParamFactory = {
+    /** Creates a new [[Param]] from a CONFIG block */
+    fromConfig: (id: string, type: ParamType, config: any) =>
+        new Param(id, type, config, DefType.CONFIG, this),
+
+    /** Creates a new [[Param]] from a url PATH */
+    fromPath: (id: string, type: ParamType, config: any) =>
+        new Param(id, type, config, DefType.PATH, this),
+
+    /** Creates a new [[Param]] from a url SEARCH */
+    fromSearch: (id: string, type: ParamType, config: any) =>
+        new Param(id, type, config, DefType.SEARCH, this),
   };
 
   /** @internalapi */

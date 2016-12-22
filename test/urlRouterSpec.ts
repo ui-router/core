@@ -15,10 +15,6 @@ describe("UrlRouter", function () {
       location: LocationServices,
       match;
 
-  function makeMatcher(url, config?) {
-    return new UrlMatcher(url, $umf.paramTypes, config);
-  }
-
   beforeEach(function() {
     router = new UIRouter();
     router.plugin(TestingPlugin);
@@ -126,25 +122,25 @@ describe("UrlRouter", function () {
   describe("location updates", function() {
     it('can push location changes', function () {
       spyOn(router.locationService, "setUrl");
-      $ur.push(makeMatcher("/hello/:name"), { name: "world" });
+      $ur.push($umf.compile("/hello/:name"), { name: "world" });
       expect(router.locationService.setUrl).toHaveBeenCalledWith("/hello/world", undefined);
     });
 
     it('can push a replacement location', function () {
       spyOn(router.locationService, "setUrl");
-      $ur.push(makeMatcher("/hello/:name"), { name: "world" }, { replace: true });
+      $ur.push($umf.compile("/hello/:name"), { name: "world" }, { replace: true });
       expect(router.locationService.setUrl).toHaveBeenCalledWith("/hello/world", true);
     });
 
     it('can push location changes with no parameters', function () {
       spyOn(router.locationService, "setUrl");
-      $ur.push(makeMatcher("/hello/:name", { params: { name: "" } }));
+      $ur.push($umf.compile("/hello/:name", { params: { name: "" } }));
       expect(router.locationService.setUrl).toHaveBeenCalledWith("/hello/", undefined);
     });
 
     it('can push location changes that include a #fragment', function () {
       // html5mode disabled
-      $ur.push(makeMatcher('/hello/:name'), { name: 'world', '#': 'frag' });
+      $ur.push($umf.compile('/hello/:name'), { name: 'world', '#': 'frag' });
       expect($url.path()).toBe('/hello/world');
       expect($url.hash()).toBe('frag');
     });
@@ -166,14 +162,14 @@ describe("UrlRouter", function () {
   describe("URL generation", function() {
     it("should return null when UrlMatcher rejects parameters", function () {
       $umf.type("custom", <any> { is: val => val === 1138 });
-      var matcher = makeMatcher("/foo/{param:custom}");
+      var matcher = $umf.compile("/foo/{param:custom}");
 
       expect($ur.href(matcher, { param: 1138 })).toBe('#/foo/1138');
       expect($ur.href(matcher, { param: 5 })).toBeNull();
     });
 
     it('should return URLs with #fragments', function () {
-      expect($ur.href(makeMatcher('/hello/:name'), { name: 'world', '#': 'frag' })).toBe('#/hello/world#frag');
+      expect($ur.href($umf.compile('/hello/:name'), { name: 'world', '#': 'frag' })).toBe('#/hello/world#frag');
     });
   });
 });

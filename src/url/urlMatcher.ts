@@ -15,6 +15,7 @@ import {DefType} from "../params/param";
 import {unnestR} from "../common/common";
 import {arrayTuples} from "../common/common";
 import {RawParams} from "../params/interface";
+import { ParamFactory } from "./interface";
 
 /** @hidden */
 function quoteRegExp(string: any, param?: any) {
@@ -114,7 +115,7 @@ export class UrlMatcher {
    * - `caseInsensitive` - `true` if URL matching should be case insensitive, otherwise `false`, the default value (for backward compatibility) is `false`.
    * - `strict` - `false` if matching against a URL with a trailing slash should be treated as equivalent to a URL without a trailing slash, the default value is `true`.
    */
-  constructor(pattern: string, paramTypes: ParamTypes, public config?: any) {
+  constructor(pattern: string, paramTypes: ParamTypes, paramFactory: ParamFactory, public config?: any) {
     this.pattern = pattern;
     this.config = defaults(this.config, {
       params: {},
@@ -172,7 +173,7 @@ export class UrlMatcher {
       if (p.segment.indexOf('?') >= 0) break; // we're into the search part
 
       checkParamErrors(p.id);
-      this._params.push(Param.fromPath(p.id, p.type, this.config.paramMap(p.cfg, false), paramTypes));
+      this._params.push(paramFactory.fromPath(p.id, p.type, this.config.paramMap(p.cfg, false)));
       this._segments.push(p.segment);
       patterns.push([p.segment, tail(this._params)]);
       last = placeholder.lastIndex;
@@ -192,7 +193,7 @@ export class UrlMatcher {
         while ((m = searchPlaceholder.exec(search))) {
           p = matchDetails(m, true);
           checkParamErrors(p.id);
-          this._params.push(Param.fromSearch(p.id, p.type, this.config.paramMap(p.cfg, true), paramTypes));
+          this._params.push(paramFactory.fromSearch(p.id, p.type, this.config.paramMap(p.cfg, true)));
           last = placeholder.lastIndex;
           // check if ?&
         }

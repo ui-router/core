@@ -13,7 +13,7 @@ import {UrlMatcher} from "../url/urlMatcher";
 import {Resolvable} from "../resolve/resolvable";
 import {services} from "../common/coreservices";
 import {ResolvePolicy} from "../resolve/interface";
-import {ParamTypes} from "../params/paramTypes";
+import { ParamFactory } from "../url/interface";
 
 const parseUrl = (url: string): any => {
   if (!isString(url)) return false;
@@ -84,9 +84,9 @@ function navigableBuilder(state: State) {
   return !isRoot(state) && state.url ? state : (state.parent ? state.parent.navigable : null);
 };
 
-const getParamsBuilder = (paramTypes: ParamTypes) => 
+const getParamsBuilder = (paramFactory: ParamFactory) =>
 function paramsBuilder(state: State): { [key: string]: Param } {
-  const makeConfigParam = (config: any, id: string) => Param.fromConfig(id, null, config, paramTypes);
+  const makeConfigParam = (config: any, id: string) => paramFactory.fromConfig(id, null, config);
   let urlParams: Param[] = (state.url && state.url.parameters({inherit: false})) || [];
   let nonUrlParams: Param[] = values(mapObj(omit(state.params || {}, urlParams.map(prop('id'))), makeConfigParam));
   return urlParams.concat(nonUrlParams).map(p => [p.id, p]).reduce(applyPairs, {});
@@ -212,7 +212,7 @@ export class StateBuilder {
   /** An object that contains all the BuilderFunctions registered, key'd by the name of the State property they build */
   private builders: Builders;
 
-  constructor(private matcher: StateMatcher, $urlMatcherFactoryProvider: UrlMatcherFactory) {
+  constructor(private matcher: StateMatcher, urlMatcherFactory: UrlMatcherFactory) {
     let self = this;
 
     const root = () => matcher.find("");
@@ -229,10 +229,10 @@ export class StateBuilder {
       parent: [ parentBuilder ],
       data: [ dataBuilder ],
       // Build a URLMatcher if necessary, either via a relative or absolute URL
-      url: [ getUrlBuilder($urlMatcherFactoryProvider, root) ],
+      url: [ getUrlBuilder(urlMatcherFactory, root) ],
       // Keep track of the closest ancestor state that has a URL (i.e. is navigable)
       navigable: [ getNavigableBuilder(isRoot) ],
-      params: [ getParamsBuilder($urlMatcherFactoryProvider.paramTypes) ],
+      params: [ getParamsBuilder(urlMatcherFactory.paramFactory) ],
       // Each framework-specific ui-router implementation should define its own `views` builder
       // e.g., src/ng1/statebuilders/views.ts
       views: [],

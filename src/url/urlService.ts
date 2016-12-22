@@ -3,6 +3,7 @@
 import { UIRouter } from "../router";
 import { LocationServices, notImplemented, LocationConfig } from "../common/coreservices";
 import { noop, createProxyFunctions } from "../common/common";
+import { UrlConfig } from "./interface";
 
 /** @hidden */
 const makeStub = (keys: string[]): any =>
@@ -49,7 +50,7 @@ export class UrlService implements LocationServices {
    * This information can be used to build absolute URLs, such as
    * `https://example.com:443/basepath/state/substate?param1=a#hashvalue`;
    */
-  config: LocationConfig;
+  config: UrlConfig;
 
   constructor(private router: UIRouter) {
     this.config = {} as any;

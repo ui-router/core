@@ -2,14 +2,14 @@
  * @internalapi
  * @module params
  */ /** for typedoc */
-import {extend, filter, map, applyPairs, allTrueR} from "../common/common";
-import {prop, propEq} from "../common/hof";
-import {isInjectable, isDefined, isString, isArray} from "../common/predicates";
-import {RawParams, ParamDeclaration} from "../params/interface";
-import {services} from "../common/coreservices";
-import {matcherConfig} from "../url/urlMatcherConfig";
-import {ParamType} from "./type";
-import {ParamTypes} from "./paramTypes";
+import { extend, filter, map, applyPairs, allTrueR } from "../common/common";
+import { prop, propEq } from "../common/hof";
+import { isInjectable, isDefined, isString, isArray } from "../common/predicates";
+import { RawParams, ParamDeclaration } from "../params/interface";
+import { services } from "../common/coreservices";
+import { ParamType } from "./type";
+import { ParamTypes } from "./paramTypes";
+import { UrlMatcherFactory } from "../url/urlMatcherFactory";
 
 let hasOwn = Object.prototype.hasOwnProperty;
 let isShorthand = (cfg: ParamDeclaration) =>
@@ -43,10 +43,10 @@ function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, i
 /**
  * returns false, true, or the squash value to indicate the "default parameter url squash policy".
  */
-function getSquashPolicy(config: ParamDeclaration, isOptional: boolean) {
+function getSquashPolicy(config: ParamDeclaration, isOptional: boolean, defaultPolicy: (boolean|string)) {
   let squash = config.squash;
   if (!isOptional || squash === false) return false;
-  if (!isDefined(squash) || squash == null) return matcherConfig.defaultSquashPolicy();
+  if (!isDefined(squash) || squash == null) return defaultPolicy;
   if (squash === true || isString(squash)) return squash;
   throw new Error(`Invalid squash policy: '${squash}'. Valid policies: false, true, or arbitrary string`);
 }
@@ -75,15 +75,15 @@ export class Param {
   raw: boolean;
   config: any;
 
-  constructor(id: string, type: ParamType, config: ParamDeclaration, location: DefType, paramTypes: ParamTypes) {
+  constructor(id: string, type: ParamType, config: ParamDeclaration, location: DefType, urlMatcherFactory: UrlMatcherFactory) {
     config = unwrapShorthand(config);
-    type = getType(config, type, location, id, paramTypes);
+    type = getType(config, type, location, id, urlMatcherFactory.paramTypes);
     let arrayMode = getArrayMode();
     type = arrayMode ? type.$asArray(arrayMode, location === DefType.SEARCH) : type;
     let isOptional = config.value !== undefined;
     let dynamic = isDefined(config.dynamic) ? !!config.dynamic : !!type.dynamic;
     let raw = isDefined(config.raw) ? !!config.raw : !!type.raw;
-    let squash = getSquashPolicy(config, isOptional);
+    let squash = getSquashPolicy(config, isOptional, urlMatcherFactory.defaultSquashPolicy());
     let replace = getReplace(config, arrayMode, isOptional, squash);
 
     // array config: param name (param[]) overrides default settings.  explicit config overrides param name.
@@ -144,21 +144,6 @@ export class Param {
 
   toString() {
     return `{Param:${this.id} ${this.type} squash: '${this.squash}' optional: ${this.isOptional}}`;
-  }
-
-  /** Creates a new [[Param]] from a CONFIG block */
-  static fromConfig(id: string, type: ParamType, config: any, paramTypes: ParamTypes): Param {
-    return new Param(id, type, config, DefType.CONFIG, paramTypes);
-  }
-
-  /** Creates a new [[Param]] from a url PATH */
-  static fromPath(id: string, type: ParamType, config: any, paramTypes: ParamTypes): Param {
-    return new Param(id, type, config, DefType.PATH, paramTypes);
-  }
-
-  /** Creates a new [[Param]] from a url SEARCH */
-  static fromSearch(id: string, type: ParamType, config: any, paramTypes: ParamTypes): Param {
-    return new Param(id, type, config, DefType.SEARCH, paramTypes);
   }
 
   static values(params: Param[], values: RawParams = {}): RawParams {
