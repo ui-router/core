@@ -4,20 +4,19 @@ import { isString } from "../common/predicates";
 import { StateDeclaration } from "./interface";
 import { State } from "./stateObject";
 import { StateBuilder } from "./stateBuilder";
-import { UrlRouterProvider } from "../url/urlRouter";
-import { StateRegistry, StateRegistryListener } from "./stateRegistry";
+import { StateRegistryListener, StateRegistry } from "./stateRegistry";
 import { Disposable } from "../interface";
-import { UrlRuleFactory } from "../url/urlRule";
+import { UrlRouter } from "../url/urlRouter";
 
 /** @internalapi */
 export class StateQueueManager implements Disposable {
   queue: State[];
 
   constructor(
+      private $registry: StateRegistry,
+      private $urlRouter: UrlRouter,
       public states: { [key: string]: State; },
-      public $registry: StateRegistry,
       public builder: StateBuilder,
-      public $urlRouterProvider: UrlRouterProvider,
       public listeners: StateRegistryListener[]) {
     this.queue = [];
   }
@@ -100,7 +99,8 @@ export class StateQueueManager implements Disposable {
 
   attachRoute(state: State) {
     if (state.abstract || !state.url) return;
-    state._urlRule = new UrlRuleFactory(this.$urlRouterProvider._router).fromState(state);
-    this.$urlRouterProvider.addRule(state._urlRule);
+
+    state._urlRule = this.$urlRouter.urlRuleFactory.fromState(state);
+    this.$urlRouter.addRule(state._urlRule);
   }
 }

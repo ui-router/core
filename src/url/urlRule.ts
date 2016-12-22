@@ -1,13 +1,12 @@
 import { UrlMatcher } from "./urlMatcher";
-import { isString } from "../common/predicates";
+import { isString, isDefined } from "../common/predicates";
 import { UIRouter } from "../router";
-import { Obj, extend } from "../common/common";
+import { Obj, extend, identity } from "../common/common";
 import { RawParams } from "../params/interface";
 import { is, pattern } from "../common/hof";
 import { State } from "../state/stateObject";
 import { UIRouterGlobals } from "../globals";
 import { StateService } from "../state/stateService";
-import { LocationServices, $InjectorLike, services } from "../common/coreservices";
 
 /**
  * Creates a [[UrlRule]]
@@ -38,17 +37,20 @@ export class UrlRuleFactory {
     return rule;
   }
 
-  fromString = (pattern: string, handler: any) =>
+  fromString = (pattern: string, handler: string|UrlMatcher|UrlRuleHandlerFn) =>
       extend(this.fromMatcher(this.compile(pattern), handler), { type: UrlRuleType.STRING });
 
-  fromMatcher = (urlMatcher: UrlMatcher, handler: any) =>
+  fromMatcher = (urlMatcher: UrlMatcher, handler: string|UrlMatcher|UrlRuleHandlerFn) =>
       new UrlMatcherRule(urlMatcher, (isString(handler) ? this.compile(handler) : handler));
 
-  fromRegExp = (pattern: RegExp, handler: any) =>
+  fromRegExp = (pattern: RegExp, handler: string|UrlRuleHandlerFn) =>
       new RegExpRule(pattern, handler);
 
   fromState = (state: State) =>
       new StateUrlRule(state, this.router);
+
+  fromMatchFn = (match: UrlRuleMatchFn) =>
+      new RawUrlRule(match);
 }
 
 /** @return truthy or falsey */
@@ -79,6 +81,9 @@ export interface UrlRule {
 
   priority: number;
 }
+
+export const isUrlRule = obj =>
+    obj && ['type', 'match', 'handler', 'priority'].every(key => isDefined(obj[key]));
 
 /**
  * A UrlRule which matches based on a regular expression
@@ -184,8 +189,7 @@ export class UrlMatcherRule implements UrlRule {
   priority = 0;
 
   constructor(public urlMatcher: UrlMatcher, handler: UrlMatcher|UrlRuleHandlerFn) {
-    const isMatcher = is(UrlMatcher);
-    this.handler = isMatcher(handler) ? this.redirectUrlTo(handler) : handler;
+    this.handler = is(UrlMatcher)(handler) ? this.redirectUrlTo(handler) : handler;
   }
 
   redirectUrlTo = (newurl: UrlMatcher) =>
@@ -238,14 +242,16 @@ export class StateUrlRule implements UrlRule {
   };
 }
 
-export class RawNg1UrlRule implements UrlRule {
+/**
+ * A "raw" rule which calls `match`
+ *
+ * The value from the `match` function is passed through as the `handler` result.
+ */
+export class RawUrlRule implements UrlRule {
   type = UrlRuleType.RAW;
   priority = 0;
 
-  constructor(public ruleFn: ($injector: $InjectorLike, $location: LocationServices) => string|void, public router: UIRouter) { }
+  constructor(public match: UrlRuleMatchFn) { }
 
-  match = (path: string, search: any, hash: string) =>
-      this.ruleFn(services.$injector, this.router.locationService);
-
-  handler = (match: string) => match;
+  handler = identity
 }

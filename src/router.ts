@@ -3,7 +3,7 @@
  * @module core
  */ /** */
 import { UrlMatcherFactory } from "./url/urlMatcherFactory";
-import { UrlRouterProvider, UrlRouter } from "./url/urlRouter";
+import { UrlRouter } from "./url/urlRouter";
 import { TransitionService } from "./transition/transitionService";
 import { ViewService } from "./view/view";
 import { StateRegistry } from "./state/stateRegistry";
@@ -41,11 +41,9 @@ export class UIRouter {
 
   urlMatcherFactory: UrlMatcherFactory = new UrlMatcherFactory();
 
-  urlRouterProvider: UrlRouterProvider = new UrlRouterProvider(this);
-
   urlRouter: UrlRouter = new UrlRouter(this);
 
-  stateRegistry: StateRegistry = new StateRegistry(this.urlMatcherFactory, this.urlRouterProvider);
+  stateRegistry: StateRegistry = new StateRegistry(this);
 
   stateService = new StateService(this);
 
@@ -92,7 +90,6 @@ export class UIRouter {
     this.globals.current = this.globals.$current.self;
 
     this.disposable(this.transitionService);
-    this.disposable(this.urlRouterProvider);
     this.disposable(this.urlRouter);
     this.disposable(this.stateRegistry);
     this.disposable(locationService);

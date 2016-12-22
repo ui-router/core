@@ -110,16 +110,15 @@ describe("UrlRouter", function () {
     expect(count).toBe(2);
   });
 
-  it('when should provide the new rule to the callback argument', function() {
-    var _rule, calls = 0;
+  it('when should return a deregistration function', function() {
+    let calls = 0;
     location.setUrl('/foo');
-    $ur.when('/foo', function() { calls++; }, function(rule) { _rule = rule; });
-    expect(_rule.constructor.name).toBe('UrlMatcherRule');
+    let dereg = $ur.when('/foo', function() { calls++; });
 
     $ur.sync();
     expect(calls).toBe(1);
 
-    $ur.removeRule(_rule);
+    dereg();
     $ur.sync();
     expect(calls).toBe(1);
   });

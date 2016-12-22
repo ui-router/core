@@ -7,12 +7,12 @@ import { State } from "./stateObject";
 import { StateMatcher } from "./stateMatcher";
 import { StateBuilder } from "./stateBuilder";
 import { StateQueueManager } from "./stateQueueManager";
-import { UrlMatcherFactory } from "../url/urlMatcherFactory";
 import { StateDeclaration } from "./interface";
 import { BuilderFunction } from "./stateBuilder";
 import { StateOrName } from "./interface";
-import { UrlRouterProvider } from "../url/urlRouter";
+import { UrlRouter } from "../url/urlRouter";
 import { removeFrom } from "../common/common";
+import { UIRouter } from "../router";
 
 /**
  * The signature for the callback function provided to [[StateRegistry.onStateRegistryEvent]].
@@ -31,14 +31,21 @@ export class StateRegistry {
   matcher: StateMatcher;
   private builder: StateBuilder;
   stateQueue: StateQueueManager;
+  urlRouter: UrlRouter;
 
   listeners: StateRegistryListener[] = [];
 
-  constructor(urlMatcherFactory: UrlMatcherFactory, private urlRouterProvider: UrlRouterProvider) {
+  /** @internalapi */
+  constructor(private _router: UIRouter) {
+    this.urlRouter = _router.urlRouter;
     this.matcher = new StateMatcher(this.states);
-    this.builder = new StateBuilder(this.matcher, urlMatcherFactory);
-    this.stateQueue = new StateQueueManager(this.states, this, this.builder, urlRouterProvider, this.listeners);
+    this.builder = new StateBuilder(this.matcher, _router.urlMatcherFactory);
+    this.stateQueue = new StateQueueManager(this, _router.urlRouter, this.states, this.builder, this.listeners);
+    this._registerRoot();
+  }
 
+  /** @internalapi */
+  private _registerRoot() {
     let rootStateDef: StateDeclaration = {
       name: '',
       url: '^',
@@ -139,7 +146,7 @@ export class StateRegistry {
     let deregistered = [state].concat(children).reverse();
 
     deregistered.forEach(state => {
-      this.urlRouterProvider.removeRule(state._urlRule);
+      this.urlRouter.removeRule(state._urlRule);
       delete this.states[state.name];
     });
 
