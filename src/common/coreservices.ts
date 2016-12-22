@@ -49,19 +49,35 @@ export interface CoreServices {
 
 export interface LocationServices extends Disposable {
   /**
-   * Changes the url
+   * Gets the current url string
+   *
+   *
+   * #### Example:
+   * ```js
+   * locationServices.url(); // "/some/path?query=value#anchor"
+   * ```
+   *
+   * @returns the current value of the url, as a string.
+   */
+  url(): string;
+
+  /**
+   * Updates the url, or gets the current url
    *
    * Updates the url, changing it to the value in `newurl`
    *
    * #### Example:
    * ```js
-   * locationServices.setUrl("/some/path?query=value#anchor", true);
+   * locationServices.url("/some/path?query=value#anchor", true);
    * ```
    *
    * @param newurl The new value for the URL
    * @param replace When true, replaces the current history entry (instead of appending it) with this new url
+   * @param state The history's state object, i.e., pushState (if the LocationServices implementation supports it)
+   * @return the url (after potentially being processed)
    */
-  setUrl(newurl: string, replace?: boolean): void;
+  url(newurl: string, replace?: boolean, state?: any): string;
+
   /**
    * Gets the path portion of the current url
    *

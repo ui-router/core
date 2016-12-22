@@ -10,7 +10,7 @@ const makeStub = (keys: string[]): any =>
     keys.reduce((acc, key) => (acc[key] = notImplemented(key), acc), { dispose: noop });
 
 /** @hidden */
-const locationServicesFns = ["setUrl", "path", "search", "hash", "onChange"];
+const locationServicesFns = ["url", "path", "search", "hash", "onChange"];
 /** @hidden */
 const locationConfigFns = ["port", "protocol", "host", "baseHref", "html5Mode", "hashPrefix"];
 
@@ -31,7 +31,10 @@ export class UrlService implements LocationServices {
   static locationConfigStub: LocationConfig = makeStub(locationConfigFns);
 
   /** @inheritdoc */
-  setUrl(newurl: string, replace?: boolean): void { return };
+  url(): string;
+  /** @inheritdoc */
+  url(newurl: string, replace?: boolean, state?): void;
+  url(newurl?, replace?, state?): any { return };
   /** @inheritdoc */
   path(): string { return };
   /** @inheritdoc */

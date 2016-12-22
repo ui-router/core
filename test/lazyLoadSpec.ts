@@ -287,7 +287,7 @@ describe('future state', function () {
     });
 
     it('triggered by a URL sync should re-parse the URL to activate the lazy loaded state', (done) => {
-      router.urlService.setUrl('/a/def');
+      router.urlService.url('/a/def');
       $urlRouter.sync();
       $transitions.onSuccess({}, () => {
         expect($state.current.name).toBe('A');
@@ -333,7 +333,7 @@ describe('future state', function () {
     });
 
     it('should re-parse the URL to activate the final state', (done) => {
-      router.urlService.setUrl('/a/def/b');
+      router.urlService.url('/a/def/b');
       $urlRouter.sync();
       $transitions.onSuccess({}, () => {
         expect($state.current.name).toBe('A.B');
@@ -451,7 +451,7 @@ describe('future state', function () {
     });
 
     it('should load and activate a nested future state by url sync', (done) => {
-      router.urlService.setUrl('/a/aid/b/bid');
+      router.urlService.url('/a/aid/b/bid');
       $urlRouter.sync();
       $transitions.onSuccess({}, (trans) => {
         expect($state.current.name).toBe('A.B');

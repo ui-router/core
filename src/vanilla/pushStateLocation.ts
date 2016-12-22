@@ -4,7 +4,7 @@
  */ /** */
 import { isDefined } from "../common/index";
 import { LocationServices, LocationConfig } from "../common/coreservices";
-import { splitQuery, trimHashVal, getParams, locationPluginFactory } from "./utils";
+import { splitQuery, trimHashVal, getParams, locationPluginFactory, buildUrl } from "./utils";
 import { LocationPlugin } from "./interface";
 import { UIRouter } from "../router";
 import { pushTo, deregAll } from "../common/common";
@@ -44,12 +44,14 @@ export class PushStateLocationService implements LocationServices, Disposable {
     return getParams(splitQuery(this._location.search)[1]);
   }
 
-  setUrl(url: string, replace: boolean = false) {
+  url(url?: string, replace: boolean = false, state?: any): any {
     if (isDefined(url)) {
       let fullUrl = this._config.baseHref() + url;
-      if (replace) this._history.replaceState(null, null, fullUrl);
-      else this._history.pushState(null, null, fullUrl);
+      if (replace) this._history.replaceState(state, null, fullUrl);
+      else this._history.pushState(state, null, fullUrl);
     }
+
+    return buildUrl(this);
   }
 
   onChange(cb: EventListener) {

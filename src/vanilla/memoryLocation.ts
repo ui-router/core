@@ -4,7 +4,7 @@
  */ /** */
 import { isDefined } from "../common/index";
 import { LocationConfig, LocationServices } from "../common/coreservices";
-import { splitQuery, getParams, splitHash, locationPluginFactory } from "./utils";
+import { splitQuery, getParams, splitHash, locationPluginFactory, buildUrl } from "./utils";
 import { removeFrom, unnestR, deregAll, noop } from "../common/common";
 import { UIRouter } from "../router";
 import { LocationPlugin } from "./interface";
@@ -44,31 +44,11 @@ export class MemoryLocationService implements LocationServices, Disposable {
     this._listeners.forEach(cb => cb(evt));
   }
 
-  url() {
-    let s = this._url.search;
-    let hash = this._url.hash;
-    let query = Object.keys(s).map(key => (isArray(s[key]) ? s[key] : [s[key]]) .map(val => key + "=" + val))
-        .reduce(unnestR, [])
-        .join("&");
+  hash   = () => this._url.hash;
+  path   = () => this._url.path;
+  search = () => this._url.search;
 
-    return this._url.path +
-        (query ? "?" + query : "") +
-        (hash ? "#" + hash : "");
-  }
-
-  hash() {
-    return this._url.hash;
-  }
-
-  path() {
-    return this._url.path;
-  }
-
-  search() {
-    return this._url.search;
-  }
-
-  setUrl(url: string, replace: boolean = false) {
+  url(url?: string, replace: boolean = false, state?): string {
     if (isDefined(url)) {
       let path = splitHash(splitQuery(url)[0])[0];
       let hash = splitHash(url)[1];
@@ -76,9 +56,12 @@ export class MemoryLocationService implements LocationServices, Disposable {
 
       let oldval = this.url();
       this._url = { path, search, hash };
+
       let newval = this.url();
       this._urlChanged(newval, oldval);
     }
+
+    return buildUrl(this);
   }
 
   onChange(cb: EventListener) {
@@ -86,9 +69,7 @@ export class MemoryLocationService implements LocationServices, Disposable {
     return () => removeFrom(this._listeners, cb);
   }
   
-  dispose() {
-    deregAll(this._listeners);
-  }
+  dispose = () => deregAll(this._listeners);
 }
 
 /** A `UIRouterPlugin` that gets/sets the current location from an in-memory object */

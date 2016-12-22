@@ -81,7 +81,7 @@ export class UrlRouter implements Disposable {
       if (!match) return false;
 
       let result = rule.handler(match, path, search, hash);
-      if (isString(result)) $url.setUrl(result, true);
+      if (isString(result)) $url.url(result, true);
       return true;
     }
 
@@ -118,7 +118,7 @@ export class UrlRouter implements Disposable {
     }
     if ($url.path() === this.location) return;
 
-    $url.setUrl(this.location, true);
+    $url.url(this.location, true);
   }
 
   /**
@@ -133,7 +133,7 @@ export class UrlRouter implements Disposable {
    */
   push(urlMatcher: UrlMatcher, params?: RawParams, options?: { replace?: (string|boolean) }) {
     let replace = options && !!options.replace;
-    this._router.urlService.setUrl(urlMatcher.format(params || {}), replace);
+    this._router.urlService.url(urlMatcher.format(params || {}), replace);
   }
 
   /**

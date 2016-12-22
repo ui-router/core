@@ -46,24 +46,24 @@ describe("UrlRouter", function () {
   });
 
   it("should execute rewrite rules", function () {
-    location.setUrl("/foo");
+    location.url("/foo");
     expect(location.path()).toBe("/foo");
 
-    location.setUrl("/baz");
+    location.url("/baz");
     expect(location.path()).toBe("/b4z");
   });
 
   it("should keep otherwise last", function () {
     $ur.otherwise('/otherwise');
 
-    location.setUrl("/lastrule");
+    location.url("/lastrule");
     expect(location.path()).toBe("/otherwise");
 
     $ur.when('/lastrule', function($match) {
       match = ['/lastrule', $match];
     });
 
-    location.setUrl("/lastrule");
+    location.url("/lastrule");
     expect(location.path()).toBe("/lastrule");
   });
 
@@ -108,7 +108,7 @@ describe("UrlRouter", function () {
 
   it('when should return a deregistration function', function() {
     let calls = 0;
-    location.setUrl('/foo');
+    location.url('/foo');
     let dereg = $ur.when('/foo', function() { calls++; });
 
     $ur.sync();
@@ -121,21 +121,21 @@ describe("UrlRouter", function () {
 
   describe("location updates", function() {
     it('can push location changes', function () {
-      spyOn(router.locationService, "setUrl");
+      spyOn(router.locationService, "url");
       $ur.push($umf.compile("/hello/:name"), { name: "world" });
-      expect(router.locationService.setUrl).toHaveBeenCalledWith("/hello/world", undefined);
+      expect(router.locationService.url).toHaveBeenCalledWith("/hello/world", undefined);
     });
 
     it('can push a replacement location', function () {
-      spyOn(router.locationService, "setUrl");
+      spyOn(router.locationService, "url");
       $ur.push($umf.compile("/hello/:name"), { name: "world" }, { replace: true });
-      expect(router.locationService.setUrl).toHaveBeenCalledWith("/hello/world", true);
+      expect(router.locationService.url).toHaveBeenCalledWith("/hello/world", true);
     });
 
     it('can push location changes with no parameters', function () {
-      spyOn(router.locationService, "setUrl");
+      spyOn(router.locationService, "url");
       $ur.push($umf.compile("/hello/:name", { params: { name: "" } }));
-      expect(router.locationService.setUrl).toHaveBeenCalledWith("/hello/", undefined);
+      expect(router.locationService.url).toHaveBeenCalledWith("/hello/", undefined);
     });
 
     it('can push location changes that include a #fragment', function () {
@@ -146,13 +146,13 @@ describe("UrlRouter", function () {
     });
 
     it('can read and sync a copy of location URL', function () {
-      $url.setUrl('/old');
+      $url.url('/old');
 
       spyOn(router.locationService, 'path').and.callThrough();
       $ur.update(true);
       expect(router.locationService.path).toHaveBeenCalled();
 
-      $url.setUrl('/new');
+      $url.url('/new');
       $ur.update();
 
       expect($url.path()).toBe('/old');
@@ -189,7 +189,7 @@ describe('UrlRouter.deferIntercept', () => {
 
     $ur.addRule($ur.urlRuleFactory.create(/.*/, () => log.push($url.path())));
 
-    $url.setUrl('/foo');
+    $url.url('/foo');
 
     expect(log).toEqual([]);
 

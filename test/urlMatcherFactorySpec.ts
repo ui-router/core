@@ -299,13 +299,13 @@ describe("UrlMatcher", function () {
       expect(m.exec("/foo", { param1: "1" })).toEqual({ param1: "1" }); // auto unwrap single values
       expect(m.exec("/foo", { param1: ["1", "2"] })).toEqual({ param1: ["1", "2"] });
 
-      $location.setUrl("/foo");
+      $location.url("/foo");
       expect(m.exec($location.path(), $location.search())).toEqual({ param1: undefined });
-      $location.setUrl("/foo?param1=bar");
+      $location.url("/foo?param1=bar");
       expect(m.exec($location.path(), $location.search())).toEqual({ param1: 'bar' }); // auto unwrap
-      $location.setUrl("/foo?param1=");
+      $location.url("/foo?param1=");
       expect(m.exec($location.path(), $location.search())).toEqual({ param1: undefined });
-      $location.setUrl("/foo?param1=bar&param1=baz");
+      $location.url("/foo?param1=bar&param1=baz");
       expect(m.exec($location.path(), $location.search())).toEqual({ param1: ['bar', 'baz'] });
 
       expect(m.format({})).toBe("/foo");
@@ -334,13 +334,13 @@ describe("UrlMatcher", function () {
       expect(m.exec("/foo", { param1: "1" })).toEqual({ param1: ["1"] });
       expect(m.exec("/foo", { param1: ["1", "2"] })).toEqual({ param1: ["1", "2"] });
 
-      $location.setUrl("/foo");
+      $location.url("/foo");
       expect(m.exec($location.path(), $location.search())).toEqual({ param1: undefined });
-      $location.setUrl("/foo?param1=");
+      $location.url("/foo?param1=");
       expect(m.exec($location.path(), $location.search())).toEqual({ param1: undefined });
-      $location.setUrl("/foo?param1=bar");
+      $location.url("/foo?param1=bar");
       expect(m.exec($location.path(), $location.search())).toEqual({ param1: ['bar'] });
-      $location.setUrl("/foo?param1=bar&param1=baz");
+      $location.url("/foo?param1=bar&param1=baz");
       expect(m.exec($location.path(), $location.search())).toEqual({ param1: ['bar', 'baz'] });
 
       expect(m.format({})).toBe("/foo");
@@ -356,12 +356,12 @@ describe("UrlMatcher", function () {
 
       expect(m.exec("/foo")).toEqualData({});
 
-      $location.setUrl("/foo?param1[]=bar");
+      $location.url("/foo?param1[]=bar");
       expect(m.exec($location.path(), $location.search())).toEqual({ "param1[]": ['bar'] });
       expect(m.format({ "param1[]": 'bar' })).toBe("/foo?param1[]=bar");
       expect(m.format({ "param1[]": ['bar'] })).toBe("/foo?param1[]=bar");
 
-      $location.setUrl("/foo?param1[]=bar&param1[]=baz");
+      $location.url("/foo?param1[]=bar&param1[]=baz");
       expect(m.exec($location.path(), $location.search())).toEqual({ "param1[]": ['bar', 'baz'] });
       expect(m.format({ "param1[]": ['bar', 'baz'] })).toBe("/foo?param1[]=bar&param1[]=baz");
     });
@@ -401,12 +401,12 @@ describe("UrlMatcher", function () {
 
       expect(m.exec("/foo")).toEqualData({});
 
-      $location.setUrl("/foo?param1=bar");
+      $location.url("/foo?param1=bar");
       expect(m.exec($location.path(), $location.search())).toEqual( { param1: 'bar' } );
       expect(m.format({ param1: 'bar' })).toBe("/foo?param1=bar");
       expect(m.format({ param1: [ 'bar' ] })).toBe("/foo?param1=bar");
 
-      $location.setUrl("/foo?param1=bar&param1=baz");
+      $location.url("/foo?param1=bar&param1=baz");
       expect(m.exec($location.path(), $location.search())).toEqual( { param1: 'bar,baz' } ); // coerced to string
       expect(m.format({ param1: ['bar', 'baz'] })).toBe("/foo?param1=bar%2Cbaz"); // coerced to string
     }));
@@ -428,7 +428,7 @@ describe("UrlMatcher", function () {
 
       expect(m.exec("/foo/")).toEqual({ param1: undefined });
       expect(m.exec("/foo/bar")).toEqual({ param1: [ "bar" ] });
-      $location.setUrl("/foo/bar-baz");
+      $location.url("/foo/bar-baz");
       expect(m.exec($location.path())).toEqual({ param1: [ "bar", "baz" ] });
 
       expect(m.format({ param1: [] })).toEqual("/foo/");
@@ -451,11 +451,11 @@ describe("UrlMatcher", function () {
       expect(m.exec("/foo/1")).toEqual({ "param1[]": [ "1" ] });
       expect(m.exec("/foo/1-2")).toEqual({ "param1[]": [ "1", "2" ] });
 
-      $location.setUrl("/foo/");
+      $location.url("/foo/");
       expect(m.exec($location.path(), $location.search())).toEqual( { "param1[]": undefined } );
-      $location.setUrl("/foo/bar");
+      $location.url("/foo/bar");
       expect(m.exec($location.path(), $location.search())).toEqual( { "param1[]": [ 'bar' ] } );
-      $location.setUrl("/foo/bar-baz");
+      $location.url("/foo/bar-baz");
       expect(m.exec($location.path(), $location.search())).toEqual( { "param1[]": ['bar', 'baz'] } );
 
       expect(m.format({ })).toBe("/foo/");
@@ -495,15 +495,15 @@ describe("UrlMatcher", function () {
     // xit("should handle angular 1 $location.url encode/decodes correctly", (function() {
     //   var m = $umf.compile('/foo/:param1[]');
     //
-    //   $location.setUrl(m.format({ "param1[]": [ 'bar-', '-baz' ] }));
+    //   $location.url(m.format({ "param1[]": [ 'bar-', '-baz' ] }));
     //   expect(m.exec($location.path(), $location.search())).toEqual({ "param1[]": [ 'bar-', '-baz' ] });
     //
     //   // check that we handle $location.url decodes correctly for multiple hyphens
-    //   $location.setUrl(m.format({ "param1[]": [ 'bar-bar-bar-', '-baz-baz-baz' ] }));
+    //   $location.url(m.format({ "param1[]": [ 'bar-bar-bar-', '-baz-baz-baz' ] }));
     //   expect(m.exec($location.path(), $location.search())).toEqual({ "param1[]": [ 'bar-bar-bar-', '-baz-baz-baz' ] });
     //
     //   // check that pre-encoded values are passed correctly
-    //   $location.setUrl(m.format({ "param1[]": [ '%2C%20%5C%2C', '-baz' ] }));
+    //   $location.url(m.format({ "param1[]": [ '%2C%20%5C%2C', '-baz' ] }));
     //   expect(m.exec($location.path(), $location.search())).toEqual({ "param1[]": [ '%2C%20%5C%2C', '-baz' ] });
     // }));
   });
@@ -684,11 +684,11 @@ describe("urlMatcherFactory", function () {
     it("should automatically handle multiple search param values", (function() {
       var m = $umf.compile("/foo/{fooid:int}?{bar:int}");
 
-      $location.setUrl("/foo/5?bar=1");
+      $location.url("/foo/5?bar=1");
       expect(m.exec($location.path(), $location.search())).toEqual( { fooid: 5, bar: 1 } );
       expect(m.format({ fooid: 5, bar: 1 })).toEqual("/foo/5?bar=1");
 
-      $location.setUrl("/foo/5?bar=1&bar=2&bar=3");
+      $location.url("/foo/5?bar=1&bar=2&bar=3");
       expect(m.exec($location.path(), $location.search())).toEqual( { fooid: 5, bar: [ 1, 2, 3 ] } );
       expect(m.format({ fooid: 5, bar: [ 1, 2, 3 ] })).toEqual("/foo/5?bar=1&bar=2&bar=3");
 
@@ -705,11 +705,11 @@ describe("urlMatcherFactory", function () {
 
       var m = $umf.compile("/foo?{bar:custArray}", { params: { bar: { array: false } } } );
 
-      $location.setUrl("/foo?bar=fox");
+      $location.url("/foo?bar=fox");
       expect(m.exec($location.path(), $location.search())).toEqual( { bar: [ 'fox' ] } );
       expect(m.format({ bar: [ 'fox' ] })).toEqual("/foo?bar=fox");
 
-      $location.setUrl("/foo?bar=quick-brown-fox");
+      $location.url("/foo?bar=quick-brown-fox");
       expect(m.exec($location.path(), $location.search())).toEqual( { bar: [ 'quick', 'brown', 'fox' ] } );
       expect(m.format({ bar: [ 'quick', 'brown', 'fox' ] })).toEqual("/foo?bar=quick-brown-fox");
     }));

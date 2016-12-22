@@ -115,12 +115,12 @@ describe('stateService', function () {
     });
 
     it("should not update the URL in response to synchronizing URL", ((done) => {
-      $loc.setUrl('/a/b/c');
-      var setUrl = spyOn($loc, 'setUrl').and.callThrough();
+      $loc.url('/a/b/c');
+      var url = spyOn($loc, 'url').and.callThrough();
 
       wait().then(() => {
         expect($state.current.name).toBe('C');
-        let pushedUrls = setUrl.calls.all().map(x => x.args[0]).filter(x => x !== undefined);
+        let pushedUrls = url.calls.all().map(x => x.args[0]).filter(x => x !== undefined);
         expect(pushedUrls).toEqual([]);
         expect($loc.path()).toBe('/a/b/c');
         done();
@@ -130,12 +130,12 @@ describe('stateService', function () {
     it("should update the URL in response to synchronizing URL then redirecting", ((done) => {
       $transitions.onStart({ to: 'C' }, () => $state.target('D'));
 
-      $loc.setUrl('/a/b/c');
-      var setUrl = spyOn($loc, 'setUrl').and.callThrough();
+      $loc.url('/a/b/c');
+      var url = spyOn($loc, 'url').and.callThrough();
 
       wait().then(() => {
         expect($state.current.name).toBe('D');
-        let pushedUrls = setUrl.calls.all().map(x => x.args[0]).filter(x => x !== undefined);
+        let pushedUrls = url.calls.all().map(x => x.args[0]).filter(x => x !== undefined);
         expect(pushedUrls).toEqual(['/a/b/c/d']);
         expect($loc.path()).toBe('/a/b/c/d');
         done();
@@ -176,7 +176,7 @@ describe('stateService', function () {
       var dynamicstate, childWithParam, childNoParam;
 
       beforeEach(async function (done) {
-        $loc.setUrl("asdfasfdasf");
+        $loc.url("asdfasfdasf");
         dynlog = paramsChangedLog = "";
         dynamicstate = {
           name: 'dyn',
@@ -368,7 +368,7 @@ describe('stateService', function () {
             done();
           });
 
-          $loc.setUrl('/dynstate/p1/pd1?search=s1&searchDyn=sd2');
+          $loc.url('/dynstate/p1/pd1?search=s1&searchDyn=sd2');
         });
 
         it('exits and enters a state when any non-dynamic params change (triggered via url)', (done) => {
@@ -377,7 +377,7 @@ describe('stateService', function () {
             done();
           });
 
-          $loc.setUrl('/dynstate/p1/pd1?search=s2&searchDyn=sd2');
+          $loc.url('/dynstate/p1/pd1?search=s2&searchDyn=sd2');
         });
 
         it('does not exit nor enter a state when only dynamic params change (triggered via $state transition)', async (done) => {
@@ -410,7 +410,7 @@ describe('stateService', function () {
             }
           });
 
-          $loc.setUrl('/dynstate/p1/pd1?search=s1&searchDyn=sd2'); // {search: 's1', searchDyn: 'sd2'});
+          $loc.url('/dynstate/p1/pd1?search=s1&searchDyn=sd2'); // {search: 's1', searchDyn: 'sd2'});
         });
 
         it('updates $stateParams and $location.search when only dynamic params change (triggered via $state transition)', async (done) => {
@@ -443,7 +443,7 @@ describe('stateService', function () {
         });
 
         it('doesn\'t re-enter state (triggered by url change)', function (done) {
-          $loc.setUrl($loc.path() + "?term=hello");
+          $loc.url($loc.path() + "?term=hello");
           awaitTransition(router).then(() => {
             expect($loc.search()).toEqual({term: 'hello'});
             expect(entered).toBeFalsy();

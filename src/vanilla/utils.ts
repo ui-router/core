@@ -3,9 +3,9 @@
  * @module vanilla
  */ /** */
 import {isArray} from "../common/index";
-import { LocationServices, LocationConfig, services } from "../common/coreservices";
+import { LocationServices, LocationConfig } from "../common/coreservices";
 import { UIRouter } from "../router";
-import { identity } from "../common/common";
+import { identity, unnestR } from "../common/common";
 
 const beforeAfterSubstr = (char: string) => (str: string): string[] => {
   if (!str) return ["", ""];
@@ -31,7 +31,21 @@ export const keyValsToObjectR = (accum, [key, val]) => {
 };
 
 export const getParams = (queryString: string): any =>
-  queryString.split("&").filter(identity).map(splitEqual).reduce(keyValsToObjectR, {});
+    queryString.split("&").filter(identity).map(splitEqual).reduce(keyValsToObjectR, {});
+
+export const buildUrl = (loc: LocationServices) => {
+  let path = loc.path();
+  let searchObject = loc.search();
+  let hash = loc.hash();
+
+  let search = Object.keys(searchObject).map(key => {
+    let param = searchObject[key];
+    let vals = isArray(param) ? param : [param];
+    return vals.map(val => key + "=" + val);
+  }).reduce(unnestR, []).join("&");
+
+  return path + (search ? "?" + search : "") + (hash ? "#" + hash : "");
+};
 
 export function locationPluginFactory(
     name: string,

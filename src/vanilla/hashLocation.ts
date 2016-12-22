@@ -4,7 +4,7 @@
  */ /** */
 import { isDefined } from "../common/index";
 import { LocationServices } from "../common/coreservices";
-import { splitHash, splitQuery, trimHashVal, getParams, locationPluginFactory } from "./utils";
+import { splitHash, splitQuery, trimHashVal, getParams, locationPluginFactory, buildUrl } from "./utils";
 import { UIRouter } from "../router";
 import { LocationPlugin } from "./interface";
 import { pushTo, deregAll } from "../common/common";
@@ -15,20 +15,13 @@ import { BrowserLocationConfig } from "./browserLocationConfig";
 export class HashLocationService implements LocationServices, Disposable {
   private _listeners: Function[] = [];
 
-  hash() {
-      return splitHash(trimHashVal(location.hash))[1];
-  }
+  hash   = () => splitHash(trimHashVal(location.hash))[1];
+  path   = () => splitHash(splitQuery(trimHashVal(location.hash))[0])[0];
+  search = () => getParams(splitQuery(splitHash(trimHashVal(location.hash))[0])[1]);
 
-  path() {
-      return splitHash(splitQuery(trimHashVal(location.hash))[0])[0];
-  }
-
-  search() {
-    return getParams(splitQuery(splitHash(trimHashVal(location.hash))[0])[1]);
-  }
-
-  setUrl(url: string, replace: boolean = true) {
+  url(url?: string, replace: boolean = true): string {
     if (isDefined(url)) location.hash = url;
+    return buildUrl(this);
   };
 
   onChange(cb: EventListener) {
@@ -36,9 +29,7 @@ export class HashLocationService implements LocationServices, Disposable {
     return pushTo(this._listeners, () => window.removeEventListener('hashchange', cb));
   }
 
-  dispose() {
-    deregAll(this._listeners);
-  }
+  dispose = () => deregAll(this._listeners);
 }
 
 /** A `UIRouterPlugin` uses the browser hash to get/set the current location */
