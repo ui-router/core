@@ -19,7 +19,9 @@ export class TestingPlugin extends UIRouterPluginBase {
 
   startRouter() {
     this.router.urlMatcherFactory.$get();
-    this.router.urlRouter.listen();
+    if (!this.router.urlRouter.interceptDeferred) {
+      this.router.urlRouter.listen();
+    }
   }
 
   addErrorLoopHandler() {
