@@ -1,12 +1,13 @@
 import { UrlMatcher } from "./urlMatcher";
 import { isString, isDefined } from "../common/predicates";
 import { UIRouter } from "../router";
-import { Obj, extend, identity } from "../common/common";
-import { RawParams } from "../params/interface";
+import { extend, identity } from "../common/common";
 import { is, pattern } from "../common/hof";
 import { State } from "../state/stateObject";
-import { UIRouterGlobals } from "../globals";
+import { RawParams } from "../params/interface";
+import { UrlRule, UrlRuleMatchFn, UrlRuleHandlerFn, UrlRuleType } from "./interface";
 import { StateService } from "../state/stateService";
+import { UIRouterGlobals } from "../globals";
 
 /**
  * Creates a [[UrlRule]]
@@ -25,6 +26,9 @@ export class UrlRuleFactory {
     return this.router.urlMatcherFactory.compile(pattern);
   }
 
+  static isUrlRule = obj =>
+      obj && ['type', 'match', 'handler', 'priority'].every(key => isDefined(obj[key]));
+
   create(what: string|State|UrlMatcher|RegExp, handler?): UrlRule {
     const makeRule = pattern([
       [isString,       () => this.fromString(what as string, handler)],
@@ -38,7 +42,7 @@ export class UrlRuleFactory {
   }
 
   fromString = (pattern: string, handler: string|UrlMatcher|UrlRuleHandlerFn) =>
-      extend(this.fromMatcher(this.compile(pattern), handler), { type: UrlRuleType.STRING });
+      extend(this.fromMatcher(this.compile(pattern), handler), { type: "STRING" });
 
   fromMatcher = (urlMatcher: UrlMatcher, handler: string|UrlMatcher|UrlRuleHandlerFn) =>
       new UrlMatcherRule(urlMatcher, (isString(handler) ? this.compile(handler) : handler));
@@ -52,38 +56,6 @@ export class UrlRuleFactory {
   fromMatchFn = (match: UrlRuleMatchFn) =>
       new RawUrlRule(match);
 }
-
-/** @return truthy or falsey */
-export interface UrlRuleMatchFn {
-  (path: string, search: Obj, hash: string): any;
-}
-
-/** Handler invoked when a rule is matched */
-export interface UrlRuleHandlerFn {
-  (matchObject: any, path?: string, search?: Obj, hash?: string): (string|boolean|void);
-}
-
-export enum UrlRuleType { STATE, URLMATCHER, STRING, REGEXP, RAW, OTHER }
-export interface UrlRule {
-  /** The type of the rule */
-  type: UrlRuleType;
-
-  /**
-   * This function should match the url and return match details
-   */
-  match: UrlRuleMatchFn;
-
-  /**
-   * This function is called after the rule matched the url.
-   * This function handles the rule match event.
-   */
-  handler: UrlRuleHandlerFn;
-
-  priority: number;
-}
-
-export const isUrlRule = obj =>
-    obj && ['type', 'match', 'handler', 'priority'].every(key => isDefined(obj[key]));
 
 /**
  * A UrlRule which matches based on a regular expression
@@ -119,7 +91,7 @@ export const isUrlRule = obj =>
  * ```
  */
 export class RegExpRule implements UrlRule {
-  type = UrlRuleType.REGEXP;
+  type: UrlRuleType = "REGEXP";
   handler: UrlRuleHandlerFn;
   priority = 0;
 
@@ -184,7 +156,7 @@ export class RegExpRule implements UrlRule {
  * ```
  */
 export class UrlMatcherRule implements UrlRule {
-  type = UrlRuleType.URLMATCHER;
+  type: UrlRuleType = "URLMATCHER";
   handler: UrlRuleHandlerFn;
   priority = 0;
 
@@ -211,7 +183,7 @@ export class UrlMatcherRule implements UrlRule {
  * ```
  */
 export class StateUrlRule implements UrlRule {
-  type = UrlRuleType.STATE;
+  type: UrlRuleType = "STATE";
   priority = 0;
   $state: StateService;
   globals: UIRouterGlobals;
@@ -248,7 +220,7 @@ export class StateUrlRule implements UrlRule {
  * The value from the `match` function is passed through as the `handler` result.
  */
 export class RawUrlRule implements UrlRule {
-  type = UrlRuleType.RAW;
+  type: UrlRuleType = "RAW";
   priority = 0;
 
   constructor(public match: UrlRuleMatchFn) { }

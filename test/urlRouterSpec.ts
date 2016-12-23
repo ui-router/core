@@ -2,7 +2,6 @@ import { UrlMatcher, UrlMatcherFactory, UrlRouter, StateService, UIRouter } from
 import { TestingPlugin } from "./_testingPlugin";
 import { LocationServices } from "../src/common/coreservices";
 import { UrlService } from "../src/url/urlService";
-import { UrlRuleType } from "../src/url/urlRule";
 
 declare var inject;
 
@@ -72,7 +71,7 @@ describe("UrlRouter", function () {
       match: () => count++,
       handler: match => match,
       priority: 0,
-      type: UrlRuleType.OTHER,
+      type: "OTHER",
     };
 
     let dereg = $ur.addRule(rule as any);
@@ -92,7 +91,7 @@ describe("UrlRouter", function () {
       match: () => count++,
       handler: match => match,
       priority: 0,
-      type: UrlRuleType.OTHER,
+      type: "OTHER",
     };
     $ur.addRule(rule as any);
 

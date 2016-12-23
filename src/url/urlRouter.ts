@@ -3,14 +3,15 @@
  * @module url
  */ /** for typedoc */
 import { removeFrom, createProxyFunctions, find } from "../common/common";
-import { isFunction, isString, isArray } from "../common/predicates";
+import { isFunction, isString } from "../common/predicates";
 import { UrlMatcher } from "./urlMatcher";
 import { RawParams } from "../params/interface";
 import { Disposable } from "../interface";
 import { UIRouter } from "../router";
 import { val, is, pattern } from "../common/hof";
-import { UrlRuleFactory, UrlRule, UrlRuleMatchFn, isUrlRule, UrlRuleHandlerFn } from "./urlRule";
+import { UrlRuleFactory } from "./urlRule";
 import { TargetState } from "../state/targetState";
+import { UrlRule, UrlRuleMatchFn, UrlRuleHandlerFn } from "./interface";
 
 /** @hidden */
 function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHref: string): string {
@@ -179,7 +180,7 @@ export class UrlRouter implements Disposable {
   }
 
   addRule(rule: UrlRule) {
-    if (!isUrlRule(rule)) throw new Error("invalid rule");
+    if (!UrlRuleFactory.isUrlRule(rule)) throw new Error("invalid rule");
     this.rules.push(rule);
     return () => this.removeRule(rule);
   }
@@ -228,12 +229,12 @@ export class UrlRouter implements Disposable {
       [isString,        (_redirectTo: string) => rf.fromMatchFn(val(_redirectTo))],
       [isFunction,      (_redirectTo: UrlRuleMatchFn) => rf.fromMatchFn(_redirectTo)],
       [is(TargetState), (target: TargetState) => ($state.go(target.name(), target.params(), target.options()), true)],
-      [val(true), invalidArgument]
+      [val(true),       error]
     ]);
 
     this.otherwiseFn = makeRule(redirectTo);
 
-    function invalidArgument() {
+    function error() {
       throw new Error("'redirectTo' must be a string, function, TargetState, or have a state: 'target' property");
     }
   };
