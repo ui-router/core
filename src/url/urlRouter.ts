@@ -72,16 +72,14 @@ export class UrlRouter implements Disposable {
   sync(evt?) {
     if (evt && evt.defaultPrevented) return;
 
-    let $url = this._router.urlService;
-    let path = $url.path(),
-        search = $url.search(),
-        hash = $url.hash();
+    let router = this._router;
+    let $url = router.urlService;
 
     function check(rule: UrlRule) {
-      let match = rule && rule.match(path, search, hash);
+      let match = rule && rule.match($url, router);
       if (!match) return false;
 
-      let result = rule.handler(match, path, search, hash);
+      let result = rule.handler(match, $url, router);
       if (isString(result)) $url.url(result, true);
       return true;
     }

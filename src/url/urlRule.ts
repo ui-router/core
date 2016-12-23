@@ -8,6 +8,7 @@ import { RawParams } from "../params/interface";
 import { UrlRule, UrlRuleMatchFn, UrlRuleHandlerFn, UrlRuleType } from "./interface";
 import { StateService } from "../state/stateService";
 import { UIRouterGlobals } from "../globals";
+import { UrlService } from "./urlService";
 
 /**
  * Creates a [[UrlRule]]
@@ -113,8 +114,8 @@ export class RegExpRule implements UrlRule {
           newurl.replace(/\$(\$|\d{1,2})/, (m, what) =>
               match[what === '$' ? 0 : Number(what)]);
 
-  match(path: string): RegExpExecArray {
-    return this.regexp.exec(path);
+  match($url: UrlService): RegExpExecArray {
+    return this.regexp.exec($url.path());
   }
 }
 
@@ -168,8 +169,8 @@ export class UrlMatcherRule implements UrlRule {
       (match: RawParams) =>
           newurl.format(match);
 
-  match = (path: string, search: any, hash: string) =>
-      this.urlMatcher.exec(path, search, hash);
+  match = ($url: UrlService) =>
+      this.urlMatcher.exec($url.path(), $url.search(), $url.hash());
 }
 
 /**
@@ -193,8 +194,8 @@ export class StateUrlRule implements UrlRule {
     this.$state = router.stateService;
   }
 
-  match = (path: string, search: any, hash: string) =>
-      this.state.url.exec(path, search, hash);
+  match = ($url: UrlService) =>
+      this.state.url.exec($url.path(), $url.search(), $url.hash());
 
   /**
    * Checks if the router should start a new transition.
@@ -210,7 +211,6 @@ export class StateUrlRule implements UrlRule {
     if (this.shouldTransition(match)) {
       this.$state.transitionTo(this.state, match, { inherit: true, source: "url" });
     }
-    return true;
   };
 }
 

@@ -26,7 +26,7 @@ describe("UrlRouter", function () {
 
   beforeEach(function () {
     let rule1 = $ur.urlRuleFactory.fromRegExp(/\/baz/, "/b4z");
-    let rule1b = $ur.urlRuleFactory.fromMatchFn(path => /baz/.test(path) && path.replace('baz', 'b4z'));
+    // let rule1 = $ur.urlRuleFactory.fromMatchFn($url => /baz/.test($url.path()) && $url.path().replace('baz', 'b4z'));
     $ur.addRule(rule1);
 
     $ur.when('/foo/:param', function ($match) {

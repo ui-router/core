@@ -2,6 +2,8 @@ import { LocationConfig } from "../common/coreservices";
 import { Obj } from "../common/common";
 import { ParamType } from "../params/type";
 import { Param } from "../params/param";
+import { UrlService } from "./urlService";
+import { UIRouter } from "../router";
 
 export interface ParamFactory {
   /** Creates a new [[Param]] from a CONFIG block */
@@ -21,14 +23,26 @@ export interface UrlMatcherConfig {
   paramType(name, type?)
 }
 
-/** @return truthy or falsey */
+/**
+ * A function that matches the URL for a [[UrlRule]]
+ *
+ * Implementations should match against the current
+ * [[UrlService.path]], [[UrlService.search]], and [[UrlService.hash]]
+ *
+ * @return truthy or falsey
+ */
 export interface UrlRuleMatchFn {
-  (path: string, search: Obj, hash: string): any;
+  (urlService?: UrlService, router?: UIRouter): any;
 }
 
-/** Handler invoked when a rule is matched */
+/**
+ * Handler invoked when a rule is matched
+ *
+ * The matched value from the rule's [[UrlRuleMatchFn]] is passed as the first argument
+ * The handler should return a string (to redirect), or void
+ */
 export interface UrlRuleHandlerFn {
-  (matchObject: any, path?: string, search?: Obj, hash?: string): (string|boolean|void);
+  (matchValue?: any, urlService?: UrlService, router?: UIRouter): (string|void);
 }
 
 export type UrlRuleType = "STATE" | "URLMATCHER" | "STRING" | "REGEXP" | "RAW" | "OTHER";
