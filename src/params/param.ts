@@ -80,7 +80,7 @@ export class Param {
     type = getType(config, type, location, id, urlMatcherFactory.paramTypes);
     let arrayMode = getArrayMode();
     type = arrayMode ? type.$asArray(arrayMode, location === DefType.SEARCH) : type;
-    let isOptional = config.value !== undefined;
+    let isOptional = config.value !== undefined || location === DefType.SEARCH;
     let dynamic = isDefined(config.dynamic) ? !!config.dynamic : !!type.dynamic;
     let raw = isDefined(config.raw) ? !!config.raw : !!type.raw;
     let squash = getSquashPolicy(config, isOptional, urlMatcherFactory.defaultSquashPolicy());
