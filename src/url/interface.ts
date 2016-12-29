@@ -1,9 +1,11 @@
 import { LocationConfig } from "../common/coreservices";
-import { Obj } from "../common/common";
 import { ParamType } from "../params/type";
 import { Param } from "../params/param";
-import { UrlService } from "./urlService";
 import { UIRouter } from "../router";
+import { TargetState } from "../state/targetState";
+import { TargetStateDef } from "../state/interface";
+import { UrlMatcher } from "./urlMatcher";
+import { State } from "../state/stateObject";
 
 export interface ParamFactory {
   /** Creates a new [[Param]] from a CONFIG block */
@@ -23,6 +25,12 @@ export interface UrlMatcherConfig {
   paramType(name, type?)
 }
 
+export interface UrlParts {
+  path: string;
+  search: { [key: string]: any };
+  hash: string;
+}
+
 /**
  * A function that matches the URL for a [[UrlRule]]
  *
@@ -32,7 +40,7 @@ export interface UrlMatcherConfig {
  * @return truthy or falsey
  */
 export interface UrlRuleMatchFn {
-  (urlService?: UrlService, router?: UIRouter): any;
+  (url?: UrlParts, router?: UIRouter): any;
 }
 
 /**
@@ -42,11 +50,38 @@ export interface UrlRuleMatchFn {
  * The handler should return a string (to redirect), or void
  */
 export interface UrlRuleHandlerFn {
-  (matchValue?: any, urlService?: UrlService, router?: UIRouter): (string|void);
+  (matchValue?: any, url?: UrlParts, router?: UIRouter): (string|TargetState|TargetStateDef|void);
 }
 
-export type UrlRuleType = "STATE" | "URLMATCHER" | "STRING" | "REGEXP" | "RAW" | "OTHER";
+export type UrlRuleType = "STATE" | "URLMATCHER" | "REGEXP" | "RAW" | "OTHER";
+
 export interface UrlRule {
+  /**
+   * The rule's ID.
+   *
+   * IDs are auto-assigned when the rule is registered, in increasing order.
+   */
+  $id: number;
+
+  /**
+   * The rule's priority (defaults to 0).
+   *
+   * This can be used to explicitly modify the rule's priority.
+   * Higher numbers are higher priority.
+   */
+  priority: number;
+
+  /**
+   * The priority of a given match.
+   *
+   * Sometimes more than one UrlRule might have matched.
+   * This method is used to choose the best match.
+   *
+   * If multiple rules matched, each rule's `matchPriority` is called with the value from [[match]].
+   * The rule with the highest `matchPriority` has its [[handler]] called.
+   */
+  matchPriority(match: any): number;
+
   /** The type of the rule */
   type: UrlRuleType;
 
@@ -60,8 +95,21 @@ export interface UrlRule {
    * This function handles the rule match event.
    */
   handler: UrlRuleHandlerFn;
+}
 
-  priority: number;
+export interface MatcherUrlRule extends UrlRule {
+  type: "URLMATCHER"|"STATE";
+  urlMatcher: UrlMatcher;
+}
+
+export interface StateRule extends MatcherUrlRule {
+  type: "STATE";
+  state: State;
+}
+
+export interface RegExpRule extends UrlRule {
+  type: "REGEXP";
+  regexp: RegExp;
 }
 
 
@@ -94,7 +142,7 @@ export interface UrlRule {
 //
 //   rules: {
 //     // UrlRouterProvider
-//     addRule(rule: UrlRule): UrlRouterProvider;
+//     rule(rule: UrlRule): UrlRouterProvider;
 //     otherwise(rule: string | (($injector: $InjectorLike, $location: LocationServices) => string)): UrlRouterProvider ;
 //     when(what: (RegExp|UrlMatcher|string), handler: string|IInjectable, ruleCallback?) ;
 //   }

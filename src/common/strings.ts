@@ -6,12 +6,12 @@
  * @module common_strings
  */ /** */
 
-import {isString, isArray, isDefined, isNull, isPromise, isInjectable, isObject} from "./predicates";
-import {Rejection} from "../transition/rejectFactory";
-import {IInjectable, identity, Obj} from "./common";
-import {pattern, is, not, val, invoke} from "./hof";
-import {Transition} from "../transition/transition";
-import {Resolvable} from "../resolve/resolvable";
+import { isString, isArray, isDefined, isNull, isPromise, isInjectable, isObject } from "./predicates";
+import { Rejection } from "../transition/rejectFactory";
+import { IInjectable, identity, Obj, tail, pushR } from "./common";
+import { pattern, is, not, val, invoke } from "./hof";
+import { Transition } from "../transition/transition";
+import { Resolvable } from "../resolve/resolvable";
 
 /**
  * Returns a string shortened to a maximum length
@@ -117,3 +117,39 @@ export const beforeAfterSubstr = (char: string) => (str: string) => {
   if (idx === -1) return [str, ""];
   return [str.substr(0, idx), str.substr(idx + 1)];
 };
+
+/**
+ * Splits on a delimiter, but returns the delimiters in the array
+ *
+ * #### Example:
+ * ```js
+ * var splitOnSlashes = splitOnDelim('/');
+ * splitOnSlashes("/foo"); // ["/", "foo"]
+ * splitOnSlashes("/foo/"); // ["/", "foo", "/"]
+ * ```
+ */
+export function splitOnDelim(delim: string) {
+  let re = new RegExp("(" + delim + ")", "g");
+  return (str: string) =>
+      str.split(re).filter(identity);
+};
+
+
+/**
+ * Reduce fn that joins neighboring strings
+ *
+ * Given an array of strings, returns a new array
+ * where all neighboring strings have been joined.
+ *
+ * #### Example:
+ * ```js
+ * let arr = ["foo", "bar", 1, "baz", "", "qux" ];
+ * arr.reduce(joinNeighborsR, []) // ["foobar", 1, "bazqux" ]
+ * ```
+ */
+export function joinNeighborsR(acc: any[], x: any) {
+  if (isString(tail(acc)) && isString(x))
+    return acc.slice(0, -1).concat(tail(acc)+ x);
+  return pushR(acc, x);
+};
+

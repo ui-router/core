@@ -7,10 +7,10 @@
  * @module common
  */ /** for typedoc */
 
-import {isFunction, isString, isArray, isRegExp, isDate} from "./predicates";
-import { all, any, not, prop, curry } from "./hof";
-import {services} from "./coreservices";
-import {State} from "../state/stateObject";
+import { isFunction, isString, isArray, isRegExp, isDate } from "./predicates";
+import { all, any, prop, curry, val } from "./hof";
+import { services } from "./coreservices";
+import { State } from "../state/stateObject";
 
 let w: any = typeof window === 'undefined' ? {} : window;
 let angular = w.angular || {};
@@ -606,6 +606,59 @@ function _arraysEq(a1: any[], a2: any[]) {
   if (a1.length !== a2.length) return false;
   return arrayTuples(a1, a2).reduce((b, t) => b && _equals(t[0], t[1]), true);
 }
+
+export type sortfn = (a,b) => number;
+
+/**
+ * Create a sort function
+ *
+ * Creates a sort function which sorts by a numeric property.
+ *
+ * The `propFn` should return the property as a number which can be sorted.
+ *
+ * #### Example:
+ * This example returns the `priority` prop.
+ * ```js
+ * var sortfn = sortBy(obj => obj.priority)
+ * // equivalent to:
+ * var longhandSortFn = (a, b) => a.priority - b.priority;
+ * ```
+ *
+ * #### Example:
+ * This example uses [[prop]]
+ * ```js
+ * var sortfn = sortBy(prop('priority'))
+ * ```
+ *
+ * The `checkFn` can be used to exclude objects from sorting.
+ *
+ * #### Example:
+ * This example only sorts objects with type === 'FOO'
+ * ```js
+ * var sortfn = sortBy(prop('priority'), propEq('type', 'FOO'))
+ * ```
+ *
+ * @param propFn a function that returns the property (as a number)
+ * @param checkFn a predicate
+ *
+ * @return a sort function like: `(a, b) => (checkFn(a) && checkFn(b)) ? propFn(a) - propFn(b) : 0`
+ */
+export const sortBy = (propFn: (a) => number, checkFn: Predicate<any> = val(true)) =>
+    (a, b) =>
+        (checkFn(a) && checkFn(b)) ? propFn(a) - propFn(b) : 0;
+
+/**
+ * Composes a list of sort functions
+ *
+ * Creates a sort function composed of multiple sort functions.
+ * Each sort function is invoked in series.
+ * The first sort function to return non-zero "wins".
+ *
+ * @param sortFns list of sort functions
+ */
+export const composeSort = (...sortFns: sortfn[]): sortfn =>
+    (a, b) =>
+        sortFns.reduce((prev, fn) => prev || fn(a, b), 0);
 
 // issue #2676
 export const silenceUncaughtInPromise = (promise: Promise<any>) =>

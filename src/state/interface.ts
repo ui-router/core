@@ -2,23 +2,27 @@
  * @coreapi
  * @module state
  */ /** for typedoc */
-import { ParamDeclaration, RawParams } from "../params/interface";
-
-import {State} from "./stateObject";
-import {ViewContext} from "../view/interface";
-import {IInjectable} from "../common/common";
-import {Transition} from "../transition/transition";
-import {TransitionStateHookFn} from "../transition/interface";
-import {ResolvePolicy, ResolvableLiteral} from "../resolve/interface";
-import {Resolvable} from "../resolve/resolvable";
-import {ProviderLike} from "../resolve/interface";
-import {TargetState} from "./targetState";
+import { ParamDeclaration, RawParams, ParamsOrArray } from "../params/interface";
+import { State } from "./stateObject";
+import { ViewContext } from "../view/interface";
+import { IInjectable } from "../common/common";
+import { Transition } from "../transition/transition";
+import { TransitionStateHookFn, TransitionOptions } from "../transition/interface";
+import { ResolvePolicy, ResolvableLiteral, ProviderLike } from "../resolve/interface";
+import { Resolvable } from "../resolve/resolvable";
+import { TargetState } from "./targetState";
 
 export type StateOrName = (string|StateDeclaration|State);
 
 /** @internalapi */
 export interface TransitionPromise extends Promise<State> {
   transition: Transition;
+}
+
+export interface TargetStateDef {
+  state: StateOrName;
+  params?: ParamsOrArray;
+  options?: TransitionOptions;
 }
 
 export type ResolveTypes = Resolvable | ResolvableLiteral | ProviderLike;

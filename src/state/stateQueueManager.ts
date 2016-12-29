@@ -100,7 +100,6 @@ export class StateQueueManager implements Disposable {
   attachRoute(state: State) {
     if (state.abstract || !state.url) return;
 
-    state._urlRule = this.$urlRouter.urlRuleFactory.fromState(state);
-    this.$urlRouter.addRule(state._urlRule);
+    this.$urlRouter.rule(this.$urlRouter.urlRuleFactory.create(state));
   }
 }

@@ -72,7 +72,7 @@ describe("StateRegistry", () => {
       $state.transitionTo['calls'].reset();
       router.urlRouter.sync();
       expect($state.transitionTo['calls'].count()).toBe(0);
-      expect(router.urlRouter.rules.length).toBe(0);
+      expect(router.urlRouter._rules.length).toBe(0);
     });
   });
 

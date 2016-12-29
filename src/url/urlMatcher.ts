@@ -3,19 +3,15 @@
  * @module url
  */ /** for typedoc */
 import {
-  map, defaults, extend, inherit, identity,
-  unnest, tail, forEach, find, Obj, pairs, allTrueR
+    map, defaults, inherit, identity, unnest, tail, find, Obj, pairs, allTrueR, unnestR, arrayTuples
 } from "../common/common";
-import {prop, propEq } from "../common/hof";
-import {isArray, isString} from "../common/predicates";
-import {Param} from "../params/param";
-import {ParamTypes} from "../params/paramTypes";
-import {isDefined} from "../common/predicates";
-import {DefType} from "../params/param";
-import {unnestR} from "../common/common";
-import {arrayTuples} from "../common/common";
-import {RawParams} from "../params/interface";
+import { prop, propEq, pattern, eq, is, val } from "../common/hof";
+import { isArray, isString, isDefined } from "../common/predicates";
+import { Param, DefType } from "../params/param";
+import { ParamTypes } from "../params/paramTypes";
+import { RawParams } from "../params/interface";
 import { ParamFactory } from "./interface";
+import { joinNeighborsR, splitOnDelim } from "../common/strings";
 
 /** @hidden */
 function quoteRegExp(string: any, param?: any) {
@@ -38,6 +34,12 @@ function quoteRegExp(string: any, param?: any) {
 /** @hidden */
 const memoizeTo = (obj: Obj, prop: string, fn: Function) =>
     obj[prop] = obj[prop] || fn();
+
+interface UrlMatcherCache {
+  path: UrlMatcher[];
+  parent: UrlMatcher;
+  pattern: RegExp;
+}
 
 /**
  * Matches URLs against patterns.
@@ -95,7 +97,7 @@ export class UrlMatcher {
   static nameValidator: RegExp = /^\w+([-.]+\w+)*(?:\[\])?$/;
 
   /** @hidden */
-  private _cache: { path: UrlMatcher[], pattern?: RegExp } = { path: [], pattern: null };
+  private _cache: UrlMatcherCache = { path: [this], parent: null, pattern: null };
   /** @hidden */
   private _children: UrlMatcher[] = [];
   /** @hidden */
@@ -202,8 +204,6 @@ export class UrlMatcher {
 
     this._segments.push(segment);
     this._compiled = patterns.map(pattern => quoteRegExp.apply(null, pattern)).concat(quoteRegExp(segment));
-
-    Object.freeze(this);
   }
 
   /**
@@ -215,14 +215,17 @@ export class UrlMatcher {
    */
   append(url: UrlMatcher): UrlMatcher {
     this._children.push(url);
-    forEach(url._cache, (val, key) => url._cache[key] = isArray(val) ? [] : null);
-    url._cache.path = this._cache.path.concat(this);
+    url._cache = {
+      path: this._cache.path.concat(url),
+      parent: this,
+      pattern: null,
+    };
     return url;
   }
 
   /** @hidden */
   isRoot(): boolean {
-    return this._cache.path.length === 0;
+    return this._cache.path[0] === this;
   }
 
   /** Returns the input pattern string */
@@ -260,7 +263,7 @@ export class UrlMatcher {
     let match = memoizeTo(this._cache, 'pattern', () => {
       return new RegExp([
         '^',
-        unnest(this._cache.path.concat(this).map(prop('_compiled'))).join(''),
+        unnest(this._cache.path.map(prop('_compiled'))).join(''),
         this.config.strict === false ? '\/?' : '',
         '$'
       ].join(''), this.config.caseInsensitive ? 'i' : undefined);
@@ -273,7 +276,7 @@ export class UrlMatcher {
     let allParams:    Param[] = this.parameters(),
         pathParams:   Param[] = allParams.filter(param => !param.isSearch()),
         searchParams: Param[] = allParams.filter(param => param.isSearch()),
-        nPathSegments  = this._cache.path.concat(this).map(urlm => urlm._segments.length - 1).reduce((a, x) => a + x),
+        nPathSegments  = this._cache.path.map(urlm => urlm._segments.length - 1).reduce((a, x) => a + x),
         values: RawParams = {};
 
     if (nPathSegments !== match.length - 1)
@@ -323,7 +326,7 @@ export class UrlMatcher {
    */
   parameters(opts: any = {}): Param[] {
     if (opts.inherit === false) return this._params;
-    return unnest(this._cache.path.concat(this).map(prop('_params')));
+    return unnest(this._cache.path.map(prop('_params')));
   }
 
   /**
@@ -335,11 +338,10 @@ export class UrlMatcher {
    * @returns {T|Param|any|boolean|UrlMatcher|null}
    */
   parameter(id: string, opts: any = {}): Param {
-    const parent = tail(this._cache.path);
-
+    let parent = this._cache.parent;
     return (
       find(this._params, propEq('id', id)) ||
-      (opts.inherit !== false && parent && parent.parameter(id)) ||
+      (opts.inherit !== false && parent && parent.parameter(id, opts)) ||
       null
     );
   }
@@ -378,7 +380,7 @@ export class UrlMatcher {
     if (!this.validates(values)) return null;
 
     // Build the full path of UrlMatchers (including all parent UrlMatchers)
-    let urlMatchers = this._cache.path.slice().concat(this);
+    let urlMatchers = this._cache.path;
 
     // Extract all the static segments and Params into an ordered array
     let pathSegmentsAndParams: Array<string|Param> =
@@ -451,12 +453,57 @@ export class UrlMatcher {
   static pathSegmentsAndParams(matcher: UrlMatcher) {
     let staticSegments = matcher._segments;
     let pathParams = matcher._params.filter(p => p.location === DefType.PATH);
-    return arrayTuples(staticSegments, pathParams.concat(undefined)).reduce(unnestR, []).filter(x => x !== "" && isDefined(x));
+    return arrayTuples(staticSegments, pathParams.concat(undefined))
+        .reduce(unnestR, [])
+        .filter(x => x !== "" && isDefined(x));
   }
 
   /** @hidden Given a matcher, return an array with the matcher's query params */
   static queryParams(matcher: UrlMatcher): Param[] {
     return matcher._params.filter(p => p.location === DefType.SEARCH);
+  }
+
+  /**
+   * Compare two UrlMatchers
+   *
+   * This comparison function converts a UrlMatcher into static and dynamic path segments.
+   * Each static path segment is a static string between a path separator (slash character).
+   * Each dynamic segment is a path parameter.
+   *
+   * The comparison function sorts static segments before dynamic ones.
+   */
+  static compare(a: UrlMatcher, b: UrlMatcher): number {
+    const splitOnSlash = splitOnDelim('/');
+
+    /**
+     * Turn a UrlMatcher and all its parent matchers into an array
+     * of slash literals '/', string literals, and Param objects
+     *
+     * This example matcher matches strings like "/foo/:param/tail":
+     * var matcher = $umf.compile("/foo").append($umf.compile("/:param")).append($umf.compile("/")).append($umf.compile("tail"));
+     * var result = segments(matcher); // [ '/', 'foo', '/', Param, '/', 'tail' ]
+     *
+     */
+    const segments = (matcher: UrlMatcher) =>
+        matcher._cache.path.map(UrlMatcher.pathSegmentsAndParams)
+            .reduce(unnestR, [])
+            .reduce(joinNeighborsR, [])
+            .map(x => isString(x) ? splitOnSlash(x) : x)
+            .reduce(unnestR, []);
+
+    let aSegments = segments(a), bSegments = segments(b);
+    // console.table( { aSegments, bSegments });
+
+    // Sort slashes first, then static strings, the Params
+    const weight = pattern([
+      [eq("/"),   val(1)],
+      [isString,  val(2)],
+      [is(Param), val(3)]
+    ]);
+    let pairs = arrayTuples(aSegments.map(weight), bSegments.map(weight));
+    // console.table(pairs);
+
+    return pairs.reduce((cmp, weightPair) => cmp !== 0 ? cmp : weightPair[0] - weightPair[1], 0);
   }
 }
 

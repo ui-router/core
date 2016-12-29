@@ -10,9 +10,9 @@ import { StateQueueManager } from "./stateQueueManager";
 import { StateDeclaration } from "./interface";
 import { BuilderFunction } from "./stateBuilder";
 import { StateOrName } from "./interface";
-import { UrlRouter } from "../url/urlRouter";
 import { removeFrom } from "../common/common";
 import { UIRouter } from "../router";
+import { propEq } from "../common/hof";
 
 /**
  * The signature for the callback function provided to [[StateRegistry.onStateRegistryEvent]].
@@ -31,13 +31,11 @@ export class StateRegistry {
   matcher: StateMatcher;
   private builder: StateBuilder;
   stateQueue: StateQueueManager;
-  urlRouter: UrlRouter;
 
   listeners: StateRegistryListener[] = [];
 
   /** @internalapi */
   constructor(private _router: UIRouter) {
-    this.urlRouter = _router.urlRouter;
     this.matcher = new StateMatcher(this.states);
     this.builder = new StateBuilder(this.matcher, _router.urlMatcherFactory);
     this.stateQueue = new StateQueueManager(this, _router.urlRouter, this.states, this.builder, this.listeners);
@@ -143,10 +141,13 @@ export class StateRegistry {
     };
 
     let children = getChildren([state]);
-    let deregistered = [state].concat(children).reverse();
+    let deregistered: State[] = [state].concat(children).reverse();
 
     deregistered.forEach(state => {
-      this.urlRouter.removeRule(state._urlRule);
+      let $ur = this._router.urlRouter;
+      // Remove URL rule
+      $ur.rules().filter(propEq("state", state)).forEach($ur.removeRule.bind($ur));
+      // Remove state from registry
       delete this.states[state.name];
     });
 

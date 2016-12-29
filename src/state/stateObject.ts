@@ -45,9 +45,6 @@ export class State {
   /** A compiled URLMatcher which detects when the state's URL is matched */
   public url: UrlMatcher;
 
-  /** @hidden temporary place to put the rule registered with $urlRouter.when() */
-  public _urlRule: any;
-
   /** The parameters for the state, built from the URL and [[StateDefinition.params]] */
   public params: { [key: string]: Param };
 
