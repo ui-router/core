@@ -169,9 +169,9 @@ export interface LocationConfig extends Disposable {
   hashPrefix(newprefix: string): string;
 }
 
+/** @hidden */
 export interface TemplateServices {
   get(url: string): Promise<string>;
 }
-
 
 export {services};

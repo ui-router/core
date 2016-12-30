@@ -1,30 +1,27 @@
-/** @module url */ /** */
+/**
+ * @coreapi
+ * @module url
+ */ /** */
 
 import { UIRouter } from "../router";
 import { LocationServices, notImplemented, LocationConfig } from "../common/coreservices";
 import { noop, createProxyFunctions } from "../common/common";
-import { UrlConfig } from "./interface";
+import { UrlConfig, UrlSync, UrlListen, UrlRules, UrlDeferIntercept } from "./interface";
 
 /** @hidden */
 const makeStub = (keys: string[]): any =>
     keys.reduce((acc, key) => (acc[key] = notImplemented(key), acc), { dispose: noop });
 
-/** @hidden */
-const locationServicesFns = ["url", "path", "search", "hash", "onChange"];
-/** @hidden */
-const locationConfigFns = ["port", "protocol", "host", "baseHref", "html5Mode", "hashPrefix"];
+/** @hidden */ const locationServicesFns = ["url", "path", "search", "hash", "onChange"];
+/** @hidden */ const locationConfigFns = ["port", "protocol", "host", "baseHref", "html5Mode", "hashPrefix"];
+/** @hidden */ const umfFns = ["type", "caseInsensitive", "strictMode", "defaultSquashPolicy"];
+/** @hidden */ const rulesFns = ["sort", "when", "otherwise", "rules", "rule", "removeRule"];
+/** @hidden */ const syncFns = ["deferIntercept", "listen", "sync"];
 
 /**
- * Service methods related to URL management
- *
- * This class delegates to other URL services.
- *
- * - [[LocationService]]: Framework specific code to interact with the browser URL
- * - [[LocationConfig]]: Framework specific code to interact with the browser URL
- * - [[UrlMatcherFactory]]:
- * - [[UrlRouter]]:
+ * API for URL management
  */
-export class UrlService implements LocationServices {
+export class UrlService implements LocationServices, UrlSync, UrlListen, UrlDeferIntercept {
   /** @hidden */
   static locationServiceStub: LocationServices = makeStub(locationServicesFns);
   /** @hidden */
@@ -46,22 +43,48 @@ export class UrlService implements LocationServices {
 
   dispose() { }
 
+  /** @inheritdoc */
+  sync(evt?) { return }
+  /** @inheritdoc */
+  listen(enabled?: boolean): Function { return };
+  /** @inheritdoc */
+  deferIntercept(defer?: boolean) { return }
+
   /**
-   * The [[LocationConfig]] service
+   * A nested API for managing URL rules and rewrites
    *
-   * This object returns information about the location (url) configuration.
-   * This information can be used to build absolute URLs, such as
-   * `https://example.com:443/basepath/state/substate?param1=a#hashvalue`;
+   * See: [[UrlRules]] for details
+   */
+  rules: UrlRules;
+
+  /**
+   * A nested API to configure the URL and retrieve URL information
+   *
+   * See: [[UrlConfig]] for details
    */
   config: UrlConfig;
 
-  constructor(private router: UIRouter) {
+  /** @hidden */
+  private router: UIRouter;
+
+  /** @hidden */
+  constructor(router: UIRouter) {
+    this.router = router;
+    this.rules = {} as any;
     this.config = {} as any;
+
     // proxy function calls from UrlService to the LocationService/LocationConfig
     const locationServices = () => router.locationService;
     createProxyFunctions(locationServices, this, locationServices, locationServicesFns, true);
 
     const locationConfig = () => router.locationConfig;
     createProxyFunctions(locationConfig, this.config, locationConfig, locationConfigFns, true);
+
+    const umf = () => router.urlMatcherFactory;
+    createProxyFunctions(umf, this.config, umf, umfFns);
+
+    const urlRouter = () => router.urlRouter;
+    createProxyFunctions(urlRouter, this.rules, urlRouter, rulesFns);
+    createProxyFunctions(urlRouter, this, urlRouter, syncFns);
   }
 }

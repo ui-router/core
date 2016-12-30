@@ -35,6 +35,7 @@ function quoteRegExp(string: any, param?: any) {
 const memoizeTo = (obj: Obj, prop: string, fn: Function) =>
     obj[prop] = obj[prop] || fn();
 
+/** @hidden */
 interface UrlMatcherCache {
   path: UrlMatcher[];
   parent: UrlMatcher;

@@ -1,5 +1,5 @@
 /**
- * @coreapi
+ * @internalapi
  * @module url
  */ /** for typedoc */
 import { forEach, extend } from "../common/common";
@@ -10,7 +10,7 @@ import { ParamTypes } from "../params/paramTypes";
 import { ParamTypeDefinition } from "../params/interface";
 import { Disposable } from "../interface";
 import { ParamType } from "../params/type";
-import { ParamFactory } from "./interface";
+import { ParamFactory, UrlMatcherConfig } from "./interface";
 
 /**
  * Factory for [[UrlMatcher]] instances.
@@ -18,7 +18,7 @@ import { ParamFactory } from "./interface";
  * The factory is available to ng1 services as
  * `$urlMatcherFactor` or ng1 providers as `$urlMatcherFactoryProvider`.
  */
-export class UrlMatcherFactory implements Disposable {
+export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
   /** @hidden */ paramTypes = new ParamTypes();
   /** @hidden */ _isCaseInsensitive: boolean = false;
   /** @hidden */ _isStrictMode: boolean = true;
@@ -28,37 +28,17 @@ export class UrlMatcherFactory implements Disposable {
     extend(this, { UrlMatcher, Param });
   }
 
-  /**
-   * Defines whether URL matching should be case sensitive (the default behavior), or not.
-   *
-   * @param value `false` to match URL in a case sensitive manner; otherwise `true`;
-   * @returns the current value of caseInsensitive
-   */
+  /** @inheritdoc */
   caseInsensitive(value?: boolean): boolean {
     return this._isCaseInsensitive = isDefined(value) ? value : this._isCaseInsensitive;
   }
 
-  /**
-   * Defines whether URLs should match trailing slashes, or not (the default behavior).
-   *
-   * @param value `false` to match trailing slashes in URLs, otherwise `true`.
-   * @returns the current value of strictMode
-   */
+  /** @inheritdoc */
   strictMode(value?: boolean): boolean {
     return this._isStrictMode = isDefined(value) ? value : this._isStrictMode;
   }
 
-  /**
-   * Sets the default behavior when generating or matching URLs with default parameter values.
-   *
-   * @param value A string that defines the default parameter URL squashing behavior.
-   *    - `nosquash`: When generating an href with a default parameter value, do not squash the parameter value from the URL
-   *    - `slash`: When generating an href with a default parameter value, squash (remove) the parameter value, and, if the
-   *             parameter is surrounded by slashes, squash (remove) one slash from the URL
-   *    - any other string, e.g. "~": When generating an href with a default parameter value, squash (remove)
-   *             the parameter value from the URL and replace it with this string.
-   * @returns the current value of defaultSquashPolicy
-   */
+  /** @inheritdoc */
   defaultSquashPolicy(value?: (boolean|string)) {
     if (isDefined(value) && value !== true && value !== false && !isString(value))
       throw new Error(`Invalid squash policy: ${value}. Valid policies: false, true, arbitrary-string`);

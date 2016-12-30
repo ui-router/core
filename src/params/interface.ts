@@ -2,6 +2,7 @@
  * @coreapi
  * @module params
  */ /** for typedoc */
+
 import {ParamType} from "./type";
 
 /**
@@ -16,11 +17,14 @@ import {ParamType} from "./type";
  *   folderId: 'inbox'
  * }
  * ```
+ *
+ * @coreapi
  */
 export interface RawParams {
   [key: string]: any;
 }
 
+/** @internalapi */
 export type ParamsOrArray = (RawParams|RawParams[]);
 
 /**
@@ -53,6 +57,7 @@ export type ParamsOrArray = (RawParams|RawParams[]);
  *   }
  * }
  * ```
+ * @coreapi
  */
 export interface ParamDeclaration {
   /**
@@ -291,6 +296,7 @@ export interface ParamDeclaration {
   raw: boolean;
 }
 
+/** @internalapi */
 export interface Replace {
   from: string;
   to: string;
@@ -402,7 +408,8 @@ export interface Replace {
  * $state.go('list', { item: "Ringo" });
  * ```
  * 
- * See: [[UrlMatcherFactory.type]]
+ * See: [[UrlConfig.type]]
+ * @coreapi
  */
 export interface ParamTypeDefinition {
   /**

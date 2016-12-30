@@ -1,5 +1,5 @@
 /**
- * @internalapi
+ * @coreapi
  * @module url
  */ /** */
 import { UrlMatcher } from "./urlMatcher";
@@ -22,6 +22,7 @@ import {
  * - [[UrlMatcher]]
  * - `RegExp`
  * - [[State]]
+ * @internalapi
  */
 export class UrlRuleFactory {
   constructor(public router: UIRouter) { }
@@ -200,6 +201,7 @@ export class UrlRuleFactory {
  * A base rule which calls `match`
  *
  * The value from the `match` function is passed through to the `handler`.
+ * @internalapi
  */
 export class BaseUrlRule implements UrlRule {
   $id: number;
