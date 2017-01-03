@@ -15,7 +15,6 @@ export let notImplemented = (fnname: string) => () => {
 let services: CoreServices = {
   $q: undefined,
   $injector: undefined,
-  template: <any> {}
 };
 
 export interface $QLikeDeferred {
@@ -44,7 +43,6 @@ export interface $InjectorLike {
 export interface CoreServices {
   $q: $QLike;
   $injector: $InjectorLike;
-  template: TemplateServices;
 }
 
 export interface LocationServices extends Disposable {
@@ -167,11 +165,6 @@ export interface LocationConfig extends Disposable {
    * @return the new hash prefix
    */
   hashPrefix(newprefix: string): string;
-}
-
-/** @hidden */
-export interface TemplateServices {
-  get(url: string): Promise<string>;
 }
 
 export {services};
