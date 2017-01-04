@@ -300,6 +300,29 @@ describe("UrlRouter", function () {
       expect(match.rule).toBe(CCC);
     });
   });
+
+  describe('lazy loaded state url', () => {
+    it("should obey rule priority ordering", (done) => {
+      let registry = router.stateRegistry;
+      let loadedState;
+      const lazyLoad = () => {
+        loadedState = registry.register({ name: 'lazy', url: '/lazy' });
+        return null;
+      };
+
+      registry.register({ name: 'lazy.**', url: '/lazy', lazyLoad: lazyLoad });
+      registry.register({ name: 'param', url: '/:param', });
+
+      router.transitionService.onSuccess({}, trans => {
+        expect(trans.$to()).toBe(loadedState);
+        expect(trans.redirectedFrom().to().name).toBe('lazy.**');
+
+        done();
+      });
+
+      router.urlService.url('/lazy');
+    })
+  })
 });
 
 describe('UrlRouter.deferIntercept', () => {

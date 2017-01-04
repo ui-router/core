@@ -5,6 +5,7 @@ import {TransitionHookFn} from "../transition/interface";
 import {StateDeclaration, LazyLoadResult} from "../state/interface";
 import {State} from "../state/stateObject";
 import {services} from "../common/coreservices";
+import { StateRule } from "../url/interface";
 
 /**
  * A [[TransitionHookFn]] that performs lazy loading
@@ -33,36 +34,32 @@ import {services} from "../common/coreservices";
 const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
   const transitionSource = (trans: Transition) =>
       trans.redirectedFrom() ? transitionSource(trans.redirectedFrom()) : trans.options().source;
+  let router = transition.router;
 
   function retryOriginalTransition() {
-    if (transitionSource(transition) === 'url') {
-      let $loc = transition.router.urlService,
-          $reg = transition.router.stateRegistry,
-          path = $loc.path(),
-          search = $loc.search(),
-          hash = $loc.hash();
-
-      let matchState = state =>
-          [state, state.url && state.url.exec(path, search, hash)];
-
-      let matches = $reg.get()
-          .map(s => s.$$state())
-          .map(matchState)
-          .filter(([state, params]) => !!params);
-
-      if (matches.length) {
-        let [state, params] = matches[0];
-        return transition.router.stateService.target(state, params, transition.options());
-      }
-
-      transition.router.urlRouter.sync();
-      return;
+    if (transitionSource(transition) !== 'url') {
+      // The original transition was not triggered via url sync
+      // The lazy state should be loaded now, so re-try the original transition
+      let orig = transition.targetState();
+      return router.stateService.target(orig.identifier(), orig.params(), orig.options());
     }
 
-    // The original transition was not triggered via url sync
-    // The lazy state should be loaded now, so re-try the original transition
-    let orig = transition.targetState();
-    return transition.router.stateService.target(orig.identifier(), orig.params(), orig.options());
+    // The original transition was triggered via url sync
+    // Run the URL rules and find the best match
+    let $url = router.urlService;
+    let result = $url.match($url.parts());
+    let rule = result && result.rule;
+
+    // If the best match is a state, redirect the transition (instead
+    // of calling sync() which supersedes the current transition)
+    if (rule && rule.type === "STATE") {
+      let state = (rule as StateRule).state;
+      let params = result.match;
+      return router.stateService.target(state, params, transition.options());
+    }
+
+    // No matching state found, so let .sync() choose the best non-state match/otherwise
+    router.urlRouter.sync();
   }
 
   let promises = transition.entering()
