@@ -4,7 +4,7 @@ import { LocationServices } from "../src/common/coreservices";
 import { UrlService } from "../src/url/urlService";
 import { StateRegistry } from "../src/state/stateRegistry";
 import { noop } from "../src/common/common";
-import { UrlRule } from "../src/url/interface";
+import { UrlRule, MatchResult } from "../src/url/interface";
 
 declare var jasmine;
 var _anything = jasmine.anything();
@@ -270,6 +270,34 @@ describe("UrlRouter", function () {
         urlService.url("/foo/123/456?query=blah");
         expect(matchlog).toEqual([1, 2]);
       })
+    });
+  });
+
+  describe('match', () => {
+    let A, B, CCC;
+    beforeEach(() => {
+      A = stateRegistry.register({ name: 'A', url: '/:pA' });
+      B = stateRegistry.register({ name: 'B', url: '/BBB' });
+      CCC = urlService.rules.when('/CCC', '/DDD');
+    });
+
+    it("should return the best match for a URL 1", () => {
+      let match: MatchResult = urlRouter.match({ path: '/BBB' });
+      expect(match.rule.type).toBe("STATE");
+      expect(match.rule['state']).toBe(B)
+    });
+
+    it("should return the best match for a URL 2", () => {
+      let match: MatchResult = urlRouter.match({ path: '/EEE' });
+      expect(match.rule.type).toBe("STATE");
+      expect(match.rule['state']).toBe(A);
+      expect(match.match).toEqual({ pA: 'EEE' });
+    });
+
+    it("should return the best match for a URL 3", () => {
+      let match: MatchResult = urlRouter.match({ path: '/CCC' });
+      expect(match.rule.type).toBe("URLMATCHER");
+      expect(match.rule).toBe(CCC);
     });
   });
 });

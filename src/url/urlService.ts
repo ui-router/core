@@ -6,7 +6,7 @@
 import { UIRouter } from "../router";
 import { LocationServices, notImplemented, LocationConfig } from "../common/coreservices";
 import { noop, createProxyFunctions } from "../common/common";
-import { UrlConfig, UrlSync, UrlListen, UrlRules, UrlDeferIntercept } from "./interface";
+import { UrlConfig, UrlSyncApi, UrlRules, UrlParts, MatchResult } from "./interface";
 
 /** @hidden */
 const makeStub = (keys: string[]): any =>
@@ -16,12 +16,12 @@ const makeStub = (keys: string[]): any =>
 /** @hidden */ const locationConfigFns = ["port", "protocol", "host", "baseHref", "html5Mode", "hashPrefix"];
 /** @hidden */ const umfFns = ["type", "caseInsensitive", "strictMode", "defaultSquashPolicy"];
 /** @hidden */ const rulesFns = ["sort", "when", "otherwise", "rules", "rule", "removeRule"];
-/** @hidden */ const syncFns = ["deferIntercept", "listen", "sync"];
+/** @hidden */ const syncFns = ["deferIntercept", "listen", "sync", "match"];
 
 /**
  * API for URL management
  */
-export class UrlService implements LocationServices, UrlSync, UrlListen, UrlDeferIntercept {
+export class UrlService implements LocationServices, UrlSyncApi {
   /** @hidden */
   static locationServiceStub: LocationServices = makeStub(locationServicesFns);
   /** @hidden */
@@ -41,6 +41,18 @@ export class UrlService implements LocationServices, UrlSync, UrlListen, UrlDefe
   /** @inheritdoc */
   onChange(callback: Function): Function { return };
 
+
+  /**
+   * Returns the current URL parts
+   *
+   * This method returns the current URL components as a [[UrlParts]] object.
+   *
+   * @returns the current url parts
+   */
+  parts(): UrlParts {
+    return { path: this.path(), search: this.search(), hash: this.hash() }
+  }
+
   dispose() { }
 
   /** @inheritdoc */
@@ -49,6 +61,8 @@ export class UrlService implements LocationServices, UrlSync, UrlListen, UrlDefe
   listen(enabled?: boolean): Function { return };
   /** @inheritdoc */
   deferIntercept(defer?: boolean) { return }
+  /** @inheritdoc */
+  match(urlParts: UrlParts): MatchResult { return }
 
   /**
    * A nested API for managing URL rules and rewrites

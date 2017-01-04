@@ -1,8 +1,9 @@
 /**
  * @internalapi
  * @module url
- */ /** for typedoc */
-import { removeFrom, createProxyFunctions, inArray, composeSort, sortBy } from "../common/common";
+ */
+/** for typedoc */
+import { removeFrom, createProxyFunctions, inArray, composeSort, sortBy, extend } from "../common/common";
 import { isFunction, isString, isDefined } from "../common/predicates";
 import { UrlMatcher } from "./urlMatcher";
 import { RawParams } from "../params/interface";
@@ -11,7 +12,7 @@ import { UIRouter } from "../router";
 import { val, is, pattern, prop, pipe } from "../common/hof";
 import { UrlRuleFactory } from "./urlRule";
 import { TargetState } from "../state/targetState";
-import { UrlRule, UrlRuleHandlerFn, UrlParts, UrlRules, UrlSync, UrlListen, UrlDeferIntercept } from "./interface";
+import { UrlRule, UrlRuleHandlerFn, UrlParts, UrlRules, UrlSyncApi, MatchResult } from "./interface";
 import { TargetStateDef } from "../state/interface";
 
 /** @hidden */
@@ -53,7 +54,7 @@ defaultRuleSortFn = composeSort(
  * This class updates the URL when the state changes.
  * It also responds to changes in the URL.
  */
-export class UrlRouter implements UrlRules, UrlSync, UrlListen, UrlDeferIntercept, Disposable {
+export class UrlRouter implements UrlRules, UrlSyncApi, Disposable {
   /** used to create [[UrlRule]] objects for common cases */
   public urlRuleFactory: UrlRuleFactory;
 
@@ -85,25 +86,20 @@ export class UrlRouter implements UrlRules, UrlSync, UrlListen, UrlDeferIntercep
     this._rules.sort(this._sortFn = compareFn || this._sortFn);
   }
 
-  /** @inheritdoc */
-  sync(evt?) {
-    if (evt && evt.defaultPrevented) return;
-
-    let router = this._router,
-        $url = router.urlService,
-        $state = router.stateService;
-
+  /**
+   * Given a URL, check all rules and return the best [[MatchResult]]
+   * @param url
+   * @returns {MatchResult}
+   */
+  match(url: UrlParts): MatchResult {
+    url = extend({path: '', search: {}, hash: '' }, url);
     let rules = this.rules();
     if (this._otherwiseFn) rules.push(this._otherwiseFn);
 
-    let url: UrlParts = {
-      path: $url.path(), search: $url.search(), hash: $url.hash()
-    };
-
     // Checks a single rule. Returns { rule: rule, match: match, weight: weight } if it matched, or undefined
-    interface MatchResult { match: any, rule: UrlRule, weight: number }
+
     let checkRule = (rule: UrlRule): MatchResult => {
-      let match = rule.match(url, router);
+      let match = rule.match(url, this._router);
       return match && { match, rule, weight: rule.matchPriority(match) };
     };
 
@@ -120,6 +116,23 @@ export class UrlRouter implements UrlRules, UrlSync, UrlListen, UrlDeferIntercep
       // Pick the best MatchResult
       best = (!best || current && current.weight > best.weight) ? current : best;
     }
+
+    return best;
+  }
+
+  /** @inheritdoc */
+  sync(evt?) {
+    if (evt && evt.defaultPrevented) return;
+
+    let router = this._router,
+        $url = router.urlService,
+        $state = router.stateService;
+
+    let url: UrlParts = {
+      path: $url.path(), search: $url.search(), hash: $url.hash()
+    };
+
+    let best = this.match(url);
 
     let applyResult = pattern([
       [isString, (newurl: string) => $url.url(newurl)],

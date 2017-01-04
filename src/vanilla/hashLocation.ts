@@ -22,7 +22,7 @@ export class HashLocationService implements LocationServices, Disposable {
   url(url?: string, replace: boolean = true): string {
     if (isDefined(url)) location.hash = url;
     return buildUrl(this);
-  };
+  }
 
   onChange(cb: EventListener) {
     window.addEventListener('hashchange', cb, false);

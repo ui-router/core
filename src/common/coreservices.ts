@@ -7,6 +7,7 @@
 /** for typedoc */
 import {IInjectable, Obj} from "./common";
 import { Disposable } from "../interface";
+import { UrlParts } from "../url/interface";
 
 export let notImplemented = (fnname: string) => () => {
   throw new Error(`${fnname}(): No coreservices implementation for UI-Router is loaded.`);
@@ -77,29 +78,32 @@ export interface LocationServices extends Disposable {
   url(newurl: string, replace?: boolean, state?: any): string;
 
   /**
-   * Gets the path portion of the current url
+   * Gets the path part of the current url
    *
    * If the current URL is `/some/path?query=value#anchor`, this returns `/some/path`
    *
    * @return the path portion of the url
    */
   path(): string;
+
   /**
-   * Gets the search portion of the current url as an object
+   * Gets the search part of the current url as an object
    *
    * If the current URL is `/some/path?query=value#anchor`, this returns `{ query: 'value' }`
    *
    * @return the search (querystring) portion of the url, as an object
    */
   search(): { [key: string]: any };
+
   /**
-   * Gets the hash portion of the current url
+   * Gets the hash part of the current url
    *
    * If the current URL is `/some/path?query=value#anchor`, this returns `anchor`
    *
    * @return the hash (anchor) portion of the url
    */
   hash(): string;
+
   /**
    * Registers a url change handler
    *

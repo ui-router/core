@@ -91,7 +91,6 @@ export interface UrlMatcherConfig {
    */
   defaultSquashPolicy(value?: (boolean|string)): (boolean|string);
 
-
   /**
    * Creates and registers a custom [[ParamTypeDefinition]] object
    *
@@ -120,7 +119,7 @@ export interface UrlMatcherConfig {
 }
 
 /** @internalapi */
-export interface UrlSync {
+export interface UrlSyncApi {
   /**
    * Checks the URL for a matching [[UrlRule]]
    *
@@ -142,10 +141,7 @@ export interface UrlSync {
    * ```
    */
   sync(evt?): void;
-}
 
-/** @internalapi */
-export interface UrlListen {
   /**
    * Starts or stops listening for URL changes
    *
@@ -166,11 +162,8 @@ export interface UrlListen {
    * });
    * ```
    */
-  listen(enabled?: boolean): Function;
-}
+  listen(enabled?: boolean): Function
 
-/** @internalapi */
-export interface UrlDeferIntercept {
   /**
    * Disables monitoring of the URL.
    *
@@ -195,7 +188,7 @@ export interface UrlDeferIntercept {
    * @param defer Indicates whether to defer location change interception.
    *        Passing no parameter is equivalent to `true`.
    */
-  deferIntercept(defer?: boolean);
+  deferIntercept(defer?: boolean)
 }
 
 /**
@@ -376,10 +369,23 @@ export interface UrlRules {
  */
 export interface UrlParts {
   path: string;
-  search: { [key: string]: any };
-  hash: string;
+  search?: { [key: string]: any };
+  hash?: string;
 }
 
+/**
+ * A UrlRule match result
+ *
+ * The result of UrlRouter.match()
+ */
+export interface MatchResult {
+  /** The matched value from a [[UrlRule]] */
+  match: any;
+  /** The rule that matched */
+  rule: UrlRule;
+  /** The match result weight */
+  weight: number;
+}
 /**
  * A function that matches the URL for a [[UrlRule]]
  *
