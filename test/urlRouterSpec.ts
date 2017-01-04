@@ -302,6 +302,7 @@ describe("UrlRouter", function () {
   });
 
   describe('lazy loaded state url', () => {
+    // Test for https://github.com/ui-router/core/issues/19
     it("should obey rule priority ordering", (done) => {
       let registry = router.stateRegistry;
       let loadedState;
