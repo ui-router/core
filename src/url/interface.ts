@@ -41,7 +41,7 @@ export interface ParamFactory {
  *
  * This API is found on [[UrlService.config]].
  */
-export interface UrlConfig extends LocationConfig, UrlMatcherConfig {}
+export interface UrlConfigApi extends LocationConfig, UrlMatcherConfig {}
 
 export interface UrlMatcherConfig {
   /**
@@ -199,7 +199,7 @@ export interface UrlSyncApi {
  *
  * The most commonly used methods are [[otherwise]] and [[when]].
  */
-export interface UrlRules {
+export interface UrlRulesApi {
   /**
    * Defines URL Rule priorities
    *
@@ -414,7 +414,7 @@ export type UrlRuleType = "STATE" | "URLMATCHER" | "REGEXP" | "RAW" | "OTHER";
 /**
  * The interface for a URL Rule
  *
- * If you are creating a rule for use with [[UrlRules.rule]], it should implement this interface.
+ * If you are creating a rule for use with [[UrlRulesApi.rule]], it should implement this interface.
  */
 export interface UrlRule {
   /**

@@ -12,7 +12,7 @@ import { UIRouter } from "../router";
 import { val, is, pattern, prop, pipe } from "../common/hof";
 import { UrlRuleFactory } from "./urlRule";
 import { TargetState } from "../state/targetState";
-import { UrlRule, UrlRuleHandlerFn, UrlParts, UrlRules, UrlSyncApi, MatchResult } from "./interface";
+import { UrlRule, UrlRuleHandlerFn, UrlParts, UrlRulesApi, UrlSyncApi, MatchResult } from "./interface";
 import { TargetStateDef } from "../state/interface";
 
 /** @hidden */
@@ -54,7 +54,7 @@ defaultRuleSortFn = composeSort(
  * This class updates the URL when the state changes.
  * It also responds to changes in the URL.
  */
-export class UrlRouter implements UrlRules, UrlSyncApi, Disposable {
+export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   /** used to create [[UrlRule]] objects for common cases */
   public urlRuleFactory: UrlRuleFactory;
 

@@ -6,7 +6,7 @@
 import { UIRouter } from "../router";
 import { LocationServices, notImplemented, LocationConfig } from "../common/coreservices";
 import { noop, createProxyFunctions } from "../common/common";
-import { UrlConfig, UrlSyncApi, UrlRules, UrlParts, MatchResult } from "./interface";
+import { UrlConfigApi, UrlSyncApi, UrlRulesApi, UrlParts, MatchResult } from "./interface";
 
 /** @hidden */
 const makeStub = (keys: string[]): any =>
@@ -67,16 +67,16 @@ export class UrlService implements LocationServices, UrlSyncApi {
   /**
    * A nested API for managing URL rules and rewrites
    *
-   * See: [[UrlRules]] for details
+   * See: [[UrlRulesApi]] for details
    */
-  rules: UrlRules;
+  rules: UrlRulesApi;
 
   /**
    * A nested API to configure the URL and retrieve URL information
    *
-   * See: [[UrlConfig]] for details
+   * See: [[UrlConfigApi]] for details
    */
-  config: UrlConfig;
+  config: UrlConfigApi;
 
   /** @hidden */
   private router: UIRouter;

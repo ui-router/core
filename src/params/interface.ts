@@ -408,7 +408,7 @@ export interface Replace {
  * $state.go('list', { item: "Ringo" });
  * ```
  * 
- * See: [[UrlConfig.type]]
+ * See: [[UrlConfigApi.type]]
  * @coreapi
  */
 export interface ParamTypeDefinition {
