@@ -7,15 +7,16 @@ var router: UIRouter;
 var $umf: UrlMatcherFactory;
 var $location: LocationServices;
 
-beforeEach(function() {
+function init() {
   router = new UIRouter();
   router.plugin(TestingPlugin);
   $umf = router.urlMatcherFactory;
   let locationPlugin = router.getPlugin('vanilla.memoryLocation') as LocationPlugin;
   $location = locationPlugin.service;
-});
+}
 
 describe("UrlMatcher", function () {
+  beforeEach(init);
 
   describe("provider", function () {
 
@@ -510,6 +511,8 @@ describe("UrlMatcher", function () {
 });
 
 describe("urlMatcherFactoryProvider", function () {
+  beforeEach(init);
+
   describe(".type()", function () {
     var m;
     beforeEach(function() {
@@ -535,6 +538,7 @@ describe("urlMatcherFactoryProvider", function () {
 });
 
 describe("urlMatcherFactory", function () {
+  beforeEach(init);
 
   it("compiles patterns", function () {
     var matcher = $umf.compile('/hello/world');

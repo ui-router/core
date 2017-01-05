@@ -120,21 +120,21 @@ describe("UrlRouter", function () {
 
   describe("location updates", function() {
     it('can push location changes', function () {
-      spyOn(router.locationService, "url");
+      spyOn(router.urlService, "url");
       urlRouter.push(matcher("/hello/:name"), { name: "world" });
-      expect(router.locationService.url).toHaveBeenCalledWith("/hello/world", undefined);
+      expect(router.urlService.url).toHaveBeenCalledWith("/hello/world", undefined);
     });
 
     it('can push a replacement location', function () {
-      spyOn(router.locationService, "url");
+      spyOn(router.urlService, "url");
       urlRouter.push(matcher("/hello/:name"), { name: "world" }, { replace: true });
-      expect(router.locationService.url).toHaveBeenCalledWith("/hello/world", true);
+      expect(router.urlService.url).toHaveBeenCalledWith("/hello/world", true);
     });
 
     it('can push location changes with no parameters', function () {
-      spyOn(router.locationService, "url");
+      spyOn(router.urlService, "url");
       urlRouter.push(urlMatcherFactory.compile("/hello/:name", { params: { name: "" } }));
-      expect(router.locationService.url).toHaveBeenCalledWith("/hello/", undefined);
+      expect(router.urlService.url).toHaveBeenCalledWith("/hello/", undefined);
     });
 
     it('can push location changes that include a #fragment', function () {
