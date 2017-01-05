@@ -368,14 +368,13 @@ export class Transition implements IHookRegistry {
   }
 
   /**
-   * If the current transition is a redirect, returns the transition that was redirected.
-   *
    * Gets the transition from which this transition was redirected.
    *
+   * If the current transition is a redirect, this method returns the transition that was redirected.
    *
    * #### Example:
    * ```js
-   * let transitionA = $state.go('A').transitionA
+   * let transitionA = $state.go('A').transition
    * transitionA.onStart({}, () => $state.target('B'));
    * $transitions.onSuccess({ to: 'B' }, (trans) => {
    *   trans.to().name === 'B'; // true
@@ -387,6 +386,37 @@ export class Transition implements IHookRegistry {
    */
   redirectedFrom(): Transition {
     return this._options.redirectedFrom || null;
+  }
+
+  /**
+   * Gets the original transition in a redirect chain
+   *
+   * A transition might belong to a long chain of multiple redirects.
+   * This method walks the [[redirectedFrom]] chain back to the original (first) transition in the chain.
+   *
+   * #### Example:
+   * ```js
+   * // states
+   * registry.register({ name: 'A', redirectTo: 'B' });
+   * registry.register({ name: 'B', redirectTo: 'C' });
+   * registry.register({ name: 'C', redirectTo: 'D' });
+   * registry.register({ name: 'D' });
+   *
+   * let transitionA = $state.go('A').transition
+   *
+   * $transitions.onSuccess({ to: 'D' }, (trans) => {
+   *   trans.to().name === 'D'; // true
+   *   trans.redirectedFrom().to().name === 'C'; // true
+   *   trans.originalTransition() === transitionA; // true
+   *   trans.originalTransition().to().name === 'A'; // true
+   * });
+   * ```
+   *
+   * @returns The original Transition that started a redirect chain
+   */
+  originalTransition(): Transition {
+    let rf = this.redirectedFrom();
+    return (rf && rf.originalTransition()) || this;
   }
 
   /**

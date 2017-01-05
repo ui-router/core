@@ -32,12 +32,10 @@ import { StateRule } from "../url/interface";
  * See [[StateDeclaration.lazyLoad]]
  */
 const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
-  const transitionSource = (trans: Transition) =>
-      trans.redirectedFrom() ? transitionSource(trans.redirectedFrom()) : trans.options().source;
   let router = transition.router;
 
-  function retryOriginalTransition() {
-    if (transitionSource(transition) !== 'url') {
+  function retryTransition() {
+    if (transition.originalTransition().options().source !== 'url') {
       // The original transition was not triggered via url sync
       // The lazy state should be loaded now, so re-try the original transition
       let orig = transition.targetState();
@@ -66,7 +64,7 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
       .filter(state => !!state.lazyLoad)
       .map(state => lazyLoadState(transition, state));
 
-  return services.$q.all(promises).then(retryOriginalTransition);
+  return services.$q.all(promises).then(retryTransition);
 };
 
 export const registerLazyLoadHook = (transitionService: TransitionService) =>
