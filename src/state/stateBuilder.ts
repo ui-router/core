@@ -151,8 +151,13 @@ export function resolvablesBuilder(state: State): Resolvable[] {
       Object.keys(resolveObj || {}).map(token => ({token, val: resolveObj[token], deps: undefined, policy: resolvePolicies[token]}));
 
   /** fetch DI annotations from a function or ng1-style array */
-  const annotate          = (fn: Function)  =>
-      fn['$inject'] || services.$injector.annotate(fn, services.$injector.strictDi);
+  const annotate          = (fn: Function)  => {
+    let $injector = services.$injector;
+    // ng1 doesn't have an $injector until runtime.
+    // If the $injector doesn't exist, use "deferred" literal as a
+    // marker indicating they should be annotated when runtime starts
+    return fn['$inject'] || ($injector && $injector.annotate(fn, $injector.strictDi)) || "deferred";
+  };
 
   /** true if the object has both `token` and `resolveFn`, and is probably a [[ResolveLiteral]] */
   const isResolveLiteral  = (obj: any) => !!(obj.token && obj.resolveFn);
