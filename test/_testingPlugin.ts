@@ -1,6 +1,7 @@
 import { UIRouter } from "../src/router";
 import { UIRouterPluginBase } from "../src/interface";
 import * as vanilla from "../src/vanilla";
+import { UrlService } from "../src/url/urlService";
 
 export class TestingPlugin extends UIRouterPluginBase {
   name: string = 'testing';
@@ -11,6 +12,8 @@ export class TestingPlugin extends UIRouterPluginBase {
     super();
     router.plugin(vanilla.servicesPlugin);
     router.plugin(vanilla.memoryLocationPlugin);
+    // bind the location proxy functions immediately
+    router.urlService = new UrlService(router, false);
 
     this.addErrorLoopHandler();
 

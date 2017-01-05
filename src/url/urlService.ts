@@ -82,17 +82,17 @@ export class UrlService implements LocationServices, UrlSyncApi {
   private router: UIRouter;
 
   /** @hidden */
-  constructor(router: UIRouter) {
+  constructor(router: UIRouter, lateBind = true) {
     this.router = router;
     this.rules = {} as any;
     this.config = {} as any;
 
     // proxy function calls from UrlService to the LocationService/LocationConfig
     const locationServices = () => router.locationService;
-    createProxyFunctions(locationServices, this, locationServices, locationServicesFns, true);
+    createProxyFunctions(locationServices, this, locationServices, locationServicesFns, lateBind);
 
     const locationConfig = () => router.locationConfig;
-    createProxyFunctions(locationConfig, this.config, locationConfig, locationConfigFns, true);
+    createProxyFunctions(locationConfig, this.config, locationConfig, locationConfigFns, lateBind);
 
     const umf = () => router.urlMatcherFactory;
     createProxyFunctions(umf, this.config, umf, umfFns);
