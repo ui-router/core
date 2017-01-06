@@ -508,7 +508,15 @@ export class Transition implements IHookRegistry {
       if (++redirects > 20) throw new Error(`Too many consecutive Transition redirects (20+)`);
     }
 
-    let newOptions = extend({}, this.options(), targetState.options(), { redirectedFrom: this, source: "redirect" });
+    let redirectOpts: TransitionOptions = { redirectedFrom: this, source: "redirect" };
+    // If the original transition was caused by URL sync, then use { location: 'replace' }
+    // on the new transition (unless  the target state explicitly specifies location)
+    if (this.options().source === 'url') {
+      redirectOpts.location = 'replace';
+    }
+
+    let newOptions = extend({}, this.options(), targetState.options(), redirectOpts);
+
     targetState = new TargetState(targetState.identifier(), targetState.$state(), targetState.params(), newOptions);
 
     let newTransition = this.router.transitionService.create(this._treeChanges.from, targetState);

@@ -2,8 +2,8 @@ import { PathNode } from "../src/path/node";
 import {
     UIRouter, RejectType, Rejection, pluck, services, TransitionService, StateService, Resolvable, Transition
 } from "../src/index";
-import * as vanilla from "../src/vanilla";
 import { tree2Array, PromiseResult } from "./_testUtils";
+import { TestingPlugin } from "./_testingPlugin";
 
 describe('transition', function () {
 
@@ -30,8 +30,7 @@ describe('transition', function () {
 
   beforeEach(() => {
     router = new UIRouter();
-    router.plugin(vanilla.servicesPlugin);
-    router.plugin(vanilla.hashLocationPlugin);
+    router.plugin(TestingPlugin);
     $state = router.stateService;
     $transitions = router.transitionService;
 
@@ -60,7 +59,7 @@ describe('transition', function () {
     states.forEach(state => router.stateRegistry.register(state));
   });
 
-  describe('provider', () => {
+  describe('service', () => {
     describe('async event hooks:', () => {
       it('$transition$.promise should resolve on success', (done) => {
         var result = new PromiseResult();
@@ -674,6 +673,41 @@ describe('transition', function () {
             .then(done, done);
       }));
     });
+
+    describe('redirected transition', () => {
+      let urlRedirect;
+      beforeEach(() => {
+        urlRedirect = router.stateRegistry.register({ name: 'urlRedirect', url: '/urlRedirect', redirectTo: 'redirectTarget' });
+        router.stateRegistry.register({ name: 'redirectTarget', url: '/redirectTarget' });
+      });
+
+      it("should not replace the current url when redirecting a state.go transition", async (done) => {
+        let spy = spyOn(router.urlService, "url").and.callThrough();
+
+        await $state.go("urlRedirect");
+        expect(router.urlService.path()).toBe("/redirectTarget");
+        expect(spy).toHaveBeenCalledWith("/redirectTarget", false);
+        done();
+      });
+
+      it("should replace the current url when redirecting a url sync", (done) => {
+        let url = spyOn(router.urlService, "url").and.callThrough();
+        let transitionTo = spyOn(router.stateService, "transitionTo").and.callThrough();
+
+        router.transitionService.onSuccess({}, () => {
+          expect(transitionTo).toHaveBeenCalledWith(urlRedirect, {}, { inherit: true, source: 'url' });
+
+          expect(url.calls.count()).toEqual(2);
+          expect(url.calls.argsFor(0)).toEqual(["/urlRedirect"]);
+          expect(url.calls.argsFor(1)).toEqual(["/redirectTarget", true]);
+
+          done();
+        });
+
+        router.urlService.url('/urlRedirect');
+      });
+
+    });
   });
 
   describe('Transition() instance', function() {
@@ -749,4 +783,8 @@ describe('transition', function () {
       }));
     });
   });
+});
+
+describe("initial url redirect", () => {
+
 });
