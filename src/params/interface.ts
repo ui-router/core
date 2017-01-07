@@ -3,7 +3,7 @@
  * @module params
  */ /** for typedoc */
 
-import {ParamType} from "./type";
+import {ParamType} from "./paramType";
 
 /**
  * Parameter values
@@ -110,6 +110,10 @@ export interface ParamDeclaration {
    *
    * This defines a default value for the parameter.
    * If a parameter value is `undefined`, this default value will be used instead
+   *
+   * ---
+   *
+   * Default: `undefined`
    */
   value?: any;
 
@@ -123,6 +127,14 @@ export interface ParamDeclaration {
    * The type may be either one of the built in types, or a custom type that has been registered with the [[UrlMatcherFactory]].
    *
    * See [[ParamTypes]] for the list of built in types.
+   *
+   * ---
+   *
+   * Default:
+   * - Path parameters (`/:fooParam`): `path`
+   * - Query parameters (`?queryParam`): `query`
+   * - Non-url parameters (`param: { foo: null }`): `any`
+   *
    */
   type: (string|ParamType);
 
@@ -212,7 +224,7 @@ export interface ParamDeclaration {
    * $state.go('mystate', { myparam2: 'someOtherValue' });
    * ```
    *
-   * If squash is not set, it uses the configured default squash policy. (See [[defaultSquashPolicy]]())
+   * Default: If squash is not set, it uses the configured default squash policy. (See [[defaultSquashPolicy]]())
    */
   squash: (boolean|string);
 
@@ -258,6 +270,10 @@ export interface ParamDeclaration {
    * ---
    *
    * Note: this value overrides the `dynamic` value on a custom parameter type ([[ParamTypeDefinition.dynamic]]).
+   *
+   * ---
+   *
+   * Default: `false`
    */
   dynamic: boolean;
 
@@ -292,8 +308,45 @@ export interface ParamDeclaration {
    * It's generally safe to use a raw parameter at the end of a path, like '/product/:slug'.
    * However, beware of the characters you allow in your raw parameter values.
    * Avoid unencoded characters that could disrupt normal URL parsing, such as `?` and `#`.
+   *
+   * ---
+   *
+   * Default: `false`
    */
   raw: boolean;
+
+  /**
+   * Enables/disables inheriting of this parameter value
+   *
+   * When a transition is run with [[TransitionOptions.inherit]] set to `true`, the current param values are inherited.
+   * Parameters values which have `inherit: false` will not be inherited.
+   *
+   * #### Example state :
+   * ```js
+   * var fooState = {
+   *   name: 'foo',
+   *   url: '/:fooId?mode&refresh',
+   *   params: {
+   *     refresh: { inherit: false }
+   *   }
+   * }
+   *
+   * // Set fooId to 123
+   * $state.go('fooState', { fooId: 1234, mode: 'list', refresh: true });
+   * ```
+   *
+   * In the component:
+   * `mode: 'list' is inherited, but refresh: true is not inherited.
+   * // The param values are thus: `{ fooId: 4567, mode: 'list' }`
+   * ```
+   * <ui-sref="foo({ fooId: 4567 })">4567</ui-sref>
+   * ```
+   *
+   * ---
+   *
+   * Default: `true`
+   */
+  inherit: boolean;
 }
 
 /** @internalapi */
@@ -520,5 +573,26 @@ export interface ParamTypeDefinition {
    * See: [[ParamDeclaration.raw]] for details
    */
   raw: boolean;
+
+  /**
+   * Enables/disables inheriting of parameter values (of this type)
+   *
+   * When a transition is run with [[TransitionOptions.inherit]] set to `true`, the current param values are inherited.
+   * Param values whose type has `inherit: false` will not be inherited.
+   *
+   * The internal parameter type of `hash` has `inherit: false`.
+   * This is used to disable inheriting of the hash value (`#`) on subsequent transitions.
+   *
+   * #### Example:
+   * ```js
+   * $state.go('home', { '#': 'inboxAnchor' });
+   * ...
+   * // "#" is not inherited.
+   * // The value of the "#" parameter will be `null`
+   * // The url's hash will be cleared.
+   * $state.go('home.nest');
+   * ```
+   */
+  inherit: boolean;
 }
 

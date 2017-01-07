@@ -9,7 +9,7 @@ import { Param, DefType } from "../params/param";
 import { ParamTypes } from "../params/paramTypes";
 import { ParamTypeDefinition } from "../params/interface";
 import { Disposable } from "../interface";
-import { ParamType } from "../params/type";
+import { ParamType } from "../params/paramType";
 import { ParamFactory, UrlMatcherConfig } from "./interface";
 
 /**

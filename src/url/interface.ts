@@ -8,7 +8,7 @@
  * @module url
  */ /** */
 import { LocationConfig } from "../common/coreservices";
-import { ParamType } from "../params/type";
+import { ParamType } from "../params/paramType";
 import { Param } from "../params/param";
 import { UIRouter } from "../router";
 import { TargetState } from "../state/targetState";

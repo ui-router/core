@@ -6,7 +6,7 @@ import { fromJson, toJson, identity, equals, inherit, map, extend, pick } from "
 import { isDefined, isNullOrUndefined } from "../common/predicates";
 import { is } from "../common/hof";
 import { services } from "../common/coreservices";
-import { ParamType } from "./type";
+import { ParamType } from "./paramType";
 import { ParamTypeDefinition } from "./interface";
 
 /**

@@ -7,7 +7,7 @@ import { prop, propEq } from "../common/hof";
 import { isInjectable, isDefined, isString, isArray } from "../common/predicates";
 import { RawParams, ParamDeclaration } from "../params/interface";
 import { services } from "../common/coreservices";
-import { ParamType } from "./type";
+import { ParamType } from "./paramType";
 import { ParamTypes } from "./paramTypes";
 import { UrlMatcherFactory } from "../url/urlMatcherFactory";
 

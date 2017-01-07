@@ -250,6 +250,7 @@ export class Transition implements IHookRegistry {
    * Gets transition parameter values
    *
    * Returns the parameter values for a transition as key/value pairs.
+   * This object is immutable.
    *
    * By default, returns the new parameter values (for the "to state").
    * To return the previous parameter values,  supply `'from'` as the `pathname` argument.
@@ -262,7 +263,7 @@ export class Transition implements IHookRegistry {
   params(pathname?: string): any;
   params<T>(pathname?: string): T;
   params(pathname: string = "to") {
-    return this._treeChanges[pathname].map(prop("paramValues")).reduce(mergeR, {});
+    return Object.freeze(this._treeChanges[pathname].map(prop("paramValues")).reduce(mergeR, {}));
   }
 
 
