@@ -156,7 +156,7 @@ export function resolvablesBuilder(state: State): Resolvable[] {
     // ng1 doesn't have an $injector until runtime.
     // If the $injector doesn't exist, use "deferred" literal as a
     // marker indicating they should be annotated when runtime starts
-    return fn['$inject'] || ($injector && $injector.annotate(fn, $injector.strictDi)) || "deferred";
+    return fn['$inject'] || ($injector && $injector.annotate(fn, $injector.strictDi)) || <any> "deferred";
   };
 
   /** true if the object has both `token` and `resolveFn`, and is probably a [[ResolveLiteral]] */
