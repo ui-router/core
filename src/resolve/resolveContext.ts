@@ -1,17 +1,17 @@
-/** @module resolve */ /** for typedoc */
+/** @module resolve */
+/** for typedoc */
 import { find, tail, uniqR, unnestR, inArray } from "../common/common";
-import {propEq} from "../common/hof";
-import {trace} from "../common/trace";
-import {services, $InjectorLike} from "../common/coreservices";
-import {resolvePolicies, PolicyWhen} from "./interface";
-
-import {PathNode} from "../path/node";
-import {Resolvable} from "./resolvable";
-import {State} from "../state/stateObject";
-import {PathFactory} from "../path/pathFactory";
-import {stringify} from "../common/strings";
-import {Transition} from "../transition/transition";
-import {UIInjector} from "../interface";
+import { propEq, not } from "../common/hof";
+import { trace } from "../common/trace";
+import { services, $InjectorLike } from "../common/coreservices";
+import { resolvePolicies, PolicyWhen, ResolvePolicy } from "./interface";
+import { PathNode } from "../path/node";
+import { Resolvable } from "./resolvable";
+import { State } from "../state/stateObject";
+import { PathFactory } from "../path/pathFactory";
+import { stringify } from "../common/strings";
+import { Transition } from "../transition/transition";
+import { UIInjector } from "../interface";
 
 const when = resolvePolicies.when;
 const ALL_WHENS = [when.EAGER, when.LAZY];
@@ -46,10 +46,16 @@ export class ResolveContext {
    * Throws an error if it doesn't exist in the ResolveContext
    */
   getResolvable(token: any): Resolvable {
-    var matching = this._path.map(node => node.resolvables)
+    let matching = this._path.map(node => node.resolvables)
         .reduce(unnestR, [])
         .filter((r: Resolvable) => r.token === token);
     return tail(matching);
+  }
+
+  /** Returns the [[ResolvePolicy]] for the given [[Resolvable]] */
+  getPolicy(resolvable: Resolvable): ResolvePolicy {
+    let node = this.findNode(resolvable);
+    return resolvable.getPolicy(node.state);
   }
 
   /**
@@ -95,8 +101,8 @@ export class ResolveContext {
    * @param state Used to find the node to put the resolvable on
    */
   addResolvables(newResolvables: Resolvable[], state: State) {
-    var node = <PathNode> find(this._path, propEq('state', state));
-    var keys = newResolvables.map(r => r.token);
+    let node = <PathNode> find(this._path, propEq('state', state));
+    let keys = newResolvables.map(r => r.token);
     node.resolvables = node.resolvables.filter(r => keys.indexOf(r.token) === -1).concat(newResolvables);
   }
   
@@ -117,19 +123,27 @@ export class ResolveContext {
     // get the subpath to the state argument, if provided
     trace.traceResolvePath(this._path, when, trans);
 
+    const matchesPolicy = (acceptedVals: string[], whenOrAsync: "when"|"async") =>
+        (resolvable: Resolvable) =>
+            inArray(acceptedVals, this.getPolicy(resolvable)[whenOrAsync]);
+
+    // Trigger all the (matching) Resolvables in the path
+    // Reduce all the "WAIT" Resolvables into an array
     let promises: Promise<any>[] = this._path.reduce((acc, node) => {
-      const matchesRequestedPolicy = (resolvable: Resolvable) =>
-          inArray(matchedWhens, resolvable.getPolicy(node.state).when);
-      let nodeResolvables = node.resolvables.filter(matchesRequestedPolicy);
-      let subContext = this.subContext(node.state);
+      let nodeResolvables = node.resolvables.filter(matchesPolicy(matchedWhens, 'when'));
+      let nowait = nodeResolvables.filter(matchesPolicy(['NOWAIT'], 'async'));
+      let wait = nodeResolvables.filter(not(matchesPolicy(['NOWAIT'], 'async')));
 
       // For the matching Resolvables, start their async fetch process.
-      var getResult = (r: Resolvable) => r.get(subContext, trans)
+      let subContext = this.subContext(node.state);
+      let getResult = (r: Resolvable) => r.get(subContext, trans)
           // Return a tuple that includes the Resolvable's token
           .then(value => ({ token: r.token, value: value }));
-      return acc.concat(nodeResolvables.map(getResult));
+      nowait.forEach(getResult);
+      return acc.concat(wait.map(getResult));
     }, []);
 
+    // Wait for all the "WAIT" resolvables
     return services.$q.all(promises);
   }
 
@@ -179,8 +193,12 @@ class UIInjectorImpl implements UIInjector {
   }
 
   get(token: any) {
-    var resolvable = this.context.getResolvable(token);
+    let resolvable = this.context.getResolvable(token);
     if (resolvable) {
+      if (this.context.getPolicy(resolvable).async === 'NOWAIT') {
+        return resolvable.get(this.context);
+      }
+
       if (!resolvable.resolved) {
         throw new Error("Resolvable async .get() not complete:" + stringify(resolvable.token))
       }
@@ -190,12 +208,12 @@ class UIInjectorImpl implements UIInjector {
   }
 
   getAsync(token: any) {
-    var resolvable = this.context.getResolvable(token);
+    let resolvable = this.context.getResolvable(token);
     if (resolvable) return resolvable.get(this.context);
     return services.$q.when(this.native.get(token));
   }
 
   getNative(token: any) {
-    return this.native.get(token);
+    return this.native && this.native.get(token);
   }
 }

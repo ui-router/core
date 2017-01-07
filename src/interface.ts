@@ -27,16 +27,34 @@ export interface UIInjector {
   /**
    * Gets a value from the injector
    *
+   * #### Example:
+   * ```js
+   * var myResolve = injector.get('myResolve');
+   * ```
+   *
    * #### ng1 Example:
    * ```js
+   * // Fetch $state service
    * injector.get('$state').go('home');
    * ```
    *
    * #### ng2 Example:
    * ```js
    * import {StateService} from "ui-router-ng2";
+   * // Fetch StateService
    * injector.get(StateService).go('home');
    * ```
+   *
+   * #### Typescript Example:
+   * ```js
+   * var stringArray = injector.get<string[]>('myStringArray');
+   * ```
+   *
+   * ---
+   *
+   * ### `NOWAIT` policy
+   *
+   * When using [[ResolvePolicy.async]] === `NOWAIT`, the value returned from `get()` is a promise for the result.
    *
    * @param token the key for the value to get.  May be a string or arbitrary object.
    * @return the Dependency Injection value that matches the token

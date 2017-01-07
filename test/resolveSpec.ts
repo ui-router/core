@@ -6,10 +6,17 @@ import { UIRouter } from "../src/router";
 
 import Spy = jasmine.Spy;
 import { TestingPlugin } from "./_testingPlugin";
+import { StateService } from "../src/state/stateService";
+import { TransitionService } from "../src/transition/transitionService";
+import { StateRegistry } from "../src/state/stateRegistry";
+import { tail } from "../src/common/common";
 
 ///////////////////////////////////////////////
 
 let router: UIRouter, states, statesMap: { [key:string]: State } = {};
+let $state: StateService;
+let $transitions: TransitionService;
+let $registry: StateRegistry;
 let vals, counts, expectCounts;
 let asyncCount;
 
@@ -78,13 +85,16 @@ describe('Resolvables system:', function () {
   beforeEach(function () {
     router = new UIRouter();
     router.plugin(TestingPlugin);
+    $state = router.stateService;
+    $transitions = router.transitionService;
+    $registry = router.stateRegistry;
 
     counts = { _J: 0, _J2: 0, _K: 0, _L: 0, _M: 0, _Q: 0 };
     vals = { _Q: null };
     expectCounts = copy(counts);
 
-    tree2Array(getStates(), false).forEach(state => router.stateRegistry.register(state));
-    statesMap = router.stateRegistry.get()
+    tree2Array(getStates(), false).forEach(state => $registry.register(state));
+    statesMap = $registry.get()
         .reduce((acc, state) => (acc[state.name] = state.$$state(), acc), statesMap);
   });
 
@@ -347,8 +357,6 @@ describe('Resolvables system:', function () {
 
   // Test for #2641
   it("should not re-resolve data, when redirecting to a child", (done) => {
-    let $state = router.stateService;
-    let $transitions = router.transitionService;
     $transitions.onStart({to: "J"}, ($transition$) => {
       var ctx = new ResolveContext($transition$.treeChanges().to);
       return invokeLater(function (_J) {}, ctx).then(function() {
@@ -366,9 +374,6 @@ describe('Resolvables system:', function () {
 
   // Test for #2796
   it("should not re-resolve data, when redirecting to self with dynamic parameter update", (done) => {
-    let $registry = router.stateRegistry;
-    let $state = router.stateService;
-    let $transitions = router.transitionService;
     let resolveCount = 0;
 
     $registry.register({
@@ -394,6 +399,71 @@ describe('Resolvables system:', function () {
       expect($state.params['param']).toBe('redirected');
       expect(resolveCount).toBe(1);
       done();
+    });
+  });
+
+  describe('NOWAIT Resolve Policy', () => {
+    it('should allow a transition to complete before the resolve is settled', async (done) => {
+      let resolve, resolvePromise = new Promise(_resolve => { resolve = _resolve; });
+
+      $registry.register({
+        name: 'nowait',
+        resolve: {
+          nowait: () => resolvePromise
+        },
+        resolvePolicy: { async: 'NOWAIT' }
+      });
+
+      $transitions.onSuccess({  }, trans => {
+        expect(trans.injector().get('nowait') instanceof Promise).toBeTruthy();
+        expect(trans.injector().getAsync('nowait') instanceof Promise).toBeTruthy();
+        expect(trans.injector().getAsync('nowait')).toBe(trans.injector().get('nowait'));
+
+        let resolvable = tail(trans.treeChanges('to')).resolvables[0];
+        expect(resolvable.token).toBe('nowait');
+        expect(resolvable.resolved).toBe(false);
+        expect(resolvable.data).toBeUndefined();
+
+        trans.injector().get('nowait').then(result => {
+          expect(result).toBe('foobar');
+          done();
+        });
+
+        resolve('foobar')
+      });
+
+      $state.go('nowait');
+    });
+
+    it('should wait for WAIT resolves and not wait for NOWAIT resolves', async (done) => {
+      let resolve, resolvePromise = new Promise(_resolve => { resolve = _resolve; });
+
+      $registry.register({
+        name: 'nowait',
+        resolve: [
+          { token: 'nowait', policy: { async: 'NOWAIT' }, resolveFn: () => resolvePromise },
+          { token: 'wait', policy: { async: 'WAIT' }, resolveFn: () => new Promise(resolve => resolve('should wait')) },
+        ]
+      });
+
+      $transitions.onSuccess({  }, trans => {
+        expect(trans.injector().get('nowait') instanceof Promise).toBeTruthy();
+        expect(trans.injector().get('wait')).toBe('should wait');
+
+        let resolvable = tail(trans.treeChanges('to')).resolvables[0];
+        expect(resolvable.token).toBe('nowait');
+        expect(resolvable.resolved).toBe(false);
+        expect(resolvable.data).toBeUndefined();
+
+        trans.injector().get('nowait').then(result => {
+          expect(result).toBe('foobar');
+          done();
+        });
+
+        resolve('foobar')
+      });
+
+      $state.go('nowait');
     });
   });
 });
