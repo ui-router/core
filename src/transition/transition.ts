@@ -10,7 +10,7 @@ import {
     omit, toJson, arrayTuples, unnestR, identity, anyTrueR
 } from "../common/common";
 import { isObject, isArray } from "../common/predicates";
-import { prop, propEq, val, not } from "../common/hof";
+import { prop, propEq, val, not, is } from "../common/hof";
 
 import {StateDeclaration, StateOrName} from "../state/interface";
 import {
@@ -36,6 +36,7 @@ import {UIRouter} from "../router";
 import {Globals} from "../globals";
 import {UIInjector} from "../interface";
 import {RawParams} from "../params/interface";
+import { ResolvableLiteral } from "../resolve/interface";
 
 /** @hidden */
 const stateSelf: (_state: State) => StateDeclaration = prop("self");
@@ -323,17 +324,19 @@ export class Transition implements IHookRegistry {
   }
 
   /**
-   * Dynamically adds a new [[Resolvable]] (`resolve`) to this transition.
+   * Dynamically adds a new [[Resolvable]] (i.e., [[StateDeclaration.resolve]]) to this transition.
    *
-   * @param resolvable an [[Resolvable]] object
+   * @param resolvable a [[ResolvableLiteral]] object (or a [[Resolvable]])
    * @param state the state in the "to path" which should receive the new resolve (otherwise, the root state)
    */
-  addResolvable(resolvable: Resolvable, state: StateOrName = ""): void {
+  addResolvable(resolvable: Resolvable|ResolvableLiteral, state: StateOrName = ""): void {
+    resolvable = is(Resolvable)(resolvable) ? resolvable : new Resolvable(resolvable);
+
     let stateName: string = (typeof state === "string") ? state : state.name;
     let topath = this._treeChanges.to;
     let targetNode = find(topath, node => node.state.name === stateName);
     let resolveContext: ResolveContext = new ResolveContext(topath);
-    resolveContext.addResolvables([resolvable], targetNode.state);
+    resolveContext.addResolvables([resolvable as Resolvable], targetNode.state);
   }
 
   /**
