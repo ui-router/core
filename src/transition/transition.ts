@@ -289,11 +289,30 @@ export class Transition implements IHookRegistry {
   /**
    * Gets all available resolve tokens (keys)
    *
-   * This method can be used in conjunction with [[getResolve]] to inspect the resolve values
+   * This method can be used in conjunction with [[injector]] to inspect the resolve values
    * available to the Transition.
    *
-   * The returned tokens include those defined on [[StateDeclaration.resolve]] blocks, for the states
+   * This returns all the tokens defined on [[StateDeclaration.resolve]] blocks, for the states
    * in the Transition's [[TreeChanges.to]] path.
+   *
+   * #### Example:
+   * This example logs all resolve values
+   * ```js
+   * let tokens = trans.getResolveTokens();
+   * tokens.forEach(token => console.log(token + " = " + trans.injector().get(token)));
+   * ```
+   *
+   * #### Example:
+   * This example creates promises for each resolve value.
+   * This triggers fetches of resolves (if any have not yet been fetched).
+   * When all promises have all settled, it logs the resolve values.
+   * ```js
+   * let tokens = trans.getResolveTokens();
+   * let promise = tokens.map(token => trans.injector().getAsync(token));
+   * Promise.all(promises).then(values => console.log("Resolved values: " + values));
+   * ```
+   *
+   * Note: Angular 1 users whould use `$q.all()`
    *
    * @param pathname resolve context's path name (e.g., `to` or `from`)
    *
@@ -301,57 +320,6 @@ export class Transition implements IHookRegistry {
    */
   getResolveTokens(pathname: string = "to"): any[] {
     return new ResolveContext(this._treeChanges[pathname]).getTokens();
-  }
-
-
-  /**
-   * Gets resolved values
-   *
-   * This method can be used in conjunction with [[getResolveTokens]] to inspect what resolve values
-   * are available to the Transition.
-   *
-   * Given a token, returns the resolved data for that token.
-   * Given an array of tokens, returns an array of resolved data for those tokens.
-   *
-   * If a resolvable hasn't yet been fetched, returns `undefined` for that token
-   * If a resolvable doesn't exist for the token, throws an error.
-   *
-   * @param token the token (or array of tokens)
-   * @param pathname resolve context's path name (e.g., `to` or `from`)
-   *
-   * @returns an array of resolve tokens (keys)
-   */
-  getResolveValue(token: any[], pathname?: string): any[];
-  getResolveValue(token: any, pathname?: string): any;
-  getResolveValue(token: (any|any[]), pathname: string = "to"): (any|any[]) {
-    let resolveContext = new ResolveContext(this._treeChanges[pathname]);
-    const getData = (token: any) => {
-      var resolvable = resolveContext.getResolvable(token);
-      if (resolvable === undefined) {
-        throw new Error(`Dependency Injection token not found: ${stringify(token)}`);
-      }
-      return resolvable.data;
-    };
-
-    if (isArray(token)) {
-      return token.map(getData);
-    }
-
-    return getData(token);
-  }
-
-  /**
-   * Gets a [[Resolvable]] primitive
-   *
-   * This is a lower level API that returns a [[Resolvable]] from the Transition for a given token.
-   *
-   * @param token the DI token
-   * @param pathname resolve context's path name (e.g., `to` or `from`)
-   *
-   * @returns the [[Resolvable]] in the transition's to path, or undefined
-   */
-  getResolvable(token: any, pathname = "to"): Resolvable {
-    return new ResolveContext(this._treeChanges[pathname]).getResolvable(token);
   }
 
   /**
