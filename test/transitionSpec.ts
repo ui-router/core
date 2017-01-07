@@ -404,7 +404,7 @@ describe('transition', function () {
             resolve: { cc: () => 'cc resolve' },
             onExit: (trans, state) => {
               expect(state.self).toBe(router.stateRegistry.get('design'));
-              expect(trans.getResolveValue('cc', 'from')).toBe('cc resolve');
+              expect(trans.injector(null, 'from').get('cc')).toBe('cc resolve');
               done();
             }
           });

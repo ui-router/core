@@ -592,7 +592,7 @@ describe('stateService', function () {
           expect(trans.from().name).toBe('design');
           expect(trans.to().name).toBe('A');
           expect(state.self).toBe($registry.get('design'));
-          expect(trans.getResolveValue('cc', 'from')).toBe('cc resolve');
+          expect(trans.injector(null, 'from').get('cc')).toBe('cc resolve');
         }
       });
 
@@ -659,7 +659,7 @@ describe('stateService', function () {
           }
         },
         onEnter: function ($transition$) {
-          let stateInfo = $transition$.getResolveValue('stateInfo');
+          let stateInfo = $transition$.injector().get('stateInfo');
           log = stateInfo.join(' => ');
         }
       });

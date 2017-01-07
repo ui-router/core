@@ -276,13 +276,55 @@ export class Transition implements IHookRegistry {
    *
    * The `UIInjector` can also provide values from the native root/global injector (ng1/ng2).
    *
+   * #### Example:
+   * ```js
+   * .onEnter({ entering: 'myState' }, trans => {
+   *   var myResolveValue = trans.injector().get('myResolve');
+   *   // Inject a global service from the global/native injector (if it exists)
+   *   var MyService = trans.injector().get('MyService');
+   * })
+   * ```
+   *
+   * In some cases (such as `onBefore`), you may need access to some resolve data but it has not yet been fetched.
+   * You can use [[UIInjector.getAsync]] to get a promise for the data.
+   * #### Example:
+   * ```js
+   * .onBefore({}, trans => {
+   *   return trans.injector().getAsync('myResolve').then(myResolveValue =>
+   *     return myResolveValue !== 'ABORT';
+   *   });
+   * });
+   * ```
+   *
    * If a `state` is provided, the injector that is returned will be limited to resolve values that the provided state has access to.
+   * This can be useful if both a parent state `foo` and a child state `foo.bar` have both defined a resolve such as `data`.
+   * #### Example:
+   * ```js
+   * .onEnter({ to: 'foo.bar' }, trans => {
+   *   // returns result of `foo` state's `data` resolve
+   *   // even though `foo.bar` also has a `data` resolve
+   *   var fooData = trans.injector('foo').get('data');
+   * });
+   * ```
+   *
+   * If you need resolve data from the exiting states, pass `'from'` as `pathName`.
+   * The resolve data from the `from` path will be returned.
+   * #### Example:
+   * ```js
+   * .onExit({ exiting: 'foo.bar' }, trans => {
+   *   // Gets the resolve value of `data` from the exiting state.
+   *   var fooData = trans.injector(null, 'foo.bar').get('data');
+   * });
+   * ```
+   *
    *
    * @param state Limits the resolves provided to only the resolves the provided state has access to.
+   * @param pathName Default: `'to'`: Chooses the path for which to create the injector. Use this to access resolves for `exiting` states.
+   *
    * @returns a [[UIInjector]]
    */
-  injector(state?: StateOrName): UIInjector {
-    let path: PathNode[] = this._treeChanges.to;
+  injector(state?: StateOrName, pathName = "to"): UIInjector {
+    let path: PathNode[] = this._treeChanges[pathName];
     if (state) path = PathFactory.subPath(path, node => node.state === state || node.state.name === state);
     return new ResolveContext(path).injector();
   }
