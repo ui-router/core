@@ -72,6 +72,11 @@ export class PathFactory {
       return extend({}, node && node.paramValues);
     }
 
+    let noInherit = fromPath.map(node => node.paramSchema)
+        .reduce(unnestR, [])
+        .filter(param => !param.inherit)
+        .map(prop('id'));
+
     /**
      * Given an [[PathNode]] "toNode", return a new [[PathNode]] with param values inherited from the
      * matching node in fromPath.  Only inherit keys that aren't found in "toKeys" from the node in "fromPath""
@@ -82,7 +87,7 @@ export class PathFactory {
       // limited to only those keys found in toParams
       let incomingParamVals = pick(toParamVals, toKeys);
       toParamVals = omit(toParamVals, toKeys);
-      let fromParamVals = nodeParamVals(fromPath, toNode.state) || {};
+      let fromParamVals = omit(nodeParamVals(fromPath, toNode.state) || {}, noInherit);
       // extend toParamVals with any fromParamVals, then override any of those those with incomingParamVals
       let ownParamVals: RawParams = extend(toParamVals, fromParamVals, incomingParamVals);
       return new PathNode(toNode.state).applyRawParams(ownParamVals);

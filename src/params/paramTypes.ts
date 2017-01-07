@@ -261,14 +261,16 @@ function initDefaultTypes() {
 
   // Default Parameter Type Definitions
   extend(ParamTypes.prototype, {
-    hash: makeDefaultType({}),
-
-    query: makeDefaultType({}),
-
     string: makeDefaultType({}),
 
     path: makeDefaultType({
-      pattern: /[^/]*/
+      pattern: /[^/]*/,
+    }),
+
+    query: makeDefaultType({}),
+
+    hash: makeDefaultType({
+      inherit: false,
     }),
 
     int: makeDefaultType({

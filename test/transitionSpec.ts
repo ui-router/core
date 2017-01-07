@@ -4,6 +4,7 @@ import {
 } from "../src/index";
 import { tree2Array, PromiseResult } from "./_testUtils";
 import { TestingPlugin } from "./_testingPlugin";
+import { equals } from "../src/common/common";
 
 describe('transition', function () {
 
@@ -783,8 +784,82 @@ describe('transition', function () {
       }));
     });
   });
-});
 
-describe("initial url redirect", () => {
+  describe('inherited params', () => {
+    it('should inherit params when trans options `inherit: true`', async(done) => {
+      router.stateRegistry.register({ name: 'foo', url: '/:path?query1&query2' });
 
+      await $state.go('foo', { path: 'abc', query1: 'def', query2: 'ghi' });
+      expect(router.globals.params).toEqualValues({ path: 'abc', query1: 'def', query2: 'ghi' });
+
+      await $state.go('foo', { query2: 'jkl' });
+      expect(router.globals.params).toEqualValues({ path: 'abc', query1: 'def', query2: 'jkl' });
+
+      done();
+    });
+
+    it('should not inherit params when param declaration has inherit: false', async(done) => {
+      router.stateRegistry.register({
+        name: 'foo',
+        url: '/:path?query1&query2',
+        params: {
+          query1: { inherit: false, value: null }
+        }
+      });
+
+      await $state.go('foo', { path: 'abc', query1: 'def', query2: 'ghi' });
+      expect(router.globals.params).toEqualValues({ path: 'abc', query1: 'def', query2: 'ghi' });
+
+      await $state.go('foo', { query2: 'jkl' });
+      expect(router.globals.params).toEqualValues({ path: 'abc', query1: null, query2: 'jkl' });
+
+      done();
+    });
+
+    it('should not inherit params whose type has inherit: false', async(done) => {
+      router.urlService.config.type('inherit', {
+        inherit: true, encode: x=>x, decode: x=>x, is: () => true, equals: equals, pattern: /.*/, raw: false,
+      });
+
+      router.urlService.config.type('noinherit', {
+        inherit: false, encode: x=>x, decode: x=>x, is: () => true, equals: equals, pattern: /.*/, raw: false,
+      });
+
+      router.stateRegistry.register({
+        name: 'foo',
+        url: '/?{query1:inherit}&{query2:noinherit}',
+      });
+
+      await $state.go('foo', { query1: 'abc', query2: 'def' });
+      expect(router.globals.params).toEqualValues({ query1: 'abc', query2: 'def' });
+
+      await $state.go('foo');
+      expect(router.globals.params).toEqualValues({ query1: 'abc', query2: undefined });
+
+      done();
+    });
+
+    it('should not inherit the "hash" param value', async(done) => {
+      router.stateRegistry.register({ name: 'hash', url: '/hash' });
+      router.stateRegistry.register({ name: 'other', url: '/other' });
+
+      await $state.go('hash', { "#": "abc" });
+      expect(router.globals.params).toEqualValues({ "#": "abc" });
+      expect(router.urlService.hash()).toBe('abc');
+
+      await $state.go('hash');
+      expect(router.globals.params).toEqualValues({ "#": null });
+      expect(router.urlService.hash()).toBe('');
+
+      await $state.go('other', { "#": "def" });
+      expect(router.globals.params).toEqualValues({ "#": "def" });
+      expect(router.urlService.hash()).toBe('def');
+
+      await $state.go('hash');
+      expect(router.globals.params).toEqualValues({ "#": null });
+      expect(router.urlService.hash()).toBe('');
+
+      done();
+    });
+  });
 });

@@ -28,10 +28,16 @@ import {ParamTypeDefinition} from "./interface";
  * @internalapi
  */
 export class ParamType implements ParamTypeDefinition {
+  /** @inheritdoc */
   pattern: RegExp = /.*/;
+  /** The name/id of the parameter type */
   name: string;
+  /** @inheritdoc */
   raw: boolean;
+  /** @inheritdoc */
   dynamic: boolean;
+  /** @inheritdoc */
+  inherit = true;
 
   /**
    * @param def  A configuration object which contains the custom type definition.  The object's
@@ -136,6 +142,7 @@ function ArrayType(type: ParamType, mode: (boolean|"auto")) {
     dynamic: type.dynamic,
     name: type.name,
     pattern: type.pattern,
+    inherit: type.inherit,
     is: arrayHandler(type.is.bind(type), true),
     $arrayMode: mode
   });

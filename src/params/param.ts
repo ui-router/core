@@ -67,12 +67,13 @@ export class Param {
   id: string;
   type: ParamType;
   location: DefType;
-  array: boolean;
-  squash: (boolean|string);
-  replace: any;
   isOptional: boolean;
   dynamic: boolean;
   raw: boolean;
+  squash: (boolean|string);
+  replace: any;
+  inherit: boolean;
+  array: boolean;
   config: any;
 
   constructor(id: string, type: ParamType, config: ParamDeclaration, location: DefType, urlMatcherFactory: UrlMatcherFactory) {
@@ -85,6 +86,7 @@ export class Param {
     let raw = isDefined(config.raw) ? !!config.raw : !!type.raw;
     let squash = getSquashPolicy(config, isOptional, urlMatcherFactory.defaultSquashPolicy());
     let replace = getReplace(config, arrayMode, isOptional, squash);
+    let inherit = isDefined(config.inherit) ? !!config.inherit : !!type.inherit;
 
     // array config: param name (param[]) overrides default settings.  explicit config overrides param name.
     function getArrayMode() {
@@ -93,7 +95,7 @@ export class Param {
       return extend(arrayDefaults, arrayParamNomenclature, config).array;
     }
 
-    extend(this, {id, type, location, squash, replace, isOptional, dynamic, raw, config, array: arrayMode});
+    extend(this, {id, type, location, isOptional, dynamic, raw, squash, replace, inherit, array: arrayMode, config, });
   }
 
   isDefaultValue(value: any): boolean {
