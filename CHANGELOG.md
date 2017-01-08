@@ -1,4 +1,191 @@
 ### ui-router-core changes
+# [3.0.0](https://github.com/ui-router/core/compare/2.0.0...3.0.0) (2017-01-08)
+
+
+### Bug Fixes
+
+* **lazyLoad:** Use UrlService.match() to retry url sync after successful lazy load triggered by url ([8c2461d](https://github.com/ui-router/core/commit/8c2461d)), closes [#19](https://github.com/ui-router/core/issues/19)
+* **Params:** `params: { foo: { raw: true } }` overrides `ParamType.raw` ([aefeabf](https://github.com/ui-router/core/commit/aefeabf))
+* **Params:** Mark all query parameters as optional ([7334d98](https://github.com/ui-router/core/commit/7334d98))
+* **Params:** Check for null in `int` param type `is()` check ([aa551e4](https://github.com/ui-router/core/commit/aa551e4)), closes [#3197](https://github.com/ui-router/core/issues/3197)
+* **Transition:** Use { location: replace } when redirecting a transtition in response to a URL sync ([23e2b78](https://github.com/ui-router/core/commit/23e2b78))
+* **UrlService:** Wire urlMatcherFactory and urlRouter functions ([a7b58d6](https://github.com/ui-router/core/commit/a7b58d6))
+* **vanilla:** vanilla locations: do not parse "empty string" query key parameter ([f949480](https://github.com/ui-router/core/commit/f949480))
+
+
+### Features
+
+* (CoreServices) Move `location` and `locationConfig` from `services` to `UIRouter.locationService` and `UIRouter.locationConfig`. ([029fb00](https://github.com/ui-router/core/commit/029fb00))
+* Built-in `string` parameter type no longer encodes slashes as `~2F` nor tildes as `~~` ([72bb2d8](https://github.com/ui-router/core/commit/72bb2d8))
+* Move `html5Mode` and `hashPrefix` from `LocationServices` to `LocationConfig` interface ([9d316a7](https://github.com/ui-router/core/commit/9d316a7))
+* Order URL Matching Rules by priority, not registration order ([eb2f5d7](https://github.com/ui-router/core/commit/eb2f5d7))
+* Path/Query parameters no longer default to `string` param type ([72bb2d8](https://github.com/ui-router/core/commit/72bb2d8))
+* Remove `getResolveValue` and `getResolvable`  methods from `Transition` in favor of `injector().get()` and `injector().getAsync()` ([111d259](https://github.com/ui-router/core/commit/111d259))
+* Replace `LocationServices.setUrl` with `LocationServices.url` ([4c39dcb](https://github.com/ui-router/core/commit/4c39dcb))
+* Replace UrlRouterProvider/UrlRouter with just UrlRouter ([fddd1e2](https://github.com/ui-router/core/commit/fddd1e2))
+* **hash:** Change the hash parameter type (`'#'`) to `inherit: false` so it is cleared out when another transition occurs. ([849f84f](https://github.com/ui-router/core/commit/849f84f)), closes [#3245](https://github.com/ui-router/core/issues/3245) [#3218](https://github.com/ui-router/core/issues/3218) [#3017](https://github.com/ui-router/core/issues/3017)
+* **LocationServices:** Add a `parts()` method which returns the URL parts as an object ([32e64f0](https://github.com/ui-router/core/commit/32e64f0))
+* **Params:** Add `path` and `query` param types ([72bb2d8](https://github.com/ui-router/core/commit/72bb2d8))
+* **Params:** add option to use generic type for Transition.params ([#17](https://github.com/ui-router/core/issues/17)) ([eb12ec8](https://github.com/ui-router/core/commit/eb12ec8)), closes [#16](https://github.com/ui-router/core/issues/16)
+* **Params:** Allow `inherit: false` specified per parameter or type ([849f84f](https://github.com/ui-router/core/commit/849f84f))
+* **Resolve:** implement NOWAIT policy: Do not wait for resolves before completing a transition. ([05d4c73](https://github.com/ui-router/core/commit/05d4c73)), closes [#3243](https://github.com/ui-router/core/issues/3243) [#2691](https://github.com/ui-router/core/issues/2691)
+* **Transition:** Add Transition.originalTransition() to return the initial transition in a chain of redirects ([4fe39e3](https://github.com/ui-router/core/commit/4fe39e3))
+* **Transition:** Allow `injector()` to retrieve resolves for the exiting states/path ([df502e8](https://github.com/ui-router/core/commit/df502e8))
+* **Transition:** Allow a plain object `ResolvableLiteral` in `Transition.addResolvable` ([ad9ae81](https://github.com/ui-router/core/commit/ad9ae81))
+* **Transition:** Make Transition.params() immutable to avoid confusion about mutability ([0162212](https://github.com/ui-router/core/commit/0162212))
+* **UrlMatcher:** Add comparison function by UrlMatcher specificity ([eb2f5d7](https://github.com/ui-router/core/commit/eb2f5d7))
+* **UrlRouter:** sort url rules by specificity, not by registration order. ([eb2f5d7](https://github.com/ui-router/core/commit/eb2f5d7))
+* **UrlService:** allow eager or lazy binding of location objects during construction ([7e0a8af](https://github.com/ui-router/core/commit/7e0a8af))
+* **UrlService:** Add `match()`: given a URL, return the best matching Url Rule ([32e64f0](https://github.com/ui-router/core/commit/32e64f0))
+
+
+### BREAKING CHANGES
+
+* BREAKING CHANGE: Remove `getResolveValue` and `getResolvable`  methods from `Transition` in favor of `injector().get()` and `injector().getAsync()`
+
+In beta.3, the Transition APIs: `injector()`, `getResolvable`, and `getResolveValue` duplicated functionality.
+
+Instead of:
+```js
+trans.getResolveValue('myResolve');
+```
+use:
+```js
+trans.injector().get('myResolve')
+```
+* BREAKING CHANGE: Order URL Matching Rules by priority, not registration order
+
+URL Rules can come from registered states' `.url`s, calling `.when()`, or calling `.rule()`.
+It's possible that two or more URL Rules could match the URL.
+
+### Previously
+
+Previously, url rules were matched in the order in which they were registered.
+The rule which was registered first would handle the URL change.
+
+### Now
+
+Now, the URL rules are sorted according to a sort function.
+More specific rules are preferred over less specific rules
+
+### Why
+
+It's possible to have multiple url rules that match a given URL.
+Consider the following states:
+
+ - `{ name: 'books', url: '/books/index' }''`
+ - `{ name: 'book', url: '/books/:bookId' }''`
+
+Both states match when the url is `/books/index`.
+Additionally, you might have some custom url rewrite rules such as:
+
+ `.when('/books/list', '/books/index')`.
+
+The `book` state also matches when the rewrite rule is matched.
+
+Previously, we simply used the first rule that matched.  However, now that lazy loading is officially supported, it can be difficult for developers to ensure the rules are registered in the right order.
+
+Instead, we now prioritize url rules by how specific they are.  More specific rules are matched earlier than less specific rules.
+We split the path on `/`.  A static segment (such as `index` in the example) is more specific than a parameter (such as`:bookId`).
+
+### More Details
+
+The built-in rule sorting function (see `UrlRouter.defaultRuleSortFn`) sorts rules in this order:
+
+- Explicit priority: `.when('/foo', '/bar', { priority: 1 })` (default priority is 0)
+- Rule Type:
+  - UrlMatchers first (registered states and `.when(string, ...)`)
+  - then regular Expressions (`.when(regexp, ...)`)
+  - finally, everything else (`.rule()`)
+- UrlMatcher specificity: static path segments are more specific than variables (see `UrlMatcher.compare`)
+- Registration order (except for UrlMatcher based rules)
+
+For complete control, a custom sort function can be registered with `UrlService.rules.sort(sortFn)`
+
+### Query params
+
+Because query parameters are optional, they are not considered during sorting.
+For example, both these rules will match when the url is `'/foo/bar'`:
+
+```
+.when('/foo/bar', doSomething);
+.when('/foo/bar?queryparam', doSomethingElse);
+```
+
+To choose the most specific rule, we match both rules, then choose the rule with the "best ratio" of matched optional parameters (see `UrlRuleFactory.fromUrlMatcher`)
+
+This allows child states to be defined with only query params for a URL.
+The state only activates when the query parameter is present.
+
+```
+.state('parent', { url: '/parent' });
+.state('parent.child', { url: '?queryParam' });
+```
+
+## Restoring the previous behavior
+
+For backwards compatibility, register a sort function which sorts by the registration order:
+
+```js
+myApp.config(function ($urlServiceProvider) {
+
+  function sortByRegistrationOrder(a, b) {
+   return a.$id - b.$id;
+  }
+
+  $urlServiceProvider.rules.sort(sortByRegistrationOrder);
+
+});
+```
+* BREAKING CHANGE: Replace `LocationServices.setUrl` with `LocationServices.url`
+
+This makes `url()` a getter/setter.  It also adds the optional `state` parameter to pass through to the browser history when using pushstate.
+End users should not notice this change, but plugin authors may.
+* BREAKING CHANGE: Replace UrlRouterProvider/UrlRouter with just UrlRouter
+
+The configuration functions from the provider object have been integrated into the normal UrlRouter object.
+The `UIRouter` object no longer has a `uriRouterProvider`, but the equivalent functions can be found on `uiRouter`
+
+One difference between the old functions on `urlRouterProvider` and the new ones on `uriRouter` is that new functions do not accept injectable functions.
+* BREAKING CHANGE: Built-in `string` parameter type no longer encodes slashes as `~2F` nor tildes as `~~`
+
+Previously, the `string` parameter type pre-encoded tilde chars (`~`) as two tilde chars (`~~`) and slashes (`/`) as `~2F`.
+
+Now, the `string` parameter type does not pre-encode slashes nor tildes.
+If you rely on the previous encoding, create a custom parameter type that implements the behavior:
+
+```js
+urlMatcherFactory.type('tildes', {
+  encode: (val: any) =>
+      val != null ? val.toString().replace(/(~|\/)/g, m => ({ '~': '~~', '/': '~2F' }[m])) : val;
+  decode: (val: string) =>
+      val != null ? val.toString().replace(/(~~|~2F)/g, m => ({ '~~': '~', '~2F': '/' }[m])) : val;
+  pattern: /[^/]*/
+});
+```
+* BREAKING CHANGE: Path/Query parameters no longer default to `string` param type
+
+Previously, if a url parameter's type  was not specified (in either the path or query), it defaulted to the `string` type.
+
+Now, path parameters default to the new `path` type and query parameters default to the new `query` type.
+
+**In Angular 1 only**, the new `path` parameter type retains the old behavior of pre-encoding `~` to `~~` and `/` to `~2F`
+* BREAKING CHANGE: (CoreServices) Move `location` and `locationConfig` from `services` to `UIRouter.locationService` and `UIRouter.locationConfig`.
+
+The core `services` object is a mutable object which each framework was monkey patching.
+This change removes the requirement to monkey patch a global mutable object.
+Instead, framework implementors should pass the `LocationServices` and `LocationConfig` implementations into the `UIRouter` constructor.
+
+### End Users
+
+End users who were accessing `services.location` or `services.locationConfig` should access these off the `UIRouter` instance instead.
+* BREAKING CHANGE: Move `html5Mode` and `hashPrefix` from `LocationServices` to `LocationConfig` interface
+
+### End users should not notice
+
+
+
+### ui-router-core changes
 # [2.0.0](https://github.com/ui-router/core/compare/1.0.1...2.0.0) (2016-12-09)
 
 
