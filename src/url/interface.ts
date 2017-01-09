@@ -389,10 +389,10 @@ export interface MatchResult {
 /**
  * A function that matches the URL for a [[UrlRule]]
  *
- * Implementations should match against the current
- * [[UrlService.path]], [[UrlService.search]], and [[UrlService.hash]]
+ * Implementations should match against the provided [[UrlParts]] and return the matched value (truthy) if the rule matches.
+ * If this rule is selected, the matched value is passed to the [[UrlRuleHandlerFn]].
  *
- * @return truthy or falsey
+ * @return the matched value, either truthy or falsey
  */
 export interface UrlRuleMatchFn {
   (url?: UrlParts, router?: UIRouter): any;
@@ -402,7 +402,10 @@ export interface UrlRuleMatchFn {
  * Handler invoked when a rule is matched
  *
  * The matched value from the rule's [[UrlRuleMatchFn]] is passed as the first argument
- * The handler should return a string (to redirect), or void
+ * The handler should return a string (to redirect), a [[TargetState]]/[[TargetStateDef]], or void
+ *
+ * If the handler returns a string, the url is replaced with the string.
+ * If the handler returns a [[TargetState]], the target state is activated.
  */
 export interface UrlRuleHandlerFn {
   (matchValue?: any, url?: UrlParts, router?: UIRouter): (string|TargetState|TargetStateDef|void);
@@ -447,13 +450,17 @@ export interface UrlRule {
   type: UrlRuleType;
 
   /**
-   * This function should match the url and return match details
+   * This function should match the url and return the match details
+   *
+   * See [[UrlRuleMatchFn]] for details
    */
   match: UrlRuleMatchFn;
 
   /**
-   * This function is called after the rule matched the url.
+   * This function is called if the rule matched, and was selected as the "best match".
    * This function handles the rule match event.
+   *
+   * See [[UrlRuleHandlerFn]] for details
    */
   handler: UrlRuleHandlerFn;
 }

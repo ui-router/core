@@ -135,7 +135,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
     let best = this.match(url);
 
     let applyResult = pattern([
-      [isString, (newurl: string) => $url.url(newurl)],
+      [isString, (newurl: string) => $url.url(newurl, true)],
       [TargetState.isDef, (def: TargetStateDef) => $state.go(def.state, def.params, def.options)],
       [is(TargetState), (target: TargetState) => $state.go(target.state(), target.params(), target.options())],
     ]);
@@ -233,6 +233,9 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * This api can be used directly for more control (to register [[RawUrlRule]], for example).
    * Rules can be created using [[UrlRouter.ruleFactory]], or create manually as simple objects.
    *
+   * A rule should have a `match` function which returns truthy if the rule matched.
+   * It should also have a `handler` function which is invoked if the rule is the best match.
+   *
    * @return a function that deregisters the rule
    */
   rule(rule: UrlRule): Function {
@@ -256,7 +259,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   /** @inheritdoc */
   otherwise(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef) {
     if (!isFunction(handler) && !isString(handler) && !is(TargetState)(handler) && !TargetState.isDef(handler)) {
-      throw new Error("'redirectTo' must be a string, function, TargetState, or have a state: 'newtarget' property");
+      throw new Error("'handler' must be a string, function, TargetState, or have a state: 'newtarget' property");
     }
 
     let handlerFn: UrlRuleHandlerFn = isFunction(handler) ? handler as UrlRuleHandlerFn : val(handler);
