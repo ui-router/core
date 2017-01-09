@@ -1,4 +1,14 @@
 ### ui-router-core changes
+# [3.1.0](https://github.com/ui-router/core/compare/3.0.0...v3.1.0) (2017-01-09)
+
+
+### Bug Fixes
+
+* **UrlRouter:** Use { location: 'replace' } whenever a url redirect happens ([6cf9b8f](https://github.com/ui-router/core/commit/6cf9b8f))
+
+
+
+### ui-router-core changes
 # [3.0.0](https://github.com/ui-router/core/compare/2.0.0...3.0.0) (2017-01-08)
 
 
