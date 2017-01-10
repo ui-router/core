@@ -295,6 +295,8 @@ export class ViewService {
     if (relativeMatch.exec(uiViewContextAnchor)) {
       let anchor = uiViewContextAnchor.split(".").reduce(((anchor, x) => anchor.parent), context);
       uiViewContextAnchor = anchor.name;
+    } else if (uiViewContextAnchor === '.') {
+      uiViewContextAnchor = context.name;
     }
 
     return {uiViewName, uiViewContextAnchor};
