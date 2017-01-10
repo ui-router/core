@@ -14,6 +14,7 @@ import { values, removeFrom } from "./common/common";
 import { isFunction } from "./common/predicates";
 import { UrlService } from "./url/urlService";
 import { LocationServices, LocationConfig } from "./common/coreservices";
+import { Trace, trace } from "./common/trace";
 
 /** @hidden */
 let _routerInstance = 0;
@@ -36,6 +37,9 @@ let _routerInstance = 0;
 export class UIRouter {
   /** @hidden */
   $id: number = _routerInstance++;
+
+  /** Provides trace information to the console */
+  trace: Trace = trace;
 
   /** Provides services related to ui-view synchronization */
   viewService = new ViewService();
