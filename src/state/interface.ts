@@ -37,6 +37,7 @@ export type ResolveTypes = Resolvable | ResolvableLiteral | ProviderLike;
 export interface _ViewDeclaration {
   /**
    * The raw name for the view declaration, i.e., the [[StateDeclaration.views]] property name.
+   * @internalapi
    */
   $name?: string;
 
@@ -49,6 +50,7 @@ export interface _ViewDeclaration {
    *
    * The `uiViewName` can also target a _nested view_ by providing a dot-notation address
    * @example `foo.bar` or `foo.$default.bar`
+   * @internalapi
    */
   $uiViewName?: string;
   
@@ -56,6 +58,7 @@ export interface _ViewDeclaration {
    * The normalized context anchor (state name) for the `uiViewName`
    *
    * When targeting a `ui-view`, the `uiViewName` address is anchored to a context name (state name).
+   * @internalapi
    */
   $uiViewContextAnchor?: string;
 
@@ -64,11 +67,13 @@ export interface _ViewDeclaration {
    *
    * This is used when loading prerequisites for the view, before it enters the DOM.  Different types of views
    * may load differently (e.g., templateProvider+controllerProvider vs component class)
+   * @internalapi
    */
   $type?: string;
 
   /**
    * The context that this view is declared within.
+   * @internalapi
    */
   $context?: ViewContext;
 }
