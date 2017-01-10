@@ -26,6 +26,33 @@ export const noop = () => <any> undefined;
 export type Mapper<X, T> = (x: X, key?: (string|number)) => T;
 export interface TypedMap<T> { [key: string]: T; }
 export type Predicate<X> = (x?: X) => boolean;
+/**
+ * An ng1-style injectable
+ *
+ * This could be a (non-minified) function such as:
+ * ```js
+ * function injectableFunction(SomeDependency) {
+ *
+ * }
+ * ```
+ *
+ * or an explicitly annotated function (minify safe)
+ * ```js
+ * injectableFunction.$inject = [ 'SomeDependency' ];
+ * function injectableFunction(SomeDependency) {
+ *
+ * }
+ * ```
+ *
+ * or an array style annotated function (minify safe)
+ * ```js
+ * ['SomeDependency', function injectableFunction(SomeDependency) {
+ *
+ * }];
+ * ```
+ *
+ * @publicapi
+ */
 export type IInjectable = (Function|any[]);
 
 export interface Obj extends Object {
