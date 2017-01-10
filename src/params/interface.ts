@@ -558,7 +558,7 @@ export interface ParamTypeDefinition {
    * - No pattern modifiers like case insensitive
    * - No start-of-string or end-of-string: `/^foo$/`
    */
-  pattern: RegExp;
+  pattern?: RegExp;
 
 
   /**
@@ -572,7 +572,7 @@ export interface ParamTypeDefinition {
    * The decoding behavior of raw parameters is not defined.
    * See: [[ParamDeclaration.raw]] for details
    */
-  raw: boolean;
+  raw?: boolean;
 
   /**
    * Enables/disables inheriting of parameter values (of this type)
@@ -593,6 +593,18 @@ export interface ParamTypeDefinition {
    * $state.go('home.nest');
    * ```
    */
-  inherit: boolean;
+  inherit?: boolean;
+
+  /**
+   * Dynamic flag
+   *
+   * When `dynamic` is `true`, changes to the parameter value will not cause the state to be entered/exited.
+   *
+   * Normally, if a parameter value changes, the state which declared that the parameter will be reloaded (entered/exited).
+   * When a parameter is `dynamic`, a transition still occurs, but it does not cause the state to exit/enter.
+   *
+   * Default: `false`
+   */
+  dynamic?: boolean;
 }
 
