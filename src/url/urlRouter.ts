@@ -33,7 +33,7 @@ const getMatcher = prop("urlMatcher");
  *
  * Sorts rules by:
  *
- * - Explicit priority (set rule priority using [[UrlService.when]])
+ * - Explicit priority (set rule priority using [[UrlRulesApi.when]])
  * - Rule type (STATE: 4, URLMATCHER: 4, REGEXP: 3, RAW: 2, OTHER: 1)
  * - `UrlMatcher` specificity ([[UrlMatcher.compare]]): works for STATE and URLMATCHER types to pick the most specific rule.
  * - Registration order (for rule types other than STATE and URLMATCHER)
@@ -230,8 +230,8 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * Manually adds a URL Rule.
    *
    * Usually, a url rule is added using [[StateDeclaration.url]] or [[when]].
-   * This api can be used directly for more control (to register [[RawUrlRule]], for example).
-   * Rules can be created using [[UrlRouter.ruleFactory]], or create manually as simple objects.
+   * This api can be used directly for more control (to register a [[BaseUrlRule]], for example).
+   * Rules can be created using [[UrlRouter.urlRuleFactory]], or create manually as simple objects.
    *
    * A rule should have a `match` function which returns truthy if the rule matched.
    * It should also have a `handler` function which is invoked if the rule is the best match.

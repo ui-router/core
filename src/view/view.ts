@@ -32,8 +32,8 @@ export interface ViewServicePluginAPI {
  *
  * - As `ui-view` components pop in and out of existence, they register themselves using [[registerUIView]].
  *
- * - When the [[sync]] function is called, the registered `ui-view`(s) ([[UIViewConfig]]
- * are configured with the matching `ViewConfig`(s)  ([[ActiveUIView]]).
+ * - When the [[sync]] function is called, the registered `ui-view`(s) ([[ActiveUIView]])
+ * are configured with the matching [[ViewConfig]](s)
  *
  */
 export class ViewService {

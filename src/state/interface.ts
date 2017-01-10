@@ -27,10 +27,10 @@ export interface TargetStateDef {
 
 export type ResolveTypes = Resolvable | ResolvableLiteral | ProviderLike;
 /**
- * Base interface for [[Ng1ViewDeclaration]] and [[Ng2ViewDeclaration]]
+ * Base interface for declaring a view
  *
  * This interface defines the basic data that a normalized view declaration will have on it.
- * Framework-specific implementations may add additional fields (to their interfaces which extend this interface).
+ * Framework-specific implementations should add additional fields (to their interfaces which extend this interface).
  *
  * @internalapi
  */
@@ -107,22 +107,21 @@ export type RedirectToResult = string | TargetState | { state?: string, params?:
  */
 export interface StateDeclaration {
   /**
-   * The state name
+   * The state name (required)
    *
    * A unique state name, e.g. `"home"`, `"about"`, `"contacts"`.
    * To create a parent/child state use a dot, e.g. `"about.sales"`, `"home.newest"`.
    *
-   *
-   * Note: States require unique names.  If you omit this property, you must provide
-   * the state name when you register it with the [[$stateProvider]].
+   * Note: [State] objects require unique names.
+   * The name is used like an id.
    */
   name?: string;
 
   /**
-   * abstract state indicator
+   * Abstract state indicator
    *
-   * An abstract state can never be directly activated.  Use an abstract state to provide inherited
-   * properties (url, resolve, data, etc) to children states.
+   * An abstract state can never be directly activated.
+   * Use an abstract state to provide inherited properties (url, resolve, data, etc) to children states.
    */
   abstract?: boolean;
 
@@ -131,8 +130,9 @@ export interface StateDeclaration {
    *
    * Normally, a state's parent is implied from the state's [[name]], e.g., `"parentstate.childstate"`.
    *
-   * Alternatively, you can explicitly set the parent state using this property.  This allows shorter state
-   * names, e.g., `<a ui-sref="childstate">Child</a>` instead of `<a ui-sref="parentstate.childstate">Child</a>
+   * Alternatively, you can explicitly set the parent state using this property.
+   * This allows shorter state names, e.g., `<a ui-sref="childstate">Child</a>`
+   * instead of `<a ui-sref="parentstate.childstate">Child</a>
    *
    * When using this property, the state's name should not have any dots in it.
    *
@@ -152,7 +152,7 @@ export interface StateDeclaration {
   parent?: (string|StateDeclaration);
 
   /**
-   * Gets the internal API
+   * Gets the internal State object API
    *
    * Gets the *internal API* for a registered state.
    *
@@ -408,7 +408,7 @@ export interface StateDeclaration {
    * - If the property is a function:
    *   - The function is called with two parameters:
    *     - The current [[Transition]]
-   *     - An injector which can be used to get dependencies using [[UIRInjector.get]]
+   *     - An [[UIInjector]] which can be used to get dependencies using [[UIInjector.get]] or resolves using [[UIInjector.getAsync]]
    *   - The return value is processed using the previously mentioned rules.
    *   - If the return value is a promise, the promise is waited for, then the resolved async value is processed using the same rules.
    *

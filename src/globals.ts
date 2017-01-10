@@ -11,7 +11,7 @@ import {TransitionService} from "./transition/transitionService";
 import {copy} from "./common/common";
 
 /**
- * Global mutable state
+ * Global router state
  *
  * This is where we hold the global mutable state such as current state, current
  * params, current transition, etc.
@@ -43,17 +43,30 @@ export interface UIRouterGlobals {
 
 
 /**
- * Global mutable state
+ * Global router state
+ *
+ * This is where we hold the global mutable state such as current state, current
+ * params, current transition, etc.
  */
 export class Globals implements UIRouterGlobals {
+  /** @inheritdoc */
   params: StateParams = new StateParams();
+  /** @inheritdoc */
   current: StateDeclaration;
+  /** @inheritdoc */
   $current: State;
+  /** @inheritdoc */
   transition: Transition;
+
+  /** @internalapi */
   transitionHistory = new Queue<Transition>([], 1);
+
+  /** @internalapi */
   successfulTransitions = new Queue<Transition>([], 1);
 
+  /** @hidden */
   constructor(transitionService: TransitionService) {
+    // TODO: This probably belongs in a hooks/globals.ts
     const beforeNewTransition = ($transition$: Transition) => {
 
       this.transition = $transition$;

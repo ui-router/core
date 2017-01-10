@@ -15,7 +15,7 @@ import { UIRouter } from "../router";
 import { propEq } from "../common/hof";
 
 /**
- * The signature for the callback function provided to [[StateRegistry.onStateRegistryEvent]].
+ * The signature for the callback function provided to [[StateRegistry.onStatesChanged]].
  *
  * This callback receives two parameters:
  *
@@ -121,7 +121,6 @@ export class StateRegistry {
    * Registers a [[StateDeclaration]] or queues it for registration.
    *
    * Note: a state will be queued if the state's parent isn't yet registered.
-   * It will also be queued if the queue is not yet in [[StateQueueManager.autoFlush]] mode.
    *
    * @param stateDefinition the definition of the state to register.
    * @returns the internal [[State]] object.

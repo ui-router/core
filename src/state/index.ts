@@ -1,5 +1,5 @@
 /**
- * The state subsystem
+ * # The state subsystem
  *
  * This subsystem implements the ui-router state tree
  *

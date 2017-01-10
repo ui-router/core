@@ -30,22 +30,22 @@ export class State {
   /** The name used to register the state */
   public name: string;
 
-  /** Prototypally inherits from [[StateDefinition.abstract]] */
+  /** Prototypally inherits from [[StateDeclaration.abstract]] */
   public abstract: boolean;
 
-  /** Prototypally inherits from [[StateDefinition.resolve]] */
+  /** Prototypally inherits from [[StateDeclaration.resolve]] */
   public resolve: ({ [key: string]: (string|any[]|Function) }|any[]);
 
   /** A list of [[Resolvable]] objects.  The internal representation of [[resolve]]. */
   public resolvables: Resolvable[];
 
-  /** Prototypally inherits from [[StateDefinition.resolvePolicy]] */
+  /** Prototypally inherits from [[StateDeclaration.resolvePolicy]] */
   public resolvePolicy: any;
 
   /** A compiled URLMatcher which detects when the state's URL is matched */
   public url: UrlMatcher;
 
-  /** The parameters for the state, built from the URL and [[StateDefinition.params]] */
+  /** The parameters for the state, built from the URL and [[StateDeclaration.params]] */
   public params: { [key: string]: Param };
 
   /**
@@ -68,7 +68,7 @@ export class State {
   public path: State[];
 
   /**
-   * Prototypally inherits from [[StateDefinition.data]]
+   * Prototypally inherits from [[StateDeclaration.data]]
    * Note: This is the only field on the [[StateDeclaration]] which is mutated.
    * The definition object's `data` field is replaced with a new object
    * which prototypally inherits from the parent state definition's `data` field.
@@ -78,17 +78,17 @@ export class State {
   /** An array of strings of the parent States' names */
   public includes: { [name: string] : boolean };
 
-  /** Prototypally inherits from [[StateDefinition.onExit]] */
+  /** Prototypally inherits from [[StateDeclaration.onExit]] */
   public onExit: TransitionStateHookFn;
-  /** Prototypally inherits from [[StateDefinition.onRetain]] */
+  /** Prototypally inherits from [[StateDeclaration.onRetain]] */
   public onRetain: TransitionStateHookFn;
-  /** Prototypally inherits from [[StateDefinition.onEnter]] */
+  /** Prototypally inherits from [[StateDeclaration.onEnter]] */
   public onEnter: TransitionStateHookFn;
 
-  /** Prototypally inherits from [[StateDefinition.lazyLoad]] */
+  /** Prototypally inherits from [[StateDeclaration.lazyLoad]] */
   public lazyLoad: (transition: Transition) => Promise<StateDeclaration[]>;
 
-  /** Prototypally inherits from [[StateDefinition.redirectTo]] */
+  /** Prototypally inherits from [[StateDeclaration.redirectTo]] */
   redirectTo: (
       string |
       (($transition$: Transition) => TargetState) |

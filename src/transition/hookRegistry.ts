@@ -51,7 +51,7 @@ export function matchState(state: State, criterion: HookMatchCriterion) {
 }
 
 /**
- * @hidden
+ * @internalapi
  * The registration data for a registered transition hook
  */
 export class RegisteredHook {
@@ -70,11 +70,13 @@ export class RegisteredHook {
   }
 
   /**
-   * Given an array of PathNodes, and a HookMatchCriteria, returns an array containing
-   * the PathNodes that the criteria matches, or null if there were no matching nodes.
+   * Gets the matching [[PathNode]]s
    *
-   * Returning null is significant to distinguish between the default
-   * "match-all criterion value" of `true` compared to a () => true,
+   * Given an array of [[PathNode]]s, and a [[HookMatchCriterion]], returns an array containing
+   * the [[PathNode]]s that the criteria matches, or `null` if there were no matching nodes.
+   *
+   * Returning `null` is significant to distinguish between the default
+   * "match-all criterion value" of `true` compared to a `() => true` function,
    * when the nodes is an empty array.
    *
    * This is useful to allow a transition match criteria of `entering: true`
@@ -89,17 +91,29 @@ export class RegisteredHook {
   }
 
   /**
+   * Gets the default match criteria (all `true`)
+   *
    * Returns an object which has all the criteria match paths as keys and `true` as values, i.e.:
    *
-   * { to: true, from: true, entering: true, exiting: true, retained: true }
+   * ```js
+   * {
+   *   to: true,
+   *   from: true,
+   *   entering: true,
+   *   exiting: true,
+   *   retained: true,
+   * }
    */
   private _getDefaultMatchCriteria(): HookMatchCriteria {
     return map(this.tranSvc._pluginapi._getPathTypes(), () => true);
   }
 
   /**
-   * Create a IMatchingNodes object from the TransitionHookTypes that basically looks like this:
+   * Gets matching nodes as [[IMatchingNodes]]
    *
+   * Create a IMatchingNodes object from the TransitionHookTypes that is roughly equivalent to:
+   *
+   * ```js
    * let matches: IMatchingNodes = {
    *   to:       _matchingNodes([tail(treeChanges.to)],   mc.to),
    *   from:     _matchingNodes([tail(treeChanges.from)], mc.from),
@@ -107,6 +121,7 @@ export class RegisteredHook {
    *   retained: _matchingNodes(treeChanges.retained,     mc.retained),
    *   entering: _matchingNodes(treeChanges.entering,     mc.entering),
    * };
+   * ```
    */
   private _getMatchingNodes(treeChanges: TreeChanges): IMatchingNodes {
     let criteria = extend(this._getDefaultMatchCriteria(), this.matchCriteria);

@@ -10,7 +10,7 @@ export interface ViewContext {
   parent: ViewContext;
 }
 
-/** @hidden */
+/** @internalapi */
 export interface ActiveUIView {
   /** type of framework, e.g., "ng1" or "ng2" */
   $type: string;
@@ -29,11 +29,11 @@ export interface ActiveUIView {
 }
 
 /**
- * This interface represents a [[ViewDeclaration]] that is bound to a [[PathNode]].
+ * This interface represents a [[_ViewDeclaration]] that is bound to a [[PathNode]].
  *
  * A `ViewConfig` is the runtime definition of a single view.
  *
- * During a transition, `ViewConfig`s are created for each [[ViewDeclaration]] defined on each "entering" [[State]].
+ * During a transition, `ViewConfig`s are created for each [[_ViewDeclaration]] defined on each "entering" [[State]].
  * Then, the [[ViewService]] finds any matching `ui-view`(s) in the DOM, and supplies the ui-view
  * with the `ViewConfig`.  The `ui-view` then loads itself using the information found in the `ViewConfig`.
  *

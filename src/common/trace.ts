@@ -1,5 +1,5 @@
 /**
- * UI-Router Transition Tracing
+ * # Transition tracing (debug)
  *
  * Enable transition tracing to print transition information to the console,
  * in order to help debug your application.

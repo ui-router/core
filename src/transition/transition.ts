@@ -74,7 +74,7 @@ export class Transition implements IHookRegistry {
    * This promise is resolved or rejected based on the outcome of the Transition.
    *
    * When the transition is successful, the promise is resolved
-   * When the transition is unsuccessful, the promise is rejected with the [[TransitionRejection]] or javascript error
+   * When the transition is unsuccessful, the promise is rejected with the [[Rejection]] or javascript error
    */
   promise: Promise<any> = this._deferred.promise;
   /**

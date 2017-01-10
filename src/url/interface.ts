@@ -1,4 +1,6 @@
 /**
+ * # URL subsystem
+ *
  * Contains code related to managing the URL
  *
  * The primary API is found in [[UrlService]], [[UrlService.config]], and [[UrlService.rules]].
@@ -221,7 +223,7 @@ export interface UrlRulesApi {
    * The `$id` is is the order in which the rule was registered.
    *
    * The sort function should use these data, or data found on a specific type
-   * of [[UrlRule]] (such as [[StateUrlRule.state]]), to order the rules as desired.
+   * of [[UrlRule]] (such as [[StateRule.state]]), to order the rules as desired.
    *
    * #### Example:
    * This compare function prioritizes rules by the order in which the rules were registered.
@@ -349,7 +351,7 @@ export interface UrlRulesApi {
    * Manually adds a URL Rule.
    *
    * Usually, a url rule is added using [[StateDeclaration.url]] or [[when]].
-   * This api can be used directly for more control (to register [[RawUrlRule]], for example).
+   * This api can be used directly for more control (to register [[BaseUrlRule]], for example).
    * Rules can be created using [[UrlRouter.urlRuleFactory]], or create manually as simple objects.
    *
    * @return a function that deregisters the rule

@@ -21,34 +21,53 @@ let _routerInstance = 0;
 /**
  * The master class used to instantiate an instance of UI-Router.
  *
- * UI-Router (for a specific framework) will create an instance of this class during bootstrap.
+ * UI-Router (for each specific framework) will create an instance of this class during bootstrap.
  * This class instantiates and wires the UI-Router services together.
  *
  * After a new instance of the UIRouter class is created, it should be configured for your app.
- * For instance, app states should be registered with the [[stateRegistry]].
+ * For instance, app states should be registered with the [[UIRouter.stateRegistry]].
  *
- * Tell UI-Router to monitor the URL by calling `uiRouter.urlRouter.listen()` ([[UrlRouter.listen]])
+ * ---
+ *
+ * Normally the framework code will bootstrap UI-Router.
+ * If you are bootstrapping UIRouter manually, tell it to monitor the URL by calling
+ * [[UrlService.listen]] then [[UrlService.sync]].
  */
 export class UIRouter {
   /** @hidden */
   $id: number = _routerInstance++;
 
+  /** Provides services related to ui-view synchronization */
   viewService = new ViewService();
 
+  /** Provides services related to Transitions */
   transitionService: TransitionService = new TransitionService(this);
 
+  /** Global router state */
   globals: UIRouterGlobals = new Globals(this.transitionService);
 
+  /**
+   * Deprecated for public use. Use [[urlService]] instead.
+   * @deprecated
+   */
   urlMatcherFactory: UrlMatcherFactory = new UrlMatcherFactory();
 
+  /**
+   * Deprecated for public use. Use [[urlService]] instead.
+   * @deprecated
+   */
   urlRouter: UrlRouter = new UrlRouter(this);
 
+  /** Provides a registry for states, and related registration services */
   stateRegistry: StateRegistry = new StateRegistry(this);
 
+  /** Provides services related to states */
   stateService = new StateService(this);
 
+  /** Provides services related to the URL */
   urlService: UrlService = new UrlService(this);
 
+  /** @hidden */
   private _disposables: Disposable[] = [];
 
   /** Registers an object to be notified when the router is disposed */
@@ -80,6 +99,13 @@ export class UIRouter {
     });
   }
 
+  /**
+   * Creates a new `UIRouter` object
+   *
+   * @param locationService a [[LocationServices]] implementation
+   * @param locationConfig a [[LocationConfig]] implementation
+   * @internalapi
+   */
   constructor(
       public locationService: LocationServices = UrlService.locationServiceStub,
       public locationConfig: LocationConfig = UrlService.locationConfigStub
@@ -99,6 +125,12 @@ export class UIRouter {
   /** @hidden */
   private _plugins: { [key: string]: UIRouterPlugin } = {};
 
+  /** Add plugin (as ES6 class) */
+  plugin<T extends UIRouterPlugin>(plugin: { new(router: UIRouter, options?: any): T }, options?: any): T;
+  /** Add plugin (as javascript constructor function) */
+  plugin<T extends UIRouterPlugin>(plugin: { (router: UIRouter, options?: any): void }, options?: any): T;
+  /** Add plugin (as javascript factory function) */
+  plugin<T extends UIRouterPlugin>(plugin: PluginFactory<T>, options?: any): T;
   /**
    * Adds a plugin to UI-Router
    *
@@ -152,12 +184,6 @@ export class UIRouter {
    * @param options options to pass to the plugin class/factory
    * @returns the registered plugin instance
    */
-  plugin<T extends UIRouterPlugin>(plugin: { new(router: UIRouter, options?: any): T }, options?: any): T;
-  /** Allow javascript constructor function */
-  plugin<T extends UIRouterPlugin>(plugin: { (router: UIRouter, options?: any): void }, options?: any): T;
-  /** Allow javascript factory function */
-  plugin<T extends UIRouterPlugin>(plugin: PluginFactory<T>, options?: any): T;
-  /** Allow javascript factory function */
   plugin<T extends UIRouterPlugin>(plugin: any, options: any = {}): T {
     let pluginInstance = new plugin(this, options);
     if (!pluginInstance.name) throw new Error("Required property `name` missing on plugin: " + pluginInstance);
@@ -181,4 +207,5 @@ export class UIRouter {
   }
 }
 
+/** @internalapi */
 export type PluginFactory<T> = (router: UIRouter, options?: any) => T;

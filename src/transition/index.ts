@@ -1,4 +1,6 @@
 /**
+ * # Transition subsystem
+ *
  * This module contains APIs related to a Transition.
  *
  * See:

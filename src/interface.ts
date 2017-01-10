@@ -1,5 +1,5 @@
 /**
- * Core classes and interfaces
+ * # Core classes and interfaces
  *
  * The classes and interfaces that are core to ui-router and do not belong
  * to a more specific subsystem (such as resolve).
@@ -16,16 +16,23 @@ import {UIRouter} from "./router";
 /**
  * An interface for getting values from dependency injection.
  *
- * This injector primarily returns resolve values (using a [[ResolveContext]]) that match the given token.
+ * This is primarily used to get resolve values for a given token.
+ * An instance of the `UIInjector` can be retrieved from the current transition using [[Transition.injector]].
+ *
+ * ---
+ *
  * If no resolve is found for a token, then it will delegate to the native injector.
- * The native injector may be Angular 1 `$injector`, Angular 2 `Injector`, or a naive polyfill.
+ * The native injector may be Angular 1 `$injector`, Angular 2 `Injector`, or a simple polyfill.
  *
  * In Angular 2, the native injector might be the root Injector,
  * or it might be a lazy loaded `NgModule` injector scoped to a lazy load state tree.
  */
 export interface UIInjector {
   /**
-   * Gets a value from the injector
+   * Gets a value from the injector.
+   *
+   * For a given token, returns the value from the injector that matches the token.
+   * If the token is for a resolve that has not yet been fetched, this throws an error.
    *
    * #### Example:
    * ```js
@@ -34,7 +41,7 @@ export interface UIInjector {
    *
    * #### ng1 Example:
    * ```js
-   * // Fetch $state service
+   * // Fetch StateService
    * injector.get('$state').go('home');
    * ```
    *
@@ -50,26 +57,23 @@ export interface UIInjector {
    * var stringArray = injector.get<string[]>('myStringArray');
    * ```
    *
-   * ---
-   *
    * ### `NOWAIT` policy
    *
    * When using [[ResolvePolicy.async]] === `NOWAIT`, the value returned from `get()` is a promise for the result.
+   * The promise is not automatically unwrapped.
    *
-   * @param token the key for the value to get.  May be a string or arbitrary object.
+   * @param token the key for the value to get.  May be a string, a class, or any arbitrary object.
    * @return the Dependency Injection value that matches the token
    */
   get(token: any): any;
+  /** Gets a value as type `T` (generics parameter) */
   get<T>(token: any): T;
 
   /**
    * Asynchronously gets a value from the injector
    *
-   * If the [[ResolveContext]] has a [[Resolvable]] matching the token, it will be
-   * asynchronously resolved.
-   *
-   * Returns a promise for a value from the injector.
-   * Returns resolve values and/or values from the native injector (ng1/ng2).
+   * For a given token, returns a promise for the value from the injector that matches the token.
+   * If the token is for a resolve that has not yet been fetched, this triggers the resolve to load.
    *
    * #### Example:
    * ```js
@@ -82,6 +86,7 @@ export interface UIInjector {
    * @return a Promise for the Dependency Injection value that matches the token
    */
   getAsync(token: any): Promise<any>;
+  /** Asynchronously gets a value as type `T` (generics parameter) */
   getAsync<T>(token: any): Promise<T>;
 
   /**
@@ -101,15 +106,19 @@ export interface UIInjector {
   getNative<T>(token: any): T;
 }
 
+/** @internalapi */
 export interface UIRouterPlugin extends Disposable {
   name: string;
 }
 
-export abstract class UIRouterPluginBase implements UIRouterPlugin {
+/** @internalapi */
+export abstract class UIRouterPluginBase implements UIRouterPlugin, Disposable {
   abstract name: string;
   dispose(router: UIRouter) { }
 }
 
+/** @internalapi */
 export interface Disposable {
+  /** Instructs the Disposable to clean up any resources */
   dispose(router?: UIRouter);
 }

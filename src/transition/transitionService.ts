@@ -45,9 +45,33 @@ export let defaultTransOpts: TransitionOptions = {
 };
 
 
+/**
+ * Plugin API for Transition Service
+ * @internalapi
+ */
 export interface TransitionServicePluginAPI {
+  /**
+   * Adds a Path to be used as a criterion against a TreeChanges path
+   *
+   * For example: the `exiting` path in [[HookMatchCriteria]] is a STATE scoped path.
+   * It was defined by calling `defineTreeChangesCriterion('exiting', TransitionHookScope.STATE)`
+   * Each state in the exiting path is checked against the criteria and returned as part of the match.
+   *
+   * Another example: the `to` path in [[HookMatchCriteria]] is a TRANSITION scoped path.
+   * It was defined by calling `defineTreeChangesCriterion('to', TransitionHookScope.TRANSITION)`
+   * Only the tail of the `to` path is checked against the criteria and returned as part of the match.
+   */
   _definePathType(name: string, hookScope: TransitionHookScope);
+
+  /**
+   * Gets a Path definition used as a criterion against a TreeChanges path
+   */
   _getPathTypes(): PathTypes;
+
+  /**
+   * Defines a transition hook type and returns a transition hook registration
+   * function (which can then be used to register hooks of this type).
+   */
   _defineEvent(name: string,
                hookPhase: TransitionHookPhase,
                hookOrder: number,
@@ -56,7 +80,14 @@ export interface TransitionServicePluginAPI {
                getResultHandler?: GetResultHandler,
                getErrorHandler?: GetErrorHandler,
                rejectIfSuperseded?: boolean);
+
+  /**
+   * Returns the known event types, such as `onBefore`
+   * If a phase argument is provided, returns only events for the given phase.
+   */
   _getEvents(phase?: TransitionHookPhase): TransitionEventType[];
+
+  /** Returns the hooks registered for the given hook name */
   getHooks(hookName: string): RegisteredHook[];
 }
 
@@ -123,6 +154,8 @@ export class TransitionService implements IHookRegistry, Disposable {
   _registeredHooks = { } as RegisteredHooks;
   /** @hidden The  paths on a criteria object */
   private _criteriaPaths = { } as PathTypes;
+  /** @hidden */
+  private _router: UIRouter;
 
   /** @internalapi */
   _pluginapi: TransitionServicePluginAPI;
@@ -147,7 +180,8 @@ export class TransitionService implements IHookRegistry, Disposable {
   };
 
   /** @hidden */
-  constructor(private _router: UIRouter) {
+  constructor(_router: UIRouter) {
+    this._router = _router;
     this.$view = _router.viewService;
     this._deregisterHookFns = <any> {};
     this._pluginapi = <TransitionServicePluginAPI> createProxyFunctions(val(this), {}, val(this), [
@@ -164,7 +198,10 @@ export class TransitionService implements IHookRegistry, Disposable {
     this._registerDefaultTransitionHooks();
   }
 
-  /** @internalapi */
+  /**
+   * dispose
+   * @internalapi
+   */
   dispose(router: UIRouter) {
     delete router.globals.transition;
 
@@ -219,11 +256,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     this._definePathType("entering", STATE);
   }
 
-  /**
-   * Defines a transition hook type and returns a transition hook registration
-   * function (which can then be used to register hooks of this type).
-   * @internalapi
-   */
+  /** @hidden */
   _defineEvent(name: string,
                hookPhase: TransitionHookPhase,
                hookOrder: number,
@@ -239,11 +272,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     makeEvent(this, this, eventType);
   };
 
-  /**
-   * @hidden
-   * Returns the known event types, such as `onBefore`
-   * If a phase argument is provided, returns only events for the given phase.
-   */
+  /** @hidden */
   private _getEvents(phase?: TransitionHookPhase): TransitionEventType[] {
     let transitionHookTypes = isDefined(phase) ?
         this._eventTypes.filter(type => type.hookPhase === phase) :
@@ -266,17 +295,13 @@ export class TransitionService implements IHookRegistry, Disposable {
    * It was defined by calling `defineTreeChangesCriterion('to', TransitionHookScope.TRANSITION)`
    * Only the tail of the `to` path is checked against the criteria and returned as part of the match.
    *
-   * @internalapi
+   * @hidden
    */
   private _definePathType(name: string, hookScope: TransitionHookScope) {
     this._criteriaPaths[name] = { name, scope: hookScope };
   }
 
-  /**
-   * Gets a Path definition used as a criterion against a TreeChanges path
-   *
-   * @internalapi
-   */
+  /** * @hidden */
   private _getPathTypes(): PathTypes {
     return this._criteriaPaths;
   }

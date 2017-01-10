@@ -1,5 +1,5 @@
 /**
- * The Resolve subsystem
+ * # The Resolve subsystem
  *
  * This subsystem is an asynchronous, hierarchical Dependency Injection system.
  *
