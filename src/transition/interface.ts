@@ -663,11 +663,9 @@ export interface IHookRegistry {
    * A transition "errors" if it was started, but failed to complete (for any reason).
    * A *non-exhaustive list* of reasons a transition can error:
    *
-   * - A transition was cancelled because a new transition started while it was still running
+   * - A transition was cancelled because a new transition started while it was still running (`Transition superseded`)
    * - A transition was cancelled by a Transition Hook returning false
    * - A transition was redirected by a Transition Hook returning a [[TargetState]]
-   * - A transition was invalid because the target state/parameters are not valid
-   * - A transition was ignored because the target state/parameters are exactly the current state/parameters
    * - A Transition Hook or resolve function threw an error
    * - A Transition Hook returned a rejected promise
    * - A resolve function returned a rejected promise
