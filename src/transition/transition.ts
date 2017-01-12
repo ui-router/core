@@ -368,6 +368,17 @@ export class Transition implements IHookRegistry {
   /**
    * Dynamically adds a new [[Resolvable]] (i.e., [[StateDeclaration.resolve]]) to this transition.
    *
+   * #### Example:
+   * ```js
+   * transitionService.onBefore({}, transition => {
+   *   transition.addResolvable({
+   *     token: 'myResolve',
+   *     deps: ['MyService'],
+   *     resolveFn: myService => myService.getData()
+   *   });
+   * });
+   * ```
+   *
    * @param resolvable a [[ResolvableLiteral]] object (or a [[Resolvable]])
    * @param state the state in the "to path" which should receive the new resolve (otherwise, the root state)
    */
