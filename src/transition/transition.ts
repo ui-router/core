@@ -214,7 +214,7 @@ export class Transition implements IHookRegistry {
   /**
    * Returns the "to state"
    *
-   * Returns the state that the transition is  going *from*.
+   * Returns the state that the transition is going *to*.
    *
    * @returns The state declaration object for the Transition's target state ("to state").
    */
