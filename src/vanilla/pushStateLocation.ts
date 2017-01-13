@@ -5,7 +5,7 @@
 import { isDefined } from "../common/index";
 import { LocationServices, LocationConfig } from "../common/coreservices";
 import { splitQuery, trimHashVal, getParams, locationPluginFactory, buildUrl } from "./utils";
-import { LocationPlugin } from "./interface";
+import { LocationPlugin, HistoryLike, LocationLike } from "./interface";
 import { UIRouter } from "../router";
 import { pushTo, deregAll } from "../common/common";
 import { Disposable } from "../interface";
@@ -18,9 +18,9 @@ import { BrowserLocationConfig } from "./browserLocationConfig";
  */
 export class PushStateLocationService implements LocationServices, Disposable {
   private _listeners: Function[] = [];
-  private _location: Location;
-  private _history: History;
-  private _config: LocationConfig;
+  _location: LocationLike;
+  _history: HistoryLike;
+  _config: LocationConfig;
 
   constructor(router: UIRouter) {
     this._location = location;
