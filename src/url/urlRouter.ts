@@ -51,6 +51,10 @@ defaultRuleSortFn = composeSort(
 /**
  * Updates URL and responds to URL changes
  *
+ * ### Deprecation warning:
+ * This class is now considered to be an internal API
+ * For configuring URL rules, use the [[UrlRulesApi]] which can be found on [[UrlService.rules]].
+ *
  * This class updates the URL when the state changes.
  * It also responds to changes in the URL.
  */
