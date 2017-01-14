@@ -49,6 +49,9 @@ export class PushStateLocationService implements LocationServices, Disposable {
       let fullUrl = this._config.baseHref() + url;
       if (replace) this._history.replaceState(state, null, fullUrl);
       else this._history.pushState(state, null, fullUrl);
+      let evt = new Event("locationchange");
+      evt['url'] = fullUrl;
+      this._listeners.forEach(cb => cb(evt));
     }
 
     return buildUrl(this);
@@ -56,7 +59,8 @@ export class PushStateLocationService implements LocationServices, Disposable {
 
   onChange(cb: EventListener) {
     window.addEventListener("popstate", cb, false);
-    return pushTo(this._listeners, () => window.removeEventListener("popstate", cb));
+    this._listeners.push(cb);
+    return () => window.removeEventListener("popstate", cb);
   }
 
   dispose(router: UIRouter) {
