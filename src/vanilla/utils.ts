@@ -1,11 +1,15 @@
 /**
  * @internalapi
  * @module vanilla
- */ /** */
-import {isArray} from "../common/index";
+ */
+/** */
+import { isArray } from "../common/index";
 import { LocationServices, LocationConfig } from "../common/coreservices";
 import { UIRouter } from "../router";
-import { identity, unnestR } from "../common/common";
+import { identity, unnestR, removeFrom, deregAll, extend } from "../common/common";
+import { LocationLike, HistoryLike } from "./interface";
+import { isDefined } from "../common/predicates";
+import { Disposable } from "../interface";
 
 const beforeAfterSubstr = (char: string) => (str: string): string[] => {
   if (!str) return ["", ""];
@@ -17,7 +21,7 @@ const beforeAfterSubstr = (char: string) => (str: string): string[] => {
 export const splitHash = beforeAfterSubstr("#");
 export const splitQuery = beforeAfterSubstr("?");
 export const splitEqual = beforeAfterSubstr("=");
-export const trimHashVal = (str):string => str ? str.replace(/^#/, "") : "";
+export const trimHashVal = (str) => str ? str.replace(/^#/, "") : "";
 
 export const keyValsToObjectR = (accum, [key, val]) => {
   if (!accum.hasOwnProperty(key)) {
@@ -32,6 +36,14 @@ export const keyValsToObjectR = (accum, [key, val]) => {
 
 export const getParams = (queryString: string): any =>
     queryString.split("&").filter(identity).map(splitEqual).reduce(keyValsToObjectR, {});
+
+export function parseUrl(url: string) {
+  const orEmptyString = x => x || "";
+  let [beforehash, hash] = splitHash(url).map(orEmptyString);
+  let [path, search] = splitQuery(beforehash).map(orEmptyString);
+
+  return { path, search, hash, url };
+}
 
 export const buildUrl = (loc: LocationServices) => {
   let path = loc.path();
@@ -65,3 +77,4 @@ export function locationPluginFactory(
     return { name, service, configuration, dispose };
   };
 }
+

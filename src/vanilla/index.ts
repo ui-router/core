@@ -4,23 +4,17 @@
  *
  * @internalapi
  * @module vanilla
- */ /** */
-import { UIRouter } from "../router";
+ */
+/** */
+export * from "./$q";
+export * from "./$injector";
 
-import { services } from "../common/coreservices";
-import { ServicesPlugin } from "./interface";
-import { $q } from "./$q";
-import { $injector } from "./$injector";
+export * from "./baseLocationService";
+export * from "./hashLocationService";
+export * from "./memoryLocationService";
+export * from "./pushStateLocationService";
 
-export { $q, $injector };
+export * from "./memoryLocationConfig";
+export * from "./browserLocationConfig";
 
-export function servicesPlugin(router: UIRouter): ServicesPlugin {
-  services.$injector = $injector;
-  services.$q = $q;
-
-  return { name: "vanilla.services", $q, $injector, dispose: () => null };
-}
-
-export * from "./hashLocation";
-export * from "./memoryLocation";
-export * from "./pushStateLocation";
+export * from "./plugins";
