@@ -3,7 +3,6 @@ import {Transition} from "../transition/transition";
 import {TransitionService} from "../transition/transitionService";
 import {TransitionHookFn} from "../transition/interface";
 import {StateDeclaration, LazyLoadResult} from "../state/interface";
-import {State} from "../state/stateObject";
 import {services} from "../common/coreservices";
 import { StateRule } from "../url/interface";
 
@@ -57,11 +56,11 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
     }
 
     // No matching state found, so let .sync() choose the best non-state match/otherwise
-    router.urlRouter.sync();
+    router.urlService.sync();
   }
 
   let promises = transition.entering()
-      .filter(state => !!state.lazyLoad)
+      .filter(state => !!state.$$state().lazyLoad)
       .map(state => lazyLoadState(transition, state));
 
   return services.$q.all(promises).then(retryTransition);
@@ -79,7 +78,7 @@ export const registerLazyLoadHook = (transitionService: TransitionService) =>
  * @returns A promise for the lazy load result
  */
 export function lazyLoadState(transition: Transition, state: StateDeclaration): Promise<LazyLoadResult> {
-  let lazyLoadFn = state.lazyLoad;
+  let lazyLoadFn = state.$$state().lazyLoad;
 
   // Store/get the lazy load promise on/from the hookfn so it doesn't get re-invoked
   let promise = lazyLoadFn['_promise'];

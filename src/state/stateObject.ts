@@ -86,7 +86,7 @@ export class State {
   public onEnter: TransitionStateHookFn;
 
   /** Prototypally inherits from [[StateDeclaration.lazyLoad]] */
-  public lazyLoad: (transition: Transition) => Promise<StateDeclaration[]>;
+  public lazyLoad: (transition: Transition, state: StateDeclaration) => Promise<StateDeclaration[]>;
 
   /** Prototypally inherits from [[StateDeclaration.redirectTo]] */
   redirectTo: (
