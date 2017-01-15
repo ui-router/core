@@ -18,6 +18,10 @@ export class HashLocationService implements LocationServices, Disposable {
   _location: LocationLike;
   _history: HistoryLike;
 
+  constructor() {
+    this._location = location;
+  }
+
   _getHash = () => trimHashVal(this._location.hash);
   _setHash = (val) => this._location.hash = val;
 
