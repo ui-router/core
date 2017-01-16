@@ -1,4 +1,22 @@
 ### ui-router-core changes
+## [3.1.1](https://github.com/ui-router/core/compare/3.1.0...v3.1.1) (2017-01-16)
+
+
+### Bug Fixes
+
+* **lazyLoad:** Allow `lazyLoad` stateBuilder: Get lazyLoad fn from internal State object, not StateDeclaration ([9313880](https://github.com/ui-router/core/commit/9313880))
+* **lazyLoad:** Fix `State.lazyLoad` type def ([9313880](https://github.com/ui-router/core/commit/9313880))
+* **pushStateLocation:** call listeners in url() ([#24](https://github.com/ui-router/core/issues/24)) ([7c90911](https://github.com/ui-router/core/commit/7c90911)), closes [#23](https://github.com/ui-router/core/issues/23)
+
+
+### Features
+
+* **UIRouter:** Add `trace` global to the `UIRouter` object ([48c5af6](https://github.com/ui-router/core/commit/48c5af6))
+* **View:** Allow targeting views on own state using `viewname@.` (normalizeUIViewTarget) ([7078216](https://github.com/ui-router/core/commit/7078216)), closes [#25](https://github.com/ui-router/core/issues/25)
+
+
+
+### ui-router-core changes
 # [3.1.0](https://github.com/ui-router/core/compare/3.0.0...v3.1.0) (2017-01-09)
 
 
