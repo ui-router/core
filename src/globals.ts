@@ -63,30 +63,4 @@ export class Globals implements UIRouterGlobals {
 
   /** @internalapi */
   successfulTransitions = new Queue<Transition>([], 1);
-
-  /** @hidden */
-  constructor(transitionService: TransitionService) {
-    // TODO: This probably belongs in a hooks/globals.ts
-    const beforeNewTransition = ($transition$: Transition) => {
-
-      this.transition = $transition$;
-      this.transitionHistory.enqueue($transition$);
-
-      const updateGlobalState = () => {
-        this.successfulTransitions.enqueue($transition$);
-        this.$current = $transition$.$to();
-        this.current = this.$current.self;
-        copy($transition$.params(), this.params);
-      };
-
-      $transition$.onSuccess({}, updateGlobalState, {priority: 10000});
-
-      const clearCurrentTransition = () => { if (this.transition === $transition$) this.transition = null; };
-
-      $transition$.promise.then(clearCurrentTransition, clearCurrentTransition);
-
-    };
-
-    transitionService.onBefore({}, beforeNewTransition);
-  }
 }

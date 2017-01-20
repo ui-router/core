@@ -48,7 +48,7 @@ export class UIRouter {
   transitionService: TransitionService = new TransitionService(this);
 
   /** Global router state */
-  globals: UIRouterGlobals = new Globals(this.transitionService);
+  globals: UIRouterGlobals = new Globals();
 
   /**
    * Deprecated for public use. Use [[urlService]] instead.

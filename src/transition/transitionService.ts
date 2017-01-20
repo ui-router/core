@@ -1,11 +1,11 @@
 /**
  * @coreapi
  * @module transition
- */ /** for typedoc */
+ */
+/** for typedoc */
 import {
-    IHookRegistry, TransitionOptions, TransitionHookScope, TransitionHookPhase, TransitionCreateHookFn,
-    HookMatchCriteria, HookRegOptions, PathTypes, PathType, RegisteredHooks, IHookRegistration, TransitionHookFn,
-    TransitionStateHookFn
+  IHookRegistry, TransitionOptions, TransitionHookScope, TransitionHookPhase, TransitionCreateHookFn, HookMatchCriteria,
+  HookRegOptions, PathTypes, PathType, RegisteredHooks, TransitionHookFn, TransitionStateHookFn
 } from "./interface";
 import { Transition } from "./transition";
 import { makeEvent, RegisteredHook } from "./hookRegistry";
@@ -13,11 +13,13 @@ import { TargetState } from "../state/targetState";
 import { PathNode } from "../path/node";
 import { ViewService } from "../view/view";
 import { UIRouter } from "../router";
-import { registerEagerResolvePath, registerLazyResolveState } from "../hooks/resolve";
-import { registerLoadEnteringViews, registerActivateViews } from "../hooks/views";
-import { registerUpdateUrl } from "../hooks/url";
+import { registerAddCoreResolvables } from "../hooks/coreResolvables";
 import { registerRedirectToHook } from "../hooks/redirectTo";
 import { registerOnExitHook, registerOnRetainHook, registerOnEnterHook } from "../hooks/onEnterExitRetain";
+import { registerEagerResolvePath, registerLazyResolveState } from "../hooks/resolve";
+import { registerLoadEnteringViews, registerActivateViews } from "../hooks/views";
+import { registerUpdateGlobalState } from "../hooks/updateGlobals";
+import { registerUpdateUrl } from "../hooks/url";
 import { registerLazyLoadHook } from "../hooks/lazyLoad";
 import { TransitionEventType } from "./transitionEventType";
 import { TransitionHook, GetResultHandler, GetErrorHandler } from "./transitionHook";
@@ -167,6 +169,7 @@ export class TransitionService implements IHookRegistry, Disposable {
    * @hidden
    */
   _deregisterHookFns: {
+    addCoreResolves: Function;
     redirectTo: Function;
     onExit: Function;
     onRetain: Function;
@@ -175,6 +178,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     lazyResolve: Function;
     loadViews: Function;
     activateViews: Function;
+    updateGlobals: Function;
     updateUrl: Function;
     lazyLoad: Function;
   };
@@ -195,7 +199,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     this._defineDefaultPaths();
     this._defineDefaultEvents();
 
-    this._registerDefaultTransitionHooks();
+    this._registerCoreTransitionHooks();
   }
 
   /**
@@ -312,29 +316,34 @@ export class TransitionService implements IHookRegistry, Disposable {
   }
 
   /** @hidden */
-  private _registerDefaultTransitionHooks() {
+  private _registerCoreTransitionHooks() {
     let fns = this._deregisterHookFns;
 
+    fns.addCoreResolves = registerAddCoreResolvables(this);
+
     // Wire up redirectTo hook
-    fns.redirectTo    = registerRedirectToHook(this);
+    fns.redirectTo      = registerRedirectToHook(this);
     
     // Wire up onExit/Retain/Enter state hooks
-    fns.onExit        = registerOnExitHook(this);
-    fns.onRetain      = registerOnRetainHook(this);
-    fns.onEnter       = registerOnEnterHook(this);
+    fns.onExit          = registerOnExitHook(this);
+    fns.onRetain        = registerOnRetainHook(this);
+    fns.onEnter         = registerOnEnterHook(this);
 
     // Wire up Resolve hooks
-    fns.eagerResolve  = registerEagerResolvePath(this);
-    fns.lazyResolve   = registerLazyResolveState(this);
-
+    fns.eagerResolve    = registerEagerResolvePath(this);
+    fns.lazyResolve     = registerLazyResolveState(this);
+                                 
     // Wire up the View management hooks
-    fns.loadViews     = registerLoadEnteringViews(this);
-    fns.activateViews = registerActivateViews(this);
+    fns.loadViews       = registerLoadEnteringViews(this);
+    fns.activateViews   = registerActivateViews(this);
+
+    // Updates global state after a transition
+    fns.updateGlobals   = registerUpdateGlobalState(this);
 
     // After globals.current is updated at priority: 10000
-    fns.updateUrl     = registerUpdateUrl(this);
+    fns.updateUrl       = registerUpdateUrl(this);
 
     // Lazy load state trees
-    fns.lazyLoad      = registerLazyLoadHook(this);
+    fns.lazyLoad        = registerLazyLoadHook(this);
   }
 }

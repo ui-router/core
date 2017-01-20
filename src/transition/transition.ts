@@ -161,25 +161,11 @@ export class Transition implements IHookRegistry {
     TransitionHook.runAllHooks(onCreateHooks);
 
     this.applyViewConfigs(router);
-    this.applyRootResolvables(router);
   }
 
   private applyViewConfigs(router: UIRouter) {
     let enteringStates = this._treeChanges.entering.map(node => node.state);
     PathFactory.applyViewConfigs(router.transitionService.$view, this._treeChanges.to, enteringStates);
-  }
-
-  private applyRootResolvables(router: UIRouter) {
-    let rootResolvables: Resolvable[] = [
-      new Resolvable(UIRouter, () => router, [], undefined, router),
-      new Resolvable(Transition, () => this, [], undefined, this),
-      new Resolvable('$transition$', () => this, [], undefined, this),
-      new Resolvable('$stateParams', () => this.params(), [], undefined, this.params())
-    ];
-
-    let rootNode: PathNode = this._treeChanges.to[0];
-    let context = new ResolveContext(this._treeChanges.to);
-    context.addResolvables(rootResolvables, rootNode.state);
   }
 
   /**
