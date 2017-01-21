@@ -11,6 +11,7 @@ karma.**.js
 tslint.json
 tsconfig.json
 tsconfig.*.json
+yarn.lock
 
 *.iml
 *.ipr

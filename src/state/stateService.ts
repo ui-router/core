@@ -26,7 +26,6 @@ import {ParamsOrArray} from "../params/interface";
 import {Param} from "../params/param";
 import {Glob} from "../common/glob";
 import {HrefOptions} from "./interface";
-import {Globals} from "../globals";
 import {UIRouter} from "../router";
 import {UIInjector} from "../interface";
 import {ResolveContext} from "../resolve/resolveContext";
@@ -98,7 +97,7 @@ export class StateService {
    */
   private _handleInvalidTargetState(fromPath: PathNode[], toState: TargetState) {
     let fromState = PathFactory.makeTargetState(fromPath);
-    let globals = <Globals> this.router.globals;
+    let globals = this.router.globals;
     const latestThing = () => globals.transitionHistory.peekTail();
     let latest = latestThing();
     let callbackQueue = new Queue<OnInvalidCallback>(this.invalidCallbacks.slice());
@@ -294,7 +293,7 @@ export class StateService {
   };
 
   private getCurrentPath(): PathNode[] {
-    let globals = <Globals> this.router.globals;
+    let globals = this.router.globals;
     let latestSuccess: Transition = globals.successfulTransitions.peekTail();
     const rootPath = () => [ new PathNode(this.router.stateRegistry.root()) ];
     return latestSuccess ? latestSuccess.treeChanges().to : rootPath();
@@ -325,7 +324,7 @@ export class StateService {
    */
   transitionTo(to: StateOrName, toParams: RawParams = {}, options: TransitionOptions = {}): TransitionPromise {
     let router = this.router;
-    let globals = <Globals> router.globals;
+    let globals = router.globals;
     let transHistory = globals.transitionHistory;
     options = defaults(options, defaultTransOpts);
     options = extend(options, { current: transHistory.peekTail.bind(transHistory)});
@@ -370,7 +369,7 @@ export class StateService {
         }
       }
 
-      var errorHandler = this.defaultErrorHandler();
+      let errorHandler = this.defaultErrorHandler();
       errorHandler(error);
 
       return services.$q.reject(error);
@@ -579,15 +578,15 @@ export class StateService {
    *
    * Returns the state declaration object for any specific state, or for all registered states.
    *
-   * @param stateOrName (absolute or relative) If provided, will only get the config for
-   * the requested state. If not provided, returns an array of ALL state configs.
-   * @param base When stateOrName is a relative state reference, the state will be retrieved relative to context.
+   * @param stateOrName (absolute or relative) If provided, will only get the declaration object for the requested state.
+   * If not provided, returns an array of ALL states.
+   * @param base When `stateOrName` is a relative state reference (such as `.bar.baz`), the state will be retrieved relative to this state.
    *
    * @returns a [[StateDeclaration]] object (or array of all registered [[StateDeclaration]] objects.)
    */
-  get(): StateDeclaration[];
-  get(stateOrName: StateOrName): StateDeclaration;
   get(stateOrName: StateOrName, base: StateOrName): StateDeclaration;
+  get(stateOrName: StateOrName): StateDeclaration;
+  get(): StateDeclaration[];
   get(stateOrName?: StateOrName, base?: StateOrName): any {
     let reg = this.router.stateRegistry;
     if (arguments.length === 0) return reg.get();

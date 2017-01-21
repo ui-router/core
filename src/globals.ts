@@ -16,46 +16,32 @@ import {copy} from "./common/common";
  * This is where we hold the global mutable state such as current state, current
  * params, current transition, etc.
  */
-export interface UIRouterGlobals {
+export class UIRouterGlobals {
   /**
    * Current parameter values
    *
    * The parameter values from the latest successful transition
    */
-  params: StateParams;
+  params: StateParams = new StateParams();
+
   /**
    * Current state
    *
    * The to-state from the latest successful transition
    */
   current: StateDeclaration;
+
   /**
-   * Current state
+   * Current state (internal object)
    *
    * The to-state from the latest successful transition
+   * @internalapi
    */
   $current: State;
+
   /**
    * The current transition (in progress)
    */
-  transition: Transition;
-}
-
-
-/**
- * Global router state
- *
- * This is where we hold the global mutable state such as current state, current
- * params, current transition, etc.
- */
-export class Globals implements UIRouterGlobals {
-  /** @inheritdoc */
-  params: StateParams = new StateParams();
-  /** @inheritdoc */
-  current: StateDeclaration;
-  /** @inheritdoc */
-  $current: State;
-  /** @inheritdoc */
   transition: Transition;
 
   /** @internalapi */

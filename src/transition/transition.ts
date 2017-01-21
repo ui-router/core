@@ -33,7 +33,6 @@ import {ViewConfig} from "../view/interface";
 import {Rejection} from "./rejectFactory";
 import {ResolveContext} from "../resolve/resolveContext";
 import {UIRouter} from "../router";
-import {Globals} from "../globals";
 import {UIInjector} from "../interface";
 import {RawParams} from "../params/interface";
 import { ResolvableLiteral } from "../resolve/interface";
@@ -628,7 +627,7 @@ export class Transition implements IHookRegistry {
   run(): Promise<any> {
     let runAllHooks = TransitionHook.runAllHooks;
     let hookBuilder = this.hookBuilder();
-    let globals = <Globals> this.router.globals;
+    let globals = this.router.globals;
     globals.transitionHistory.enqueue(this);
 
     let onBeforeHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.BEFORE);

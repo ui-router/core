@@ -1,7 +1,6 @@
 /** @module hooks */ /** for typedoc */
 import { Transition } from "../transition/transition";
 import { copy } from "../common/common";
-import { Globals } from "../globals";
 import { TransitionService } from "../transition/transitionService";
 
 /**
@@ -17,7 +16,7 @@ import { TransitionService } from "../transition/transitionService";
  * [[StateService.transition]], [[StateService.current]], [[StateService.params]]
  */
 const updateGlobalState = (trans: Transition) => {
-  let globals = trans.router.globals as Globals;
+  let globals = trans.router.globals;
   globals.transition = trans;
   globals.transitionHistory.enqueue(trans);
 

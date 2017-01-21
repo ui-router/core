@@ -8,7 +8,7 @@ import { TransitionService } from "./transition/transitionService";
 import { ViewService } from "./view/view";
 import { StateRegistry } from "./state/stateRegistry";
 import { StateService } from "./state/stateService";
-import { UIRouterGlobals, Globals } from "./globals";
+import { UIRouterGlobals } from "./globals";
 import { UIRouterPlugin, Disposable } from "./interface";
 import { values, removeFrom } from "./common/common";
 import { isFunction } from "./common/predicates";
@@ -48,7 +48,7 @@ export class UIRouter {
   transitionService: TransitionService = new TransitionService(this);
 
   /** Global router state */
-  globals: UIRouterGlobals = new Globals();
+  globals: UIRouterGlobals = new UIRouterGlobals();
 
   /**
    * Deprecated for public use. Use [[urlService]] instead.
@@ -204,8 +204,8 @@ export class UIRouter {
    * @param pluginName (optional) the name of the plugin to get
    * @return the named plugin (undefined if not found), or all plugins (if `pluginName` is omitted)
    */
+  getPlugin(pluginName: string): UIRouterPlugin;
   getPlugin(): UIRouterPlugin[];
-  getPlugin(pluginName?: string): UIRouterPlugin;
   getPlugin(pluginName?: string): UIRouterPlugin|UIRouterPlugin[] {
     return pluginName ? this._plugins[pluginName] : values(this._plugins);
   }
