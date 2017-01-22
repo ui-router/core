@@ -1,4 +1,54 @@
 ### ui-router-core changes
+# [4.0.0](https://github.com/ui-router/core/compare/3.1.1...v4.0.0) (2017-01-22)
+
+
+### Bug Fixes
+
+* **resolve:** Allow hook and resolve's state context to be injected as `$state$` ([a06948b](https://github.com/ui-router/core/commit/a06948b))
+
+
+### Features
+
+* **core:** Export all vanilla.* code from `ui-router-core` ([f3392d1](https://github.com/ui-router/core/commit/f3392d1))
+* **globals:** Removed `UIRouterGlobals` interface. Renamed `Globals` class to `UIRouterGlobals` ([8719334](https://github.com/ui-router/core/commit/8719334))
+
+
+### BREAKING CHANGES
+
+* BREAKING CHANGE:
+
+This change will likely only affect a small subset of typescript users and probably only those using `ui-router-ng2`.
+If you're injecting the `Globals` class somewhere, e.g.:
+```
+@Injectable()
+class MyService {
+  _globals: UIRouterGlobals;
+  constructor(globals: Globals) {
+    this._globals = <UIRouterGlobals> globals;
+  }
+}
+```
+you should now inject `UIRouterGlobals`, e.g.:
+```
+@Injectable()
+class MyService {
+  constructor(public globals: UIRouterGlobals) { }
+}
+```
+
+Likewise, if you were casting the `UIRouter.globals` object as a `UIRouterGlobals`, it is no longer necessary:
+
+```js
+function myHook(trans: Transition) {
+  let globals: UIRouterGlobals = trans.router.globals; // cast is no longer necessary
+}
+```
+
+Closes https://github.com/ui-router/core/issues/31
+
+
+
+### ui-router-core changes
 ## [3.1.1](https://github.com/ui-router/core/compare/3.1.0...v3.1.1) (2017-01-16)
 
 
