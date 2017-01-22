@@ -14,4 +14,5 @@ export * from "./view/index";
 export * from "./globals";
 
 export * from "./router";
+export * from "./vanilla";
 export * from "./interface";

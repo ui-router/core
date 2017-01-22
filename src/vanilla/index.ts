@@ -6,6 +6,8 @@
  * @module vanilla
  */
 /** */
+export * from "./interface";
+
 export * from "./$q";
 export * from "./$injector";
 
@@ -17,4 +19,5 @@ export * from "./pushStateLocationService";
 export * from "./memoryLocationConfig";
 export * from "./browserLocationConfig";
 
+export * from "./utils";
 export * from "./plugins";
