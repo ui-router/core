@@ -1,7 +1,12 @@
-/** @module params */ /** for typedoc */
+/**
+ * @coreapi
+ * @module params
+ */
+/** */
 import {extend, ancestors, Obj} from "../common/common";
 import {State} from "../state/stateObject";
 
+/** @internalapi */
 export class StateParams {
   [key: string]: any;
 

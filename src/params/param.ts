@@ -1,5 +1,5 @@
 /**
- * @internalapi
+ * @coreapi
  * @module params
  */ /** for typedoc */
 import { extend, filter, map, applyPairs, allTrueR } from "../common/common";
@@ -11,14 +11,16 @@ import { ParamType } from "./paramType";
 import { ParamTypes } from "./paramTypes";
 import { UrlMatcherFactory } from "../url/urlMatcherFactory";
 
-let hasOwn = Object.prototype.hasOwnProperty;
-let isShorthand = (cfg: ParamDeclaration) =>
+/** @hidden */ let hasOwn = Object.prototype.hasOwnProperty;
+/** @hidden */ let isShorthand = (cfg: ParamDeclaration) =>
     ["value", "type", "squash", "array", "dynamic"].filter(hasOwn.bind(cfg || {})).length === 0;
 
+/** @internalapi */
 export enum DefType {
   PATH, SEARCH, CONFIG
 }
 
+/** @hidden */
 function unwrapShorthand(cfg: ParamDeclaration): ParamDeclaration {
   cfg = isShorthand(cfg) && { value: cfg } as any || cfg;
 
@@ -27,6 +29,7 @@ function unwrapShorthand(cfg: ParamDeclaration): ParamDeclaration {
   });
 }
 
+/** @hidden */
 function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, id: string, paramTypes: ParamTypes) {
   if (cfg.type && urlType && urlType.name !== 'string') throw new Error(`Param '${id}' has two type configurations.`);
   if (cfg.type && urlType && urlType.name === 'string' && paramTypes.type(cfg.type as string)) return paramTypes.type(cfg.type as string);
@@ -41,6 +44,7 @@ function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, i
 }
 
 /**
+ * @internalapi
  * returns false, true, or the squash value to indicate the "default parameter url squash policy".
  */
 function getSquashPolicy(config: ParamDeclaration, isOptional: boolean, defaultPolicy: (boolean|string)) {
@@ -51,6 +55,7 @@ function getSquashPolicy(config: ParamDeclaration, isOptional: boolean, defaultP
   throw new Error(`Invalid squash policy: '${squash}'. Valid policies: false, true, or arbitrary string`);
 }
 
+/** @internalapi */
 function getReplace(config: ParamDeclaration, arrayMode: boolean, isOptional: boolean, squash: (string|boolean)) {
   let replace: any, configuredKeys: string[], defaultPolicy = [
     {from: "", to: (isOptional || arrayMode ? undefined : "")},
@@ -63,6 +68,7 @@ function getReplace(config: ParamDeclaration, arrayMode: boolean, isOptional: bo
 }
 
 
+/** @internalapi */
 export class Param {
   id: string;
   type: ParamType;
