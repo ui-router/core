@@ -310,7 +310,7 @@ export function omit(obj: Obj) {
 
 
 /** Given an array of objects, maps each element to a named property of the element. */
-export function pluck(collection: Obj[], propName: string): Obj[];
+export function pluck<T>(collection: Obj[], propName: string): T[];
 /** Given an object, maps each property of the object to a named property of the property. */
 export function pluck(collection: { [key: string]: any }, propName: string): { [key: string]: any };
 /**
