@@ -3,7 +3,7 @@
  * @module url
  */ /** */
 import { UrlMatcher } from "./urlMatcher";
-import { isString, isDefined, isFunction } from "../common/predicates";
+import { isString, isDefined, isFunction, isState } from "../common/predicates";
 import { UIRouter } from "../router";
 import { identity, extend } from "../common/common";
 import { is, pattern } from "../common/hof";
@@ -38,7 +38,7 @@ export class UrlRuleFactory {
     const makeRule = pattern([
       [isString,       (_what: string)         => makeRule(this.compile(_what))],
       [is(UrlMatcher), (_what: UrlMatcher)     => this.fromUrlMatcher(_what, handler)],
-      [is(State),      (_what: State)          => this.fromState(_what, this.router)],
+      [isState,        (_what: State)          => this.fromState(_what, this.router)],
       [is(RegExp),     (_what: RegExp)         => this.fromRegExp(_what, handler)],
       [isFunction,     (_what: UrlRuleMatchFn) => new BaseUrlRule(_what, handler as UrlRuleHandlerFn)],
     ]);

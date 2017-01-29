@@ -1,17 +1,17 @@
 /**
  * @coreapi
  * @module state
- */ /** for typedoc */
-
-import {StateDeclaration, _ViewDeclaration} from "./interface";
-import {extend, defaults, values, find} from "../common/common";
-import {propEq} from "../common/hof";
-import {Param} from "../params/param";
-import {UrlMatcher} from "../url/urlMatcher";
-import {Resolvable} from "../resolve/resolvable";
-import {TransitionStateHookFn} from "../transition/interface";
-import {TargetState} from "./targetState";
-import {Transition} from "../transition/transition";
+ */
+/** for typedoc */
+import { StateDeclaration, _ViewDeclaration } from "./interface";
+import { defaults, values, find, inherit } from "../common/common";
+import { propEq } from "../common/hof";
+import { Param } from "../params/param";
+import { UrlMatcher } from "../url/urlMatcher";
+import { Resolvable } from "../resolve/resolvable";
+import { TransitionStateHookFn } from "../transition/interface";
+import { TargetState } from "./targetState";
+import { Transition } from "../transition/transition";
 
 /**
  * Internal representation of a UI-Router state.
@@ -96,10 +96,30 @@ export class State {
   );
 
 
+  /** @deprecated use State.create() */
   constructor(config?: StateDeclaration) {
-    extend(this, config);
-    // Object.freeze(this);
+    return State.create(config || {});
   }
+
+  /**
+   * Create a state object to put the private/internal implementation details onto.
+   * The object's prototype chain looks like:
+   * (Internal State Object) -> (Copy of State.prototype) -> (State Declaration object) -> (State Declaration's prototype...)
+   *
+   * @param stateDecl the user-supplied State Declaration
+   * @returns {State} an internal State object
+   */
+  static create(stateDecl: StateDeclaration): State {
+    let state = inherit(inherit(stateDecl, State.prototype)) as State;
+    stateDecl.$$state = () => state;
+    state['__stateObject'] = true;
+    state.self = stateDecl;
+    return state;
+  }
+
+  /** Predicate which returns true if the object is an internal State object */
+  static isState = (obj: any): obj is State =>
+      obj['__stateObject'] === true;
 
   /**
    * Returns true if the provided parameter is the same state.

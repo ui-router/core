@@ -52,13 +52,13 @@ export class UIRouter {
 
   /**
    * Deprecated for public use. Use [[urlService]] instead.
-   * @deprecated
+   * @deprecated Use [[urlService]] instead
    */
   urlMatcherFactory: UrlMatcherFactory = new UrlMatcherFactory();
 
   /**
    * Deprecated for public use. Use [[urlService]] instead.
-   * @deprecated
+   * @deprecated Use [[urlService]] instead
    */
   urlRouter: UrlRouter = new UrlRouter(this);
 

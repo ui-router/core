@@ -4,9 +4,11 @@
  * Although these functions are exported, they are subject to change without notice.
  *
  * @module common_predicates
- */ /** */
-import { and, not, pipe, prop, compose, or } from "./hof";
-import {Predicate} from "./common"; // has or is using
+ */
+/** */
+import { and, not, pipe, prop, or } from "./hof";
+import { Predicate } from "./common"; // has or is using
+import { State } from "../state/stateObject";
 
 const toStr = Object.prototype.toString;
 const tis = (t: string) => (x: any) => typeof(x) === t;
@@ -21,6 +23,7 @@ export const isObject = (x: any) => x !== null && typeof x === 'object';
 export const isArray = Array.isArray;
 export const isDate: (x: any) => x is Date = <any> ((x: any) => toStr.call(x) === '[object Date]');
 export const isRegExp: (x: any) => x is RegExp = <any> ((x: any) => toStr.call(x) === '[object RegExp]');
+export const isState: (x: any) => x is State = State.isState;
 
 /**
  * Predicate which checks if a value is injectable

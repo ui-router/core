@@ -1,12 +1,13 @@
 /** @module state */ /** for typedoc */
-import { extend, inherit, pluck } from "../common/common";
-import { isString } from "../common/predicates";
+import { extend, inherit, pluck, inArray } from "../common/common";
+import { isString, isDefined } from "../common/predicates";
 import { StateDeclaration } from "./interface";
 import { State } from "./stateObject";
 import { StateBuilder } from "./stateBuilder";
 import { StateRegistryListener, StateRegistry } from "./stateRegistry";
 import { Disposable } from "../interface";
 import { UrlRouter } from "../url/urlRouter";
+import { prop } from "../common/hof";
 
 /** @internalapi */
 export class StateQueueManager implements Disposable {
@@ -26,19 +27,14 @@ export class StateQueueManager implements Disposable {
     this.queue = [];
   }
 
-  register(config: StateDeclaration) {
-    let {states, queue} = this;
-    // Wrap a new object around the state so we can store our private details easily.
-    // @TODO: state = new State(extend({}, config, { ... }))
-    let state = inherit(new State(), extend({}, config, {
-      self: config,
-      resolve: config.resolve || [],
-      toString: () => config.name
-    }));
+  register(stateDecl: StateDeclaration) {
+    let queue = this.queue;
+    let state = State.create(stateDecl);
+    let name = state.name;
 
-    if (!isString(state.name)) throw new Error("State must have a valid name");
-    if (states.hasOwnProperty(state.name) || pluck(queue, 'name').indexOf(state.name) !== -1)
-      throw new Error(`State '${state.name}' is already defined`);
+    if (!isString(name)) throw new Error("State must have a valid name");
+    if (this.states.hasOwnProperty(name) || inArray(queue.map(prop('name')), name))
+      throw new Error(`State '${name}' is already defined`);
 
     queue.push(state);
     this.flush();
