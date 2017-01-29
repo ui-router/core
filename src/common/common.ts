@@ -137,8 +137,8 @@ export function createProxyFunctions(source: Function, target: Obj, bind: Functi
  * prototypal inheritance helper.
  * Creates a new object which has `parent` object as its prototype, and then copies the properties from `extra` onto it
  */
-export const inherit = (parent: Obj, extra: Obj) =>
-    extend(new (extend(function() {}, { prototype: parent }))(), extra);
+export const inherit = (parent: Obj, extra?: Obj) =>
+    extend(Object.create(parent), extra);
 
 /**
  * Given an arguments object, converts the arguments at index idx and above to an array.
