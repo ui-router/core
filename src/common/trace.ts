@@ -81,6 +81,10 @@ export enum Category {
   RESOLVE, TRANSITION, HOOK, UIVIEW, VIEWCONFIG
 }
 
+/** @hidden */ const _tid = parse("$id");
+/** @hidden */ const _rid = parse("router.$id");
+/** @hidden */ const transLbl = (trans) => `Transition #${_tid(trans)}-${_rid(trans)}`;
+
 /**
  * Prints UI-Router Transition trace information to the console.
  */
@@ -146,77 +150,52 @@ export class Trace {
   /** @internalapi called by ui-router code */
   traceTransitionStart(trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
-    let tid = trans.$id,
-        digest = this.approximateDigests,
-        transitionStr = stringify(trans);
-    console.log(`Transition #${tid} r${trans.router.$id}: Started  -> ${transitionStr}`);
+    console.log(`${transLbl(trans)}: Started  -> ${stringify(trans)}`);
   }
 
   /** @internalapi called by ui-router code */
   traceTransitionIgnored(trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
-    let tid = trans && trans.$id,
-        digest = this.approximateDigests,
-        transitionStr = stringify(trans);
-    console.log(`Transition #${tid} r${trans.router.$id}: Ignored  <> ${transitionStr}`);
+    console.log(`${transLbl(trans)}: Ignored  <> ${stringify(trans)}`);
   }
 
   /** @internalapi called by ui-router code */
   traceHookInvocation(step: TransitionHook, trans: Transition, options: any) {
     if (!this.enabled(Category.HOOK)) return;
-    let tid = parse("transition.$id")(options),
-        digest = this.approximateDigests,
-        event = parse("traceData.hookType")(options) || "internal",
+    let event = parse("traceData.hookType")(options) || "internal",
         context = parse("traceData.context.state.name")(options) || parse("traceData.context")(options) || "unknown",
         name = functionToString((step as any).registeredHook.callback);
-    console.log(`Transition #${tid} r${trans.router.$id}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
+    console.log(`${transLbl(trans)}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
   }
 
   /** @internalapi called by ui-router code */
   traceHookResult(hookResult: HookResult, trans: Transition, transitionOptions: any) {
     if (!this.enabled(Category.HOOK)) return;
-    let tid = parse("transition.$id")(transitionOptions),
-        digest = this.approximateDigests,
-        hookResultStr = stringify(hookResult);
-    console.log(`Transition #${tid} r${trans.router.$id}:   <- Hook returned: ${maxLength(200, hookResultStr)}`);
+    console.log(`${transLbl(trans)}:   <- Hook returned: ${maxLength(200, stringify(hookResult))}`);
   }
 
   /** @internalapi called by ui-router code */
   traceResolvePath(path: PathNode[], when: PolicyWhen, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
-    let tid = trans && trans.$id,
-        digest = this.approximateDigests,
-        pathStr = path && path.toString();
-    console.log(`Transition #${tid} r${trans.router.$id}:         Resolving ${pathStr} (${when})`);
+    console.log(`${transLbl(trans)}:         Resolving ${path} (${when})`);
   }
 
   /** @internalapi called by ui-router code */
   traceResolvableResolved(resolvable: Resolvable, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
-    let tid = trans && trans.$id,
-        digest = this.approximateDigests,
-        resolvableStr = resolvable && resolvable.toString(),
-        result = stringify(resolvable.data);
-    console.log(`Transition #${tid} r${trans.router.$id}:               <- Resolved  ${resolvableStr} to: ${maxLength(200, result)}`);
+    console.log(`${transLbl(trans)}:               <- Resolved  ${resolvable} to: ${maxLength(200, stringify(resolvable.data))}`);
   }
 
   /** @internalapi called by ui-router code */
   traceError(reason: any, trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
-    let tid = trans && trans.$id,
-        digest = this.approximateDigests,
-        transitionStr = stringify(trans);
-    console.log(`Transition #${tid} r${trans.router.$id}: <- Rejected ${transitionStr}, reason: ${reason}`);
+    console.log(`${transLbl(trans)}: <- Rejected ${stringify(trans)}, reason: ${reason}`);
   }
 
   /** @internalapi called by ui-router code */
   traceSuccess(finalState: State, trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
-    let tid = trans && trans.$id,
-        digest = this.approximateDigests,
-        state = finalState.name,
-        transitionStr = stringify(trans);
-    console.log(`Transition #${tid} r${trans.router.$id}: <- Success  ${transitionStr}, final state: ${state}`);
+    console.log(`${transLbl(trans)}: <- Success  ${stringify(trans)}, final state: ${finalState.name}`);
   }
 
   /** @internalapi called by ui-router code */
