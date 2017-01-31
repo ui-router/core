@@ -198,7 +198,7 @@ export class ParamTypes {
 
 
   /** @internalapi */
-  private defaultTypes: any = pick(ParamTypes.prototype, "hash", "string", "query", "path", "int", "bool", "date", "json", "any");
+  private defaultTypes: any = pick(ParamTypes.prototype, ["hash", "string", "query", "path", "int", "bool", "date", "json", "any"]);
 
   /** @internalapi */
   constructor() {

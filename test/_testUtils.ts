@@ -6,8 +6,8 @@ let stateProps = ["resolve", "resolvePolicy", "data", "template", "templateUrl",
 export function tree2Array(tree, inheritName) {
 
   function processState(parent, state, name) {
-    let substates = omit.apply(null, [state].concat(stateProps));
-    let thisState = pick.apply(null, [state].concat(stateProps));
+    let substates: any = omit(state, stateProps);
+    let thisState: any = pick(state, stateProps);
     thisState.name = name;
     if (!inheritName) thisState.parent = parent;
 

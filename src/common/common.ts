@@ -5,10 +5,10 @@
  *
  * @preferred
  * @module common
- */ /** for typedoc */
-
-import { isFunction, isString, isArray, isRegExp, isDate } from "./predicates";
-import { all, any, prop, curry, val } from "./hof";
+ */
+/** for typedoc */
+import { isFunction, isString, isArray, isRegExp, isDate, isDefined } from "./predicates";
+import { all, any, prop, curry, val, not } from "./hof";
 import { services } from "./coreservices";
 import { State } from "../state/stateObject";
 
@@ -18,10 +18,10 @@ export const fromJson = angular.fromJson || JSON.parse.bind(JSON);
 export const toJson = angular.toJson || JSON.stringify.bind(JSON);
 export const copy = angular.copy || _copy;
 export const forEach = angular.forEach || _forEach;
-export const extend = angular.extend || _extend;
+export const extend = Object.assign || _extend;
 export const equals = angular.equals || _equals;
-export const identity = (x: any) => x;
-export const noop = () => <any> undefined;
+export function identity(x: any) { return x; }
+export function noop(): any {}
 
 export type Mapper<X, T> = (x: X, key?: (string|number)) => T;
 export interface TypedMap<T> { [key: string]: T; }
@@ -206,22 +206,10 @@ export const deregAll = (functions: Function[]) =>
  * to only those properties of the objects in the defaultsList.
  * Earlier objects in the defaultsList take precedence when applying defaults.
  */
-export function defaults(opts = {}, ...defaultsList: Obj[]) {
-  let defaults = merge.apply(null, [{}].concat(defaultsList));
-  return extend({}, defaults, pick(opts || {}, Object.keys(defaults)));
-}
-
-/**
- * Merges properties from the list of objects to the destination object.
- * If a property already exists in the destination object, then it is not overwritten.
- */
-export function merge(dst: Obj, ...objs: Obj[]) {
-  forEach(objs, function(obj: Obj) {
-    forEach(obj, function(value: any, key: string) {
-      if (!dst.hasOwnProperty(key)) dst[key] = value;
-    });
-  });
-  return dst;
+export function defaults(opts, ...defaultsList: Obj[]) {
+  let _defaultsList = defaultsList.concat({}).reverse();
+  let defaultVals = extend.apply(null, _defaultsList);
+  return extend({}, defaultVals, pick(opts || {}, Object.keys(defaultVals)));
 }
 
 /** Reduce function that merges each element of the list into a single object, using extend */
@@ -244,16 +232,9 @@ export function ancestors(first: State, second: State) {
   return path;
 }
 
-type PickOmitPredicate = (keys: string[], key: string) => boolean;
-function pickOmitImpl(predicate: PickOmitPredicate, obj: Obj, ...keys: string[]) {
-  let objCopy = {};
-  for (let key in obj) {
-    if (predicate(keys, key)) objCopy[key] = obj[key];
-  }
-  return objCopy;
-}
-
 /**
+ * Return a copy of the object only containing the whitelisted properties.
+
  * @example
  * ```
  *
@@ -263,24 +244,16 @@ function pickOmitImpl(predicate: PickOmitPredicate, obj: Obj, ...keys: string[])
  * @param obj the source object
  * @param propNames an Array of strings, which are the whitelisted property names
  */
-export function pick(obj: Obj, propNames: string[]): Obj;
-/**
- * @example
- * ```
- *
- * var foo = { a: 1, b: 2, c: 3 };
- * var ab = pick(foo, 'a', 'b'); // { a: 1, b: 2 }
- * ```
- * @param obj the source object
- * @param propNames 1..n strings, which are the whitelisted property names
- */
-export function pick(obj: Obj, ...propNames: string[]): Obj;
-/** Return a copy of the object only containing the whitelisted properties. */
-export function pick(obj: Obj) {
-  return pickOmitImpl.apply(null, [inArray].concat(restArgs(arguments)));
+export function pick(obj: Obj, propNames: string[]): Obj {
+  let copy = {};
+  // propNames.forEach(prop => { if (obj.hasOwnProperty(prop)) copy[prop] = obj[prop] });
+  propNames.forEach(prop => { if (isDefined(obj[prop])) copy[prop] = obj[prop] });
+  return copy;
 }
 
 /**
+ * Return a copy of the object omitting the blacklisted properties.
+ *
  * @example
  * ```
  *
@@ -290,22 +263,10 @@ export function pick(obj: Obj) {
  * @param obj the source object
  * @param propNames an Array of strings, which are the blacklisted property names
  */
-export function omit(obj: Obj, propNames: string[]): Obj;
-/**
- * @example
- * ```
- *
- * var foo = { a: 1, b: 2, c: 3 };
- * var ab = omit(foo, 'a', 'b'); // { c: 3 }
- * ```
- * @param obj the source object
- * @param propNames 1..n strings, which are the blacklisted property names
- */
-export function omit(obj: Obj, ...propNames: string[]): Obj;
-/** Return a copy of the object omitting the blacklisted properties. */
-export function omit(obj: Obj) {
-  let notInArray = (array, item) => !inArray(array, item);
-  return pickOmitImpl.apply(null, [notInArray].concat(restArgs(arguments)));
+export function omit(obj: Obj, propNames: string[]): Obj {
+  return Object.keys(obj)
+      .filter(not(inArray(propNames)))
+      .reduce((acc, key) => (acc[key] = obj[key], acc), {});
 }
 
 
@@ -534,10 +495,26 @@ export const pairs = (obj: Obj) =>
  * arrayTuples(foo, bar, baz);  // [ [0, 1, 10], [2, 3, 30], [4, 5, 50], [6, 7, 70] ]
  * ```
  */
-export function arrayTuples(...arrayArgs: any[]): any[] {
-  if (arrayArgs.length === 0) return [];
-  let length = arrayArgs.reduce((min, arr) => Math.min(arr.length, min), 9007199254740991); // aka 2^53 − 1 aka Number.MAX_SAFE_INTEGER
-  return Array.apply(null, Array(length)).map((ignored, idx) => arrayArgs.map(arr => arr[idx]));
+export function arrayTuples(...args: any[]): any[] {
+  if (args.length === 0) return [];
+  let maxArrayLen = args.reduce((min, arr) => Math.min(arr.length, min), 9007199254740991); // aka 2^53 − 1 aka Number.MAX_SAFE_INTEGER
+
+  let i, result = [];
+
+  for (i = 0; i < maxArrayLen; i++) {
+    // This is a hot function
+    // Unroll when there are 1-4 arguments
+    switch (args.length) {
+      case 1: result.push([args[0][i]]); break;
+      case 2: result.push([args[0][i], args[1][i]]); break;
+      case 3: result.push([args[0][i], args[1][i], args[2][i]]); break;
+      case 4: result.push([args[0][i], args[1][i], args[2][i], args[3][i]]); break;
+      default:
+        result.push(args.map(array => array[i])); break;
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -591,14 +568,20 @@ function _forEach(obj: (any[]|any), cb: (el, idx?) => void, _this: Obj) {
   Object.keys(obj).forEach(key => cb(obj[key], key));
 }
 
-function _copyProps(to: Obj, from: Obj) {
-  Object.keys(from).forEach(key => to[key] = from[key]);
-  return to;
-}
-function _extend(toObj: Obj, fromObj: Obj): Obj;
-function _extend(toObj: Obj, ...fromObj: Obj[]): Obj;
-function _extend(toObj: Obj) {
-  return restArgs(arguments, 1).filter(identity).reduce(_copyProps, toObj);
+/** Like Object.assign() */
+export function _extend(toObj: Obj, ...fromObjs: Obj[]): any;
+export function _extend(toObj: Obj): any {
+  for (let i = 1; i < arguments.length; i++) {
+    let obj = arguments[i];
+    if (!obj) continue;
+    let keys = Object.keys(obj);
+
+    for (let j = 0; j < keys.length; j++) {
+      toObj[keys[j]] = obj[keys[j]];
+    }
+  }
+
+  return toObj;
 }
 
 function _equals(o1: any, o2: any): boolean {
@@ -684,8 +667,9 @@ export const sortBy = (propFn: (a) => number, checkFn: Predicate<any> = val(true
  * @param sortFns list of sort functions
  */
 export const composeSort = (...sortFns: sortfn[]): sortfn =>
-    (a, b) =>
-        sortFns.reduce((prev, fn) => prev || fn(a, b), 0);
+    function composedSort(a, b) {
+      return sortFns.reduce((prev, fn) => prev || fn(a, b), 0);
+    };
 
 // issue #2676
 export const silenceUncaughtInPromise = (promise: Promise<any>) =>

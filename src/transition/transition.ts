@@ -728,7 +728,7 @@ export class Transition implements IHookRegistry {
     let toStateOrName = this.to();
 
     const avoidEmptyHash = (params: RawParams) =>
-      (params["#"] !== null && params["#"] !== undefined) ? params : omit(params, "#");
+      (params["#"] !== null && params["#"] !== undefined) ? params : omit(params, ["#"]);
 
     // (X) means the to state is invalid.
     let id = this.$id,
