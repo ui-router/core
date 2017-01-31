@@ -76,7 +76,7 @@ export const $injector = {
   invoke: (fn: IInjectable, context?, locals?) => {
     let all = extend({}, globals, locals || {});
     let params = $injector.annotate(fn);
-    let ensureExist = assertPredicate(key => all.hasOwnProperty(key), key => `DI can't find injectable: '${key}'`);
+    let ensureExist = assertPredicate((key: string) => all.hasOwnProperty(key), key => `DI can't find injectable: '${key}'`);
     let args = params.filter(ensureExist).map(x => all[x]);
     if (isFunction(fn)) return fn.apply(context, args);
     else return (fn as any[]).slice(-1)[0].apply(context, args);

@@ -12,6 +12,8 @@ import { Resolvable } from "../resolve/resolvable";
 import { TransitionStateHookFn } from "../transition/interface";
 import { TargetState } from "./targetState";
 import { Transition } from "../transition/transition";
+import { Glob } from "../common/glob";
+import { isObject } from "../common/predicates";
 
 /**
  * Internal representation of a UI-Router state.
@@ -95,6 +97,12 @@ export class State {
       { state: (string|StateDeclaration), params: { [key: string]: any }}
   );
 
+  /** @hidden */
+  __stateObjectCache: {
+    /** Might be null */
+    nameGlob?: Glob
+  };
+
 
   /** @deprecated use State.create() */
   constructor(config?: StateDeclaration) {
@@ -112,14 +120,16 @@ export class State {
   static create(stateDecl: StateDeclaration): State {
     let state = inherit(inherit(stateDecl, State.prototype)) as State;
     stateDecl.$$state = () => state;
-    state['__stateObject'] = true;
     state.self = stateDecl;
+    state.__stateObjectCache = {
+      nameGlob: Glob.fromString(state.name) // might return null
+    };
     return state;
   }
 
-  /** Predicate which returns true if the object is an internal State object */
+  /** Predicate which returns true if the object is an internal [[State]] object */
   static isState = (obj: any): obj is State =>
-      obj['__stateObject'] === true;
+      isObject(obj['__stateObjectCache']);
 
   /**
    * Returns true if the provided parameter is the same state.

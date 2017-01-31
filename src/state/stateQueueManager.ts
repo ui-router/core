@@ -1,6 +1,6 @@
 /** @module state */ /** for typedoc */
-import { extend, inherit, pluck, inArray } from "../common/common";
-import { isString, isDefined } from "../common/predicates";
+import { inArray } from "../common/common";
+import { isString } from "../common/predicates";
 import { StateDeclaration } from "./interface";
 import { State } from "./stateObject";
 import { StateBuilder } from "./stateBuilder";
@@ -8,10 +8,12 @@ import { StateRegistryListener, StateRegistry } from "./stateRegistry";
 import { Disposable } from "../interface";
 import { UrlRouter } from "../url/urlRouter";
 import { prop } from "../common/hof";
+import { StateMatcher } from "./stateMatcher";
 
 /** @internalapi */
 export class StateQueueManager implements Disposable {
   queue: State[];
+  matcher: StateMatcher;
 
   constructor(
       private $registry: StateRegistry,
@@ -20,6 +22,7 @@ export class StateQueueManager implements Disposable {
       public builder: StateBuilder,
       public listeners: StateRegistryListener[]) {
     this.queue = [];
+    this.matcher = $registry.matcher;
   }
 
   /** @internalapi */
@@ -47,36 +50,39 @@ export class StateQueueManager implements Disposable {
     let registered: State[] = [], // states that got registered
         orphans: State[] = [], // states that don't yet have a parent registered
         previousQueueLength = {}; // keep track of how long the queue when an orphan was first encountered
+    const getState = (name) =>
+        this.states.hasOwnProperty(name) && this.states[name];
 
     while (queue.length > 0) {
       let state: State = queue.shift();
+      let name = state.name;
       let result: State = builder.build(state);
       let orphanIdx: number = orphans.indexOf(state);
 
       if (result) {
-        let existingState = this.$registry.get(state.name);
-
-        if (existingState && existingState.name === state.name) {
-          throw new Error(`State '${state.name}' is already defined`);
+        let existingState = getState(name);
+        if (existingState && existingState.name === name) {
+          throw new Error(`State '${name}' is already defined`);
         }
 
-        if (existingState && existingState.name === state.name + ".**") {
+        let existingFutureState = getState(name + ".**");
+        if (existingFutureState) {
           // Remove future state of the same name
-          this.$registry.deregister(existingState);
+          this.$registry.deregister(existingFutureState);
         }
 
-        states[state.name] = state;
+        states[name] = state;
         this.attachRoute(state);
         if (orphanIdx >= 0) orphans.splice(orphanIdx, 1);
         registered.push(state);
         continue;
       }
 
-      let prev = previousQueueLength[state.name];
-      previousQueueLength[state.name] = queue.length;
+      let prev = previousQueueLength[name];
+      previousQueueLength[name] = queue.length;
       if (orphanIdx >= 0 && prev === queue.length) {
         // Wait until two consecutive iterations where no additional states were dequeued successfully.
-        // throw new Error(`Cannot register orphaned state '${state.name}'`);
+        // throw new Error(`Cannot register orphaned state '${name}'`);
         queue.push(state);
         return states;
       } else if (orphanIdx < 0) {

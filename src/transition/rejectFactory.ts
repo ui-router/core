@@ -29,7 +29,7 @@ export class Rejection {
     return `TransitionRejection(type: ${type}, message: ${message}, detail: ${detail})`;
   }
 
-  toPromise() {
+  toPromise(): Promise<any> {
     return extend(silentRejection(this), { _transitionRejection: this });
   }
 

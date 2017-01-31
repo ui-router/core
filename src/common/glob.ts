@@ -73,14 +73,13 @@ export class Glob {
     return this.regexp.test('.' + name);
   }
 
-  /** @deprecated whats the point? */
+  /** Returns true if the string has glob-like characters in it */
   static is(text: string) {
-    return text.indexOf('*') > -1;
+    return !!/[!,*]+/.exec(text);
   }
 
-  /** @deprecated whats the point? */
+  /** Returns a glob from the string, or null if the string isn't Glob-like */
   static fromString(text: string) {
-    if (!this.is(text)) return null;
-    return new Glob(text);
+    return Glob.is(text) ? new Glob(text) : null;
   }
 }
