@@ -26,8 +26,6 @@ function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHr
 /** @hidden */
 const getMatcher = prop("urlMatcher");
 
-
-
 /**
  * Default rule priority sorting function.
  *
@@ -71,6 +69,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   /** @hidden */ private _otherwiseFn: UrlRule;
   /** @hidden */ interceptDeferred = false;
   /** @hidden */ private _id = 0;
+  /** @hidden */ private _sorted = false;
 
   /** @hidden */
   constructor(router: UIRouter) {
@@ -89,6 +88,11 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   /** @inheritdoc */
   sort(compareFn?: (a: UrlRule, b: UrlRule) => number) {
     this._rules.sort(this._sortFn = compareFn || this._sortFn);
+    this._sorted = true;
+  }
+
+  private ensureSorted() {
+    this._sorted || this.sort();
   }
 
   /**
@@ -97,6 +101,8 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * @returns {MatchResult}
    */
   match(url: UrlParts): MatchResult {
+    this.ensureSorted();
+
     url = extend({path: '', search: {}, hash: '' }, url);
     let rules = this.rules();
     if (this._otherwiseFn) rules.push(this._otherwiseFn);
@@ -247,19 +253,23 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
     if (!UrlRuleFactory.isUrlRule(rule)) throw new Error("invalid rule");
     rule.$id = this._id++;
     rule.priority = rule.priority || 0;
+
     this._rules.push(rule);
-    this.sort();
+    this._sorted = false;
+
     return () => this.removeRule(rule);
   }
 
   /** @inheritdoc */
   removeRule(rule): void {
     removeFrom(this._rules, rule);
-    this.sort();
   }
 
   /** @inheritdoc */
-  rules(): UrlRule[] { return this._rules.slice(); }
+  rules(): UrlRule[] {
+    this.ensureSorted();
+    return this._rules.slice();
+  }
 
   /** @inheritdoc */
   otherwise(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef) {
@@ -269,7 +279,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
     let handlerFn: UrlRuleHandlerFn = isFunction(handler) ? handler as UrlRuleHandlerFn : val(handler);
     this._otherwiseFn = this.urlRuleFactory.create(val(true), handlerFn);
-    this.sort();
+    this._sorted = false;
   };
 
   /** @inheritdoc */

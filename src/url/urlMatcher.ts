@@ -1,11 +1,12 @@
 /**
  * @coreapi
  * @module url
- */ /** for typedoc */
+ */
+/** for typedoc */
 import {
-    map, defaults, inherit, identity, unnest, tail, find, Obj, pairs, allTrueR, unnestR, arrayTuples
+  map, defaults, inherit, identity, unnest, tail, find, Obj, pairs, allTrueR, unnestR, arrayTuples
 } from "../common/common";
-import { prop, propEq, pattern, eq, is, val } from "../common/hof";
+import { prop, propEq } from "../common/hof";
 import { isArray, isString, isDefined } from "../common/predicates";
 import { Param, DefType } from "../params/param";
 import { ParamTypes } from "../params/paramTypes";
@@ -36,10 +37,15 @@ const memoizeTo = (obj: Obj, prop: string, fn: Function) =>
     obj[prop] = obj[prop] || fn();
 
 /** @hidden */
+const splitOnSlash = splitOnDelim('/');
+
+/** @hidden */
 interface UrlMatcherCache {
-  path: UrlMatcher[];
-  parent: UrlMatcher;
-  pattern: RegExp;
+  segments?: any[];
+  weights?: number[];
+  path?: UrlMatcher[];
+  parent?: UrlMatcher;
+  pattern?: RegExp;
 }
 
 /**
@@ -98,7 +104,7 @@ export class UrlMatcher {
   static nameValidator: RegExp = /^\w+([-.]+\w+)*(?:\[\])?$/;
 
   /** @hidden */
-  private _cache: UrlMatcherCache = { path: [this], parent: null, pattern: null };
+  private _cache: UrlMatcherCache = { path: [this] };
   /** @hidden */
   private _children: UrlMatcher[] = [];
   /** @hidden */
@@ -474,8 +480,6 @@ export class UrlMatcher {
    * The comparison function sorts static segments before dynamic ones.
    */
   static compare(a: UrlMatcher, b: UrlMatcher): number {
-    const splitOnSlash = splitOnDelim('/');
-
     /**
      * Turn a UrlMatcher and all its parent matchers into an array
      * of slash literals '/', string literals, and Param objects
@@ -484,27 +488,38 @@ export class UrlMatcher {
      * var matcher = $umf.compile("/foo").append($umf.compile("/:param")).append($umf.compile("/")).append($umf.compile("tail"));
      * var result = segments(matcher); // [ '/', 'foo', '/', Param, '/', 'tail' ]
      *
+     * Caches the result as `matcher._cache.segments`
      */
     const segments = (matcher: UrlMatcher) =>
-        matcher._cache.path.map(UrlMatcher.pathSegmentsAndParams)
-            .reduce(unnestR, [])
-            .reduce(joinNeighborsR, [])
-            .map(x => isString(x) ? splitOnSlash(x) : x)
-            .reduce(unnestR, []);
+        matcher._cache.segments = matcher._cache.segments ||
+            matcher._cache.path.map(UrlMatcher.pathSegmentsAndParams)
+                .reduce(unnestR, [])
+                .reduce(joinNeighborsR, [])
+                .map(x => isString(x) ? splitOnSlash(x) : x)
+                .reduce(unnestR, []);
 
-    let aSegments = segments(a), bSegments = segments(b);
-    // console.table( { aSegments, bSegments });
+    /**
+     * Gets the sort weight for each segment of a UrlMatcher
+     *
+     * Caches the result as `matcher._cache.weights`
+     */
+    const weights = (matcher: UrlMatcher) =>
+        matcher._cache.weights = matcher._cache.weights ||
+            segments(matcher).map(segment => {
+              // Sort slashes first, then static strings, the Params
+              if (segment === '/') return 1;
+              if (isString(segment)) return 2;
+              if (segment instanceof Param) return 3;
+            });
 
-    // Sort slashes first, then static strings, the Params
-    const weight = pattern([
-      [eq("/"),   val(1)],
-      [isString,  val(2)],
-      [is(Param), val(3)]
-    ]);
-    let pairs = arrayTuples(aSegments.map(weight), bSegments.map(weight));
-    // console.table(pairs);
+    let cmp, i, pairs = arrayTuples(weights(a), weights(b));
 
-    return pairs.reduce((cmp, weightPair) => cmp !== 0 ? cmp : weightPair[0] - weightPair[1], 0);
+    for (i = 0; i < pairs.length; i++) {
+      cmp = pairs[i][0] - pairs[i][1];
+      if (cmp !== 0) return cmp;
+    }
+
+    return 0;
   }
 }
 
