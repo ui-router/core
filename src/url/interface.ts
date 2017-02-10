@@ -49,33 +49,39 @@ export interface UrlMatcherConfig {
   /**
    * Defines whether URL matching should be case sensitive (the default behavior), or not.
    *
-   * @param value `false` to match URL in a case sensitive manner; otherwise `true`;
-   * @returns the current value of caseInsensitive
-   *
    * #### Example:
    * ```js
    * // Allow case insensitive url matches
    * urlService.config.caseInsensitive(true);
    * ```
+   *
+   * @param value `false` to match URL in a case sensitive manner; otherwise `true`;
+   * @returns the current value of caseInsensitive
    */
   caseInsensitive(value?: boolean): boolean;
 
   /**
    * Defines whether URLs should match trailing slashes, or not (the default behavior).
    *
-   * @param value `false` to match trailing slashes in URLs, otherwise `true`.
-   * @returns the current value of strictMode
-   *
    * #### Example:
    * ```js
    * // Allow optional trailing slashes
    * urlService.config.strictMode(false);
    * ```
+   *
+   * @param value `false` to match trailing slashes in URLs, otherwise `true`.
+   * @returns the current value of strictMode
    */
   strictMode(value?: boolean): boolean;
 
   /**
    * Sets the default behavior when generating or matching URLs with default parameter values.
+   *
+   * #### Example:
+   * ```js
+   * // Remove default parameter values from the url
+   * urlService.config.defaultSquashPolicy(true);
+   * ```
    *
    * @param value A string that defines the default parameter URL squashing behavior.
    *    - `nosquash`: When generating an href with a default parameter value, do not squash the parameter value from the URL
@@ -84,12 +90,6 @@ export interface UrlMatcherConfig {
    *    - any other string, e.g. "~": When generating an href with a default parameter value, squash (remove)
    *      the parameter value from the URL and replace it with this string.
    * @returns the current value of defaultSquashPolicy
-   *
-   * #### Example:
-   * ```js
-   * // Remove default parameter values from the url
-   * urlService.config.defaultSquashPolicy(true);
-   * ```
    */
   defaultSquashPolicy(value?: (boolean|string)): (boolean|string);
 
@@ -97,11 +97,6 @@ export interface UrlMatcherConfig {
    * Creates and registers a custom [[ParamTypeDefinition]] object
    *
    * A custom parameter type can be used to generate URLs with typed parameters or custom encoding/decoding.
-   *
-   * @param name  The type name.
-   * @param type The type definition. See [[ParamTypeDefinition]] for examples and information.
-   *
-   * @returns if only the `name` parameter was specified: the currently registered [[ParamType]] object, or undefined
    *
    * #### Note: Register custom types *before using them* in a state definition.
    *
@@ -116,6 +111,11 @@ export interface UrlMatcherConfig {
    *   equals: (a, b) => _.isEqual(a, b),
    * });
    * ```
+   *
+   * @param name  The type name.
+   * @param type The type definition. See [[ParamTypeDefinition]] for examples and information.
+   *
+   * @returns if only the `name` parameter was specified: the currently registered [[ParamType]] object, or undefined
    */
   type(name: string, type?: ParamTypeDefinition): ParamType;
 }
@@ -297,13 +297,13 @@ export interface UrlRulesApi {
    * .when(new RegExp("^/foo/(.*)$"), match => "/bar/" + match[1]);
    * ```
    *
+   * Note: the `handler` may also invoke arbitrary code, such as `$state.go()`
+   *
    * @param matcher A pattern `string` to match, compiled as a [[UrlMatcher]], or a `RegExp`.
    * @param handler The path to redirect to, or a function that returns the path.
    * @param options `{ priority: number }`
    *
    * @return the registered [[UrlRule]]
-   *
-   * Note: the `handler` may also invoke arbitrary code, such as `$state.go()`
    */
   when(matcher: (RegExp|UrlMatcher|string), handler: string|UrlRuleHandlerFn, options?: { priority: number }): UrlRule;
 
