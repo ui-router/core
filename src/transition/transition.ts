@@ -214,6 +214,7 @@ export class Transition implements IHookRegistry {
 
   /**
    * Determines whether two transitions are equivalent.
+   * @deprecated
    */
   is(compare: (Transition|{to?: any, from?: any})): boolean {
     if (compare instanceof Transition) {
