@@ -50,6 +50,29 @@ export interface LocationServices extends Disposable {
   /**
    * Gets the current url string
    *
+   * The URL is normalized using the internal [[path]]/[[search]]/[[hash]] values.
+   *
+   * For example, the URL may be stored in the hash ([[HashLocationServices]]) or
+   * have a base HREF prepended ([[PushStateLocationServices]]).
+   *
+   * The raw URL in the browser might be:
+   *
+   * ```
+   * http://mysite.com/somepath/index.html#/internal/path/123?param1=foo#anchor
+   * ```
+   *
+   * or
+   *
+   * ```
+   * http://mysite.com/basepath/internal/path/123?param1=foo#anchor
+   * ```
+   *
+   * then this method returns:
+   *
+   * ```
+   * /internal/path/123?param1=foo#anchor
+   * ```
+   *
    *
    * #### Example:
    * ```js
@@ -70,7 +93,9 @@ export interface LocationServices extends Disposable {
    * locationServices.url("/some/path?query=value#anchor", true);
    * ```
    *
-   * @param newurl The new value for the URL
+   * @param newurl The new value for the URL.
+   *               This url should reflect only the new internal [[path]], [[search]], and [[hash]] values.
+   *               It should not include the protocol, site, port, or base path of an absolute HREF.
    * @param replace When true, replaces the current history entry (instead of appending it) with this new url
    * @param state The history's state object, i.e., pushState (if the LocationServices implementation supports it)
    * @return the url (after potentially being processed)
@@ -144,7 +169,7 @@ export interface LocationConfig extends Disposable {
    */
   host(): string;
   /**
-   * Gets the base Href, e.g., `http://localhost/approot`
+   * Gets the base Href, e.g., `http://localhost/approot/`
    *
    * @return the application's base href
    */
