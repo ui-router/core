@@ -10,7 +10,10 @@ export enum RejectType {
   SUPERSEDED = 2, ABORTED = 3, INVALID = 4, IGNORED = 5, ERROR = 6
 }
 
+/** @hidden */ let id = 0;
+
 export class Rejection {
+  $id = id++;
   type: number;
   message: string;
   detail: any;
@@ -25,8 +28,9 @@ export class Rejection {
   toString() {
     const detailString = (d: any) => 
         d && d.toString !== Object.prototype.toString ? d.toString() : stringify(d);
-    let type = this.type, message = this.message, detail = detailString(this.detail);
-    return `TransitionRejection(type: ${type}, message: ${message}, detail: ${detail})`;
+    let detail = detailString(this.detail);
+    let { $id, type, message } = this;
+    return `TransitionRejection($id: ${$id} type: ${type}, message: ${message}, detail: ${detail})`;
   }
 
   toPromise(): Promise<any> {
