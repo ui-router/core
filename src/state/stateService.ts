@@ -365,7 +365,7 @@ export class StateService {
 
         if (error.type === RejectType.ABORTED) {
           router.urlRouter.update();
-          // Fall through to default error handler
+          return services.$q.reject(error);
         }
       }
 
