@@ -14,11 +14,15 @@ export class BrowserLocationConfig implements LocationConfig {
   constructor(router?, private _isHtml5 = false) { }
 
   port(): number {
-    return parseInt(location.port);
+    if (location.port) {
+      return Number(location.port);
+    }
+
+    return this.protocol() === 'https' ? 443 : 80;
   }
 
   protocol(): string {
-    return location.protocol;
+    return location.protocol.replace(/:/g, '');
   }
 
   host(): string {
