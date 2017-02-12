@@ -119,9 +119,11 @@ export class UIRouter {
     this.globals.$current = this.stateRegistry.root();
     this.globals.current = this.globals.$current.self;
 
+    this.disposable(this.globals);
+    this.disposable(this.stateService);
+    this.disposable(this.stateRegistry);
     this.disposable(this.transitionService);
     this.disposable(this.urlRouter);
-    this.disposable(this.stateRegistry);
     this.disposable(locationService);
     this.disposable(locationConfig);
   }
