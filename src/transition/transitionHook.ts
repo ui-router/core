@@ -70,6 +70,7 @@ export class TransitionHook {
     let options = this.options;
     trace.traceHookInvocation(this, this.transition, options);
 
+    // A new transition started before this hook (from a previous transition) could be run.
     if (this.rejectIfSuperseded()) {
       return Rejection.superseded(options.current()).toPromise();
     }
@@ -113,7 +114,7 @@ export class TransitionHook {
 
     // Hook returned a promise
     if (isPromise(result)) {
-      // Wait for the promise, then reprocess the resolved value
+      // Wait for the promise, then reprocess the settled promise value
       return result.then(this.handleHookResult.bind(this));
     }
 
@@ -128,7 +129,7 @@ export class TransitionHook {
     const isTargetState = is(TargetState);
     // hook returned a TargetState
     if (isTargetState(result)) {
-      // Halt the current Transition and start a redirected Transition (to the TargetState).
+      // Halt the current Transition and redirect (a new Transition) to the TargetState.
       return Rejection.redirected(result).toPromise();
     }
   }
