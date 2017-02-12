@@ -18,16 +18,20 @@ describe('transition', function () {
     return $transitions.create(fromPath, $state.target(to, null, options));
   }
 
-  const wait = (val?) =>
+  const _delay = (millis) =>
+      new Promise(resolve => setTimeout(resolve, millis));
+  const delay = (millis) => () => _delay(millis);
+
+  const tick = (val?) =>
       new Promise((resolve) => setTimeout(() => resolve(val)));
 
   // Use this in a .then(go('from', 'to')) when you want to run a transition you expect to succeed
   const go = (from, to, options?) =>
-      () => makeTransition(from, to, options).run().then(wait);
+      () => makeTransition(from, to, options).run().then(tick);
 
   // Use this in a .then(goFail('from', 'to')) when you want to run a transition you expect to fail
   const goFail = (from, to, options?) =>
-      () => makeTransition(from, to, options).run().catch(wait);
+      () => makeTransition(from, to, options).run().catch(tick);
 
   beforeEach(() => {
     router = new UIRouter();
@@ -121,7 +125,7 @@ describe('transition', function () {
 
         var tsecond = makeTransition("", "second");
         tsecond.run()
-            .then(wait)
+            .then(tick)
             .then(() => expect(t).toBe(tsecond))
             .then(done);
       }));
@@ -132,7 +136,7 @@ describe('transition', function () {
         router.stateRegistry.register({
           name: 'slowResolve',
           resolve: {
-            foo: () => new Promise(resolve => setTimeout(resolve, 50))
+            foo: delay(50)
           }
         });
 
@@ -143,10 +147,13 @@ describe('transition', function () {
 
         $state.go('slowResolve');
 
-        setTimeout(() => $state.go('slowResolve').transition.promise.then(() => {
-          expect(results).toEqual({success: 1, error: 1});
-          done();
-        }), 20);
+        _delay(20)
+            .then(() =>
+                $state.go('slowResolve').transition.promise )
+            .then(delay(50))
+            .then(() =>
+                expect(results).toEqual({ success: 1, error: 1 }))
+            .then(done)
       }));
 
       describe('.onCreate()', function() {
@@ -275,7 +282,7 @@ describe('transition', function () {
           var transition = makeTransition("", "third");
           var result = new PromiseResult(transition.promise);
           transition.run()
-              .then(wait)
+              .then(tick)
               .then(() => {
                 expect(result.called()).toEqual({ resolve: true, reject: false, complete: true });
                 expect(typeof args.trans.from).toBe('function');
@@ -532,7 +539,7 @@ describe('transition', function () {
 
         transition.promise.catch(function(err) { rejection = err; });
         transition.run()
-            .catch(wait)
+            .catch(tick)
             .then(() => {
               expect(pluck(states, 'name')).toEqual([ 'A', 'B', 'C' ]);
               expect(rejection.type).toEqual(RejectType.ABORTED);
@@ -547,7 +554,7 @@ describe('transition', function () {
         transition.promise.catch(function(err) { rejection = err; });
 
         transition.run()
-            .catch(wait)
+            .catch(tick)
             .then(() => {
               expect(pluck(states, 'name')).toEqual([ 'B', 'C' ]);
               expect(rejection.type).toEqual(RejectType.SUPERSEDED);
@@ -574,12 +581,12 @@ describe('transition', function () {
 
         transition.promise.catch(function(err) { rejection = err; });
         transition.run()
-            .then(wait, wait)
+            .then(tick, tick)
             .then(() => {
               // .onEnter() from A->C should have set transition2.
               transition2.promise.then(function() { transition2success = true; });
             })
-            .then(wait, wait)
+            .then(tick, tick)
             .then(() => {
               expect(pluck(states, 'name')).toEqual([ 'B', 'C', 'G' ]);
               expect(rejection instanceof Rejection).toBeTruthy();
@@ -607,7 +614,7 @@ describe('transition', function () {
         });
 
         transition.run()
-            .then(wait, wait)
+            .then(tick, tick)
             .then(() => expect(log.join('')).toBe("#B^B#C^C#D^D"))
             .then(done);
       });
@@ -619,7 +626,7 @@ describe('transition', function () {
         function resolveDeferredFor(name) {
           log.push("^" + name);
           defers[name].resolve("ok, go ahead!");
-          return wait();
+          return tick();
         }
 
         $transitions.onEnter({ entering: '**' }, function waitWhileEnteringState(trans, state) {
@@ -630,7 +637,7 @@ describe('transition', function () {
         transition.promise.then(function() { log.push("DONE"); });
         transition.run();
 
-        wait().then(() => expect(log.join(';')).toBe("#B"))
+        tick().then(() => expect(log.join(';')).toBe("#B"))
 
             .then(() => resolveDeferredFor("B"))
             .then(() => expect(log.join(';')).toBe("#B;^B;#C"))
@@ -667,9 +674,9 @@ describe('transition', function () {
 
         transition.run();
 
-        wait().then(() => expect(log.join(';')).toBe("adding resolve;Entered#B;resolving"))
+        tick().then(() => expect(log.join(';')).toBe("adding resolve;Entered#B;resolving"))
             .then(() => defer.resolve("resolvedval"))
-            .then(wait, wait)
+            .then(tick, tick)
             .then(() => expect(log.join(';')).toBe("adding resolve;Entered#B;resolving;resolvedval;Entered#C;Entered#D;DONE!"))
             .then(done, done);
       }));
