@@ -14,5 +14,5 @@ function addCoreResolvables(trans: Transition) {
   });
 }
 
-export const registerAddCoreResolvables= (transitionService: TransitionService) =>
+export const registerAddCoreResolvables = (transitionService: TransitionService) =>
     transitionService.onCreate({}, addCoreResolvables);
