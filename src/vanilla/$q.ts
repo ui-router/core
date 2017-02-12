@@ -40,11 +40,7 @@ export const $q = {
   /** Like Promise.all(), but also supports object key/promise notation like $q */
   all: (promises: { [key: string]: Promise<any> } | Promise<any>[]) => {
     if (isArray(promises)) {
-      return new Promise((resolve, reject) => {
-        let results = [];
-        promises.reduce((wait4, promise) => wait4.then(() => promise.then(val => results.push(val))), $q.when())
-          .then(() => { resolve(results); }, reject);
-      });
+      return Promise.all(promises);
     }
 
     if (isObject(promises)) {
@@ -52,6 +48,7 @@ export const $q = {
       // When each promise resolves, map it to a tuple { key: key, val: val }
       let chain = Object.keys(promises)
           .map(key => promises[key].then(val => ({key, val})));
+
       // Then wait for all promises to resolve, and convert them back to an object
       return $q.all(chain).then(values =>
         values.reduce((acc, tuple) => { acc[tuple.key] = tuple.val; return acc; }, {}));
