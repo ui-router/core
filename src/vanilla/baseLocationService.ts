@@ -23,7 +23,31 @@ export abstract class BaseLocationServices implements LocationServices, Disposab
   _location: LocationLike;
   _history: HistoryLike;
 
+  /**
+   * This should return the current internal URL representation.
+   *
+   * The internal URL includes only the portion that UI-Router matches.
+   * It does not include:
+   * - protocol
+   * - server
+   * - port
+   * - base href or hash
+   */
   abstract _get(): string;
+
+  /**
+   * This should set the current URL.
+   *
+   * The `url` param should include only the portion that UI-Router matches on.
+   * It should not include:
+   * - protocol
+   * - server
+   * - port
+   * - base href or hash
+   *
+   * However, after this function completes, the browser URL should reflect the entire (fully qualified)
+   * HREF including those data.
+   */
   abstract _set(state: any, title: string, url: string, replace: boolean);
 
   hash   = () => parseUrl(this._get()).hash;
