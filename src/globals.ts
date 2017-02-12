@@ -9,6 +9,7 @@ import {Transition} from "./transition/transition";
 import {Queue} from "./common/queue";
 import {TransitionService} from "./transition/transitionService";
 import {copy} from "./common/common";
+import { Disposable } from './interface';
 
 /**
  * Global router state
@@ -16,7 +17,7 @@ import {copy} from "./common/common";
  * This is where we hold the global mutable state such as current state, current
  * params, current transition, etc.
  */
-export class UIRouterGlobals {
+export class UIRouterGlobals implements Disposable {
   /**
    * Current parameter values
    *
@@ -49,4 +50,10 @@ export class UIRouterGlobals {
 
   /** @internalapi */
   successfulTransitions = new Queue<Transition>([], 1);
+
+  dispose() {
+    this.transitionHistory.clear();
+    this.successfulTransitions.clear();
+    this.transition = null;
+  }
 }
