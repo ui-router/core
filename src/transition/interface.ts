@@ -816,5 +816,5 @@ export interface PathType {
  */
 export type HookMatchCriterion = (string|IStateMatch|boolean)
 
-export enum TransitionHookPhase { CREATE, BEFORE, ASYNC, SUCCESS, ERROR }
+export enum TransitionHookPhase { CREATE, BEFORE, RUN, SUCCESS, ERROR }
 export enum TransitionHookScope { TRANSITION, STATE }

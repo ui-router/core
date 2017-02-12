@@ -143,34 +143,36 @@ export class TransitionHook {
   }
 
   /**
+   * Chains together an array of TransitionHooks.
+   *
+   * Given a list of [[TransitionHook]] objects, chains them together.
+   * Each hook is invoked after the previous one completes.
+   *
+   * #### Example:
+   * ```js
+   * var hooks: TransitionHook[] = getHooks();
+   * let promise: Promise<any> = TransitionHook.chain(hooks);
+   *
+   * promise.then(handleSuccess, handleError);
+   * ```
+   *
+   * @param hooks the list of hooks to chain together
+   * @param waitFor if provided, the chain is `.then()`'ed off this promise
+   * @returns a `Promise` for sequentially invoking the hooks (in order)
+   */
+  static chain(hooks: TransitionHook[], waitFor?: Promise<any>): Promise<any> {
+    // Chain the next hook off the previous
+    const createHookChainR = (prev: Promise<any>, nextHook: TransitionHook) =>
+        prev.then(() => nextHook.invokeHook());
+    return hooks.reduce(createHookChainR, waitFor || services.$q.when());
+  }
+
+
+  /**
    * Run all TransitionHooks, ignoring their return value.
    */
   static runAllHooks(hooks: TransitionHook[]): void {
     hooks.forEach(hook => hook.invokeHook());
   }
 
-  /**
-   * Given an array of TransitionHooks, runs each one synchronously and sequentially.
-   * Should any hook return a Rejection synchronously, the remaining hooks will not run.
-   *
-   * Returns a promise chain composed of any promises returned from each hook.invokeStep() call
-   */
-  static runOnBeforeHooks(hooks: TransitionHook[]): Promise<any> {
-    let results: Promise<HookResult>[] = [];
-
-    for (let hook of hooks) {
-      let hookResult = hook.invokeHook();
-
-      if (Rejection.isTransitionRejectionPromise(hookResult)) {
-        // Break on first thrown error or false/TargetState
-        return hookResult;
-      }
-
-      results.push(hookResult);
-    }
-
-    return results
-        .filter(isPromise)
-        .reduce((chain: Promise<any>, promise: Promise<any>) => chain.then(val(promise)), services.$q.when());
-  }
 }

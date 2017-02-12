@@ -1,41 +1,35 @@
 /**
  * @coreapi
  * @module transition
- */ /** for typedoc */
-import {stringify} from "../common/strings";
-import {trace} from "../common/trace";
-import {services} from "../common/coreservices";
+ */
+/** for typedoc */
+import { trace } from '../common/trace';
+import { services } from '../common/coreservices';
 import {
-    map, find, extend, mergeR, tail,
-    omit, toJson, arrayTuples, unnestR, identity, anyTrueR
-} from "../common/common";
-import { isObject, isArray } from "../common/predicates";
-import { prop, propEq, val, not, is } from "../common/hof";
-
-import {StateDeclaration, StateOrName} from "../state/interface";
+  map, find, extend, mergeR, tail, omit, toJson, arrayTuples, unnestR, identity, anyTrueR
+} from '../common/common';
+import { isObject } from '../common/predicates';
+import { prop, propEq, val, not, is } from '../common/hof';
+import { StateDeclaration, StateOrName } from '../state/interface';
 import {
-    TransitionOptions, TreeChanges, IHookRegistry, TransitionHookPhase,
-    RegisteredHooks, HookRegOptions, HookMatchCriteria
-} from "./interface";
-
-import { TransitionStateHookFn, TransitionHookFn } from "./interface"; // has or is using
-
-import {TransitionHook} from "./transitionHook";
-import {matchState, makeEvent, RegisteredHook} from "./hookRegistry";
-import {HookBuilder} from "./hookBuilder";
-import {PathNode} from "../path/node";
-import {PathFactory} from "../path/pathFactory";
-import {State} from "../state/stateObject";
-import {TargetState} from "../state/targetState";
-import {Param} from "../params/param";
-import {Resolvable} from "../resolve/resolvable";
-import {ViewConfig} from "../view/interface";
-import {Rejection} from "./rejectFactory";
-import {ResolveContext} from "../resolve/resolveContext";
-import {UIRouter} from "../router";
-import {UIInjector} from "../interface";
-import {RawParams} from "../params/interface";
-import { ResolvableLiteral } from "../resolve/interface";
+  TransitionOptions, TreeChanges, IHookRegistry, TransitionHookPhase, RegisteredHooks, HookRegOptions,
+  HookMatchCriteria, TransitionStateHookFn, TransitionHookFn
+} from './interface'; // has or is using
+import { TransitionHook } from './transitionHook';
+import { matchState, makeEvent, RegisteredHook } from './hookRegistry';
+import { HookBuilder } from './hookBuilder';
+import { PathNode } from '../path/node';
+import { PathFactory } from '../path/pathFactory';
+import { State } from '../state/stateObject';
+import { TargetState } from '../state/targetState';
+import { Param } from '../params/param';
+import { Resolvable } from '../resolve/resolvable';
+import { ViewConfig } from '../view/interface';
+import { ResolveContext } from '../resolve/resolveContext';
+import { UIRouter } from '../router';
+import { UIInjector } from '../interface';
+import { RawParams } from '../params/interface';
+import { ResolvableLiteral } from '../resolve/interface';
 
 /** @hidden */
 const stateSelf: (_state: State) => StateDeclaration = prop("self");
@@ -630,28 +624,6 @@ export class Transition implements IHookRegistry {
     let globals = this.router.globals;
     globals.transitionHistory.enqueue(this);
 
-    let onBeforeHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.BEFORE);
-    let syncResult = TransitionHook.runOnBeforeHooks(onBeforeHooks);
-
-    if (Rejection.isTransitionRejectionPromise(syncResult)) {
-      syncResult.catch(() => 0); // issue #2676
-      let rejectReason = (<any> syncResult)._transitionRejection;
-      this._deferred.reject(rejectReason);
-      return this.promise;
-    }
-
-    if (!this.valid()) {
-      let error = new Error(this.error());
-      this._deferred.reject(error);
-      return this.promise;
-    }
-
-    if (this.ignored()) {
-      trace.traceTransitionIgnored(this);
-      this._deferred.reject(Rejection.ignored());
-      return this.promise;
-    }
-
     // When the chain is complete, then resolve or reject the deferred
     const transitionSuccess = () => {
       trace.traceSuccess(this.$to(), this);
@@ -670,16 +642,16 @@ export class Transition implements IHookRegistry {
       runAllHooks(onErrorHooks);
     };
 
-    trace.traceTransitionStart(this);
+    // Builds a chain of transition hooks for the given phase
+    // Each hook is invoked after the previous one completes
+    const chainFor = (phase: TransitionHookPhase) =>
+        TransitionHook.chain(hookBuilder.buildHooksForPhase(phase));
 
-    // Chain the next hook off the previous
-    const appendHookToChain = (prev: Promise<any>, nextHook: TransitionHook) =>
-        prev.then(() => nextHook.invokeHook());
-
-    // Run the hooks, then resolve or reject the overall deferred in the .then() handler
-    let asyncHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.ASYNC);
-
-    asyncHooks.reduce(appendHookToChain, syncResult)
+    services.$q.when()
+        .then(() => chainFor(TransitionHookPhase.BEFORE))
+        // This waits to build the RUN hook chain until after the "BEFORE" hooks complete
+        // This allows a BEFORE hook to dynamically add RUN hooks via the Transition object.
+        .then(() => chainFor(TransitionHookPhase.RUN))
         .then(transitionSuccess, transitionError);
 
     return this.promise;

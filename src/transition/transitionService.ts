@@ -27,6 +27,8 @@ import { isDefined } from "../common/predicates";
 import { removeFrom, values, createProxyFunctions } from "../common/common";
 import { Disposable } from "../interface"; // has or is using
 import { val } from "../common/hof";
+import { registerIgnoredTransitionHook } from '../hooks/ignoredTransition';
+import { registerInvalidTransitionHook } from '../hooks/invalidTransition';
 
 /**
  * The default [[Transition]] options.
@@ -170,6 +172,8 @@ export class TransitionService implements IHookRegistry, Disposable {
    */
   _deregisterHookFns: {
     addCoreResolves: Function;
+    ignored: Function;
+    invalid: Function;
     redirectTo: Function;
     onExit: Function;
     onRetain: Function;
@@ -196,9 +200,8 @@ export class TransitionService implements IHookRegistry, Disposable {
       'getHooks',
     ]);
 
-    this._defineDefaultPaths();
-    this._defineDefaultEvents();
-
+    this._defineCorePaths();
+    this._defineCoreEvents();
     this._registerCoreTransitionHooks();
   }
 
@@ -228,7 +231,7 @@ export class TransitionService implements IHookRegistry, Disposable {
   }
 
   /** @hidden */
-  private _defineDefaultEvents() {
+  private _defineCoreEvents() {
     const Phase = TransitionHookPhase;
     const TH = TransitionHook;
     const paths = this._criteriaPaths;
@@ -237,18 +240,18 @@ export class TransitionService implements IHookRegistry, Disposable {
 
     this._defineEvent("onBefore",  Phase.BEFORE,  0,   paths.to, false, TH.HANDLE_RESULT);
 
-    this._defineEvent("onStart",   Phase.ASYNC,   0,   paths.to);
-    this._defineEvent("onExit",    Phase.ASYNC,   100, paths.exiting, true);
-    this._defineEvent("onRetain",  Phase.ASYNC,   200, paths.retained);
-    this._defineEvent("onEnter",   Phase.ASYNC,   300, paths.entering);
-    this._defineEvent("onFinish",  Phase.ASYNC,   400, paths.to);
+    this._defineEvent("onStart",   Phase.RUN,     0,   paths.to);
+    this._defineEvent("onExit",    Phase.RUN,     100, paths.exiting, true);
+    this._defineEvent("onRetain",  Phase.RUN,     200, paths.retained);
+    this._defineEvent("onEnter",   Phase.RUN,     300, paths.entering);
+    this._defineEvent("onFinish",  Phase.RUN,     400, paths.to);
 
     this._defineEvent("onSuccess", Phase.SUCCESS, 0,   paths.to, false, TH.IGNORE_RESULT, TH.LOG_ERROR, false);
     this._defineEvent("onError",   Phase.ERROR,   0,   paths.to, false, TH.IGNORE_RESULT, TH.LOG_ERROR, false);
   }
 
   /** @hidden */
-  private _defineDefaultPaths() {
+  private _defineCorePaths() {
     const { STATE, TRANSITION } = TransitionHookScope;
 
     this._definePathType("to", TRANSITION);
@@ -318,6 +321,8 @@ export class TransitionService implements IHookRegistry, Disposable {
     let fns = this._deregisterHookFns;
 
     fns.addCoreResolves = registerAddCoreResolvables(this);
+    fns.ignored         = registerIgnoredTransitionHook(this);
+    fns.invalid         = registerInvalidTransitionHook(this);
 
     // Wire up redirectTo hook
     fns.redirectTo      = registerRedirectToHook(this);
