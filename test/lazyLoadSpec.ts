@@ -389,7 +389,7 @@ describe('future state', function () {
       expect($state.get('A')).toBe(futureStateDef);
 
       $state.go('A').catch(() => {
-        expect(errors).toEqual(['nope']);
+        expect(errors.map(x => x.detail)).toEqual(['nope']);
         expect($state.get('A')).toBe(futureStateDef);
         done();
       });
@@ -399,18 +399,18 @@ describe('future state', function () {
       expect($state.get('A')).toBe(futureStateDef);
 
       $state.go('A').catch(() => {
-        expect(errors).toEqual(['nope']);
+        expect(errors.map(x => x.detail)).toEqual(['nope']);
         expect($state.get('A')).toBe(futureStateDef);
         expect(count).toBe(1);
 
         $state.go('A').catch(() => {
-          expect(errors).toEqual(['nope', 'nope']);
+          expect(errors.map(x => x.detail)).toEqual(['nope', 'nope']);
           expect($state.get('A')).toBe(futureStateDef);
           expect(count).toBe(2);
 
           // this time it should lazy load
           $state.go('A').then(() => {
-            expect(errors).toEqual(['nope', 'nope']);
+            expect(errors.map(x => x.detail)).toEqual(['nope', 'nope']);
             expect($state.get('A')).toBeTruthy();
             expect($state.get('A')).not.toBe(futureStateDef);
             expect(count).toBe(3);

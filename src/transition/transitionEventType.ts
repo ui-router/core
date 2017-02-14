@@ -16,6 +16,6 @@ export class TransitionEventType {
               public reverseSort:        boolean = false,
               public getResultHandler:   GetResultHandler = TransitionHook.HANDLE_RESULT,
               public getErrorHandler:    GetErrorHandler = TransitionHook.REJECT_ERROR,
-              public rejectIfSuperseded: boolean = true,
+              public synchronous:         boolean = false,
   ) { }
 }
