@@ -238,7 +238,7 @@ export class TransitionService implements IHookRegistry, Disposable {
 
     this._defineEvent("onCreate",  Phase.CREATE,  0,   paths.to, false, TH.IGNORE_RESULT, TH.THROW_ERROR, false);
 
-    this._defineEvent("onBefore",  Phase.BEFORE,  0,   paths.to, false, TH.HANDLE_RESULT);
+    this._defineEvent("onBefore",  Phase.BEFORE,  0,   paths.to);
 
     this._defineEvent("onStart",   Phase.RUN,     0,   paths.to);
     this._defineEvent("onExit",    Phase.RUN,     100, paths.exiting, true);
