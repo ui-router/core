@@ -34,30 +34,11 @@ import {RegisteredHook} from "./hookRegistry";
  *
  */
 export class HookBuilder {
-
-  private $transitions: TransitionService;
-  private baseHookOptions: TransitionHookOptions;
-
-  treeChanges: TreeChanges;
-  transitionOptions: TransitionOptions;
-
-  toState: State;
-  fromState: State;
-
-  constructor(private transition: Transition) {
-    this.treeChanges        = transition.treeChanges();
-    this.transitionOptions  = transition.options();
-    this.toState            = tail(this.treeChanges.to).state;
-    this.fromState          = tail(this.treeChanges.from).state;
-    this.$transitions       = transition.router.transitionService;
-    this.baseHookOptions    = <TransitionHookOptions> {
-      transition: transition,
-      current: transition.options().current
-    };
-  }
+  constructor(private transition: Transition) { }
 
   buildHooksForPhase(phase: TransitionHookPhase): TransitionHook[] {
-    return this.$transitions._pluginapi._getEvents(phase)
+    let $transitions = this.transition.router.transitionService;
+    return $transitions._pluginapi._getEvents(phase)
         .map(type => this.buildHooks(type))
         .reduce(unnestR, [])
         .filter(identity);
@@ -73,13 +54,21 @@ export class HookBuilder {
    * @param hookType the type of the hook registration function, e.g., 'onEnter', 'onFinish'.
    */
   buildHooks(hookType: TransitionEventType): TransitionHook[] {
+    let transition = this.transition;
+    let treeChanges = transition.treeChanges();
+
     // Find all the matching registered hooks for a given hook type
-    let matchingHooks = this.getMatchingHooks(hookType, this.treeChanges);
+    let matchingHooks = this.getMatchingHooks(hookType, treeChanges);
     if (!matchingHooks) return [];
 
-     const makeTransitionHooks = (hook: RegisteredHook) => {
+    let baseHookOptions = <TransitionHookOptions> {
+      transition: transition,
+      current: transition.options().current
+    };
+
+    const makeTransitionHooks = (hook: RegisteredHook) => {
        // Fetch the Nodes that caused this hook to match.
-       let matches: IMatchingNodes = hook.matches(this.treeChanges);
+       let matches: IMatchingNodes = hook.matches(treeChanges);
        // Select the PathNode[] that will be used as TransitionHook context objects
        let matchingNodes: PathNode[] = matches[hookType.criteriaMatchPath.name];
 
@@ -87,11 +76,11 @@ export class HookBuilder {
        return matchingNodes.map(node => {
          let _options = extend({
            bind: hook.bind,
-           traceData: { hookType: hookType.name, context: node}
-         }, this.baseHookOptions);
+           traceData: { hookType: hookType.name, context: node }
+         }, baseHookOptions);
 
          let state = hookType.criteriaMatchPath.scope === TransitionHookScope.STATE ? node.state : null;
-         let transitionHook = new TransitionHook(this.transition, state, hook, _options);
+         let transitionHook = new TransitionHook(transition, state, hook, _options);
          return <HookTuple> { hook, node, transitionHook };
        });
     };
@@ -117,7 +106,8 @@ export class HookBuilder {
     let isCreate = hookType.hookPhase === TransitionHookPhase.CREATE;
 
     // Instance and Global hook registries
-    let registries = isCreate ? [ this.$transitions ] : [ this.transition, this.$transitions ];
+    let $transitions = this.transition.router.transitionService;
+    let registries = isCreate ? [ $transitions ] : [ this.transition, $transitions ];
 
     return registries.map((reg: IHookRegistry) => reg.getHooks(hookType.name))    // Get named hooks from registries
         .filter(assertPredicate(isArray, `broken event named: ${hookType.name}`)) // Sanity check

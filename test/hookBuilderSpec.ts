@@ -46,7 +46,7 @@ describe('HookBuilder:', function() {
     let A = $state.target('A', null).$state();
     let path = [new PathNode(root), new PathNode(A)];
     trans = $trans.create(path, $state.target("A.B.C", null));
-    hb = trans.hookBuilder();
+    hb = trans._hookBuilder;
     expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).length).toBe(0);
 
     // Transition from 'A.B.C' to 'A'
@@ -55,7 +55,7 @@ describe('HookBuilder:', function() {
     let C = $state.target('A.B.C', null).$state();
     let fromPath = [new PathNode(root), new PathNode(A), new PathNode(B), new PathNode(C)];
     trans2 = $trans.create(fromPath, $state.target("A", null));
-    hb2 = trans2.hookBuilder();
+    hb2 = trans2._hookBuilder;
 
     callback = hook('hook');
     expect(typeof callback).toBe('function')
