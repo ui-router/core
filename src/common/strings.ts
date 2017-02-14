@@ -79,7 +79,7 @@ export function fnToString(fn: IInjectable) {
 
 let stringifyPatternFn: (val: any) => string = null;
 let stringifyPattern = function(value: any) {
-  let isRejection = Rejection.isTransitionRejectionPromise;
+  let isRejection = Rejection.isRejectionPromise;
 
   stringifyPatternFn = <any> stringifyPatternFn || pattern([
     [not(isDefined),  val("undefined")],

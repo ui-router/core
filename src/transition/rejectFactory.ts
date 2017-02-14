@@ -5,6 +5,7 @@
 "use strict";
 import {extend, silentRejection} from "../common/common";
 import {stringify} from "../common/strings";
+import { is } from '../common/hof';
 
 export enum RejectType {
   SUPERSEDED = 2, ABORTED = 3, INVALID = 4, IGNORED = 5, ERROR = 6
@@ -30,7 +31,7 @@ export class Rejection {
         d && d.toString !== Object.prototype.toString ? d.toString() : stringify(d);
     let detail = detailString(this.detail);
     let { $id, type, message } = this;
-    return `TransitionRejection($id: ${$id} type: ${type}, message: ${message}, detail: ${detail})`;
+    return `Transition Rejection($id: ${$id} type: ${type}, message: ${message}, detail: ${detail})`;
   }
 
   toPromise(): Promise<any> {
@@ -38,12 +39,12 @@ export class Rejection {
   }
 
   /** Returns true if the obj is a rejected promise created from the `asPromise` factory */
-  static isTransitionRejectionPromise(obj: any) {
-    return obj && (typeof obj.then === 'function') && obj._transitionRejection instanceof Rejection;
+  static isRejectionPromise(obj: any): boolean {
+    return obj && (typeof obj.then === 'function') && is(Rejection)(obj._transitionRejection);
   }
 
-  /** Returns a TransitionRejection due to transition superseded */
-  static superseded(detail?: any, options?: any) {
+  /** Returns a Rejection due to transition superseded */
+  static superseded(detail?: any, options?: any): Rejection {
     let message = "The transition has been superseded by a different transition";
     let rejection = new Rejection(RejectType.SUPERSEDED, message, detail);
     if (options && options.redirected) {
@@ -52,34 +53,45 @@ export class Rejection {
     return rejection;
   }
 
-  /** Returns a TransitionRejection due to redirected transition */
-  static redirected(detail?: any) {
-    return Rejection.superseded(detail, {redirected: true});
+  /** Returns a Rejection due to redirected transition */
+  static redirected(detail?: any): Rejection {
+    return Rejection.superseded(detail, { redirected: true });
   }
 
-  /** Returns a TransitionRejection due to invalid transition */
-  static invalid(detail?: any) {
+  /** Returns a Rejection due to invalid transition */
+  static invalid(detail?: any): Rejection {
     let message = "This transition is invalid";
     return new Rejection(RejectType.INVALID, message, detail);
   }
 
-  /** Returns a TransitionRejection due to ignored transition */
-  static ignored(detail?: any) {
+  /** Returns a Rejection due to ignored transition */
+  static ignored(detail?: any): Rejection {
     let message = "The transition was ignored";
     return new Rejection(RejectType.IGNORED, message, detail);
   }
 
-  /** Returns a TransitionRejection due to aborted transition */
-  static aborted(detail?: any) {
-    // TODO think about how to encapsulate an Error() object
+  /** Returns a Rejection due to aborted transition */
+  static aborted(detail?: any): Rejection {
     let message = "The transition has been aborted";
     return new Rejection(RejectType.ABORTED, message, detail);
   }
 
-  /** Returns a TransitionRejection due to aborted transition */
-  static errored(detail?: any) {
-    // TODO think about how to encapsulate an Error() object
+  /** Returns a Rejection due to aborted transition */
+  static errored(detail?: any): Rejection {
     let message = "The transition errored";
     return new Rejection(RejectType.ERROR, message, detail);
+  }
+  
+  /**
+   * Returns a Rejection
+   *
+   * Normalizes a value as a Rejection.
+   * If the value is already a Rejection, returns it.
+   * Otherwise, wraps and returns the value as a Rejection (Rejection type: ERROR).
+   *
+   * @returns `detail` if it is already a `Rejection`, else returns an ERROR Rejection.
+   */
+  static normalize(detail?: Rejection | Error | any): Rejection {
+    return is(Rejection)(detail) ? detail : Rejection.errored(detail);
   }
 }
