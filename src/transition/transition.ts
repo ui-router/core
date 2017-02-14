@@ -89,6 +89,8 @@ export class Transition implements IHookRegistry {
   private _treeChanges: TreeChanges;
   /** @hidden */
   private _targetState: TargetState;
+  /** @hidden */
+  private _hookBuilder = new HookBuilder(this);
 
 
   /** @hidden */
@@ -150,7 +152,7 @@ export class Transition implements IHookRegistry {
     this._treeChanges = PathFactory.treeChanges(fromPath, toPath, this._options.reloadState);
     this.createTransitionHookRegFns();
 
-    let onCreateHooks = this.hookBuilder().buildHooksForPhase(TransitionHookPhase.CREATE);
+    let onCreateHooks = this._hookBuilder.buildHooksForPhase(TransitionHookPhase.CREATE);
     TransitionHook.runAllHooks(onCreateHooks);
 
     this.applyViewConfigs(router);
@@ -604,13 +606,6 @@ export class Transition implements IHookRegistry {
   }
 
   /**
-   * @hidden
-   */
-  hookBuilder(): HookBuilder {
-    return new HookBuilder(this);
-  }
-
-  /**
    * Runs the transition
    *
    * This method is generally called from the [[StateService.transitionTo]]
@@ -621,17 +616,24 @@ export class Transition implements IHookRegistry {
    */
   run(): Promise<any> {
     let runAllHooks = TransitionHook.runAllHooks;
-    let hookBuilder = this.hookBuilder();
     let globals = this.router.globals;
     globals.transitionHistory.enqueue(this);
+
+    // Gets transition hooks array for the given phase
+    const hooksFor = (phase: TransitionHookPhase) =>
+        this._hookBuilder.buildHooksForPhase(phase);
+
+    // Builds a chain of transition hooks for the given phase
+    // Each hook is invoked after the previous one completes
+    const chainFor = (phase: TransitionHookPhase) =>
+        TransitionHook.chain(hooksFor(phase));
 
     // When the chain is complete, then resolve or reject the deferred
     const transitionSuccess = () => {
       trace.traceSuccess(this.$to(), this);
       this.success = true;
       this._deferred.resolve(this.to());
-      let onSuccessHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.SUCCESS);
-      runAllHooks(onSuccessHooks);
+      runAllHooks(hooksFor(TransitionHookPhase.SUCCESS));
     };
 
     const transitionError = (reason: any) => {
@@ -639,14 +641,8 @@ export class Transition implements IHookRegistry {
       this.success = false;
       this._deferred.reject(reason);
       this._error = reason;
-      let onErrorHooks = hookBuilder.buildHooksForPhase(TransitionHookPhase.ERROR);
-      runAllHooks(onErrorHooks);
+      runAllHooks(hooksFor(TransitionHookPhase.ERROR));
     };
-
-    // Builds a chain of transition hooks for the given phase
-    // Each hook is invoked after the previous one completes
-    const chainFor = (phase: TransitionHookPhase) =>
-        TransitionHook.chain(hookBuilder.buildHooksForPhase(phase));
 
     services.$q.when()
         .then(() => chainFor(TransitionHookPhase.BEFORE))
