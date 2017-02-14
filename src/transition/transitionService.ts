@@ -235,19 +235,21 @@ export class TransitionService implements IHookRegistry, Disposable {
     const Phase = TransitionHookPhase;
     const TH = TransitionHook;
     const paths = this._criteriaPaths;
+    const NORMAL_SORT = false, REVERSE_SORT = true;
+    const ASYNCHRONOUS = false, SYNCHRONOUS = true;
 
-    this._defineEvent("onCreate",  Phase.CREATE,  0,   paths.to, false, TH.IGNORE_RESULT, TH.THROW_ERROR, false);
+    this._defineEvent("onCreate",  Phase.CREATE,  0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.THROW_ERROR, SYNCHRONOUS);
 
     this._defineEvent("onBefore",  Phase.BEFORE,  0,   paths.to);
 
     this._defineEvent("onStart",   Phase.RUN,     0,   paths.to);
-    this._defineEvent("onExit",    Phase.RUN,     100, paths.exiting, true);
+    this._defineEvent("onExit",    Phase.RUN,     100, paths.exiting, REVERSE_SORT);
     this._defineEvent("onRetain",  Phase.RUN,     200, paths.retained);
     this._defineEvent("onEnter",   Phase.RUN,     300, paths.entering);
     this._defineEvent("onFinish",  Phase.RUN,     400, paths.to);
 
-    this._defineEvent("onSuccess", Phase.SUCCESS, 0,   paths.to, false, TH.IGNORE_RESULT, TH.LOG_ERROR, false);
-    this._defineEvent("onError",   Phase.ERROR,   0,   paths.to, false, TH.IGNORE_RESULT, TH.LOG_ERROR, false);
+    this._defineEvent("onSuccess", Phase.SUCCESS, 0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.LOG_ERROR, SYNCHRONOUS);
+    this._defineEvent("onError",   Phase.ERROR,   0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.LOG_ERROR, SYNCHRONOUS);
   }
 
   /** @hidden */
@@ -269,9 +271,9 @@ export class TransitionService implements IHookRegistry, Disposable {
                reverseSort: boolean = false,
                getResultHandler: GetResultHandler = TransitionHook.HANDLE_RESULT,
                getErrorHandler: GetErrorHandler = TransitionHook.REJECT_ERROR,
-               rejectIfSuperseded: boolean = true)
+               synchronous: boolean = false)
   {
-    let eventType = new TransitionEventType(name, hookPhase, hookOrder, criteriaMatchPath, reverseSort, getResultHandler, getErrorHandler, rejectIfSuperseded);
+    let eventType = new TransitionEventType(name, hookPhase, hookOrder, criteriaMatchPath, reverseSort, getResultHandler, getErrorHandler, synchronous);
 
     this._eventTypes.push(eventType);
     makeEvent(this, this, eventType);
