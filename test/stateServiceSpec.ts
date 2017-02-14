@@ -18,6 +18,9 @@ describe('stateService', function () {
   let $state: StateService;
   let $loc: LocationServices;
 
+  const delay = (millis) => () =>
+      new Promise(resolve => setTimeout(resolve, millis));
+
   const wait = (val?) =>
       new Promise((resolve) => setTimeout(() => resolve(val), 50));
 
@@ -670,5 +673,148 @@ describe('stateService', function () {
 
       done();
     });
+  });
+
+  describe('defaultErrorHandler', () => {
+    let count, doh: Error, spy: jasmine.Spy;
+
+    const expectDoh = () => {
+      expect(count).toBe(1);
+      expect(spy).toHaveBeenCalledWith(doh);
+    };
+
+    const expectNone = () => {
+      expect(count).toBe(1);
+      expect(spy).not.toHaveBeenCalled();
+    };
+
+
+    beforeEach(() => {
+      spy = jasmine.createSpy("defaultErrorHandler", function(err) {});
+      $state.defaultErrorHandler((err) => spy(err.detail));
+      $registry.register({ name: 'a' });
+      $registry.register({ name: 'a.b' });
+      doh = new Error('doh');
+      count = 0;
+    });
+
+    // thrown error
+
+    it('should not be called when an onCreate hook throws', (done) => {
+      $transitions.onCreate({}, () => { count++; throw doh; });
+      expect(() => $state.go('a')).toThrow();
+      expectNone();
+      done();
+    });
+
+    it('should be called when an onBefore hook throws', (done) => {
+      $transitions.onBefore({}, () => { count++; throw doh; });
+      $state.go('a').then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when an onStart hook throws', (done) => {
+      $transitions.onStart({}, () => { count++; throw doh; });
+      $state.go('a').then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when an onEnter hook throws', (done) => {
+      $transitions.onEnter({}, () => { count++; throw doh; });
+      $state.go('a').then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when an onRetain hook throws', (done) => {
+      $transitions.onRetain({}, () => { count++; throw doh; });
+      $state.go('a').then(() => $state.go('a.b')).then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when an onExit hook throws', (done) => {
+      $transitions.onExit({}, () => { count++; throw doh; });
+      $state.go('a.b').then(() => $state.go('a')).then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when an onFinish hook throws', (done) => {
+      $transitions.onFinish({}, () => { count++; throw doh; });
+      $state.go('a').then(expectDoh, expectDoh).then(done);
+    });
+
+    // rejected promise
+
+    it('should be called when an onCreate hook rejects a promise', (done) => {
+      $transitions.onCreate({}, () => {
+        count++; return Promise.reject(doh); });
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when a rejected promise is returned from an onBefore hook', (done) => {
+      $transitions.onBefore({}, () => { count++; return Promise.reject(doh) });
+      $state.go('a').then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when a rejected promise is returned from an onStart hook', (done) => {
+      $transitions.onStart({}, () => { count++; return Promise.reject(doh) });
+      $state.go('a').then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when a rejected promise is returned from an onEnter hook', (done) => {
+      $transitions.onEnter({}, () => { count++; return Promise.reject(doh) });
+      $state.go('a').then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when a rejected promise is returned from an onRetain hook', (done) => {
+      $transitions.onRetain({}, () => { count++; return Promise.reject(doh) });
+      $state.go('a').then(() => $state.go('a.b')).then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when a rejected promise is returned from an onExit hook', (done) => {
+      $transitions.onExit({}, () => { count++; return Promise.reject(doh) });
+      $state.go('a.b').then(() => $state.go('a')).then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when a rejected promise is returned from an onFinish hook', (done) => {
+      $transitions.onFinish({}, () => { count++; return Promise.reject(doh) });
+      $state.go('a').then(expectDoh, expectDoh).then(done);
+    });
+
+    // onSuccess
+
+    it('should be called when an onSuccess hook throws', (done) => {
+      $transitions.onSuccess({}, () => { count++; throw doh; });
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when a rejected promise is returned from an onSuccess hook', (done) => {
+      $transitions.onSuccess({}, () => {
+        count++; return Promise.reject(doh) });
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
+    });
+
+    // onError
+
+    it('should be called when an onError hook throws', (done) => {
+      $transitions.onStart({}, () => { throw doh; });
+      $transitions.onError({}, () => { count++; throw doh; });
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
+    });
+
+    it('should be called when a rejected promise is returned from an onError hook', (done) => {
+      $transitions.onStart({}, () => { throw doh; });
+      $transitions.onError({}, () => { count++; return Promise.reject(doh) });
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
+    });
+
+    // ABORT
+
+    it('should be not called when a hook aborts the transition', (done) => {
+      $transitions.onFinish({}, () => { count++; return false; });
+      $state.go('a').then(expectNone, expectNone).then(done);
+    });
+
+    // REDIRECT
+
+    it('should be not called when a hook redirects the transition', (done) => {
+      $transitions.onStart({ to: 'a' } , (trans) => { count++; return trans.router.stateService.target('a.b'); });
+      $state.go('a').then(expectNone, expectNone).then(done);
+    });
+
   });
 });
