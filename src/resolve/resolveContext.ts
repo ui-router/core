@@ -20,7 +20,7 @@ const EAGER_WHENS = [when.EAGER];
 export const NATIVE_INJECTOR_TOKEN = "Native Injector";
 
 /**
- * Encapsulates Depenency Injection for a path of nodes
+ * Encapsulates Dependency Injection for a path of nodes
  *
  * UI-Router states are organized as a tree.
  * A nested state has a path of ancestors to the root of the tree.
