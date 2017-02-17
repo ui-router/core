@@ -14,7 +14,7 @@ import {
     HookMatchCriterion, IMatchingNodes, HookFn
 } from "./interface";
 import {Glob} from "../common/glob";
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 import {TransitionEventType} from "./transitionEventType";
 import { TransitionService } from "./transitionService";
 
@@ -31,10 +31,10 @@ import { TransitionService } from "./transitionService";
  * - If a function, matchState calls the function with the state and returns true if the function's result is truthy.
  * @returns {boolean}
  */
-export function matchState(state: State, criterion: HookMatchCriterion) {
+export function matchState(state: StateObject, criterion: HookMatchCriterion) {
   let toMatch = isString(criterion) ? [criterion] : criterion;
 
-  function matchGlobs(_state: State) {
+  function matchGlobs(_state: StateObject) {
     let globStrings = <string[]> toMatch;
     for (let i = 0; i < globStrings.length; i++) {
       let glob = new Glob(globStrings[i]);

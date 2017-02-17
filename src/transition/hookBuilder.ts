@@ -13,7 +13,7 @@ import {
 
 import {Transition} from "./transition";
 import {TransitionHook} from "./transitionHook";
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 import {PathNode} from "../path/node";
 import {TransitionService} from "./transitionService";
 import {TransitionEventType} from "./transitionEventType";

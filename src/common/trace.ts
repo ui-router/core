@@ -43,7 +43,7 @@ import {PathNode} from "../path/node";
 import {PolicyWhen} from "../resolve/interface";
 import {TransitionHook} from "../transition/transitionHook";
 import {HookResult} from "../transition/interface";
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 
 /** @hidden */
 function uiViewString (viewData: ActiveUIView) {
@@ -193,7 +193,7 @@ export class Trace {
   }
 
   /** @internalapi called by ui-router code */
-  traceSuccess(finalState: State, trans: Transition) {
+  traceSuccess(finalState: StateObject, trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
     console.log(`${transLbl(trans)}: <- Success  ${stringify(trans)}, final state: ${finalState.name}`);
   }

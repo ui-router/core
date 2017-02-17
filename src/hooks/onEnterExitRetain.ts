@@ -1,6 +1,6 @@
 /** @module hooks */ /** for typedoc */
 import {TransitionStateHookFn} from "../transition/interface";
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 import {Transition} from "../transition/transition";
 import {TransitionService} from "../transition/transitionService";
 
@@ -13,7 +13,7 @@ import {TransitionService} from "../transition/transitionService";
  * @hidden
  */
 function makeEnterExitRetainHook(hookName: string): TransitionStateHookFn {
-  return (transition: Transition, state: State) => {
+  return (transition: Transition, state: StateObject) => {
     let hookFn: TransitionStateHookFn = state[hookName];
     return hookFn(transition, state);
   }

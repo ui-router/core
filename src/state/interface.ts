@@ -3,7 +3,7 @@
  * @module state
  */ /** for typedoc */
 import { ParamDeclaration, RawParams, ParamsOrArray } from "../params/interface";
-import { State } from "./stateObject";
+import { StateObject } from "./stateObject";
 import { ViewContext } from "../view/interface";
 import { IInjectable } from "../common/common";
 import { Transition } from "../transition/transition";
@@ -12,10 +12,10 @@ import { ResolvePolicy, ResolvableLiteral, ProviderLike } from "../resolve/inter
 import { Resolvable } from "../resolve/resolvable";
 import { TargetState } from "./targetState";
 
-export type StateOrName = (string|StateDeclaration|State);
+export type StateOrName = (string|StateDeclaration|StateObject);
 
 /** @internalapi */
-export interface TransitionPromise extends Promise<State> {
+export interface TransitionPromise extends Promise<StateObject> {
   transition: Transition;
 }
 
@@ -163,7 +163,7 @@ export interface StateDeclaration {
    *
    * Note: the internal [[State]] API is subject to change without notice
    */
-  $$state?: () => State;
+  $$state?: () => StateObject;
 
   /**
    * Resolve - a mechanism to asynchronously fetch data, participating in the Transition lifecycle

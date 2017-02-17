@@ -20,7 +20,7 @@ import { matchState, makeEvent, RegisteredHook } from './hookRegistry';
 import { HookBuilder } from './hookBuilder';
 import { PathNode } from '../path/node';
 import { PathFactory } from '../path/pathFactory';
-import { State } from '../state/stateObject';
+import { StateObject } from '../state/stateObject';
 import { TargetState } from '../state/targetState';
 import { Param } from '../params/param';
 import { Resolvable } from '../resolve/resolvable';
@@ -32,7 +32,7 @@ import { RawParams } from '../params/interface';
 import { ResolvableLiteral } from '../resolve/interface';
 
 /** @hidden */
-const stateSelf: (_state: State) => StateDeclaration = prop("self");
+const stateSelf: (_state: StateObject) => StateDeclaration = prop("self");
 
 /**
  * Represents a transition between two states.
@@ -475,7 +475,7 @@ export class Transition implements IHookRegistry {
    *
    * @returns a list of ViewConfig objects for the given path.
    */
-  views(pathname: string = "entering", state?: State): ViewConfig[] {
+  views(pathname: string = "entering", state?: StateObject): ViewConfig[] {
     let path = this._treeChanges[pathname];
     path = !state ? path : path.filter(propEq('state', state));
     return path.map(prop("views")).filter(identity).reduce(unnestR, []);
@@ -540,7 +540,7 @@ export class Transition implements IHookRegistry {
     // The redirected transition does not have to re-fetch the resolve.
     // ---------------------------------------------------------
 
-    const nodeIsReloading = (reloadState: State) => (node: PathNode) => {
+    const nodeIsReloading = (reloadState: StateObject) => (node: PathNode) => {
       return reloadState && node.state.includes[reloadState.name];
     };
 
@@ -677,7 +677,7 @@ export class Transition implements IHookRegistry {
    * @returns an error message explaining why the transition is invalid, or the reason the transition failed.
    */
   error() {
-    let state: State = this.$to();
+    let state: StateObject = this.$to();
 
     if (state.self.abstract)
       return `Cannot transition to abstract state '${state.name}'`;

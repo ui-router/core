@@ -16,7 +16,7 @@ import { UIRouter } from "../router";
 import { TargetState } from "../state/targetState";
 import { TargetStateDef } from "../state/interface";
 import { UrlMatcher } from "./urlMatcher";
-import { State } from "../state/stateObject";
+import { StateObject } from "../state/stateObject";
 import { ParamTypeDefinition } from "../params/interface";
 
 /** @internalapi */
@@ -476,7 +476,7 @@ export interface MatcherUrlRule extends UrlRule {
 /** @internalapi */
 export interface StateRule extends MatcherUrlRule {
   type: "STATE";
-  state: State;
+  state: StateObject;
 }
 
 /** @internalapi */

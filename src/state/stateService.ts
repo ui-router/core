@@ -18,7 +18,7 @@ import {Rejection, RejectType} from "../transition/rejectFactory";
 import {Transition} from "../transition/transition";
 
 import {StateOrName, StateDeclaration, TransitionPromise, LazyLoadResult} from "./interface";
-import {State} from "./stateObject";
+import {StateObject} from "./stateObject";
 import {TargetState} from "./targetState";
 
 import {RawParams} from "../params/interface";
@@ -204,7 +204,7 @@ export class StateService {
    *
    * @returns A promise representing the state of the new transition. See [[StateService.go]]
    */
-  reload(reloadState?: StateOrName): Promise<State> {
+  reload(reloadState?: StateOrName): Promise<StateObject> {
     return this.transitionTo(this.current, this.params, {
       reload: isDefined(reloadState) ? reloadState : true,
       inherit: false,

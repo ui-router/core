@@ -4,7 +4,7 @@
  */ /** */
 import {StateParams} from "./params/stateParams";
 import {StateDeclaration} from "./state/interface";
-import {State} from "./state/stateObject";
+import {StateObject} from "./state/stateObject";
 import {Transition} from "./transition/transition";
 import {Queue} from "./common/queue";
 import {TransitionService} from "./transition/transitionService";
@@ -38,7 +38,7 @@ export class UIRouterGlobals implements Disposable {
    * The to-state from the latest successful transition
    * @internalapi
    */
-  $current: State;
+  $current: StateObject;
 
   /**
    * The current transition (in progress)

@@ -13,7 +13,7 @@ import { services } from '../common/coreservices';
 import { Rejection } from './rejectFactory';
 import { TargetState } from '../state/targetState';
 import { Transition } from './transition';
-import { State } from '../state/stateObject';
+import { StateObject } from '../state/stateObject';
 import { TransitionEventType } from './transitionEventType';
 import { RegisteredHook } from './hookRegistry'; // has or is using
 
@@ -34,7 +34,7 @@ export type ErrorHandler  = (error)              => Promise<any>;
 export class TransitionHook {
   type: TransitionEventType;
   constructor(private transition: Transition,
-              private stateContext: State,
+              private stateContext: StateObject,
               private registeredHook: RegisteredHook,
               private options: TransitionHookOptions) {
     this.options = defaults(options, defaultOptions);

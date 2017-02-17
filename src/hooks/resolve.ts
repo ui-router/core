@@ -1,7 +1,7 @@
 /** @module hooks */ /** for typedoc */
 import {noop} from "../common/common";
 import {Transition} from "../transition/transition";
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 import {ResolveContext} from "../resolve/resolveContext";
 import {TransitionStateHookFn, TransitionHookFn} from "../transition/interface";
 import {TransitionService} from "../transition/transitionService";
@@ -33,7 +33,7 @@ export const registerEagerResolvePath = (transitionService: TransitionService) =
  *
  * See [[StateDeclaration.resolve]]
  */
-const lazyResolveState: TransitionStateHookFn = (trans: Transition, state: State) =>
+const lazyResolveState: TransitionStateHookFn = (trans: Transition, state: StateObject) =>
     new ResolveContext(trans.treeChanges().to)
         .subContext(state)
         .resolvePath("LAZY", trans)

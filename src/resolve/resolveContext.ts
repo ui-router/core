@@ -7,7 +7,7 @@ import { services, $InjectorLike } from "../common/coreservices";
 import { resolvePolicies, PolicyWhen, ResolvePolicy } from "./interface";
 import { PathNode } from "../path/node";
 import { Resolvable } from "./resolvable";
-import { State } from "../state/stateObject";
+import { StateObject } from "../state/stateObject";
 import { PathFactory } from "../path/pathFactory";
 import { stringify } from "../common/strings";
 import { Transition } from "../transition/transition";
@@ -81,7 +81,7 @@ export class ResolveContext {
    * When resolving for the `B` node, first take the full "To Path" Context `[A,B,C,D]` and limit to the subpath `[A,B]`.
    * `let AB = ABCD.subcontext(a)`
    */
-  subContext(state: State): ResolveContext {
+  subContext(state: StateObject): ResolveContext {
     return new ResolveContext(PathFactory.subPath(this._path, node => node.state === state));
   }
 
@@ -100,7 +100,7 @@ export class ResolveContext {
    * @param newResolvables the new Resolvables
    * @param state Used to find the node to put the resolvable on
    */
-  addResolvables(newResolvables: Resolvable[], state: State) {
+  addResolvables(newResolvables: Resolvable[], state: StateObject) {
     let node = <PathNode> find(this._path, propEq('state', state));
     let keys = newResolvables.map(r => r.token);
     node.resolvables = node.resolvables.filter(r => keys.indexOf(r.token) === -1).concat(newResolvables);
