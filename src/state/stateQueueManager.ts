@@ -2,7 +2,7 @@
 import { inArray } from "../common/common";
 import { isString } from "../common/predicates";
 import { StateDeclaration } from "./interface";
-import { State } from "./stateObject";
+import { StateObject } from "./stateObject";
 import { StateBuilder } from "./stateBuilder";
 import { StateRegistryListener, StateRegistry } from "./stateRegistry";
 import { Disposable } from "../interface";
@@ -12,13 +12,13 @@ import { StateMatcher } from "./stateMatcher";
 
 /** @internalapi */
 export class StateQueueManager implements Disposable {
-  queue: State[];
+  queue: StateObject[];
   matcher: StateMatcher;
 
   constructor(
       private $registry: StateRegistry,
       private $urlRouter: UrlRouter,
-      public states: { [key: string]: State; },
+      public states: { [key: string]: StateObject; },
       public builder: StateBuilder,
       public listeners: StateRegistryListener[]) {
     this.queue = [];
@@ -32,7 +32,7 @@ export class StateQueueManager implements Disposable {
 
   register(stateDecl: StateDeclaration) {
     let queue = this.queue;
-    let state = State.create(stateDecl);
+    let state = StateObject.create(stateDecl);
     let name = state.name;
 
     if (!isString(name)) throw new Error("State must have a valid name");
@@ -47,16 +47,16 @@ export class StateQueueManager implements Disposable {
 
   flush() {
     let {queue, states, builder} = this;
-    let registered: State[] = [], // states that got registered
-        orphans: State[] = [], // states that don't yet have a parent registered
+    let registered: StateObject[] = [], // states that got registered
+        orphans: StateObject[] = [], // states that don't yet have a parent registered
         previousQueueLength = {}; // keep track of how long the queue when an orphan was first encountered
     const getState = (name) =>
         this.states.hasOwnProperty(name) && this.states[name];
 
     while (queue.length > 0) {
-      let state: State = queue.shift();
+      let state: StateObject = queue.shift();
       let name = state.name;
-      let result: State = builder.build(state);
+      let result: StateObject = builder.build(state);
       let orphanIdx: number = orphans.indexOf(state);
 
       if (result) {
@@ -99,7 +99,7 @@ export class StateQueueManager implements Disposable {
     return states;
   }
 
-  attachRoute(state: State) {
+  attachRoute(state: StateObject) {
     if (state.abstract || !state.url) return;
 
     this.$urlRouter.rule(this.$urlRouter.urlRuleFactory.create(state));

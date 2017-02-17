@@ -5,7 +5,7 @@ import { TransitionOptions } from "../src/transition/interface";
 import { LocationServices, services } from "../src/common/coreservices";
 import { isFunction } from "../src/common/predicates";
 import { StateRegistry } from "../src/state/stateRegistry";
-import { State } from "../src/state/stateObject";
+import { StateObject } from "../src/state/stateObject";
 import { Transition } from "../src/transition/transition";
 import { Param } from "../src/params/param";
 import { RejectType } from "../src/transition/rejectFactory";
@@ -209,7 +209,7 @@ describe('stateService', function () {
         router.stateRegistry.register(childNoParam);
 
         function logChangedParams(prefix, suffix) {
-          return (trans: Transition, state: State) => {
+          return (trans: Transition, state: StateObject) => {
             trans.onSuccess({}, () => {
               let changed = Param.changed(state.parameters({ inherit: true }), trans.params("to"), trans.params("from"))
                   .map(param => param.id + "=" + trans.params("to")[param.id])

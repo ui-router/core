@@ -1,4 +1,4 @@
-import { UIRouter, TransitionService, StateService, State, PathNode } from "../src/index";
+import { UIRouter, TransitionService, StateService, StateObject, PathNode } from "../src/index";
 import { tree2Array } from "./_testUtils";
 import { TransitionHookPhase } from "../src/transition/interface";
 import { TestingPlugin } from "./_testingPlugin";
@@ -7,7 +7,7 @@ describe('HookBuilder:', function() {
   let uiRouter: UIRouter = null;
   let $trans: TransitionService = null;
   let $state: StateService = null;
-  let root: State = null;
+  let root: StateObject = null;
 
   let log = "";
   let hookNames = [ "onBefore", "onStart", "onExit", "onRetain", "onEnter", "onFinish", "onSuccess", "onError" ];

@@ -1,7 +1,7 @@
 /** @module path */ /** for typedoc */
 import {extend, applyPairs, find, allTrueR} from "../common/common";
 import {propEq} from "../common/hof";
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 import {RawParams} from "../params/interface";
 import {Param} from "../params/param";
 import {Resolvable} from "../resolve/resolvable";
@@ -16,7 +16,7 @@ import {ViewConfig} from "../view/interface";
  */
 export class PathNode {
   /** The state being entered, exited, or retained */
-  public state: State;
+  public state: StateObject;
   /** The parameters declared on the state */
   public paramSchema: Param[];
   /** The parameter values that belong to the state */
@@ -29,7 +29,7 @@ export class PathNode {
   /** Creates a copy of a PathNode */
   constructor(state: PathNode);
   /** Creates a new (empty) PathNode for a State */
-  constructor(state: State);
+  constructor(state: StateObject);
   constructor(stateOrPath: any) {
     if (stateOrPath instanceof PathNode) {
       let node: PathNode = stateOrPath;
@@ -39,7 +39,7 @@ export class PathNode {
       this.resolvables = node.resolvables.slice();
       this.views = node.views && node.views.slice();
     } else {
-      let state: State = stateOrPath;
+      let state: StateObject = stateOrPath;
       this.state = state;
       this.paramSchema = state.parameters({ inherit: false });
       this.paramValues = {};

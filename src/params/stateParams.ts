@@ -4,7 +4,7 @@
  */
 /** */
 import {extend, ancestors, Obj} from "../common/common";
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 
 /** @internalapi */
 export class StateParams {
@@ -22,7 +22,7 @@ export class StateParams {
    * @param {Object} $current Internal definition of object representing the current state.
    * @param {Object} $to Internal definition of object representing state to transition to.
    */
-  $inherit(newParams: Obj, $current: State, $to: State) {
+  $inherit(newParams: Obj, $current: StateObject, $to: StateObject) {
     let parents = ancestors($current, $to),
         parentParams: string[],
         inherited: Obj = {},

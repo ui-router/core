@@ -25,9 +25,9 @@ import { isObject } from "../common/predicates";
  * This class prototypally inherits from the corresponding [[StateDeclaration]].
  * Each of its own properties (i.e., `hasOwnProperty`) are built using builders from the [[StateBuilder]].
  */
-export class State {
+export class StateObject {
   /** The parent [[State]] */
-  public parent: State;
+  public parent: StateObject;
 
   /** The name used to register the state */
   public name: string;
@@ -64,10 +64,10 @@ export class State {
   public self: StateDeclaration;
 
   /** The nearest parent [[State]] which has a URL */
-  public navigable: State;
+  public navigable: StateObject;
 
   /** The parent [[State]] objects from this state up to the root */
-  public path: State[];
+  public path: StateObject[];
 
   /**
    * Prototypally inherits from [[StateDeclaration.data]]
@@ -106,7 +106,7 @@ export class State {
 
   /** @deprecated use State.create() */
   constructor(config?: StateDeclaration) {
-    return State.create(config || {});
+    return StateObject.create(config || {});
   }
 
   /**
@@ -115,10 +115,10 @@ export class State {
    * (Internal State Object) -> (Copy of State.prototype) -> (State Declaration object) -> (State Declaration's prototype...)
    *
    * @param stateDecl the user-supplied State Declaration
-   * @returns {State} an internal State object
+   * @returns {StateObject} an internal State object
    */
-  static create(stateDecl: StateDeclaration): State {
-    let state = inherit(inherit(stateDecl, State.prototype)) as State;
+  static create(stateDecl: StateDeclaration): StateObject {
+    let state = inherit(inherit(stateDecl, StateObject.prototype)) as StateObject;
     stateDecl.$$state = () => state;
     state.self = stateDecl;
     state.__stateObjectCache = {
@@ -128,7 +128,7 @@ export class State {
   }
 
   /** Predicate which returns true if the object is an internal [[State]] object */
-  static isState = (obj: any): obj is State =>
+  static isState = (obj: any): obj is StateObject =>
       isObject(obj['__stateObjectCache']);
 
   /**
@@ -142,7 +142,7 @@ export class State {
    *        into `$stateProvider.state()`, (c) the fully-qualified name of a state as a string.
    * @returns Returns `true` if `ref` matches the current `State` instance.
    */
-  is(ref: State|StateDeclaration|string): boolean {
+  is(ref: StateObject|StateDeclaration|string): boolean {
     return this === ref || this.self === ref || this.fqn() === ref;
   }
 
@@ -161,7 +161,7 @@ export class State {
    *
    * @returns The root of this state's tree.
    */
-  root(): State {
+  root(): StateObject {
     return this.parent && this.parent.root() || this;
   }
 

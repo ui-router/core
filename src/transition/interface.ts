@@ -6,7 +6,7 @@ import {StateDeclaration} from "../state/interface";
 import {Predicate} from "../common/common";
 
 import {Transition} from "./transition";
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 import {PathNode} from "../path/node";
 import {TargetState} from "../state/targetState";
 import {RegisteredHook} from "./hookRegistry";
@@ -33,7 +33,7 @@ export interface TransitionOptions {
    * When transitioning to relative path (e.g '`^`'), this option defines which state to be relative from.
    * @default `$state.current`
    */
-  relative    ?: (string|StateDeclaration|State);
+  relative    ?: (string|StateDeclaration|StateObject);
 
   /**
    * This option sets whether or not the transition's parameter values should be inherited from
@@ -71,13 +71,13 @@ export interface TransitionOptions {
    *
    * @default `false`
    */
-  reload      ?: (boolean|string|StateDeclaration|State);
+  reload      ?: (boolean|string|StateDeclaration|StateObject);
   /**
    * You can define your own Transition Options inside this property and use them, e.g., from a Transition Hook
    */
   custom      ?: any;
   /** @internalapi */
-  reloadState ?: (State);
+  reloadState ?: (StateObject);
   /** @internalapi
    * If this transition is a redirect, this property should be the original Transition (which was redirected to this one)
    */
@@ -210,7 +210,7 @@ export interface TransitionHookFn {
  * - [[IHookRegistry.onEnter]]
  */
 export interface TransitionStateHookFn {
-  (transition: Transition, state: State) : HookResult
+  (transition: Transition, state: StateObject) : HookResult
 }
 
 /**
@@ -701,7 +701,7 @@ export interface IHookRegistry {
 }
 
 /** A predicate type which takes a [[State]] and returns a boolean */
-export type IStateMatch = Predicate<State>
+export type IStateMatch = Predicate<StateObject>
 /**
  * This object is used to configure whether or not a Transition Hook is invoked for a particular transition,
  * based on the Transition's "to state" and "from state".

@@ -3,7 +3,7 @@
  * @module state
  */ /** for typedoc */
 
-import { State } from "./stateObject";
+import { StateObject } from "./stateObject";
 import { StateMatcher } from "./stateMatcher";
 import { StateBuilder } from "./stateBuilder";
 import { StateQueueManager } from "./stateQueueManager";
@@ -25,8 +25,8 @@ import { propEq } from "../common/hof";
 export type StateRegistryListener = (event: "registered"|"deregistered", states: StateDeclaration[]) => void;
 
 export class StateRegistry {
-  private _root: State;
-  private states: { [key: string]: State } = {};
+  private _root: StateObject;
+  private states: { [key: string]: StateObject } = {};
 
   matcher: StateMatcher;
   private builder: StateBuilder;
@@ -127,20 +127,20 @@ export class StateRegistry {
    *          If the state was successfully registered, then the object is fully built (See: [[StateBuilder]]).
    *          If the state was only queued, then the object is not fully built.
    */
-  register(stateDefinition: StateDeclaration): State {
+  register(stateDefinition: StateDeclaration): StateObject {
     return this.stateQueue.register(stateDefinition);
   }
 
   /** @hidden */
-  private _deregisterTree(state: State) {
+  private _deregisterTree(state: StateObject) {
     let all = this.get().map(s => s.$$state());
-    const getChildren = (states: State[]) => {
+    const getChildren = (states: StateObject[]) => {
       let children = all.filter(s => states.indexOf(s.parent) !== -1);
       return children.length === 0 ? children : children.concat(getChildren(children));
     };
 
     let children = getChildren([state]);
-    let deregistered: State[] = [state].concat(children).reverse();
+    let deregistered: StateObject[] = [state].concat(children).reverse();
 
     deregistered.forEach(state => {
       let $ur = this._router.urlRouter;
@@ -160,7 +160,7 @@ export class StateRegistry {
    * If the state has children, they are are also removed from the registry.
    *
    * @param stateOrName the state's name or object representation
-   * @returns {State[]} a list of removed states
+   * @returns {StateObject[]} a list of removed states
    */
   deregister(stateOrName: StateOrName) {
     let _state = this.get(stateOrName);

@@ -5,7 +5,7 @@ import {stringify} from "../common/strings";
 import {prop, pattern, is, pipe, val} from "../common/hof";
 import {StateDeclaration} from "./interface";
 
-import {State} from "./stateObject";
+import {StateObject} from "./stateObject";
 import {StateMatcher} from "./stateMatcher";
 import {Param} from "../params/param";
 import {UrlMatcherFactory} from "../url/urlMatcherFactory";
@@ -21,7 +21,7 @@ const parseUrl = (url: string): any => {
   return { val: root ? url.substring(1) : url, root };
 };
 
-export type BuilderFunction = (state: State, parent?: BuilderFunction) => any;
+export type BuilderFunction = (state: StateObject, parent?: BuilderFunction) => any;
 
 interface Builders {
   [key: string]: BuilderFunction[];
@@ -39,24 +39,24 @@ interface Builders {
 }
 
 
-function nameBuilder(state: State) {
+function nameBuilder(state: StateObject) {
   return state.name;
 }
 
-function selfBuilder(state: State) {
+function selfBuilder(state: StateObject) {
   state.self.$$state = () => state;
   return state.self;
 }
 
-function dataBuilder(state: State) {
+function dataBuilder(state: StateObject) {
   if (state.parent && state.parent.data) {
     state.data = state.self.data = inherit(state.parent.data, state.data);
   }
   return state.data;
 }
 
-const getUrlBuilder = ($urlMatcherFactoryProvider: UrlMatcherFactory, root: () => State) =>
-function urlBuilder(state: State) {
+const getUrlBuilder = ($urlMatcherFactoryProvider: UrlMatcherFactory, root: () => StateObject) =>
+function urlBuilder(state: StateObject) {
   let stateDec: StateDeclaration = <any> state;
 
   // For future states, i.e., states whose name ends with `.**`,
@@ -79,24 +79,24 @@ function urlBuilder(state: State) {
   return (parsed && parsed.root) ? url : ((parent && parent.navigable) || root()).url.append(<UrlMatcher> url);
 };
 
-const getNavigableBuilder = (isRoot: (state: State) => boolean) =>
-function navigableBuilder(state: State) {
+const getNavigableBuilder = (isRoot: (state: StateObject) => boolean) =>
+function navigableBuilder(state: StateObject) {
   return !isRoot(state) && state.url ? state : (state.parent ? state.parent.navigable : null);
 };
 
 const getParamsBuilder = (paramFactory: ParamFactory) =>
-function paramsBuilder(state: State): { [key: string]: Param } {
+function paramsBuilder(state: StateObject): { [key: string]: Param } {
   const makeConfigParam = (config: any, id: string) => paramFactory.fromConfig(id, null, config);
   let urlParams: Param[] = (state.url && state.url.parameters({inherit: false})) || [];
   let nonUrlParams: Param[] = values(mapObj(omit(state.params || {}, urlParams.map(prop('id'))), makeConfigParam));
   return urlParams.concat(nonUrlParams).map(p => [p.id, p]).reduce(applyPairs, {});
 };
 
-function pathBuilder(state: State) {
+function pathBuilder(state: StateObject) {
   return state.parent ? state.parent.path.concat(state) : /*root*/ [state];
 }
 
-function includesBuilder(state: State) {
+function includesBuilder(state: StateObject) {
   let includes = state.parent ? extend({}, state.parent.includes) : {};
   includes[state.name] = true;
   return includes;
@@ -143,7 +143,7 @@ function includesBuilder(state: State) {
  *   { provide: "myBazResolve", useFactory: function(dep) { dep.fetchSomethingAsPromise() }, deps: [ "DependencyName" ] }
  * ]
  */
-export function resolvablesBuilder(state: State): Resolvable[] {
+export function resolvablesBuilder(state: StateObject): Resolvable[] {
   interface Tuple { token: any, val: any, deps: any[], policy: ResolvePolicy }
   
   /** convert resolve: {} and resolvePolicy: {} objects to an array of tuples */
@@ -221,9 +221,9 @@ export class StateBuilder {
     let self = this;
 
     const root = () => matcher.find("");
-    const isRoot = (state: State) => state.name === "";
+    const isRoot = (state: StateObject) => state.name === "";
 
-    function parentBuilder(state: State) {
+    function parentBuilder(state: StateObject) {
       if (isRoot(state)) return null;
       return matcher.find(self.parentName(state)) || root();
     }
@@ -278,7 +278,7 @@ export class StateBuilder {
    * @param state an uninitialized State object
    * @returns the built State object
    */
-  build(state: State): State {
+  build(state: StateObject): StateObject {
     let {matcher, builders} = this;
     let parent = this.parentName(state);
     if (parent && !matcher.find(parent)) return null;
@@ -291,7 +291,7 @@ export class StateBuilder {
     return state;
   }
 
-  parentName(state: State) {
+  parentName(state: StateObject) {
     let name = state.name || "";
 
     let segments = name.split('.');
@@ -308,7 +308,7 @@ export class StateBuilder {
     return isString(state.parent) ? state.parent : state.parent.name;
   }
 
-  name(state: State) {
+  name(state: StateObject) {
     let name = state.name;
     if (name.indexOf('.') !== -1 || !state.parent) return name;
 

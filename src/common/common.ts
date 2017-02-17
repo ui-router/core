@@ -10,7 +10,7 @@
 import { isFunction, isString, isArray, isRegExp, isDate, isDefined } from "./predicates";
 import { all, any, prop, curry, val, not } from "./hof";
 import { services } from "./coreservices";
-import { State } from "../state/stateObject";
+import { StateObject } from "../state/stateObject";
 
 let w: any = typeof window === 'undefined' ? {} : window;
 let angular = w.angular || {};
@@ -222,8 +222,8 @@ export const mergeR = (memo: Obj, item: Obj) => extend(memo, item);
  * @param {Object} second The second state.
  * @return {Array} Returns an array of state names in descending order, not including the root.
  */
-export function ancestors(first: State, second: State) {
-  let path: State[] = [];
+export function ancestors(first: StateObject, second: StateObject) {
+  let path: StateObject[] = [];
 
   for (var n in first.path) {
     if (first.path[n] !== second.path[n]) break;

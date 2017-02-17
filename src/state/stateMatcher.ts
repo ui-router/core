@@ -1,11 +1,11 @@
 /** @module state */ /** for typedoc */
 import {isString} from "../common/predicates";
 import {StateOrName} from "./interface";
-import {State} from "./stateObject";
+import {StateObject} from "./stateObject";
 import {values} from "../common/common";
 
 export class StateMatcher {
-  constructor (private _states: { [key: string]: State }) { }
+  constructor (private _states: { [key: string]: StateObject }) { }
   
   isRelative(stateName: string) {
     stateName = stateName || "";
@@ -13,7 +13,7 @@ export class StateMatcher {
   }
 
 
-  find(stateOrName: StateOrName, base?: StateOrName): State {
+  find(stateOrName: StateOrName, base?: StateOrName): StateObject {
     if (!stateOrName && stateOrName !== "") return undefined;
     let isStr = isString(stateOrName);
     let name: string = isStr ? stateOrName : (<any>stateOrName).name;
@@ -41,7 +41,7 @@ export class StateMatcher {
   resolvePath(name: string, base: StateOrName) {
     if (!base) throw new Error(`No reference point given for path '${name}'`);
     
-    let baseState: State = this.find(base);
+    let baseState: StateObject = this.find(base);
 
     let splitName = name.split("."), i = 0, pathLength = splitName.length, current = baseState;
 

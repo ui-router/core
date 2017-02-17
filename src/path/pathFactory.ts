@@ -8,7 +8,7 @@ import {TreeChanges} from "../transition/interface";
 import {ViewConfig} from "../view/interface";
 import {_ViewDeclaration} from "../state/interface";
 
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 import {TargetState} from "../state/targetState";
 import {PathNode} from "../path/node";
 import {ViewService} from "../view/view";
@@ -45,7 +45,7 @@ export class PathFactory {
    *
    * On each [[PathNode]], creates ViewConfig objects from the views: property of the node's state
    */
-  static applyViewConfigs($view: ViewService, path: PathNode[], states: State[]) {
+  static applyViewConfigs($view: ViewService, path: PathNode[], states: StateObject[]) {
     // Only apply the viewConfigs to the nodes for the given states
     path.filter(node => inArray(states, node.state)).forEach(node => {
       let viewDecls: _ViewDeclaration[] = values(node.state.views || {});
@@ -67,7 +67,7 @@ export class PathFactory {
    * it is not inherited from the fromPath.
    */
   static inheritParams(fromPath: PathNode[], toPath: PathNode[], toKeys: string[] = []): PathNode[] {
-    function nodeParamVals(path: PathNode[], state: State): RawParams {
+    function nodeParamVals(path: PathNode[], state: StateObject): RawParams {
       let node: PathNode = find(path, propEq('state', state));
       return extend({}, node && node.paramValues);
     }
@@ -100,9 +100,9 @@ export class PathFactory {
   /**
    * Computes the tree changes (entering, exiting) between a fromPath and toPath.
    */
-  static treeChanges(fromPath: PathNode[], toPath: PathNode[], reloadState: State): TreeChanges {
+  static treeChanges(fromPath: PathNode[], toPath: PathNode[], reloadState: StateObject): TreeChanges {
     let keep = 0, max = Math.min(fromPath.length, toPath.length);
-    const staticParams = (state: State) => 
+    const staticParams = (state: StateObject) =>
         state.parameters({ inherit: false }).filter(not(prop('dynamic'))).map(prop('id'));
     const nodesMatch = (node1: PathNode, node2: PathNode) =>
         node1.equals(node2, staticParams(node1.state));

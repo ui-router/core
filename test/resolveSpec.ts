@@ -1,4 +1,4 @@
-import { ResolveContext, State, PathNode, Resolvable, copy } from "../src/index";
+import { ResolveContext, StateObject, PathNode, Resolvable, copy } from "../src/index";
 import { services } from "../src/common/coreservices";
 import * as vanilla from "../src/vanilla";
 import { tree2Array } from "./_testUtils";
@@ -13,7 +13,7 @@ import { tail } from "../src/common/common";
 
 ///////////////////////////////////////////////
 
-let router: UIRouter, states, statesMap: { [key:string]: State } = {};
+let router: UIRouter, states, statesMap: { [key:string]: StateObject } = {};
 let $state: StateService;
 let $transitions: TransitionService;
 let $registry: StateRegistry;

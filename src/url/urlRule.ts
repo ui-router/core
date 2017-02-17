@@ -7,7 +7,7 @@ import { isString, isDefined, isFunction, isState } from "../common/predicates";
 import { UIRouter } from "../router";
 import { identity, extend } from "../common/common";
 import { is, pattern } from "../common/hof";
-import { State } from "../state/stateObject";
+import { StateObject } from "../state/stateObject";
 import { RawParams } from "../params/interface";
 import {
     UrlRule, UrlRuleMatchFn, UrlRuleHandlerFn, UrlRuleType, UrlParts, MatcherUrlRule, StateRule, RegExpRule
@@ -34,11 +34,11 @@ export class UrlRuleFactory {
   static isUrlRule = obj =>
       obj && ['type', 'match', 'handler'].every(key => isDefined(obj[key]));
 
-  create(what: string|UrlMatcher|State|RegExp|UrlRuleMatchFn, handler?: string|UrlRuleHandlerFn): UrlRule {
+  create(what: string|UrlMatcher|StateObject|RegExp|UrlRuleMatchFn, handler?: string|UrlRuleHandlerFn): UrlRule {
     const makeRule = pattern([
       [isString,       (_what: string)         => makeRule(this.compile(_what))],
       [is(UrlMatcher), (_what: UrlMatcher)     => this.fromUrlMatcher(_what, handler)],
-      [isState,        (_what: State)          => this.fromState(_what, this.router)],
+      [isState,        (_what: StateObject)          => this.fromState(_what, this.router)],
       [is(RegExp),     (_what: RegExp)         => this.fromRegExp(_what, handler)],
       [isFunction,     (_what: UrlRuleMatchFn) => new BaseUrlRule(_what, handler as UrlRuleHandlerFn)],
     ]);
@@ -122,7 +122,7 @@ export class UrlRuleFactory {
    * // Starts a transition to 'foo' with params: { fooId: '123', barId: '456' }
    * ```
    */
-  fromState(state: State, router: UIRouter): StateRule {
+  fromState(state: StateObject, router: UIRouter): StateRule {
     /**
      * Handles match by transitioning to matched state
      *

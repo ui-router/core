@@ -11,7 +11,7 @@ import {ResolveContext} from "./resolveContext";
 import {stringify} from "../common/strings";
 import {isFunction, isObject} from "../common/predicates";
 import {Transition} from "../transition/transition";
-import {State} from "../state/stateObject";
+import {StateObject} from "../state/stateObject";
 import {PathNode} from "../path/node";
 
 
@@ -90,7 +90,7 @@ export class Resolvable implements ResolvableLiteral {
     }
   }
 
-  getPolicy(state:State): ResolvePolicy {
+  getPolicy(state:StateObject): ResolvePolicy {
     let thisPolicy = this.policy || {};
     let statePolicy = state && state.resolvePolicy || {};
     return {
@@ -133,7 +133,7 @@ export class Resolvable implements ResolvableLiteral {
 
     // If the resolve policy is RXWAIT, wait for the observable to emit something. otherwise pass through.
     let node: PathNode = resolveContext.findNode(this);
-    let state: State = node && node.state;
+    let state: StateObject = node && node.state;
     let maybeWaitForRx = this.getPolicy(state).async === "RXWAIT" ? waitForRx : identity;
 
     // After the final value has been resolved, update the state of the Resolvable

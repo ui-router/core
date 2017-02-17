@@ -1,7 +1,7 @@
 import { StateMatcher, StateBuilder, UrlMatcher, extend } from "../src/index";
 import { ParamTypes } from "../src/params/paramTypes";
 import { UIRouter } from "../src/router";
-import { State } from "../src/state/stateObject";
+import { StateObject } from "../src/state/stateObject";
 
 let paramTypes = new ParamTypes();
 describe('StateBuilder', function() {
@@ -68,15 +68,15 @@ describe('StateBuilder', function() {
 
   describe('state building', function() {
     it('should build parent property', function() {
-      let about = State.create({ name: 'home.about' });
+      let about = StateObject.create({ name: 'home.about' });
       expect(builder.builder('parent')(about)).toBe(states['home'].$$state());
     });
 
     it('should inherit parent data', function() {
-      let state = State.create(states['home.withData.child']);
+      let state = StateObject.create(states['home.withData.child']);
       expect(builder.builder('data')(state)).toEqualData({ val1: "foo", val2: "baz" });
 
-      state = State.create(states['home.withData']);
+      state = StateObject.create(states['home.withData']);
       expect(builder.builder('data')(state)).toEqualData({ val1: "foo", val2: "bar" });
     });
 
@@ -97,7 +97,7 @@ describe('StateBuilder', function() {
       let root = states[''].$$state();
       spyOn(root.url, 'append').and.callThrough();
 
-      let childstate = State.create({ name: 'asdf', url: "/foo" });
+      let childstate = StateObject.create({ name: 'asdf', url: "/foo" });
       builder.builder('url')(childstate);
       
       expect(root.url.append).toHaveBeenCalled();
@@ -159,7 +159,7 @@ describe('StateBuilder', function() {
     MyNestedStateClass.prototype = nestedProto;
     function MyNestedStateClass () { }
 
-    let router, myBuiltState: State, myNestedBuiltState: State;
+    let router, myBuiltState: StateObject, myNestedBuiltState: StateObject;
     beforeEach(() => {
       router = new UIRouter();
       myNestedBuiltState = router.stateRegistry.register(new MyNestedStateClass());

@@ -6,7 +6,7 @@
 import { StateDeclaration, StateOrName, TargetStateDef } from "./interface";
 import { ParamsOrArray } from "../params/interface";
 import { TransitionOptions } from "../transition/interface";
-import { State } from "./stateObject";
+import { StateObject } from "./stateObject";
 import { toJson } from "../common/common";
 import { isString } from "../common/predicates";
 
@@ -58,7 +58,7 @@ export class TargetState {
    */
   constructor(
     private _identifier: StateOrName,
-    private _definition?: State,
+    private _definition?: StateObject,
     _params?: ParamsOrArray,
     private _options: TransitionOptions = {}
   ) {
@@ -81,7 +81,7 @@ export class TargetState {
   }
 
   /** The internal state object (if it was found) */
-  $state(): State {
+  $state(): StateObject {
     return this._definition;
   }
 
