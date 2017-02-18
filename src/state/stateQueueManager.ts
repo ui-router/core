@@ -1,7 +1,7 @@
 /** @module state */ /** for typedoc */
 import { inArray } from "../common/common";
 import { isString } from "../common/predicates";
-import { StateDeclaration } from "./interface";
+import { StateDeclaration, _StateDeclaration } from "./interface";
 import { StateObject } from "./stateObject";
 import { StateBuilder } from "./stateBuilder";
 import { StateRegistryListener, StateRegistry } from "./stateRegistry";
@@ -30,7 +30,7 @@ export class StateQueueManager implements Disposable {
     this.queue = [];
   }
 
-  register(stateDecl: StateDeclaration) {
+  register(stateDecl: _StateDeclaration) {
     let queue = this.queue;
     let state = StateObject.create(stateDecl);
     let name = state.name;

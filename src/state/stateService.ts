@@ -65,7 +65,7 @@ export class StateService {
    */
   get current()     { return this.router.globals.current; }
   /**
-   * The current [[State]]
+   * The current [[StateObject]]
    *
    * This is a passthrough through to [[UIRouterGlobals.$current]]
    */

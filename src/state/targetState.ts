@@ -33,7 +33,7 @@ import { isString } from "../common/predicates";
  * 4) the registered state object (the [[StateDeclaration]])
  *
  * Many UI-Router APIs such as [[StateService.go]] take a [[StateOrName]] argument which can
- * either be a *state object* (a [[StateDeclaration]] or [[State]]) or a *state name* (a string).
+ * either be a *state object* (a [[StateDeclaration]] or [[StateObject]]) or a *state name* (a string).
  * The `TargetState` class normalizes those options.
  *
  * A `TargetState` may be valid (the state being targeted exists in the registry)

@@ -105,7 +105,7 @@ function includesBuilder(state: StateObject) {
 /**
  * This is a [[StateBuilder.builder]] function for the `resolve:` block on a [[StateDeclaration]].
  *
- * When the [[StateBuilder]] builds a [[State]] object from a raw [[StateDeclaration]], this builder
+ * When the [[StateBuilder]] builds a [[StateObject]] object from a raw [[StateDeclaration]], this builder
  * validates the `resolve` property and converts it to a [[Resolvable]] array.
  *
  * resolve: input value can be:
@@ -204,13 +204,13 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
 /**
  * @internalapi A internal global service
  *
- * StateBuilder is a factory for the internal [[State]] objects.
+ * StateBuilder is a factory for the internal [[StateObject]] objects.
  *
  * When you register a state with the [[StateRegistry]], you register a plain old javascript object which
  * conforms to the [[StateDeclaration]] interface.  This factory takes that object and builds the corresponding
- * [[State]] object, which has an API and is used internally.
+ * [[StateObject]] object, which has an API and is used internally.
  *
- * Custom properties or API may be added to the internal [[State]] object by registering a decorator function
+ * Custom properties or API may be added to the internal [[StateObject]] object by registering a decorator function
  * using the [[builder]] method.
  */
 export class StateBuilder {
@@ -250,10 +250,10 @@ export class StateBuilder {
   }
 
   /**
-   * Registers a [[BuilderFunction]] for a specific [[State]] property (e.g., `parent`, `url`, or `path`).
+   * Registers a [[BuilderFunction]] for a specific [[StateObject]] property (e.g., `parent`, `url`, or `path`).
    * More than one BuilderFunction can be registered for a given property.
    *
-   * The BuilderFunction(s) will be used to define the property on any subsequently built [[State]] objects.
+   * The BuilderFunction(s) will be used to define the property on any subsequently built [[StateObject]] objects.
    *
    * @param name The name of the State property being registered for.
    * @param fn The BuilderFunction which will be used to build the State property

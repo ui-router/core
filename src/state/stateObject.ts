@@ -3,7 +3,7 @@
  * @module state
  */
 /** for typedoc */
-import { StateDeclaration, _ViewDeclaration } from "./interface";
+import { StateDeclaration, _ViewDeclaration, _StateDeclaration } from "./interface";
 import { defaults, values, find, inherit } from "../common/common";
 import { propEq } from "../common/hof";
 import { Param } from "../params/param";
@@ -13,20 +13,20 @@ import { TransitionStateHookFn } from "../transition/interface";
 import { TargetState } from "./targetState";
 import { Transition } from "../transition/transition";
 import { Glob } from "../common/glob";
-import { isObject } from "../common/predicates";
+import { isObject, isFunction } from "../common/predicates";
 
 /**
  * Internal representation of a UI-Router state.
  *
  * Instances of this class are created when a [[StateDeclaration]] is registered with the [[StateRegistry]].
  *
- * A registered [[StateDeclaration]] is augmented with a getter ([[StateDeclaration.$$state]]) which returns the corresponding [[State]] object.
+ * A registered [[StateDeclaration]] is augmented with a getter ([[StateDeclaration.$$state]]) which returns the corresponding [[StateObject]] object.
  *
  * This class prototypally inherits from the corresponding [[StateDeclaration]].
  * Each of its own properties (i.e., `hasOwnProperty`) are built using builders from the [[StateBuilder]].
  */
 export class StateObject {
-  /** The parent [[State]] */
+  /** The parent [[StateObject]] */
   public parent: StateObject;
 
   /** The name used to register the state */
@@ -58,15 +58,15 @@ export class StateObject {
   public views: { [key: string]: _ViewDeclaration; };
 
   /**
-   * The original [[StateDeclaration]] used to build this [[State]].
+   * The original [[StateDeclaration]] used to build this [[StateObject]].
    * Note: `this` object also prototypally inherits from the `self` declaration object.
    */
   public self: StateDeclaration;
 
-  /** The nearest parent [[State]] which has a URL */
+  /** The nearest parent [[StateObject]] which has a URL */
   public navigable: StateObject;
 
-  /** The parent [[State]] objects from this state up to the root */
+  /** The parent [[StateObject]] objects from this state up to the root */
   public path: StateObject[];
 
   /**
@@ -117,7 +117,9 @@ export class StateObject {
    * @param stateDecl the user-supplied State Declaration
    * @returns {StateObject} an internal State object
    */
-  static create(stateDecl: StateDeclaration): StateObject {
+  static create(stateDecl: _StateDeclaration): StateObject {
+    stateDecl = StateObject.isStateClass(stateDecl) ? new stateDecl() : stateDecl;
+
     let state = inherit(inherit(stateDecl, StateObject.prototype)) as StateObject;
     stateDecl.$$state = () => state;
     state.self = stateDecl;
@@ -127,7 +129,11 @@ export class StateObject {
     return state;
   }
 
-  /** Predicate which returns true if the object is an internal [[State]] object */
+  /** Predicate which returns true if the object is an class with @State() decorator */
+  static isStateClass = (stateDecl: _StateDeclaration): stateDecl is ({ new (): StateDeclaration }) =>
+      isFunction(stateDecl) && stateDecl['__uiRouterState'] === true;
+
+  /** Predicate which returns true if the object is an internal [[StateObject]] object */
   static isState = (obj: any): obj is StateObject =>
       isObject(obj['__stateObjectCache']);
 

@@ -198,7 +198,7 @@ export interface TransitionHookFn {
  * As each lifecycle event occurs, the hooks which are registered for the event and that state are called (in priority order).
  *
  * @param transition the current [[Transition]]
- * @param state the [[State]] that the hook is bound to
+ * @param state the [[StateObject]] that the hook is bound to
  * @param injector (for ng1 or ng2 only) the injector service
  *
  * @returns a [[HookResult]] which may alter the transition
@@ -700,7 +700,7 @@ export interface IHookRegistry {
   _registeredHooks: { [key: string]: RegisteredHook[] }
 }
 
-/** A predicate type which takes a [[State]] and returns a boolean */
+/** A predicate type which takes a [[StateObject]] and returns a boolean */
 export type IStateMatch = Predicate<StateObject>
 /**
  * This object is used to configure whether or not a Transition Hook is invoked for a particular transition,
