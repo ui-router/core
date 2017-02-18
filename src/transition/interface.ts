@@ -210,7 +210,7 @@ export interface TransitionHookFn {
  * - [[IHookRegistry.onEnter]]
  */
 export interface TransitionStateHookFn {
-  (transition: Transition, state: StateObject) : HookResult
+  (transition: Transition, state: StateDeclaration) : HookResult
 }
 
 /**
@@ -700,8 +700,9 @@ export interface IHookRegistry {
   _registeredHooks: { [key: string]: RegisteredHook[] }
 }
 
-/** A predicate type which takes a [[StateObject]] and returns a boolean */
-export type IStateMatch = Predicate<StateObject>
+/** A predicate type which tests if a [[StateDeclaration]] passes some test. Returns a boolean. */
+export type IStateMatch = Predicate<StateDeclaration>
+
 /**
  * This object is used to configure whether or not a Transition Hook is invoked for a particular transition,
  * based on the Transition's "to state" and "from state".

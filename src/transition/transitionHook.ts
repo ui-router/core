@@ -13,9 +13,9 @@ import { services } from '../common/coreservices';
 import { Rejection } from './rejectFactory';
 import { TargetState } from '../state/targetState';
 import { Transition } from './transition';
-import { StateObject } from '../state/stateObject';
 import { TransitionEventType } from './transitionEventType';
-import { RegisteredHook } from './hookRegistry'; // has or is using
+import { RegisteredHook } from './hookRegistry';
+import { StateDeclaration } from '../state/interface'; // has or is using
 
 let defaultOptions: TransitionHookOptions = {
   current: noop,
@@ -34,7 +34,7 @@ export type ErrorHandler  = (error)              => Promise<any>;
 export class TransitionHook {
   type: TransitionEventType;
   constructor(private transition: Transition,
-              private stateContext: StateObject,
+              private stateContext: StateDeclaration,
               private registeredHook: RegisteredHook,
               private options: TransitionHookOptions) {
     this.options = defaults(options, defaultOptions);

@@ -39,7 +39,7 @@ describe('transition', function () {
     $state = router.stateService;
     $transitions = router.transitionService;
 
-    var stateTree = {
+    let stateTree = {
       first: {},
       second: {},
       third: {},
@@ -67,7 +67,7 @@ describe('transition', function () {
   describe('service', () => {
     describe('async event hooks:', () => {
       it('$transition$.promise should resolve on success', (done) => {
-        var result = new PromiseResult();
+        let result = new PromiseResult();
         $transitions.onStart({ from: "*", to: "second" }, function($transition$) {
           result.setPromise($transition$.promise);
         });
@@ -79,7 +79,7 @@ describe('transition', function () {
       });
 
       it('$transition$.promise should reject on error', (done) => {
-        var result = new PromiseResult();
+        let result = new PromiseResult();
 
         $transitions.onStart({ from: "*", to: "third" }, function($transition$) {
           result.setPromise($transition$.promise);
@@ -98,7 +98,7 @@ describe('transition', function () {
       });
 
       it('$transition$.promise should reject on error in synchronous hooks', ((done) => {
-        var result = new PromiseResult();
+        let result = new PromiseResult();
 
         $transitions.onBefore({ from: "*", to: "third" }, function($transition$) {
           result.setPromise($transition$.promise);
@@ -117,13 +117,13 @@ describe('transition', function () {
       }));
 
       it('should receive the transition as the first parameter', ((done) => {
-        var t = null;
+        let t = null;
 
         $transitions.onStart({ from: "*", to: "second" }, function(trans) {
           t = trans;
         });
 
-        var tsecond = makeTransition("", "second");
+        let tsecond = makeTransition("", "second");
         tsecond.run()
             .then(tick)
             .then(() => expect(t).toBe(tsecond))
@@ -164,7 +164,7 @@ describe('transition', function () {
           $transitions.onCreate({}, t => log += `${t.from().name};${t.to().name};`);
 
           log += "create;";
-          let trans = makeTransition('first', 'second');
+          makeTransition('first', 'second');
           log += "created;";
 
           expect(log).toBe('create;first;second;created;');
@@ -177,14 +177,13 @@ describe('transition', function () {
           $transitions.onCreate({}, t => (log += "1;", null), { priority: 1 });
 
           log += "create;";
-          let trans = makeTransition('first', 'second');
+          makeTransition('first', 'second');
           log += "created;";
 
           expect(log).toBe('create;3;2;1;created;');
         }));
 
         it('should ignore return values', ((done) => {
-          let log = "";
           $transitions.onCreate({}, t => false);
           $transitions.onCreate({}, t => new Promise(resolve => resolve(false)));
 
@@ -196,7 +195,6 @@ describe('transition', function () {
         }));
 
         it('should fail on error', () => {
-          let log = "";
           $transitions.onCreate({}, () => { throw "doh" });
           expect(() => makeTransition('first', 'second')).toThrow();
         });
@@ -259,7 +257,7 @@ describe('transition', function () {
 
       describe('.onStart()', function() {
         it('should fire matching events when transition starts', ((done) => {
-          var t = null;
+          let t = null;
           $transitions.onStart({ from: "first", to: "second" }, function($transition$) {
             t = $transition$;
           });
@@ -273,14 +271,14 @@ describe('transition', function () {
         }));
 
         it('should get Transition as an argument, and a null state', ((done) => {
-          var args = { trans: undefined, state: undefined };
+          let args = { trans: undefined, state: undefined };
           $transitions.onStart({ from: "*", to: "third" }, <any> function(trans, state) {
             args.trans = trans;
             args.state = state;
           });
 
-          var transition = makeTransition("", "third");
-          var result = new PromiseResult(transition.promise);
+          let transition = makeTransition("", "third");
+          let result = new PromiseResult(transition.promise);
           transition.run()
               .then(tick)
               .then(() => {
@@ -294,8 +292,8 @@ describe('transition', function () {
 
       describe('.onEnter()', function() {
         it('should get Transition and the state being entered as arguments', ((done) => {
-          var states = [];
-          var args = { trans: undefined, state: undefined, third: undefined };
+          let states = [];
+          let args = { trans: undefined, state: undefined, third: undefined };
 
           $transitions.onEnter({ entering: "*" }, <any> function(trans, state, third) {
             states.push(state);
@@ -316,7 +314,7 @@ describe('transition', function () {
         it('should be called on only states being entered', ((done) => {
           $transitions.onEnter({ entering: "**" }, function(trans, state) { states.push(state); });
 
-          var states = [];
+          let states = [];
           Promise.resolve()
               .then(go("B", "D"))
               .then(() => expect(pluck(states, 'name')).toEqual([ 'C', 'D' ]))
@@ -330,7 +328,7 @@ describe('transition', function () {
           $transitions.onEnter({ from: "*", entering: "C" }, function(trans, state) { states.push(state); });
           $transitions.onEnter({ from: "B", entering: "C" }, function(trans, state) { states2.push(state); });
 
-          var states = [], states2 = [];
+          let states = [], states2 = [];
           Promise.resolve()
               .then(go("A", "D"))
               .then(() => {
@@ -351,7 +349,7 @@ describe('transition', function () {
 
       describe('.onExit()', function() {
         it('should get Transition, the state being exited, and Injector as arguments', ((done) => {
-          var args = { trans: undefined, state: undefined, third: undefined };
+          let args = { trans: undefined, state: undefined, third: undefined };
 
           $transitions.onExit({ exiting: "**" }, <any> function(trans, state, third) {
             states.push(state);
@@ -359,7 +357,7 @@ describe('transition', function () {
             args.third = third;
           });
 
-          var states = [];
+          let states = [];
           Promise.resolve()
               .then(go("D", "H"))
               .then(() => {
@@ -374,7 +372,7 @@ describe('transition', function () {
         it('should be called on only states being exited', ((done) => {
           $transitions.onExit({ exiting: "*" }, function(trans, state) { states.push(state); });
 
-          var states = [];
+          let states = [];
           Promise.resolve()
               .then(go("D", "B"))
               .then(() => expect(pluck(states, 'name')).toEqual([ 'D', 'C' ]))
@@ -388,7 +386,7 @@ describe('transition', function () {
           $transitions.onExit({ exiting: "D", to: "*" }, function(trans, state) { states.push(state); });
           $transitions.onExit({ exiting: "D", to: "C" }, function(trans, state) { states2.push(state); });
 
-          var states = [], states2 = [];
+          let states = [], states2 = [];
           Promise.resolve()
               .then(go("D", "B"))
               .then(() => {
@@ -411,7 +409,7 @@ describe('transition', function () {
             url: '/design',
             resolve: { cc: () => 'cc resolve' },
             onExit: (trans, state) => {
-              expect(state.self).toBe(router.stateRegistry.get('design'));
+              expect(state).toBe(router.stateRegistry.get('design'));
               expect(trans.injector(null, 'from').get('cc')).toBe('cc resolve');
               done();
             }
@@ -431,7 +429,7 @@ describe('transition', function () {
           $transitions.onSuccess({ from: "*", to: "*" }, function(trans) { states.push(trans.to().name); });
           $transitions.onEnter({ from: "A", entering: "C" }, function() { return false; });
 
-          var states = [];
+          let states = [];
           Promise.resolve()
               .then(goFail("A", "C"))
               .then(() => expect(states).toEqual([ ]))
@@ -447,7 +445,7 @@ describe('transition', function () {
           $transitions.onSuccess({ from: "*", to: "*" }, function() { throw new Error("oops!"); });
           $transitions.onSuccess({ from: "*", to: "*" }, function(trans) { states.push(trans.to().name); });
 
-          var states = [];
+          let states = [];
           Promise.resolve()
               .then(go("B", "C"))
               .then(() => expect(states).toEqual([ 'C' ]))
@@ -460,7 +458,7 @@ describe('transition', function () {
           $transitions.onEnter({ from: "A", entering: "C" }, function() { return false; });
           $transitions.onError({ }, function(trans) { states.push(trans.to().name); });
 
-          var states = [];
+          let states = [];
           Promise.resolve()
               .then(goFail("A", "D"))
               .then(() => expect(states).toEqual([ 'D' ]))
@@ -471,7 +469,7 @@ describe('transition', function () {
           $transitions.onEnter({ from: "A", entering: "C" }, function() { throw new Error("oops!");  });
           $transitions.onError({ }, function(trans) { states.push(trans.to().name); });
 
-          var states = [];
+          let states = [];
           Promise.resolve()
               .then(goFail("A", "D"))
               .then(() => expect(states).toEqual([ 'D' ]))
@@ -484,7 +482,7 @@ describe('transition', function () {
           $transitions.onError({ from: "A", to: "C" }, function() { hooks.push("AC"); });
           $transitions.onError({ from: "A", to: "D" }, function() { hooks.push("AD"); });
 
-          var hooks = [];
+          let hooks = [];
           Promise.resolve()
               .then(goFail("A", "D"))
               .then(() => expect(hooks).toEqual([ 'splatsplat', 'AD' ]))
@@ -533,7 +531,7 @@ describe('transition', function () {
       }));
 
       it("return value of 'false' should reject the transition with ABORT status", ((done) => {
-        var states = [], rejection, transition = makeTransition("", "D");
+        let states = [], rejection, transition = makeTransition("", "D");
         $transitions.onEnter({ entering: "*" }, function(trans, state) { states.push(state); });
         $transitions.onEnter({ from: "*", entering: "C" }, function() { return false; });
 
@@ -548,7 +546,7 @@ describe('transition', function () {
       }));
 
       it("return value of type Transition should abort the transition with SUPERSEDED status", ((done) => {
-        var states = [], rejection, transition = makeTransition("A", "D");
+        let states = [], rejection, transition = makeTransition("A", "D");
         $transitions.onEnter({ entering: "*" }, function(trans, state) { states.push(state); });
         $transitions.onEnter({ from: "*", entering: "C" }, () => $state.target("B"));
         transition.promise.catch(function(err) { rejection = err; });
@@ -565,12 +563,12 @@ describe('transition', function () {
       }));
 
       it("hooks which start a new transition should cause the old transition to be rejected.", ((done) => {
-        var current = null;
+        let current = null;
         function currenTransition() {
           return current;
         }
 
-        var states = [], rejection, transition2, transition2success,
+        let states = [], rejection, transition2, transition2success,
             transition = current = makeTransition("A", "D", { current: currenTransition });
 
         $transitions.onEnter({ entering: "*", to: "*" }, function(trans, state) { states.push(state); });
@@ -601,7 +599,7 @@ describe('transition', function () {
       }));
 
       it("hooks which return a promise should resolve the promise before continuing", (done) => {
-        var log = [], transition = makeTransition("A", "D");
+        let log = [], transition = makeTransition("A", "D");
         $transitions.onEnter({ from: "*", entering: "*" }, function(trans, state) {
           log.push("#"+state.name);
 
@@ -620,9 +618,9 @@ describe('transition', function () {
       });
 
       it("hooks which return a promise should resolve the promise before continuing", ((done) => {
-        var log = [], transition = makeTransition("A", "D");
-        var $q = services.$q;
-        var defers = { B: $q.defer(), C: $q.defer(), D: $q.defer() };
+        let log = [], transition = makeTransition("A", "D");
+        let $q = services.$q;
+        let defers = { B: $q.defer(), C: $q.defer(), D: $q.defer() };
         function resolveDeferredFor(name) {
           log.push("^" + name);
           defers[name].resolve("ok, go ahead!");
@@ -652,9 +650,9 @@ describe('transition', function () {
       }));
 
       it("hooks can add resolves to a $transition$ and they will be available to be injected elsewhere", ((done) => {
-        var log = [], transition = makeTransition("A", "D");
-        var $q = services.$q;
-        var defer = $q.defer();
+        let log = [], transition = makeTransition("A", "D");
+        let $q = services.$q;
+        let defer = $q.defer();
 
         $transitions.onEnter({ entering: '**'}, function logEnter(trans, state) {
           log.push("Entered#"+state.name);
@@ -662,7 +660,7 @@ describe('transition', function () {
 
         $transitions.onEnter({ entering: "B" }, function addResolves($transition$: Transition) {
           log.push("adding resolve");
-          var resolveFn = function () { log.push("resolving"); return defer.promise; };
+          let resolveFn = function () { log.push("resolving"); return defer.promise; };
           $transition$.addResolvable(new Resolvable('newResolve', resolveFn));
         });
 
@@ -721,7 +719,7 @@ describe('transition', function () {
   describe('Transition() instance', function() {
     describe('.entering', function() {
       it('should return the path elements being entered', (() => {
-        var t = makeTransition("", "A");
+        let t = makeTransition("", "A");
         expect(pluck(t.entering(), 'name')).toEqual([ "A" ]);
 
         t = makeTransition("", "D");
@@ -736,7 +734,7 @@ describe('transition', function () {
 
     describe('.exiting', function() {
       it('should return the path elements being exited', (() => {
-        var t = makeTransition("D", "C");
+        let t = makeTransition("D", "C");
         expect(pluck(t.exiting(), 'name')).toEqual([ 'D' ]);
 
         t = makeTransition("D", "A");
@@ -746,7 +744,7 @@ describe('transition', function () {
 
     describe('.is', function() {
       it('should match globs', (() => {
-        var t = makeTransition("", "first");
+        let t = makeTransition("", "first");
 
         expect(t.is({ to: "first" })).toBe(true);
         expect(t.is({ from: "" })).toBe(true);
@@ -765,7 +763,7 @@ describe('transition', function () {
       }));
 
       it('should match using functions', (() => {
-        var t = makeTransition("", "first");
+        let t = makeTransition("", "first");
 
         expect(t.is({ to: function(state) { return state.name === "first"; } })).toBe(true);
         expect(t.is({ from: function(state) { return state.name === ""; } })).toBe(true);

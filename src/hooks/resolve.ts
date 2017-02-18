@@ -1,11 +1,12 @@
-/** @module hooks */ /** for typedoc */
-import {noop} from "../common/common";
-import {Transition} from "../transition/transition";
-import {StateObject} from "../state/stateObject";
-import {ResolveContext} from "../resolve/resolveContext";
-import {TransitionStateHookFn, TransitionHookFn} from "../transition/interface";
-import {TransitionService} from "../transition/transitionService";
-import {val} from "../common/hof";
+/** @module hooks */
+/** for typedoc */
+import { noop } from '../common/common';
+import { Transition } from '../transition/transition';
+import { ResolveContext } from '../resolve/resolveContext';
+import { TransitionStateHookFn, TransitionHookFn } from '../transition/interface';
+import { TransitionService } from '../transition/transitionService';
+import { val } from '../common/hof';
+import { StateDeclaration } from '../state/interface';
 
 /**
  * A [[TransitionHookFn]] which resolves all EAGER Resolvables in the To Path
@@ -33,9 +34,9 @@ export const registerEagerResolvePath = (transitionService: TransitionService) =
  *
  * See [[StateDeclaration.resolve]]
  */
-const lazyResolveState: TransitionStateHookFn = (trans: Transition, state: StateObject) =>
+const lazyResolveState: TransitionStateHookFn = (trans: Transition, state: StateDeclaration) =>
     new ResolveContext(trans.treeChanges().to)
-        .subContext(state)
+        .subContext(state.$$state())
         .resolvePath("LAZY", trans)
         .then(noop);
 
