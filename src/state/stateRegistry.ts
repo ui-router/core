@@ -7,7 +7,7 @@ import { StateObject } from "./stateObject";
 import { StateMatcher } from "./stateMatcher";
 import { StateBuilder } from "./stateBuilder";
 import { StateQueueManager } from "./stateQueueManager";
-import { StateDeclaration } from "./interface";
+import { StateDeclaration, _StateDeclaration } from "./interface";
 import { BuilderFunction } from "./stateBuilder";
 import { StateOrName } from "./interface";
 import { removeFrom } from "../common/common";
@@ -107,9 +107,9 @@ export class StateRegistry {
    *
    * Gets the root of the state tree.
    * The root state is implicitly created by UI-Router.
-   * Note: this returns the internal [[State]] representation, not a [[StateDeclaration]]
+   * Note: this returns the internal [[StateObject]] representation, not a [[StateDeclaration]]
    *
-   * @return the root [[State]]
+   * @return the root [[StateObject]]
    */
   root() {
     return this._root;
@@ -123,11 +123,11 @@ export class StateRegistry {
    * Note: a state will be queued if the state's parent isn't yet registered.
    *
    * @param stateDefinition the definition of the state to register.
-   * @returns the internal [[State]] object.
+   * @returns the internal [[StateObject]] object.
    *          If the state was successfully registered, then the object is fully built (See: [[StateBuilder]]).
    *          If the state was only queued, then the object is not fully built.
    */
-  register(stateDefinition: StateDeclaration): StateObject {
+  register(stateDefinition: _StateDeclaration): StateObject {
     return this.stateQueue.register(stateDefinition);
   }
 

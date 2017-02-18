@@ -33,7 +33,7 @@ export interface ActiveUIView {
  *
  * A `ViewConfig` is the runtime definition of a single view.
  *
- * During a transition, `ViewConfig`s are created for each [[_ViewDeclaration]] defined on each "entering" [[State]].
+ * During a transition, `ViewConfig`s are created for each [[_ViewDeclaration]] defined on each "entering" [[StateObject]].
  * Then, the [[ViewService]] finds any matching `ui-view`(s) in the DOM, and supplies the ui-view
  * with the `ViewConfig`.  The `ui-view` then loads itself using the information found in the `ViewConfig`.
  *

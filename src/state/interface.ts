@@ -30,7 +30,8 @@ export type ResolveTypes = Resolvable | ResolvableLiteral | ProviderLike;
  * Base interface for declaring a view
  *
  * This interface defines the basic data that a normalized view declaration will have on it.
- * Framework-specific implementations should add additional fields (to their interfaces which extend this interface).
+ * Each implementation of UI-Router (for a specific framework) should define its own extension of this interface.
+ * Add any additional fields that the framework requires to that interface.
  *
  * @internalapi
  */
@@ -90,25 +91,48 @@ export type RedirectToResult = string | TargetState | { state?: string, params?:
 /**
  * The StateDeclaration object is used to define a state or nested state.
  *
+ * Note: Each implementation of UI-Router (for a specific framework)
+ * extends this interface as necessary.
+ *
  * #### Example:
  * ```js
  * // StateDeclaration object
  * var foldersState = {
  *   name: 'folders',
  *   url: '/folders',
+ *   component: FoldersComponent,
  *   resolve: {
  *     allfolders: function(FolderService) {
  *       return FolderService.list();
  *     }
  *   },
- *   template: "<ul><li ng-repeat='folder in allfolders'>{{folder.name}}</li></ul>",
- *   controller: function(allfolders, $scope) {
- *     $scope.allfolders = allfolders;
- *   }
  * }
+ *
+ * registry.register(foldersState);
  * ```
  *
- * Note: Each front-end framework extends this interface as necessary
+ * A state declaration may also be an ES6 class which implements the StateDeclaration interface
+ * and has a `@State()` decorator
+ *
+ * #### Example:
+ * ```js
+ * import { State } from "ui-router-core"
+ * import { FolderService } from "../folder.service"
+ * // StateDeclaration class
+ * @State()
+ * export class FoldersState implements StateDeclaration {
+ *   name: 'folders',
+ *   url: '/folders',
+ *   component: FoldersComponent
+ *
+ *   @Resolve({ deps: [ FolderService ] })
+ *   allfolders(FolderService) {
+ *       return FolderService.list();
+ *   },
+ * }
+ *
+ * registry.register(FoldersState);
+ * ```
  */
 export interface StateDeclaration {
   /**
@@ -161,7 +185,7 @@ export interface StateDeclaration {
    *
    * Gets the *internal API* for a registered state.
    *
-   * Note: the internal [[State]] API is subject to change without notice
+   * Note: the internal [[StateObject]] API is subject to change without notice
    */
   $$state?: () => StateObject;
 
@@ -685,3 +709,8 @@ export interface HrefOptions {
   absolute?:  boolean;
 }
 
+/**
+ * Either a [[StateDeclaration]] or an ES6 class that implements [[StateDeclaration]]
+ * The ES6 class constructor should have no arguments.
+ */
+export type _StateDeclaration = StateDeclaration | { new (): StateDeclaration };

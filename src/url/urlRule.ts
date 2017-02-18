@@ -21,7 +21,7 @@ import {
  * - `string`
  * - [[UrlMatcher]]
  * - `RegExp`
- * - [[State]]
+ * - [[StateObject]]
  * @internalapi
  */
 export class UrlRuleFactory {
