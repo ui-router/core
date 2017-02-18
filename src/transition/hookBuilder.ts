@@ -79,7 +79,7 @@ export class HookBuilder {
            traceData: { hookType: hookType.name, context: node }
          }, baseHookOptions);
 
-         let state = hookType.criteriaMatchPath.scope === TransitionHookScope.STATE ? node.state : null;
+         let state = hookType.criteriaMatchPath.scope === TransitionHookScope.STATE ? node.state.self : null;
          let transitionHook = new TransitionHook(transition, state, hook, _options);
          return <HookTuple> { hook, node, transitionHook };
        });
