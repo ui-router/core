@@ -512,12 +512,11 @@ export interface IHookRegistry {
    * Registers a [[TransitionStateHookFn]], called when a specific state is retained/kept.
    *
    * Registers a lifecycle hook, which is invoked (during a transition) for
-   * a specific state that was previously active and is not being entered nor exited.
+   * a specific state that was previously active will remain active (is not being entered nor exited).
    * 
-   * Since this hook is invoked when a transition is when the state is kept, it means the transition
-   * is coming *from* a substate of the kept state *to* a substate of the kept state.  
-   * This hook can be used to perform actions when the user moves from one substate to another, such as
-   * between steps in a wizard.
+   * This hook is invoked when a state is "retained" or "kept".
+   * It means the transition is coming *from* a substate of the retained state *to* a substate of the retained state.
+   * This hook can be used to perform actions when the user moves from one substate to another, such as between steps in a wizard.
    *
    * The [[HookMatchCriteria]] is used to determine which Transitions the hook should be invoked for.
    * `onRetain` hooks generally specify `{ retained: 'somestate' }`.
