@@ -761,15 +761,15 @@ export interface HookMatchCriteria {
   [key: string]: HookMatchCriterion;
 
   /** A [[HookMatchCriterion]] to match the destination state */
-  to?: HookMatchCriterion;
+  to?: HookMatchCriterion | undefined;
   /** A [[HookMatchCriterion]] to match the original (from) state */
-  from?: HookMatchCriterion;
+  from?: HookMatchCriterion | undefined;
   /** A [[HookMatchCriterion]] to match any state that would be exiting */
-  exiting?: HookMatchCriterion;
+  exiting?: HookMatchCriterion | undefined;
   /** A [[HookMatchCriterion]] to match any state that would be retained */
-  retained?: HookMatchCriterion;
+  retained?: HookMatchCriterion | undefined;
   /** A [[HookMatchCriterion]] to match any state that would be entering */
-  entering?: HookMatchCriterion;
+  entering?: HookMatchCriterion | undefined;
 }
 
 export interface IMatchingNodes {
