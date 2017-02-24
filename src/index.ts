@@ -11,7 +11,6 @@ export * from "./state/index";
 export * from "./transition/index";
 export * from "./url/index";
 export * from "./view/index";
-export * from "./decorators/index";
 export * from "./globals";
 
 export * from "./router";
