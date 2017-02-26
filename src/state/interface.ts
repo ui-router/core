@@ -701,11 +701,32 @@ export interface LazyLoadResult {
   states?: StateDeclaration[];
 }
 
-/** @internalapi */
+/**
+ * An options object for [[StateService.href]]
+ */
 export interface HrefOptions {
+  /**
+   * Defines what state to be "relative from"
+   *
+   * When a relative path is found (e.g `^` or `.bar`), defines which state to be relative from.
+   */
   relative?:  StateOrName;
+
+  /**
+   * If true, and if there is no url associated with the state provided in the
+   *    first parameter, then the constructed href url will be built from the first
+   *    ancestor which has a url.
+   */
   lossy?:     boolean;
+
+  /**
+   * If `true` will inherit parameters from the current parameter values.
+   */
   inherit?:   boolean;
+
+  /**
+   * If true will generate an absolute url, e.g. `http://www.example.com/fullurl`.
+   */
   absolute?:  boolean;
 }
 

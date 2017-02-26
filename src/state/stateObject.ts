@@ -172,10 +172,10 @@ export class StateObject {
   }
 
   /**
-   * Gets the state's `Param`eters
+   * Gets the state's `Param` objects
    *
-   * Gets [[Param]] information that is owned by the state.
-   * If `opts.inherit` is true, it also includes the ancestor states' [[Param]] information.
+   * Gets the list of [[Param]] objects owned by the state.
+   * If `opts.inherit` is true, it also includes the ancestor states' [[Param]] objects.
    * If `opts.matchingKeys` exists, returns only `Param`s whose `id` is a key on the `matchingKeys` object
    *
    * @param opts options
@@ -190,7 +190,7 @@ export class StateObject {
   /**
    * Returns a single [[Param]] that is owned by the state
    *
-   * If `opts.inherit` is true, it also searches the ancestor states` [[Param]] information.
+   * If `opts.inherit` is true, it also searches the ancestor states` [[Param]]s.
    * @param id the name of the [[Param]] to return
    * @param opts options
    */

@@ -213,15 +213,15 @@ export class StateService {
   };
 
   /**
-   * Transition to a different state or parameters
+   * Transition to a different state and/or parameters
    *
    * Convenience method for transitioning to a new state.
    *
    * `$state.go` calls `$state.transitionTo` internally but automatically sets options to
-   * `{ location: true, inherit: true, relative: $state.$current, notify: true }`.
-   * This allows you to easily use an absolute or relative to path and specify
-   * only the parameters you'd like to update (while letting unspecified parameters
-   * inherit from the currently active ancestor states).
+   * `{ location: true, inherit: true, relative: router.globals.$current, notify: true }`.
+   * This allows you to use either an absolute or relative `to` argument (because of `relative: router.globals.$current`).
+   * It also allows you to specify * only the parameters you'd like to update, while letting unspecified parameters
+   * inherit from the current parameter values (because of `inherit: true`).
    *
    * #### Example:
    * ```js
@@ -244,12 +244,8 @@ export class StateService {
    *
    * @param params A map of the parameters that will be sent to the state, will populate $stateParams.
    *
-   *    Any parameters that are not specified will be inherited from currently defined parameters (because of `inherit: true`).
-   *    This allows, for example, going to a sibling state that shares parameters specified in a parent state.
-   *
-   *    Parameter inheritance only works between common ancestor states, I.e.
-   *    transitioning to a sibling will get you the parameters for all parents, transitioning to a child
-   *    will get you all current parameters, etc.
+   *    Any parameters that are not specified will be inherited from current parameter values (because of `inherit: true`).
+   *    This allows, for example, going to a sibling state that shares parameters defined by a parent state.
    *
    * @param options Transition options
    *
@@ -495,14 +491,6 @@ export class StateService {
    * @param stateOrName The state name or state object you'd like to generate a url from.
    * @param params An object of parameter values to fill the state's required parameters.
    * @param options Options object. The options are:
-   *
-   * - **`lossy`** - {boolean=true} -  If true, and if there is no url associated with the state provided in the
-   *    first parameter, then the constructed href url will be built from the first navigable ancestor (aka
-   *    ancestor with a valid url).
-   * - **`inherit`** - {boolean=true}, If `true` will inherit url parameters from current url.
-   * - **`relative`** - {object=$state.$current}, When transitioning with relative path (e.g '^'),
-   *    defines which state to be relative from.
-   * - **`absolute`** - {boolean=false},  If true will generate an absolute url, e.g. "http://www.example.com/fullurl".
    *
    * @returns {string} compiled state url
    */

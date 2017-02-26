@@ -316,10 +316,11 @@ export interface ParamDeclaration {
   raw: boolean;
 
   /**
-   * Enables/disables inheriting of this parameter value
+   * Enables/disables inheriting of this parameter's value
    *
-   * When a transition is run with [[TransitionOptions.inherit]] set to `true`, the current param values are inherited.
-   * Parameters values which have `inherit: false` will not be inherited.
+   * When a transition is run with [[TransitionOptions.inherit]] set to
+   * `true`, the current param values are inherited in the new transition.
+   * However, parameters values which have `inherit: false` set  will *not be inherited*.
    *
    * #### Example state :
    * ```js
@@ -341,6 +342,10 @@ export interface ParamDeclaration {
    * ```
    * <ui-sref="foo({ fooId: 4567 })">4567</ui-sref>
    * ```
+   *
+   * ---
+   *
+   * See also [[TransitionOptions.inherit]] and [[ParamTypeDefinition.inherit]]
    *
    * ---
    *
@@ -577,8 +582,9 @@ export interface ParamTypeDefinition {
   /**
    * Enables/disables inheriting of parameter values (of this type)
    *
-   * When a transition is run with [[TransitionOptions.inherit]] set to `true`, the current param values are inherited.
-   * Param values whose type has `inherit: false` will not be inherited.
+   * When a transition is run with [[TransitionOptions.inherit]] set to
+   * `true`, the current param values are inherited in the new transition.
+   * However, parameters whose type has `inherit: false` set  will *not be inherited*.
    *
    * The internal parameter type of `hash` has `inherit: false`.
    * This is used to disable inheriting of the hash value (`#`) on subsequent transitions.
@@ -592,6 +598,11 @@ export interface ParamTypeDefinition {
    * // The url's hash will be cleared.
    * $state.go('home.nest');
    * ```
+   *
+   * ---
+   *
+   * See also [[TransitionOptions.inherit]] and [[ParamDeclaration.inherit]]
+   *
    */
   inherit?: boolean;
 

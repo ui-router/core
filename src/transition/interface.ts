@@ -37,9 +37,9 @@ export interface TransitionOptions {
 
   /**
    * This option sets whether or not the transition's parameter values should be inherited from
-   * the current state parameters.
+   * the current parameter values.
    *
-   * - If `true`, it will inherit parameters from current state.
+   * - If `true`, it will inherit parameter values from the current parameter values.
    * - If `false`, only the parameters which are provided to `transitionTo` will be used.
    *
    * @default `false`
