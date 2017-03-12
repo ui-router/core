@@ -646,6 +646,7 @@ export class Transition implements IHookRegistry {
 
     services.$q.when()
         .then(() => chainFor(TransitionHookPhase.BEFORE))
+        .then(() => trace.traceTransitionStart(this))
         // This waits to build the RUN hook chain until after the "BEFORE" hooks complete
         // This allows a BEFORE hook to dynamically add RUN hooks via the Transition object.
         .then(() => chainFor(TransitionHookPhase.RUN))
