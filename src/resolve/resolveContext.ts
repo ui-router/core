@@ -17,7 +17,7 @@ const when = resolvePolicies.when;
 const ALL_WHENS = [when.EAGER, when.LAZY];
 const EAGER_WHENS = [when.EAGER];
 
-export const NATIVE_INJECTOR_TOKEN = "Native Injector";
+export const NATIVE_INJECTOR_TOKEN: string = "Native Injector";
 
 /**
  * Encapsulates Dependency Injection for a path of nodes

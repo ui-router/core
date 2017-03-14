@@ -27,8 +27,8 @@ let defaultOptions: TransitionHookOptions = {
 export type GetResultHandler = (hook: TransitionHook) => ResultHandler;
 export type GetErrorHandler  = (hook: TransitionHook) => ErrorHandler;
 
-export type ResultHandler = (result: HookResult) => Promise<HookResult>;
-export type ErrorHandler  = (error)              => Promise<any>;
+export type ResultHandler = (result: HookResult)      => Promise<HookResult>;
+export type ErrorHandler  = (error: any)              => Promise<any>;
 
 /** @hidden */
 export class TransitionHook {
@@ -62,13 +62,13 @@ export class TransitionHook {
    * These GetErrorHandler(s) are used by [[invokeHook]] below
    * Each HookType chooses a GetErrorHandler (See: [[TransitionService._defineCoreEvents]])
    */
-  static LOG_ERROR: GetErrorHandler = (hook: TransitionHook) => (error) =>
+  static LOG_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) =>
       hook.logError(error);
 
-  static REJECT_ERROR: GetErrorHandler = (hook: TransitionHook) => (error) =>
+  static REJECT_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) =>
       silentRejection(error);
 
-  static THROW_ERROR: GetErrorHandler = (hook: TransitionHook) => (error) => {
+  static THROW_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) => {
     throw error;
   };
 

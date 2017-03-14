@@ -617,7 +617,7 @@ function _arraysEq(a1: any[], a2: any[]) {
   return arrayTuples(a1, a2).reduce((b, t) => b && _equals(t[0], t[1]), true);
 }
 
-export type sortfn = (a,b) => number;
+export type sortfn = (a: any, b: any) => number;
 
 /**
  * Create a sort function
