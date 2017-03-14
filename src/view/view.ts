@@ -167,9 +167,13 @@ export class ViewService {
     let uiViewsByFqn: TypedMap<ActiveUIView> =
         this._uiViews.map(uiv => [uiv.fqn, uiv]).reduce(applyPairs, <any> {});
 
-    // Return the number of dots in the fully qualified name
+    // Return a weighted depth value for a uiView.
+    // The depth is the nesting depth of ui-views (based on FQN; times 10,000)
+    // plus the depth of the state that is populating the uiView
     function uiViewDepth(uiView: ActiveUIView) {
-      return uiView.fqn.split(".").length;
+      const stateDepth = (context: ViewContext) =>
+          context.parent ? stateDepth(context.parent) + 1 : 1;
+      return (uiView.fqn.split(".").length * 10000) + stateDepth(uiView.creationContext);
     }
 
     // Return the ViewConfig's context's depth in the context tree.
@@ -200,6 +204,7 @@ export class ViewService {
         uiView.configUpdated(viewConfig);
     };
 
+    // Sort views by FQN and state depth. Process uiviews nearest the root first.
     this._uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair).forEach(configureUIView);
   };
 
