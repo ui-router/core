@@ -85,7 +85,7 @@ export interface TransitionOptions {
   /** @internalapi */
   current     ?: () => Transition;
   /** @internalapi */
-  source      ?: "sref"|"url"|"redirect"|"otherwise"|"unknown";
+  source      ?: "sref" | "url" | "redirect" | "otherwise" | "unknown";
 }
 
 /** @internalapi */
@@ -171,21 +171,22 @@ export type IHookRegistration = (matchCriteria: HookMatchCriteria, callback: Hoo
  *
  * A transition hook may alter a Transition by returning a [[HookResult]].
  *
- * @param transition the current [[Transition]]
- * @param injector (for ng1 or ng2 only) the injector service
- *
- * @returns a [[HookResult]] which may alter the transition
- *
- * See:
+ * #### See:
  *
  * - [[IHookRegistry.onBefore]]
  * - [[IHookRegistry.onStart]]
  * - [[IHookRegistry.onFinish]]
  * - [[IHookRegistry.onSuccess]]
  * - [[IHookRegistry.onError]]
+ *
+ * @param transition the current [[Transition]]
+ * @param injector (for ng1 or ng2 only) the injector service
+ *
+ * @returns a [[HookResult]] which may alter the transition
+ *
  */
 export interface TransitionHookFn {
-  (transition: Transition) : HookResult
+  (transition: Transition) : HookResult;
 }
 
 /**
@@ -197,20 +198,20 @@ export interface TransitionHookFn {
  * As a transition runs, it may exit some states, retain (keep) states, and enter states.
  * As each lifecycle event occurs, the hooks which are registered for the event and that state are called (in priority order).
  *
+ * #### See:
+ *
+ * - [[IHookRegistry.onExit]]
+ * - [[IHookRegistry.onRetain]]
+ * - [[IHookRegistry.onEnter]]
+ *
  * @param transition the current [[Transition]]
  * @param state the [[StateObject]] that the hook is bound to
  * @param injector (for ng1 or ng2 only) the injector service
  *
  * @returns a [[HookResult]] which may alter the transition
- *
- * See:
- *
- * - [[IHookRegistry.onExit]]
- * - [[IHookRegistry.onRetain]]
- * - [[IHookRegistry.onEnter]]
  */
 export interface TransitionStateHookFn {
-  (transition: Transition, state: StateDeclaration) : HookResult
+  (transition: Transition, state: StateDeclaration) : HookResult;
 }
 
 /**
@@ -223,7 +224,7 @@ export interface TransitionStateHookFn {
  * @return a [[Transition]] which will then be returned from [[TransitionService.create]]
  */
 export interface TransitionCreateHookFn {
-  (transition: Transition): void
+  (transition: Transition): void;
 }
 
 export type HookFn = (TransitionHookFn|TransitionStateHookFn|TransitionCreateHookFn);
@@ -351,7 +352,7 @@ export interface IHookRegistry {
    * This example assumes a state tree where all states which require authentication are children of a parent `'requireauth'` state.
    * This example assumes `MyAuthService` synchronously returns a boolean from `isAuthenticated()`.
    *
-   * @example
+   * #### Example:
    * ```js
    * // ng1
    * $transitions.onBefore( { to: 'requireauth.**' }, function(trans) {
@@ -407,7 +408,7 @@ export interface IHookRegistry {
    * - `MyAuthService.authenticate()` presents a login dialog, and returns a promise which is resolved
    *   or rejected, whether or not the login attempt was successful.
    *
-   * @example
+   * #### Example:
    * ```js
    * // ng1
    * $transitions.onStart( { to: 'auth.**' }, function(trans) {
@@ -687,16 +688,15 @@ export interface IHookRegistry {
   /**
    * Returns all the registered hooks of a given `hookName` type
    *
-   * @example
+   * #### Example:
    * ```
-   *
    * $transitions.getHooks("onEnter")
    * ```
    */
   getHooks(hookName: string): RegisteredHook[];
 
   /** @hidden place to store the hooks */
-  _registeredHooks: { [key: string]: RegisteredHook[] }
+  _registeredHooks: { [key: string]: RegisteredHook[] };
 }
 
 /** A predicate type which tests if a [[StateDeclaration]] passes some test. Returns a boolean. */
@@ -789,13 +789,13 @@ export interface RegisteredHooks {
 
 /** @hidden */
 export interface PathTypes {
-  [key: string]: PathType
+  [key: string]: PathType;
 
-  to: PathType
-  from: PathType
-  exiting: PathType
-  retained: PathType
-  entering: PathType
+  to: PathType;
+  from: PathType;
+  exiting: PathType;
+  retained: PathType;
+  entering: PathType;
 }
 
 /** @hidden */
