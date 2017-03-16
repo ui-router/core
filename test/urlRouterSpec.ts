@@ -6,12 +6,12 @@ import { StateRegistry } from "../src/state/stateRegistry";
 import { noop } from "../src/common/common";
 import { UrlRule, MatchResult } from "../src/url/interface";
 
-declare var jasmine;
-var _anything = jasmine.anything();
+declare let jasmine;
+let _anything = jasmine.anything();
 
 describe("UrlRouter", function () {
-  var router: UIRouter;
-  var urlRouter: UrlRouter,
+  let router: UIRouter;
+  let urlRouter: UrlRouter,
       urlService: UrlService,
       urlMatcherFactory: UrlMatcherFactory,
       stateService: StateService,
@@ -62,8 +62,8 @@ describe("UrlRouter", function () {
   });
 
   it('`rule` should return a deregistration function', function() {
-    var count = 0;
-    var rule: UrlRule = {
+    let count = 0;
+    let rule: UrlRule = {
       match: () => count++,
       handler: match => match,
       matchPriority: () => 0,
@@ -85,8 +85,8 @@ describe("UrlRouter", function () {
   });
 
   it('`removeRule` should remove a previously registered rule', function() {
-    var count = 0;
-    var rule: UrlRule = {
+    let count = 0;
+    let rule: UrlRule = {
       match: () => count++,
       handler: match => match,
       matchPriority: () => 0,
@@ -161,7 +161,7 @@ describe("UrlRouter", function () {
   describe("URL generation", function() {
     it("should return null when UrlMatcher rejects parameters", function () {
       urlMatcherFactory.type("custom", <any> { is: val => val === 1138 });
-      var urlmatcher = matcher("/foo/{param:custom}");
+      let urlmatcher = matcher("/foo/{param:custom}");
 
       expect(urlRouter.href(urlmatcher, { param: 1138 })).toBe('#/foo/1138');
       expect(urlRouter.href(urlmatcher, { param: 5 })).toBeNull();
@@ -174,12 +174,12 @@ describe("UrlRouter", function () {
 
   describe('Url Rule priority', () => {
 
-    var matchlog: string[];
+    let matchlog: string[];
     beforeEach(() => matchlog = []);
     const log = (id) => () => (matchlog.push(id), null);
 
     it("should prioritize a path with a static string over a param 1", () => {
-      var spy = spyOn(stateService, "transitionTo");
+      let spy = spyOn(stateService, "transitionTo");
       let A = stateRegistry.register({ name: 'A', url: '/:pA' });
       let B = stateRegistry.register({ name: 'B', url: '/BBB' });
 
@@ -191,7 +191,7 @@ describe("UrlRouter", function () {
     });
 
     it("should prioritize a path with a static string over a param 2", () => {
-      var spy = spyOn(stateService, "transitionTo");
+      let spy = spyOn(stateService, "transitionTo");
       stateRegistry.register({ name: 'foo', url: '/foo' });
       let A = stateRegistry.register({ name: 'foo.A', url: '/:pA' });
       let B = stateRegistry.register({ name: 'B', url: '/foo/BBB' });
@@ -269,7 +269,7 @@ describe("UrlRouter", function () {
 
         urlService.url("/foo/123/456?query=blah");
         expect(matchlog).toEqual([1, 2]);
-      })
+      });
     });
   });
 
@@ -284,7 +284,7 @@ describe("UrlRouter", function () {
     it("should return the best match for a URL 1", () => {
       let match: MatchResult = urlRouter.match({ path: '/BBB' });
       expect(match.rule.type).toBe("STATE");
-      expect(match.rule['state']).toBe(B)
+      expect(match.rule['state']).toBe(B);
     });
 
     it("should return the best match for a URL 2", () => {
@@ -312,7 +312,7 @@ describe("UrlRouter", function () {
       };
 
       registry.register({ name: 'lazy.**', url: '/lazy', lazyLoad: lazyLoad });
-      registry.register({ name: 'param', url: '/:param', });
+      registry.register({ name: 'param', url: '/:param' });
 
       router.transitionService.onSuccess({}, trans => {
         expect(trans.$to()).toBe(loadedState);
@@ -322,14 +322,14 @@ describe("UrlRouter", function () {
       });
 
       router.urlService.url('/lazy');
-    })
-  })
+    });
+  });
 });
 
 describe('UrlRouter.deferIntercept', () => {
-  var $ur, $url;
+  let $ur, $url;
   beforeEach(function() {
-    var router = new UIRouter();
+    let router = new UIRouter();
     router.urlRouter.deferIntercept();
     router.plugin(TestingPlugin);
     $ur = router.urlRouter;
@@ -337,7 +337,7 @@ describe('UrlRouter.deferIntercept', () => {
   });
 
   it("should allow location changes to be deferred", function () {
-    var log = [];
+    let log = [];
 
     $ur.rule($ur.urlRuleFactory.create(/.*/, () => log.push($url.path())));
 
