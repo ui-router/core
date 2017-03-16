@@ -77,7 +77,7 @@
     "readline-sync": "^1.4.4",
     "shelljs": "^0.7.0",
     "shx": "^0.1.4",
-    "tslint": "=2.5.0",
+    "tslint": "^4.5.1",
     "typescript": "^2.1.4",
     "webpack": "^1.13.3"
   }
