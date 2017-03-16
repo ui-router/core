@@ -435,9 +435,7 @@ export interface StateDeclaration {
    * - If the value is a [[TargetState]] the Transition is redirected to the `TargetState`
    *
    * - If the property is a function:
-   *   - The function is called with two parameters:
-   *     - The current [[Transition]]
-   *     - An [[UIInjector]] which can be used to get dependencies using [[UIInjector.get]] or resolves using [[UIInjector.getAsync]]
+   *   - The function is called with the current [[Transition]]
    *   - The return value is processed using the previously mentioned rules.
    *   - If the return value is a promise, the promise is waited for, then the resolved async value is processed using the same rules.
    *
@@ -489,7 +487,8 @@ export interface StateDeclaration {
    * })
    * ```
    */
-  redirectTo?: RedirectToResult | Promise<RedirectToResult>
+  redirectTo?: RedirectToResult |
+      ((transition: Transition) => Promise<RedirectToResult>);
 
   /**
    * A Transition Hook called with the state is being entered.  See: [[IHookRegistry.onEnter]]

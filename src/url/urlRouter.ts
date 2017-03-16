@@ -3,17 +3,17 @@
  * @module url
  */
 /** for typedoc */
-import { removeFrom, createProxyFunctions, inArray, composeSort, sortBy, extend } from "../common/common";
-import { isFunction, isString, isDefined } from "../common/predicates";
-import { UrlMatcher } from "./urlMatcher";
-import { RawParams } from "../params/interface";
-import { Disposable } from "../interface";
-import { UIRouter } from "../router";
-import { val, is, pattern, prop, pipe } from "../common/hof";
-import { UrlRuleFactory } from "./urlRule";
-import { TargetState } from "../state/targetState";
-import { UrlRule, UrlRuleHandlerFn, UrlParts, UrlRulesApi, UrlSyncApi, MatchResult } from "./interface";
-import { TargetStateDef } from "../state/interface";
+import { composeSort, createProxyFunctions, extend, inArray, removeFrom, sortBy } from '../common/common';
+import { isDefined, isFunction, isString } from '../common/predicates';
+import { UrlMatcher } from './urlMatcher';
+import { RawParams } from '../params/interface';
+import { Disposable } from '../interface';
+import { UIRouter } from '../router';
+import { is, pattern, pipe, prop, val } from '../common/hof';
+import { UrlRuleFactory } from './urlRule';
+import { TargetState } from '../state/targetState';
+import { MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi, UrlSyncApi } from './interface';
+import { TargetStateDef } from '../state/interface';
 
 /** @hidden */
 function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHref: string): string {
@@ -42,7 +42,7 @@ let defaultRuleSortFn: (a: UrlRule, b: UrlRule) => number;
 defaultRuleSortFn = composeSort(
     sortBy(pipe(prop("priority"), x => -x)),
     sortBy(pipe(prop("type"), type => ({ "STATE": 4, "URLMATCHER": 4, "REGEXP": 3, "RAW": 2, "OTHER": 1 })[type])),
-    (a,b) => (getMatcher(a) && getMatcher(b)) ? UrlMatcher.compare(getMatcher(a), getMatcher(b)) : 0,
+    (a, b) => (getMatcher(a) && getMatcher(b)) ? UrlMatcher.compare(getMatcher(a), getMatcher(b)) : 0,
     sortBy(prop("$id"), inArray([ "REGEXP", "RAW", "OTHER" ])),
 );
 
@@ -140,7 +140,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
         $state = router.stateService;
 
     let url: UrlParts = {
-      path: $url.path(), search: $url.search(), hash: $url.hash()
+      path: $url.path(), search: $url.search(), hash: $url.hash(),
     };
 
     let best = this.match(url);
@@ -273,13 +273,20 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
   /** @inheritdoc */
   otherwise(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef) {
-    if (!isFunction(handler) && !isString(handler) && !is(TargetState)(handler) && !TargetState.isDef(handler)) {
-      throw new Error("'handler' must be a string, function, TargetState, or have a state: 'newtarget' property");
-    }
+    let handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
 
-    let handlerFn: UrlRuleHandlerFn = isFunction(handler) ? handler as UrlRuleHandlerFn : val(handler);
     this._otherwiseFn = this.urlRuleFactory.create(val(true), handlerFn);
     this._sorted = false;
+  };
+
+  /** @inheritdoc */
+  initial(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef) {
+    let handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
+
+    let matchFn: UrlRuleMatchFn = (urlParts, router) =>
+        router.globals.transitionHistory.size() === 0 && !!/^\/?$/.exec(urlParts.path);
+
+    this.rule(this.urlRuleFactory.create(matchFn, handlerFn));
   };
 
   /** @inheritdoc */
@@ -297,3 +304,9 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   };
 }
 
+function getHandlerFn(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef): UrlRuleHandlerFn {
+  if (!isFunction(handler) && !isString(handler) && !is(TargetState)(handler) && !TargetState.isDef(handler)) {
+    throw new Error("'handler' must be a string, function, TargetState, or have a state: 'newtarget' property");
+  }
+  return isFunction(handler) ? handler as UrlRuleHandlerFn : val(handler);
+}

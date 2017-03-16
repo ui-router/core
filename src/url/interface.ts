@@ -308,9 +308,12 @@ export interface UrlRulesApi {
   when(matcher: (RegExp|UrlMatcher|string), handler: string|UrlRuleHandlerFn, options?: { priority: number }): UrlRule;
 
   /**
-   * Defines the path or behavior to use when no url can be matched.
+   * Defines the state, url, or behavior to use when no other rule matches the URL.
    *
-   * - If a string, it is treated as a url redirect
+   * This rule is matched when *no other rule* matches.
+   * It is generally used to handle unknown URLs (similar to "404" behavior, but on the client side).
+   *
+   * - If `handler` a string, it is treated as a url redirect
    *
    * #### Example:
    * When no other url rule matches, redirect to `/index`
@@ -318,27 +321,73 @@ export interface UrlRulesApi {
    * .otherwise('/index');
    * ```
    *
-   * - If a function, the function receives the current url ([[UrlParts]]) and the [[UIRouter]] object.
-   *   If the function returns a string, the url is redirected to the return value.
+   * - If `handler` is an object with a `state` property, the state is activated.
    *
    * #### Example:
-   * When no other url rule matches, redirect to `/index`
+   * When no other url rule matches, redirect to `home` and provide a `dashboard` parameter value.
    * ```js
-   * .otherwise(() => '/index');
+   * .otherwise({ state: 'home', params: { dashboard: 'default' } });
+   * ```
+   *
+   * - If `handler` is a function, the function receives the current url ([[UrlParts]]) and the [[UIRouter]] object.
+   *   The function can perform actions, and/or return a value.
+   *
+   * #### Example:
+   * When no other url rule matches, manually trigger a transition to the `home` state
+   * ```js
+   * .otherwise((urlParts, router) => {
+   *   router.stateService.go('home');
+   * });
    * ```
    *
    * #### Example:
    * When no other url rule matches, go to `home` state
    * ```js
-   * .otherwise((url, router) => {
-   *   router.stateService.go('home');
-   *   return;
-   * }
+   * .otherwise((urlParts, router) => {
+   *   return { state: 'home' };
+   * });
    * ```
    *
    * @param handler The url path to redirect to, or a function which returns the url path (or performs custom logic).
    */
   otherwise(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef): void;
+
+  /**
+   * Defines the initial state, path, or behavior to use when the app starts.
+   *
+   * This rule defines the initial/starting state for the application.
+   *
+   * This rule is triggered the first time the URL is checked (when the app initially loads).
+   * The rule is triggered only when the url matches either `""` or `"/"`.
+   *
+   * Note: The rule is intended to be used when the root of the application is directly linked to.
+   * When the URL is *not* `""` or `"/"` and doesn't match other rules, the [[otherwise]] rule is triggered.
+   * This allows 404-like behavior when an unknown URL is deep-linked.
+   *
+   * #### Example:
+   * Start app at `home` state.
+   * ```js
+   * .initial({ state: 'home' });
+   * ```
+   *
+   * #### Example:
+   * Start app at `/home` (by url)
+   * ```js
+   * .initial('/home');
+   * ```
+   *
+   * #### Example:
+   * When no other url rule matches, go to `home` state
+   * ```js
+   * .initial((url, router) => {
+   *   console.log('initial state');
+   *   return { state: 'home' };
+   * })
+   * ```
+   *
+   * @param handler The initial state or url path, or a function which returns the state or url path (or performs custom logic).
+   */
+  initial(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef, options?: { priority: number }): void;
 
   /**
    * Gets all registered rules

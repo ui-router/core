@@ -4,7 +4,7 @@ import { TestingPlugin } from "./_testingPlugin";
 import { UrlService } from "../src/url/urlService";
 
 describe('UrlService facade', () => {
-  var router: UIRouter;
+  let router: UIRouter;
 
   beforeEach(() => {
     router = new UIRouter();
@@ -109,6 +109,10 @@ describe('UrlService facade', () => {
 
   it("should pass rules.otherwise() through to UrlRouter", () => {
     expectProxyCall(() => router.urlService.rules, router.urlRouter, "otherwise", ["foo"]);
+  });
+
+  it("should pass rules.initial() through to UrlRouter", () => {
+    expectProxyCall(() => router.urlService.rules, router.urlRouter, "initial", ["foo"]);
   });
 
   it("should pass rules.rules() through to UrlRouter", () => {

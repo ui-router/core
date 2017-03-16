@@ -61,6 +61,68 @@ describe("UrlRouter", function () {
     expect(locationService.path()).toBe("/lastrule");
   });
 
+  describe('.initial(string)', () => {
+    beforeEach(() => {
+      router.stateRegistry.register({ name: 'foo', url: '/foo' });
+      router.stateRegistry.register({ name: 'bar', url: '/bar' });
+      router.stateRegistry.register({ name: 'otherwise', url: '/otherwise' });
+
+      urlRouter.initial('/foo');
+      urlRouter.otherwise('/otherwise');
+    });
+
+    it("should activate the initial path when initial path matches ''" , function () {
+      locationService.url("");
+      expect(locationService.path()).toBe("/foo");
+    });
+
+    it("should activate the initial path when initial path matches '/'" , function () {
+      locationService.url("/");
+      expect(locationService.path()).toBe("/foo");
+    });
+
+    it("should not activate the initial path after the initial transition" , function (done) {
+      stateService.go('bar').then(() => {
+        locationService.url("/");
+        expect(locationService.path()).toBe("/otherwise");
+        done();
+      });
+    });
+  });
+
+  describe('.initial({ state: "state" })', () => {
+    let goSpy = null;
+    beforeEach(() => {
+      router.stateRegistry.register({ name: 'foo', url: '/foo' });
+      router.stateRegistry.register({ name: 'bar', url: '/bar' });
+      router.stateRegistry.register({ name: 'otherwise', url: '/otherwise' });
+
+      urlRouter.initial({ state: 'foo' });
+      urlRouter.otherwise({ state: 'otherwise' });
+
+      goSpy = spyOn(stateService, "transitionTo").and.callThrough();
+    });
+
+    it("should activate the initial path when initial path matches ''" , function () {
+      locationService.url("");
+      expect(goSpy).toHaveBeenCalledWith("foo", undefined, jasmine.anything());
+    });
+
+    it("should activate the initial path when initial path matches '/'" , function () {
+      locationService.url("/");
+      expect(goSpy).toHaveBeenCalledWith("foo", undefined, jasmine.anything());
+    });
+
+    it("should not activate the initial path after the initial transition" , function (done) {
+      stateService.go('bar').then(() => {
+        locationService.url("/");
+        expect(goSpy).toHaveBeenCalledWith("otherwise", undefined, jasmine.anything());
+        done();
+      });
+    });
+  });
+
+
   it('`rule` should return a deregistration function', function() {
     let count = 0;
     let rule: UrlRule = {
