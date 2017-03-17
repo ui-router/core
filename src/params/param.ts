@@ -2,9 +2,9 @@
  * @coreapi
  * @module params
  */ /** for typedoc */
-import { extend, filter, map, applyPairs, allTrueR } from "../common/common";
-import { prop, propEq } from "../common/hof";
-import { isInjectable, isDefined, isString, isArray } from "../common/predicates";
+import { extend, filter, map, allTrueR } from "../common/common";
+import { prop } from "../common/hof";
+import { isInjectable, isDefined, isString, isArray, isUndefined } from "../common/predicates";
 import { RawParams, ParamDeclaration } from "../params/interface";
 import { services } from "../common/coreservices";
 import { ParamType } from "./paramType";
@@ -17,15 +17,22 @@ import { UrlMatcherFactory } from "../url/urlMatcherFactory";
 
 /** @internalapi */
 export enum DefType {
-  PATH, SEARCH, CONFIG
+  PATH,
+  SEARCH,
+  CONFIG,
 }
 
 /** @hidden */
 function unwrapShorthand(cfg: ParamDeclaration): ParamDeclaration {
   cfg = isShorthand(cfg) && { value: cfg } as any || cfg;
 
+  getStaticDefaultValue['__cacheable'] = true;
+  function getStaticDefaultValue() {
+    return cfg.value;
+  }
+
   return extend(cfg, {
-    $$fn: isInjectable(cfg.value) ? cfg.value : () => cfg.value
+    $$fn: isInjectable(cfg.value) ? cfg.value : getStaticDefaultValue,
   });
 }
 
@@ -59,7 +66,7 @@ function getSquashPolicy(config: ParamDeclaration, isOptional: boolean, defaultP
 function getReplace(config: ParamDeclaration, arrayMode: boolean, isOptional: boolean, squash: (string|boolean)) {
   let replace: any, configuredKeys: string[], defaultPolicy = [
     {from: "", to: (isOptional || arrayMode ? undefined : "")},
-    {from: null, to: (isOptional || arrayMode ? undefined : "")}
+    {from: null, to: (isOptional || arrayMode ? undefined : "")},
   ];
   replace = isArray(config.replace) ? config.replace : [];
   if (isString(squash)) replace.push({ from: squash, to: undefined });
@@ -77,10 +84,14 @@ export class Param {
   dynamic: boolean;
   raw: boolean;
   squash: (boolean|string);
-  replace: any;
+  replace: [{ to: any, from: any }];
   inherit: boolean;
   array: boolean;
   config: any;
+  /** Cache the default value if it is a static value */
+  _defaultValueCache: {
+    defaultValue: any,
+  };
 
   constructor(id: string, type: ParamType, config: ParamDeclaration, location: DefType, urlMatcherFactory: UrlMatcherFactory) {
     config = unwrapShorthand(config);
@@ -101,7 +112,7 @@ export class Param {
       return extend(arrayDefaults, arrayParamNomenclature, config).array;
     }
 
-    extend(this, {id, type, location, isOptional, dynamic, raw, squash, replace, inherit, array: arrayMode, config, });
+    extend(this, {id, type, location, isOptional, dynamic, raw, squash, replace, inherit, array: arrayMode, config });
   }
 
   isDefaultValue(value: any): boolean {
@@ -116,21 +127,33 @@ export class Param {
     /**
      * [Internal] Get the default value of a parameter, which may be an injectable function.
      */
-    const $$getDefaultValue = () => {
+    const getDefaultValue = () => {
+      if (this._defaultValueCache) return this._defaultValueCache.defaultValue;
+
       if (!services.$injector) throw new Error("Injectable functions cannot be called at configuration time");
+
       let defaultValue = services.$injector.invoke(this.config.$$fn);
+
       if (defaultValue !== null && defaultValue !== undefined && !this.type.is(defaultValue))
         throw new Error(`Default value (${defaultValue}) for parameter '${this.id}' is not an instance of ParamType (${this.type.name})`);
+
+      if (this.config.$$fn['__cacheable']) {
+        this._defaultValueCache = { defaultValue };
+      }
+
       return defaultValue;
     };
 
-    const $replace = (val: any) => {
-      let replacement: any = map(filter(this.replace, propEq('from', val)), prop("to"));
-      return replacement.length ? replacement[0] : val;
+    const replaceSpecialValues = (val: any) => {
+      for (let tuple of this.replace) {
+        if (tuple.from === val) return tuple.to;
+      }
+      return val;
     };
 
-    value = $replace(value);
-    return !isDefined(value) ? $$getDefaultValue() : this.type.$normalize(value);
+    value = replaceSpecialValues(value);
+
+    return isUndefined(value) ? getDefaultValue() : this.type.$normalize(value);
   }
 
   isSearch(): boolean {
@@ -139,7 +162,7 @@ export class Param {
 
   validates(value: any): boolean {
     // There was no parameter value, but the param is optional
-    if ((!isDefined(value) || value === null) && this.isOptional) return true;
+    if ((isUndefined(value) || value === null) && this.isOptional) return true;
 
     // The value was not of the correct ParamType, and could not be decoded to the correct ParamType
     const normalized = this.type.$normalize(value);
@@ -155,7 +178,11 @@ export class Param {
   }
 
   static values(params: Param[], values: RawParams = {}): RawParams {
-    return <RawParams> params.map(param => [param.id, param.value(values[param.id])]).reduce(applyPairs, {});
+    const paramValues = {} as RawParams;
+    for (let param of params) {
+      paramValues[param.id] = param.value(values[param.id]);
+    }
+    return paramValues;
   }
 
   /**

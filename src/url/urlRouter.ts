@@ -214,9 +214,9 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * @returns Returns the fully compiled URL, or `null` if `params` fail validation against `urlMatcher`
    */
   href(urlMatcher: UrlMatcher, params?: any, options?: { absolute: boolean }): string {
-    if (!urlMatcher.validates(params)) return null;
-
     let url = urlMatcher.format(params);
+    if (url == null) return null;
+    
     options = options || { absolute: false };
 
     let cfg = this._router.urlService.config;

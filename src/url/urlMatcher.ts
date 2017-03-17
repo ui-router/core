@@ -333,7 +333,7 @@ export class UrlMatcher {
    */
   parameters(opts: any = {}): Param[] {
     if (opts.inherit === false) return this._params;
-    return unnest(this._cache.path.map(prop('_params')));
+    return unnest(this._cache.path.map(matcher => matcher._params));
   }
 
   /**
@@ -345,12 +345,14 @@ export class UrlMatcher {
    * @returns {T|Param|any|boolean|UrlMatcher|null}
    */
   parameter(id: string, opts: any = {}): Param {
+    const findParam = () => {
+      for (let param of this._params) {
+        if (param.id === id) return param;
+      }
+    };
+
     let parent = this._cache.parent;
-    return (
-      find(this._params, propEq('id', id)) ||
-      (opts.inherit !== false && parent && parent.parameter(id, opts)) ||
-      null
-    );
+    return findParam() || (opts.inherit !== false && parent && parent.parameter(id, opts)) || null;
   }
 
   /**
@@ -363,9 +365,14 @@ export class UrlMatcher {
    * @returns Returns `true` if `params` validates, otherwise `false`.
    */
   validates(params: RawParams): boolean {
-    const validParamVal = (param: Param, val: any) => 
+    const validParamVal = (param: Param, val: any) =>
         !param || param.validates(val);
-    return pairs(params || {}).map(([key, val]) => validParamVal(this.parameter(key), val)).reduce(allTrueR, true);
+
+    params = params || {};
+
+    // I'm not sure why this checks only the param keys passed in, and not all the params known to the matcher
+    let paramSchema = this.parameters().filter(paramDef => params.hasOwnProperty(paramDef.id));
+    return paramSchema.map(paramDef => validParamVal(paramDef, params[paramDef.id])).reduce(allTrueR, true);
   }
 
   /**
