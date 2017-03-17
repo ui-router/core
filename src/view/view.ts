@@ -172,7 +172,7 @@ export class ViewService {
     // plus the depth of the state that is populating the uiView
     function uiViewDepth(uiView: ActiveUIView) {
       const stateDepth = (context: ViewContext) =>
-          context.parent ? stateDepth(context.parent) + 1 : 1;
+          context && context.parent ? stateDepth(context.parent) + 1 : 1;
       return (uiView.fqn.split(".").length * 10000) + stateDepth(uiView.creationContext);
     }
 
