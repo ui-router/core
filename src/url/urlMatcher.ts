@@ -391,42 +391,48 @@ export class UrlMatcher {
    * @returns the formatted URL (path and optionally search part).
    */
   format(values: RawParams = {}) {
-    if (!this.validates(values)) return null;
-
     // Build the full path of UrlMatchers (including all parent UrlMatchers)
     let urlMatchers = this._cache.path;
 
-    // Extract all the static segments and Params into an ordered array
-    let pathSegmentsAndParams: Array<string|Param> =
-        urlMatchers.map(UrlMatcher.pathSegmentsAndParams).reduce(unnestR, []);
+    // Extract all the static segments and Params (processed as ParamDetails)
+    // into an ordered array
+    let pathSegmentsAndParams: Array<string|ParamDetails> = urlMatchers.map(UrlMatcher.pathSegmentsAndParams)
+            .reduce(unnestR, [])
+            .map(x => isString(x) ? x : getDetails(x));
 
     // Extract the query params into a separate array
-    let queryParams: Array<Param> =
-        urlMatchers.map(UrlMatcher.queryParams).reduce(unnestR, []);
+    let queryParams: Array<ParamDetails> = urlMatchers.map(UrlMatcher.queryParams)
+            .reduce(unnestR, [])
+            .map(getDetails);
+
+    const isInvalid = (param: ParamDetails) => param.isValid === false;
+    if (pathSegmentsAndParams.concat(queryParams).filter(isInvalid).length) {
+      return null;
+    }
 
     /**
-     * Given a Param,
-     * Applies the parameter value, then returns details about it
+     * Given a Param, applies the parameter value, then returns detailed information about it
      */
     function getDetails(param: Param): ParamDetails {
       // Normalize to typed value
       let value = param.value(values[param.id]);
+      let isValid = param.validates(value);
       let isDefaultValue = param.isDefaultValue(value);
       // Check if we're in squash mode for the parameter
       let squash = isDefaultValue ? param.squash : false;
       // Allow the Parameter's Type to encode the value
       let encoded = param.type.encode(value);
 
-      return { param, value, isDefaultValue, squash, encoded };
+      return { param, value, isValid, isDefaultValue, squash, encoded };
     }
 
     // Build up the path-portion from the list of static segments and parameters
-    let pathString = pathSegmentsAndParams.reduce((acc: string, x: string|Param) => {
+    let pathString = pathSegmentsAndParams.reduce((acc: string, x: string|ParamDetails) => {
       // The element is a static segment (a raw string); just append it
       if (isString(x)) return acc + x;
 
-      // Otherwise, it's a Param.  Fetch details about the parameter value
-      let {squash, encoded, param} = getDetails(<Param> x);
+      // Otherwise, it's a ParamDetails.
+      let { squash, encoded, param } = x;
 
       // If squash is === true, try to remove a slash from the path
       if (squash === true) return (acc.match(/\/$/)) ? acc.slice(0, -1) : acc;
@@ -444,8 +450,8 @@ export class UrlMatcher {
 
     // Build the query string by applying parameter values (array or regular)
     // then mapping to key=value, then flattening and joining using "&"
-    let queryString = queryParams.map((param: Param) => {
-      let {squash, encoded, isDefaultValue} = getDetails(param);
+    let queryString = queryParams.map((paramDetails: ParamDetails) => {
+      let { param, squash, encoded, isDefaultValue } = paramDetails;
       if (encoded == null || (isDefaultValue && squash !== false)) return;
       if (!isArray(encoded)) encoded = [<string> encoded];
       if (encoded.length === 0) return;
@@ -534,6 +540,7 @@ export class UrlMatcher {
 interface ParamDetails {
   param: Param;
   value: any;
+  isValid: boolean;
   isDefaultValue: boolean;
   squash: (boolean|string);
   encoded: (string|string[]);
