@@ -25,8 +25,19 @@ export interface ProviderLike {
 /**
  * A plain object used to describe a [[Resolvable]]
  *
- * These objects may be defined in [[StateDeclaration.resolve]] blocks to declare
+ * These objects may be used in the [[StateDeclaration.resolve]] array to declare
  * async data that the state or substates require.
+ *
+ * #### Example:
+ * ```js
+ *
+ * var state = {
+ *   name: 'main',
+ *   resolve: [
+ *     { token: 'myData', deps: [MyDataApi], resolveFn: (myDataApi) => myDataApi.getData() },
+ *   ],
+ * }
+ * ```
  */
 export interface ResolvableLiteral {
   /**
@@ -113,6 +124,41 @@ export interface ResolvePolicy {
    *   - Resolved as the resolve's state is being entered
    * - `EAGER`
    *   - Resolved as the transition is starting
+   *
+   * #### Example:
+   * Resolves for `main` and `main.home` are fetched when each state is entered.
+   * All of `main` resolves are processed before fetching `main.home` resolves.
+   * ```js
+   * var state = {
+   *   name: 'main',
+   *   resolve: mainResolves, // defined elsewhere
+   *   resolvePolicy: { when: 'LAZY' }, // default
+   * }
+   *
+   * var state = {
+   *   name: 'main.home',
+   *   resolve: homeResolves, // defined elsewhere
+   *   resolvePolicy: { when: 'LAZY' }, // default
+   * }
+   * ```
+   *
+   * #### Example:
+   * Resolves for `main` and `main.home` are fetched at the same time when the transition starts.
+   * This happens earlier in the lifecycle than when states are entered.
+   * All of the `main` and `main.home` resolves are fetched as soon as possible.
+   * ```js
+   * var mainState = {
+   *   name: 'main',
+   *   resolve: mainResolves, // defined elsewhere
+   *   resolvePolicy: { when: 'EAGER' },
+   * }
+   *
+   * var homeState = {
+   *   name: 'main.home',
+   *   resolve: homeResolves, // defined elsewhere
+   *   resolvePolicy: { when: 'EAGER' },
+   * }
+   * ```
    */
   when?: PolicyWhen;
 
@@ -121,14 +167,35 @@ export interface ResolvePolicy {
    *
    * - `WAIT` (default)
    *   - If a promise is returned from the resolveFn, wait for the promise before proceeding
+   *   - The unwrapped value from the promise
    * - `NOWAIT`
    *   - If a promise is returned from the resolve, do not wait for the promise.
+   *   - Any other value returned is wrapped in a promise.
    *   - The promise will not be unwrapped.
    *   - The promise itself will be provided when the resolve is injected or bound elsewhere.
    * - `RXWAIT`
    *   - When an Observable is returned from the resolveFn, wait until the Observable emits at least one item.
    *   - The Observable item will not be unwrapped.
    *   - The Observable stream itself will be provided when the resolve is injected or bound elsewhere.
+   *
+   * #### Example:
+   * The `Transition` will not wait for the resolve promise(s) from `main` to settle before continuing.
+   * Resolves for `main` will be provided to components wrapped in a `Promise`.
+   *
+   * The `Transition` will wait for the `main.home` resolve promises.
+   * Resolved values will be unwrapped before being provided to components.
+   * ```js
+   * var mainState = {
+   *   name: 'main',
+   *   resolve: mainResolves, // defined elsewhere
+   *   resolvePolicy: { async: 'NOWAIT' },
+   * }
+   * var homeState = {
+   *   name: 'main.home',
+   *   resolve: homeResolves, // defined elsewhere
+   *   resolvePolicy: { async: 'WAIT' }, // default
+   * }
+   * ```
    */
   async?: PolicyAsync;
 }
