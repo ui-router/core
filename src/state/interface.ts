@@ -192,45 +192,59 @@ export interface StateDeclaration {
   /**
    * Resolve - a mechanism to asynchronously fetch data, participating in the Transition lifecycle
    *
-   * The `resolve:` property defines data (or other dependencies) to be fetched asynchronously when the state
-   * is being entered.  After the data is fetched, it can be used in views, transition hooks or other resolves
-   * that belong to this state, or to any views or resolves that belong to nested states.
+   * The `resolve:` property defines data (or other dependencies) to be fetched asynchronously when the state is being entered.
+   * After the data is fetched, it may be used in views, transition hooks or other resolves that belong to this state.
+   * The data may also be used in any views or resolves that belong to nested states.
    *
    * ### As an array
    *
-   * Each array element should either be:
+   * Each array element should be a [[ResolvableLiteral]] object.
    *
-   * - a [[ResolvableLiteral]] object (a plain old javascript object), e.g., `{ token: 'token', resolveFn: (http) => http.get('/'), deps: [ Http ] }`
-   * - a [[Resolvable]] object, e.g., `new Resolvable('token', (http) => http.get('/'), [ Http ])`
-   * - an Angular 2 style [provider literal](https://angular.io/docs/ts/latest/cookbook/dependency-injection.html#!#provide), e.g.,
-   *   `{ provide: 'token', useFactory: (http) => http.get('/'), deps: [ Http ] }`
-   *
-   * #### ng2 Example:
+   * #### Example:
+   * The `user` resolve injects the current `Transition` and the `UserService` (using its token, which is a string).
+   * The [[ResolvableLiteral.resolvePolicy]] sets how the resolve is processed.
+   * The `user` data, fetched asynchronously, can then be used in a view.
    * ```js
-   * import {Resolvable} from "ui-router-ng2"; // or "angular-ui-router"
-   * ...
+   * var state = {
+   *   name: 'user',
+   *   url: '/user/:userId
+   *   resolve: [
+   *     {
+   *       token: 'user',
+   *       policy: { when: 'EAGER' },
+   *       deps: ['UserService', Transition],
+   *       resolveFn: (userSvc, trans) => userSvc.fetchUser(trans.params().userId) },
+   *     }
+   *   ]
+   * }
+   * ```
+   *
+   * Note: an Angular 2 style [`useFactory` provider literal](https://angular.io/docs/ts/latest/cookbook/dependency-injection.html#!#provide)
+   * may also be used.  See [[ProviderLike]].
+   * #### Example:
+   * ```
    * resolve: [
-   *   // If you inject `myStateDependency` into a component, you'll get "abc"
-   *   { provide: 'myStateDependency', useFactory: () => 'abc' }, // ng2 style provide literal
-   *   new Resolvable('myFoos', (http, trans) => http.get(`/foos/${trans.params().fooId}`), [Http, Transition])
+   *   { provide: 'token', useFactory: (http) => http.get('/'), deps: [ Http ] },
    * ]
    * ```
    *
    * ### As an object
    *
-   * - The key (string) is the name of the dependency.
-   * - The value (function) is an injectable function which returns the dependency, or a promise for the dependency.
+   * The `resolve` property may be an object where:
+   * - Each key (string) is the name of the dependency.
+   * - Each value (function) is an injectable function which returns the dependency, or a promise for the dependency.
    *
-   * Note: You cannot specify a policy for each Resolvable, nor can you use non-string
-   * tokens when using the object style `resolve:` block.
+   * This style is based on AngularJS injectable functions, but can be used with any UI-Router implementation.
+   * If your code will be minified, the function should be ["annotated" in the AngularJS manner](https://docs.angularjs.org/guide/di#dependency-annotation).
    *
-   * #### ng1 Example:
+   * #### AngularJS Example:
    * ```js
    * resolve: {
    *   // If you inject `myStateDependency` into a controller, you'll get "abc"
    *   myStateDependency: function() {
    *     return "abc";
    *   },
+   *   // Dependencies are annotated in "Inline Array Annotation"
    *   myAsyncData: ['$http', '$transition$' function($http, $transition$) {
    *     // Return a promise (async) for the data
    *     return $http.get("/foos/" + $transition$.params().foo);
@@ -238,46 +252,48 @@ export interface StateDeclaration {
    * }
    * ```
    *
+   * Note: You cannot specify a policy for each Resolvable, nor can you use non-string
+   * tokens when using the object style `resolve:` block.
+   *
    * ### Lifecycle
    *
-   * Since a resolve function can return a promise, the router will delay entering the state until the  promises
-   * are ready.  If any of the promises are rejected, the Transition is aborted with an Error.
+   * Since a resolve function can return a promise, the router will delay entering the state until the promises are ready.
+   * If any of the promises are rejected, the Transition is aborted with an Error.
    *
-   * By default, resolves for a state are fetched just before that state is entered. Note that only states
-   * which are being *entered* have their resolves fetched.  States that are "retained" do not have their resolves
-   * re-fetched.  If you are currently in a parent state `A` and are transitioning to a child state `A.B`, the
-   * previously resolved data for state `A` can be injected into `A.B` without delay.
+   * By default, resolves for a state are fetched just before that state is entered.
+   * Note that only states which are being *entered* during the `Transition` have their resolves fetched.
+   * States that are "retained" do not have their resolves re-fetched.
    *
-   * Any resolved data for `A.B` is retained until `A.B` is exited, e.g., by transitioning back to the parent state `A`.
+   * If you are currently in a parent state `parent` and are transitioning to a child state `parent.child`, the
+   * previously resolved data for state `parent` can be injected into `parent.child` without delay.
    *
-   * Because of this, resolves are a great place to fetch your application's primary data.
+   * Any resolved data for `parent.child` is retained until `parent.child` is exited, e.g., by transitioning back to the `parent` state.
+   *
+   * Because of this scoping and lifecycle, resolves are a great place to fetch your application's primary data.
    *
    * ### Injecting resolves into other things
    *
    * During a transition, Resolve data can be injected into:
-   * - ui-view Controllers
-   * - TemplateProviders and ControllerProviders
-   * - Other resolves
+   *
+   * - Views (the components which fill a `ui-view` tag)
+   * - Transition Hooks
+   * - Other resolves (a resolve may depend on asynchronous data from a different resolve)
    *
    * ### Injecting other things into resolves
    *
-   * Since resolve functions are injected, a common pattern is to inject a custom service such as `UserService`
-   * and delegate to a custom service method, such as `UserService.list()`;
+   * Resolve functions usually have dependencies on some other API(s).
+   * The dependencies are usually declared and injected into the resolve function.
+   * A common pattern is to inject a custom service such as `UserService`.
+   * The resolve then delegates to a service method, such as `UserService.list()`;
    *
-   * #### Angular 1
+   * #### Special injectable tokens
    *
-   * An Angular 1 resolve function can inject some special values:
-   * - `$transition$`: The current [[Transition]] object; information and API about the current transition, such as
-   *    "to" and "from" State Parameters and transition options.
-   * - Other resolves: This resolve can depend on another resolve, either from the same state, or from any parent state.
-   * - `$stateParams`: (deprecated) The parameters for the current state (Note: these parameter values are
-   *
-   * #### Angular 2
-   *
-   * An Angular 2 resolve function can inject some special values:
+   * - `UIRouter`: The [[UIRouter]] instance which has references to all the UI-Router services.
    * - `Transition`: The current [[Transition]] object; information and API about the current transition, such as
    *    "to" and "from" State Parameters and transition options.
-   * - Other resolves: This resolve can depend on another resolve, either from the same state, or from any parent state.
+   * - `'$transition$'`: A string alias for the `Transition` injectable
+   * - `'$state$'`: For `onEnter`/`onExit`/`onRetain`, the state being entered/exited/retained.
+   * - Other resolve tokens: A resolve can depend on another resolve, either from the same state, or from any parent state.
    *
    * #### Example:
    * ```js
