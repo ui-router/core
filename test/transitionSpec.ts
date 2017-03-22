@@ -681,9 +681,10 @@ describe('transition', function () {
     });
 
     describe('redirected transition', () => {
-      let urlRedirect;
+      let urlRedirect, requiresAuth;
       beforeEach(() => {
         urlRedirect = router.stateRegistry.register({ name: 'urlRedirect', url: '/urlRedirect', redirectTo: 'redirectTarget' });
+        requiresAuth = router.stateRegistry.register({ name: 'requiresAuth', url: '/requiresAuth' });
         router.stateRegistry.register({ name: 'redirectTarget', url: '/redirectTarget' });
       });
 
@@ -703,6 +704,9 @@ describe('transition', function () {
         router.transitionService.onSuccess({}, () => {
           expect(transitionTo).toHaveBeenCalledWith(urlRedirect, {}, { inherit: true, source: 'url' });
 
+          expect(router.stateService.current.name).toBe('redirectTarget');
+          expect(router.urlService.path()).toBe('/redirectTarget');
+
           expect(url.calls.count()).toEqual(2);
           expect(url.calls.argsFor(0)).toEqual(["/urlRedirect"]);
           expect(url.calls.argsFor(1)).toEqual(["/redirectTarget", true]);
@@ -711,6 +715,29 @@ describe('transition', function () {
         });
 
         router.urlService.url('/urlRedirect');
+      });
+
+      it("should not replace the current url when redirecting a url sync with { location: false }", (done) => {
+        router.transitionService.onBefore({ to: 'requiresAuth' }, trans => {
+          return router.stateService.target('redirectTarget', null, { location: false })
+        });
+
+        let url = spyOn(router.urlService, "url").and.callThrough();
+        let transitionTo = spyOn(router.stateService, "transitionTo").and.callThrough();
+
+        router.transitionService.onSuccess({}, () => {
+          expect(transitionTo).toHaveBeenCalledWith(requiresAuth, {}, { inherit: true, source: 'url' });
+
+          expect(router.globals.current.name).toBe("redirectTarget");
+          expect(router.urlService.path()).toBe('/requiresAuth');
+
+          expect(url.calls.count()).toEqual(1);
+          expect(url.calls.argsFor(0)).toEqual(["/requiresAuth"]);
+
+          done();
+        });
+
+        router.urlService.url('/requiresAuth');
       });
 
     });

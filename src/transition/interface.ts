@@ -23,7 +23,7 @@ export interface TransitionOptions {
    *
    * - If `true`, it will update the url in the location bar.
    * - If `false`, it will not update the url in the location bar.
-   * - If it is the string "`replace`", it will update the url and also replace the last history record.
+   * - If it is the string `"replace"`, it will update the url and also replace the last history record.
    *
    * @default `true`
    */

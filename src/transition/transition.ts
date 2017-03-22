@@ -8,7 +8,7 @@ import { services } from '../common/coreservices';
 import {
   map, find, extend, mergeR, tail, omit, toJson, arrayTuples, unnestR, identity, anyTrueR
 } from '../common/common';
-import { isObject } from '../common/predicates';
+import { isObject, isUndefined } from '../common/predicates';
 import { prop, propEq, val, not, is } from '../common/hof';
 import { StateDeclaration, StateOrName } from '../state/interface';
 import {
@@ -517,8 +517,10 @@ export class Transition implements IHookRegistry {
 
     let redirectOpts: TransitionOptions = { redirectedFrom: this, source: "redirect" };
     // If the original transition was caused by URL sync, then use { location: 'replace' }
-    // on the new transition (unless  the target state explicitly specifies location)
-    if (this.options().source === 'url') {
+    // on the new transition (unless the target state explicitly specifies location: false).
+    // This causes the original url to be replaced with the url for the redirect target
+    // so the original url disappears from the browser history.
+    if (this.options().source === 'url' && targetState.options().location !== false) {
       redirectOpts.location = 'replace';
     }
 
