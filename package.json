@@ -13,7 +13,9 @@
     "watch:buildesm": "tsc -w -m es6 --outDir lib-esm",
     "watch:dts-downlevel": "npm run fixdts",
     "watch:test": "karma start --singleRun=false --autoWatch=true --autoWatchInterval=1",
-    "debug": "karma start --singleRun=false --autoWatch=true --autoWatchInterval=1 --browsers=Chrome"
+    "debug": "karma start --singleRun=false --autoWatch=true --autoWatchInterval=1 --browsers=Chrome",
+    "changelog": "node scripts/update_changelog.js",
+    "release": "node scripts/release.js"
   },
   "homepage": "https://ui-router.github.io",
   "contributors": [
