@@ -231,13 +231,14 @@ export class StateService {
    * });
    * ```
    *
+   * @param to Absolute state name, state object, or relative state path (relative to current state).
    *
-   * @param to Absolute state name, state object, or relative state path. Some examples:
+   * Some examples:
    *
    * - `$state.go('contact.detail')` - will go to the `contact.detail` state
-   * - `$state.go('^')` - will go to a parent state
-   * - `$state.go('^.sibling')` - will go to a sibling state
-   * - `$state.go('.child.grandchild')` - will go to grandchild state
+   * - `$state.go('^')` - will go to the parent state
+   * - `$state.go('^.sibling')` - if current state is `home.child`, will go to the `home.sibling` state
+   * - `$state.go('.child.grandchild')` - if current state is home, will go to the `home.child.grandchild` state
    *
    * @param params A map of the parameters that will be sent to the state, will populate $stateParams.
    *
@@ -247,16 +248,6 @@ export class StateService {
    * @param options Transition options
    *
    * @returns {promise} A promise representing the state of the new transition.
-   *
-   * - Possible success values:
-   *    - $state.current
-   *
-   * - Possible rejection reasons:
-   *   - transition superseded - when a newer transition has been started after this one
-   *   - transition aborted - when the transition is cancelled by a Transition Hook returning `false`
-   *   - transition failed - when a transition hook errors
-   *   - resolve error - when a resolve has errored or rejected
-   *
    */
   go(to: StateOrName, params?: RawParams, options?: TransitionOptions): TransitionPromise {
     let defautGoOpts = { relative: this.$current, inherit: true };
