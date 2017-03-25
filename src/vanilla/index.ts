@@ -8,8 +8,8 @@
 /** */
 export * from "./interface";
 
-export * from "./$q";
-export * from "./$injector";
+export * from "./q";
+export * from "./injector";
 
 export * from "./baseLocationService";
 export * from "./hashLocationService";

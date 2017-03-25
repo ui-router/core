@@ -11,8 +11,8 @@ import { UIRouter } from "../router";
 import { PushStateLocationService } from "./pushStateLocationService";
 import { MemoryLocationService } from "./memoryLocationService";
 import { MemoryLocationConfig } from "./memoryLocationConfig";
-import { $injector } from "./$injector";
-import { $q } from "./$q";
+import { $injector } from "./injector";
+import { $q } from "./q";
 import { services } from "../common/coreservices";
 
 export function servicesPlugin(router: UIRouter): ServicesPlugin {
