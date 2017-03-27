@@ -305,7 +305,7 @@ describe('future state', function () {
 
     let lazyB = { name: 'B', url: '/b' };
     let lazyBA = { name: 'B.A', url: '/A' };
-    let lazyBB = { name: 'B.B', url: '/B' };
+    let lazyBAC = { name: 'B.A.C', url: '/C' };
 
     beforeEach(() => {
       // Re-create each time because the state is mutated: the lazyLoad function is removed after success
@@ -348,7 +348,7 @@ describe('future state', function () {
     });
 
     it('should not care about the order of lazy loaded states (1)', (done) => {
-      futureB.lazyLoad = () => new Promise(resolve => { resolve({ states: [lazyB, lazyBA, lazyBB] }); });
+      futureB.lazyLoad = () => new Promise(resolve => { resolve({ states: [lazyB, lazyBA, lazyBAC] }); });
       $registry.register(futureB);
 
       $state.go('B.A').then(() => {
@@ -358,7 +358,7 @@ describe('future state', function () {
     });
 
     it('should not care about the order of lazy loaded states (2)', (done) => {
-      futureB.lazyLoad = () => new Promise(resolve => { resolve({ states: [lazyBA, lazyB, lazyBB] }); });
+      futureB.lazyLoad = () => new Promise(resolve => { resolve({ states: [lazyBA, lazyB, lazyBAC] }); });
       $registry.register(futureB);
 
       $state.go('B.A').then(() => {
@@ -368,7 +368,7 @@ describe('future state', function () {
     });
 
     it('should not care about the order of lazy loaded states (3)', (done) => {
-      futureB.lazyLoad = () => new Promise(resolve => { resolve({ states: [lazyBB, lazyBA, lazyB] }); });
+      futureB.lazyLoad = () => new Promise(resolve => { resolve({ states: [lazyBAC, lazyBA, lazyB] }); });
       $registry.register(futureB);
 
       $state.go('B.A').then(() => {
