@@ -13,7 +13,7 @@ export class StateMatcher {
   }
 
 
-  find(stateOrName: StateOrName, base?: StateOrName): StateObject {
+  find(stateOrName: StateOrName, base?: StateOrName, matchGlob = true): StateObject {
     if (!stateOrName && stateOrName !== "") return undefined;
     let isStr = isString(stateOrName);
     let name: string = isStr ? stateOrName : (<any>stateOrName).name;
@@ -23,7 +23,7 @@ export class StateMatcher {
 
     if (state && (isStr || (!isStr && (state === stateOrName || state.self === stateOrName)))) {
       return state;
-    } else if (isStr) {
+    } else if (isStr && matchGlob) {
       let _states = values(this._states);
       let matches = _states.filter(state =>
           state.__stateObjectCache.nameGlob &&

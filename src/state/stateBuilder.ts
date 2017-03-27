@@ -281,7 +281,10 @@ export class StateBuilder {
   build(state: StateObject): StateObject {
     let {matcher, builders} = this;
     let parent = this.parentName(state);
-    if (parent && !matcher.find(parent)) return null;
+
+    if (parent && !matcher.find(parent, undefined, false)) {
+      return null;
+    }
 
     for (let key in builders) {
       if (!builders.hasOwnProperty(key)) continue;
