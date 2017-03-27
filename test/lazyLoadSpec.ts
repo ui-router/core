@@ -298,26 +298,31 @@ describe('future state', function () {
   });
 
   describe('that resolves to multiple states', () => {
-    let lazyStateDefA = { name: 'A', url: '/a/:id', params: {id: "default"} };
-    let lazyStateDefAB = { name: 'A.B', url: '/b' };
-    let futureStateDef;
+    let futureA, futureB;
+    let lazyA = { name: 'A', url: '/a/:id', params: {id: "default"} };
+    let lazyAB = { name: 'A.B', url: '/b' };
+
+
+    let lazyB = { name: 'B', url: '/b' };
+    let lazyBA = { name: 'B.A', url: '/A' };
+    let lazyBB = { name: 'B.B', url: '/B' };
 
     beforeEach(() => {
-      futureStateDef = {
-        name: 'A.**', url: '/a',
-        lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyStateDefA, lazyStateDefAB] }); })
-      };
-      $registry.register(futureStateDef)
+      // Re-create each time because the state is mutated: the lazyLoad function is removed after success
+      futureA = { name: 'A.**', url: '/a', lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyA, lazyAB] }); }) };
+      futureB = { name: 'B.**', url: '/b', lazyLoad: () => null, };
+
+      $registry.register(futureA)
     });
 
     it('should register all returned states and remove the placeholder', (done) => {
       expect($state.get().map(x=>x.name)).toEqual(["", "A.**"]);
-      expect($state.get('A')).toBe(futureStateDef);
+      expect($state.get('A')).toBe(futureA);
       expect($state.get('A').lazyLoad).toBeDefined();
 
       $state.go('A').then(() => {
         expect($state.get().map(x=>x.name)).toEqual(["", "A", "A.B"]);
-        expect($state.get('A')).toBe(lazyStateDefA);
+        expect($state.get('A')).toBe(lazyA);
         expect($state.get('A').lazyLoad).toBeUndefined();
         expect($state.current.name).toBe('A');
         done();
@@ -338,6 +343,36 @@ describe('future state', function () {
       $transitions.onSuccess({}, () => {
         expect($state.current.name).toBe('A.B');
         expect($state.params).toEqualValues({ id: 'def' });
+        done();
+      });
+    });
+
+    it('should not care about the order of lazy loaded states (1)', (done) => {
+      futureB.lazyLoad = () => new Promise(resolve => { resolve({ states: [lazyB, lazyBA, lazyBB] }); });
+      $registry.register(futureB);
+
+      $state.go('B.A').then(() => {
+        expect($state.current.name).toBe('B.A');
+        done();
+      });
+    });
+
+    it('should not care about the order of lazy loaded states (2)', (done) => {
+      futureB.lazyLoad = () => new Promise(resolve => { resolve({ states: [lazyBA, lazyB, lazyBB] }); });
+      $registry.register(futureB);
+
+      $state.go('B.A').then(() => {
+        expect($state.current.name).toBe('B.A');
+        done();
+      });
+    });
+
+    it('should not care about the order of lazy loaded states (3)', (done) => {
+      futureB.lazyLoad = () => new Promise(resolve => { resolve({ states: [lazyBB, lazyBA, lazyB] }); });
+      $registry.register(futureB);
+
+      $state.go('B.A').then(() => {
+        expect($state.current.name).toBe('B.A');
         done();
       });
     });
