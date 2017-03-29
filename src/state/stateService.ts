@@ -309,9 +309,10 @@ export class StateService {
   transitionTo(to: StateOrName, toParams: RawParams = {}, options: TransitionOptions = {}): TransitionPromise {
     let router = this.router;
     let globals = router.globals;
-    let transHistory = globals.transitionHistory;
     options = defaults(options, defaultTransOpts);
-    options = extend(options, { current: transHistory.peekTail.bind(transHistory)});
+    const getCurrent = () =>
+        globals.transition;
+    options = extend(options, { current: getCurrent });
 
     let ref: TargetState = this.target(to, toParams, options);
     let currentPath = this.getCurrentPath();

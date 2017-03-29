@@ -1,7 +1,8 @@
-/** @module hooks */ /** for typedoc */
-import { Transition } from "../transition/transition";
-import { copy } from "../common/common";
-import { TransitionService } from "../transition/transitionService";
+/** @module hooks */
+/** for typedoc */
+import { Transition } from '../transition/transition';
+import { copy } from '../common/common';
+import { TransitionService } from '../transition/transitionService';
 
 /**
  * A [[TransitionHookFn]] which updates global UI-Router state
@@ -17,25 +18,23 @@ import { TransitionService } from "../transition/transitionService";
  */
 const updateGlobalState = (trans: Transition) => {
   let globals = trans.router.globals;
-  globals.transition = trans;
-  globals.transitionHistory.enqueue(trans);
 
-  const updateGlobalState = () => {
+  const transitionSuccessful = () => {
     globals.successfulTransitions.enqueue(trans);
     globals.$current = trans.$to();
     globals.current = globals.$current.self;
+
     copy(trans.params(), globals.params);
   };
-
-  trans.onSuccess({}, updateGlobalState, {priority: 10000});
 
   const clearCurrentTransition = () => {
     // Do not clear globals.transition if a different transition has started in the meantime
     if (globals.transition === trans) globals.transition = null;
   };
 
+  trans.onSuccess({}, transitionSuccessful, { priority: 10000 });
   trans.promise.then(clearCurrentTransition, clearCurrentTransition);
 };
 
 export const registerUpdateGlobalState = (transitionService: TransitionService) =>
-    transitionService.onBefore({}, updateGlobalState);
+    transitionService.onCreate({}, updateGlobalState);

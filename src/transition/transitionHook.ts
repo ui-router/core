@@ -3,7 +3,7 @@
  * @module transition
  */
 /** for typedoc */
-import { TransitionHookOptions, HookResult } from './interface';
+import { TransitionHookOptions, HookResult, TransitionHookPhase } from './interface';
 import { defaults, noop, silentRejection } from '../common/common';
 import { fnToString, maxLength } from '../common/strings';
 import { isPromise } from '../common/predicates';
@@ -73,7 +73,7 @@ export class TransitionHook {
   };
 
   private isSuperseded = () =>
-      !this.type.synchronous && this.options.current() !== this.options.transition;
+    this.type.hookPhase === TransitionHookPhase.RUN && !this.options.transition.isActive();
 
   logError(err): any {
     this.transition.router.stateService.defaultErrorHandler()(err);

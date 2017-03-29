@@ -241,11 +241,8 @@ describe('stateService', function () {
       });
 
       afterEach((done) => {
-        if (router.globals.transition) {
-          router.globals.transition.promise.then(done, done)
-        } else {
-          done();
-        }
+        router.dispose();
+        done();
       });
 
       describe('[ transition.dynamic() ]:', function() {
@@ -545,12 +542,15 @@ describe('stateService', function () {
       done();
     });
 
-    it('aborts pending transitions when superseded from callbacks', async(done) => {
+    fit('aborts pending transitions when superseded from callbacks', async(done) => {
+      // router.trace.enable();
       $state.defaultErrorHandler(() => null);
       $registry.register({
         name: 'redir',
         url: "redir",
-        onEnter: (trans) => { trans.router.stateService.go('A') }
+        onEnter: (trans) => {
+          trans.router.stateService.go('A')
+        }
       });
       let result = await $state.transitionTo('redir').catch(err => err);
       await router.globals.transition.promise;
@@ -559,6 +559,25 @@ describe('stateService', function () {
       expect(result.type).toBe(RejectType.SUPERSEDED);
 
       done();
+    });
+
+    it('does not abort pending transition when a new transition is cancelled by onBefore hook', (done) => {
+      router.transitionService.onBefore({}, (t) => {
+        if (t.$id === 1) return false;
+        return (new Promise(resolve => setTimeout(resolve, 100))) as any;
+      });
+
+      let promise1 = $state.transitionTo('A'); // takes 100 ms
+      let promise2 = $state.transitionTo('A'); // is cancelled
+      let promise2Error;
+
+      promise1.then(() => {
+        expect($state.current.name).toBe('A');
+        expect(promise2Error).toBeDefined();
+        done();
+      });
+
+      promise2.catch((err) => promise2Error = err);
     });
 
     it('triggers onEnter and onExit callbacks', async(done) => {

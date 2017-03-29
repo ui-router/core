@@ -41,9 +41,13 @@ export class UIRouterGlobals implements Disposable {
   $current: StateObject;
 
   /**
-   * The current transition (in progress)
+   * The current started/running transition.
+   * This transition has reached at least the onStart phase, but is not yet complete
    */
   transition: Transition;
+
+  /** @internalapi */
+  lastStartedTransitionId: number = -1;
 
   /** @internalapi */
   transitionHistory = new Queue<Transition>([], 1);
