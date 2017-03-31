@@ -35,8 +35,9 @@ let _routerInstance = 0;
  * [[UrlService.listen]] then [[UrlService.sync]].
  */
 export class UIRouter {
-  /** @hidden */
-  $id: number = _routerInstance++;
+  /** @hidden */ $id = _routerInstance++;
+  /** @hidden */ _disposed = false;
+  /** @hidden */ private _disposables: Disposable[] = [];
 
   /** Provides trace information to the console */
   trace: Trace = trace;
@@ -71,8 +72,6 @@ export class UIRouter {
   /** Provides services related to the URL */
   urlService: UrlService = new UrlService(this);
 
-  /** @hidden */
-  private _disposables: Disposable[] = [];
 
   /** Registers an object to be notified when the router is disposed */
   disposable(disposable: Disposable) {
@@ -95,6 +94,7 @@ export class UIRouter {
       return undefined;
     }
 
+    this._disposed = true;
     this._disposables.slice().forEach(d => {
       try {
         typeof d.dispose === 'function' && d.dispose(this);

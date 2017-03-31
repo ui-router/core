@@ -83,16 +83,14 @@ export class TransitionHook {
     let hook = this.registeredHook;
     if (hook._deregistered) return;
 
+    let notCurrent = this.getNotCurrentRejection();
+    if (notCurrent) return notCurrent;
+
     let options = this.options;
     trace.traceHookInvocation(this, this.transition, options);
 
-    // A new transition started before this hook (from a previous transition) could be run.
-    if (this.isSuperseded()) {
-      return Rejection.superseded(options.current()).toPromise();
-    }
-
     const invokeCallback = () =>
-        hook.callback.call(this.options.bind, this.transition, this.stateContext);
+        hook.callback.call(options.bind, this.transition, this.stateContext);
 
     const normalizeErr = err =>
         Rejection.normalize(err).toPromise();
@@ -127,12 +125,8 @@ export class TransitionHook {
    * was started while the hook was still running
    */
   handleHookResult(result: HookResult): Promise<HookResult> {
-    // This transition is no longer current.
-    // Another transition started while this hook was still running.
-    if (this.isSuperseded()) {
-      // Abort this transition
-      return Rejection.superseded(this.options.current()).toPromise();
-    }
+    let notCurrent = this.getNotCurrentRejection();
+    if (notCurrent) return notCurrent;
 
     // Hook returned a promise
     if (isPromise(result)) {
@@ -153,6 +147,27 @@ export class TransitionHook {
     if (isTargetState(result)) {
       // Halt the current Transition and redirect (a new Transition) to the TargetState.
       return Rejection.redirected(result).toPromise();
+    }
+  }
+
+
+  /**
+   * Return a Rejection promise if the transition is no longer current due
+   * to a stopped router (disposed), or a new transition has started and superseded this one.
+   */
+  private getNotCurrentRejection() {
+    let router = this.transition.router;
+
+    // The router is stopped
+    if (router._disposed) {
+      return Rejection.aborted(`UIRouter instance #${router.$id} has been stopped (disposed)`).toPromise();
+    }
+
+    // This transition is no longer current.
+    // Another transition started while this hook was still running.
+    if (this.isSuperseded()) {
+      // Abort this transition
+      return Rejection.superseded(this.options.current()).toPromise();
     }
   }
 

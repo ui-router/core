@@ -1,5 +1,5 @@
 import { UIRouter } from "../src/router";
-import { tree2Array } from "./_testUtils";
+import {delay, tree2Array} from "./_testUtils";
 import { find } from "../src/common/common";
 import { StateService } from "../src/state/stateService";
 import { StateDeclaration } from "../src/state/interface";
@@ -19,7 +19,7 @@ let statetree = {
 };
 
 describe("hooks", () => {
-  let router;
+  let router: UIRouter;
   let $state: StateService;
   let $transitions: TransitionService;
   let states: StateDeclaration[];
@@ -179,4 +179,38 @@ describe("hooks", () => {
     });
   });
 
+  it("should not run a hook after the router is stopped", (done) => {
+    init();
+    let called = false;
+    router.transitionService.onSuccess({}, () => called = true);
+
+    $state.go('A').catch(err => {
+      expect(called).toBe(false);
+      expect(err).toBeDefined();
+      expect(err.detail).toContain('disposed');
+      done();
+    });
+
+    router.dispose();
+  });
+
+  it("should not process a hook result after the router is stopped", (done) => {
+    init();
+    let called = false;
+    let disposed, isdisposed = new Promise<any>(resolve => disposed = resolve);
+
+    router.transitionService.onEnter({}, () => {
+      called = true;
+      return isdisposed.then(() => $state.target('B'));
+    });
+
+    $state.go('A').catch(err => {
+      expect(called).toBe(true);
+      expect(err).toBeDefined();
+      expect(err.detail).toContain('disposed');
+      done();
+    });
+
+    setTimeout(() => { router.dispose(); disposed(); }, 50);
+  });
 });

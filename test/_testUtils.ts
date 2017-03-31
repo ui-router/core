@@ -3,6 +3,10 @@ import { map } from "../src/common/common";
 
 let stateProps = ["resolve", "resolvePolicy", "data", "template", "templateUrl", "url", "name", "params"];
 
+export const delay = (ms) =>
+    new Promise<any>(resolve => setTimeout(resolve, ms));
+export const _delay = (ms) => () => delay(ms);
+
 export function tree2Array(tree, inheritName) {
 
   function processState(parent, state, name) {
