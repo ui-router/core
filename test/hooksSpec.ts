@@ -1,10 +1,10 @@
-import { UIRouter } from "../src/router";
-import {delay, tree2Array} from "./_testUtils";
-import { find } from "../src/common/common";
-import { StateService } from "../src/state/stateService";
-import { StateDeclaration } from "../src/state/interface";
-import { TestingPlugin } from "./_testingPlugin";
-import { TransitionService } from "../src/transition/transitionService";
+import {UIRouter} from '../src/router';
+import {tree2Array} from './_testUtils';
+import {find} from '../src/common/common';
+import {StateService} from '../src/state/stateService';
+import {StateDeclaration} from '../src/state/interface';
+import {TestingPlugin} from './_testingPlugin';
+import {TransitionService} from '../src/transition/transitionService';
 
 
 let statetree = {
@@ -62,7 +62,7 @@ describe("hooks", () => {
 
       $state.go('A').then(() => {
         expect(router.globals.current.name).toBe('AAA');
-        expect(router.globals.params.fooId).toBe('abc');
+        expect(router.globals.params['fooId']).toBe('abc');
         done();
       });
     });
@@ -98,7 +98,7 @@ describe("hooks", () => {
 
       $state.go('A').then(() => {
         expect(router.globals.current.name).toBe('AAA');
-        expect(router.globals.params.fooId).toBe('FOO');
+        expect(router.globals.params['fooId']).toBe('FOO');
         done();
       });
     });

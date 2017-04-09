@@ -1,10 +1,8 @@
 import { ResolveContext, StateObject, PathNode, Resolvable, copy } from "../src/index";
 import { services } from "../src/common/coreservices";
-import * as vanilla from "../src/vanilla";
 import { tree2Array } from "./_testUtils";
 import { UIRouter } from "../src/router";
 
-import Spy = jasmine.Spy;
 import { TestingPlugin } from "./_testingPlugin";
 import { StateService } from "../src/state/stateService";
 import { TransitionService } from "../src/transition/transitionService";
@@ -13,7 +11,7 @@ import { tail } from "../src/common/common";
 
 ///////////////////////////////////////////////
 
-let router: UIRouter, states, statesMap: { [key:string]: StateObject } = {};
+let router: UIRouter, statesMap: { [key: string]: StateObject } = {};
 let $state: StateService;
 let $transitions: TransitionService;
 let $registry: StateRegistry;
@@ -21,7 +19,7 @@ let vals, counts, expectCounts;
 let asyncCount;
 
 function invokeLater(fn: Function, ctx: ResolveContext) {
-  return new Resolvable("", fn, services.$injector.annotate(fn)).get(ctx)
+  return new Resolvable("", fn, services.$injector.annotate(fn)).get(ctx);
 }
 
 function getStates() {
@@ -29,43 +27,39 @@ function getStates() {
     A: { resolve: { _A: function () { return "A"; }, _A2: function() { return "A2"; }},
       B: { resolve: { _B: function () { return "B"; }, _B2: function() { return "B2"; }},
         C: { resolve: { _C: function (_A, _B) { return _A + _B + "C"; }, _C2: function() { return "C2"; }},
-          D: { resolve: { _D: function (_D2) { return "D1" + _D2; }, _D2: function () { return "D2"; }} }
-        }
+          D: { resolve: { _D: function (_D2) { return "D1" + _D2; }, _D2: function () { return "D2"; }} },
+        },
       },
       E: { resolve: { _E: function() { return "E"; } },
-        F: { resolve: { _E: function() { return "_E"; }, _F: function(_E) { return _E + "F"; }} }
+        F: { resolve: { _E: function() { return "_E"; }, _F: function(_E) { return _E + "F"; }} },
       },
       G: { resolve: { _G: function() { return "G"; } },
-        H: { resolve: { _G: function(_G) { return _G + "_G"; }, _H: function(_G) { return _G + "H"; } } }
+        H: { resolve: { _G: function(_G) { return _G + "_G"; }, _H: function(_G) { return _G + "H"; } } },
       },
-      I: { resolve: { _I: function(_I) { return "I"; } } }
+      I: { resolve: { _I: function(_I) { return "I"; } } },
     },
     J: {
       resolve: {
         _J: function() { counts['_J']++; return "J"; },
-        _J2: function(_J) { counts['_J2']++; return _J + "J2"; }
+        _J2: function(_J) { counts['_J2']++; return _J + "J2"; },
       },
       resolvePolicy: {
-        _J: { when: 'EAGER' }
+        _J: { when: 'EAGER' },
       },
       K: { resolve: { _K: function(_J2) { counts['_K']++; return _J2 + "K"; }},
         L: { resolve: { _L: function(_K) { counts['_L']++; return _K + "L"; }},
-          M: { resolve: { _M: function(_L) { counts['_M']++; return _L + "M"; }} }
-        }
+          M: { resolve: { _M: function(_L) { counts['_M']++; return _L + "M"; }} },
+        },
       },
       N: {
         resolve: [
           { token: "_N", resolveFn: (_J) => _J + "N", deps: ['_J'], policy: {when: 'EAGER'} },
           { token: "_N2", resolveFn: (_J) => _J + "N2", deps: ['_J'] },
           { token: "_N3", resolveFn: (_J) => _J + "N3", deps: ['_J'] },
-        ]
-      }
+        ],
+      },
     },
     O: { resolve: { _O: function(_O2) { return _O2 + "O"; }, _O2: function(_O) { return _O + "O2"; } } },
-    P: { resolve: { $state: function($state) { return $state } },
-      Q: { resolve: { _Q: function($state) { counts._Q++; vals._Q = $state; return "foo"; }}}
-    },
-    PAnnotated: { resolve: { $state: ['$state', function($state) { return $state }] } }
   };
 }
 
@@ -146,7 +140,7 @@ describe('Resolvables system:', function () {
       let path = makePath([ "A", "B", "C" ]);
       let ctx = new ResolveContext(path);
       ctx.getResolvable("_C").resolve(ctx).then(function () {
-        expect(getResolvedData(ctx)).toEqualData({ _A: "A", _B: "B",_C: "ABC" });
+        expect(getResolvedData(ctx)).toEqualData({ _A: "A", _B: "B", _C: "ABC" });
       }).then(done);
     });
   });
@@ -189,7 +183,7 @@ describe('Resolvables system:', function () {
       let path = makePath([ "A", "B", "C" ]);
       let ctx = new ResolveContext(path);
 
-      let cOnEnter = function (_D) { throw new Error("Shouldn't get here. " + _D) };
+      let cOnEnter = function (_D) { throw new Error("Shouldn't get here. " + _D); };
       invokeLater(cOnEnter, ctx).catch(function (err) {
         expect(err.message).toContain('Could not find Dependency Injection token: "_D"');
         done();
@@ -235,9 +229,8 @@ describe('Resolvables system:', function () {
   // It also has a resolve named _H which takes _G as an injected parameter. injected _G should come from state "H"
   describe('Resolvables', function () {
     it('of a particular name should be injected from the parent PathElements for their own name', done => {
-      let path = makePath([ "A", "G", "H" ]);
+      let result, path = makePath([ "A", "G", "H" ]);
       let hOnEnter = (_H) => { result = _H; };
-      let result;
       let ctx = new ResolveContext(path);
 
       ctx.getResolvable("_G").get(ctx).then(data => {
@@ -254,7 +247,7 @@ describe('Resolvables system:', function () {
       let ctx = new ResolveContext(path);
 
       // let iPathElement = path.elements[1];
-      let iOnEnter = function (_I) { throw new Error("Shouldn't get here. " + _I)  };
+      let iOnEnter = function (_I) { throw new Error("Shouldn't get here. " + _I);  };
       let promise = invokeLater(iOnEnter, ctx);
       promise.catch(function (err) {
         expect(err.message).toContain('Could not find Dependency Injection token: "_I"');
@@ -265,10 +258,10 @@ describe('Resolvables system:', function () {
 
   xdescribe('Resolvables', function () {
     it('should fail to inject circular dependency', done => {
-      var path = makePath([ "O" ]);
+      let path = makePath([ "O" ]);
       let ctx = new ResolveContext(path);
 
-      var iOnEnter = function (_O) { throw new Error("Shouldn't get here. " + _O)  };
+      let iOnEnter = function (_O) { throw new Error("Shouldn't get here. " + _O); };
       invokeLater(iOnEnter, ctx).catch(function (err) {
         expect(err.message).toContain("[$injector:unpr] Unknown provider: _IProvider ");
         done();
@@ -298,7 +291,7 @@ describe('Resolvables system:', function () {
           .then(checkCounts)
           .then(() => invokeLater(kOnEnter, ctx))
           .then(checkCounts)
-          .then(done)
+          .then(done);
     });
   });
 
@@ -358,7 +351,7 @@ describe('Resolvables system:', function () {
   // Test for #2641
   it("should not re-resolve data, when redirecting to a child", (done) => {
     $transitions.onStart({to: "J"}, ($transition$) => {
-      var ctx = new ResolveContext($transition$.treeChanges().to);
+      let ctx = new ResolveContext($transition$.treeChanges().to);
       return invokeLater(function (_J) {}, ctx).then(function() {
         expect(counts._J).toEqualData(1);
         return $state.target("K");
@@ -380,13 +373,13 @@ describe('Resolvables system:', function () {
       name: 'dynamic',
       url: '/dynamic/{param}',
       params: {
-        param: { dynamic: true }
+        param: { dynamic: true },
       },
       resolve: {
         data: () => {
-          new Promise(resolve => resolve('Expensive data ' + resolveCount++))
-        }
-      }
+          new Promise(resolve => resolve('Expensive data ' + resolveCount++));
+        },
+      },
     });
 
     $transitions.onEnter({entering: "dynamic"}, trans => {
@@ -409,9 +402,9 @@ describe('Resolvables system:', function () {
       $registry.register({
         name: 'nowait',
         resolve: {
-          nowait: () => resolvePromise
+          nowait: () => resolvePromise,
         },
-        resolvePolicy: { async: 'NOWAIT' }
+        resolvePolicy: { async: 'NOWAIT' },
       });
 
       $transitions.onSuccess({  }, trans => {
@@ -429,21 +422,21 @@ describe('Resolvables system:', function () {
           done();
         });
 
-        resolve('foobar')
+        resolve('foobar');
       });
 
       $state.go('nowait');
     });
 
     it('should wait for WAIT resolves and not wait for NOWAIT resolves', async (done) => {
-      let resolve, resolvePromise = new Promise(_resolve => { resolve = _resolve; });
+      let promiseResolveFn, resolvePromise = new Promise(resolve => { promiseResolveFn = resolve; });
 
       $registry.register({
         name: 'nowait',
         resolve: [
           { token: 'nowait', policy: { async: 'NOWAIT' }, resolveFn: () => resolvePromise },
           { token: 'wait', policy: { async: 'WAIT' }, resolveFn: () => new Promise(resolve => resolve('should wait')) },
-        ]
+        ],
       });
 
       $transitions.onSuccess({  }, trans => {
@@ -460,7 +453,7 @@ describe('Resolvables system:', function () {
           done();
         });
 
-        resolve('foobar')
+        promiseResolveFn('foobar');
       });
 
       $state.go('nowait');

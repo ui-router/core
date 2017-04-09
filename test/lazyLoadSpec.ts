@@ -2,7 +2,6 @@ import { UIRouter, TransitionService, StateService } from "../src/index";
 import * as vanilla from "../src/vanilla";
 
 import { StateRegistry } from "../src/state/stateRegistry";
-import { services } from "../src/common/coreservices";
 import { UrlRouter } from "../src/url/urlRouter";
 import {StateDeclaration} from "../src/state/interface";
 import {tail} from "../src/common/common";
@@ -14,9 +13,6 @@ describe('future state', function () {
   let $transitions: TransitionService;
   let $state: StateService;
   let $urlRouter: UrlRouter;
-
-  const wait = (val?) =>
-      new Promise((resolve) => setTimeout(() => resolve(val)));
 
   beforeEach(() => {
     router = new UIRouter();
@@ -48,7 +44,7 @@ describe('future state', function () {
 
     it('should get future states by state declaration object', () => {
       let statedef = { name: 'future.**' };
-      let state = $registry.register(statedef);
+      $registry.register(statedef);
       expect($registry.get(statedef)).toBe(statedef);
     });
 
@@ -111,7 +107,7 @@ describe('future state', function () {
     });
 
     it('should not match future states with non-matching prefix', () => {
-      let state = $registry.register({ name: 'future.**' });
+      $registry.register({ name: 'future.**' });
       expect($registry.matcher.find('futurX')).toBeFalsy();
       expect($registry.matcher.find('futurX.lazystate')).toBeFalsy();
       expect($registry.matcher.find('futurX.foo.bar.baz')).toBeFalsy();
@@ -133,7 +129,7 @@ describe('future state', function () {
     });
 
     it('should not match future states if the prefix does not match', () => {
-      let state = $registry.register({ name: 'future.**', url: '/future' });
+      $registry.register({ name: 'future.**', url: '/future' });
       expect(match('/futurX')).toBeFalsy();
     });
 
@@ -180,7 +176,7 @@ describe('future state', function () {
 
     it('should pass a transition and the state context to the lazyLoad function', (done) => {
       let objs = {};
-      var stateDefinition = {name: 'll', url: '/ll', lazyLoad: (trans, state) => (objs = { trans, state }, null) };
+      let stateDefinition = {name: 'll', url: '/ll', lazyLoad: (trans, state) => (objs = { trans, state }, null) };
       $registry.register(stateDefinition);
       $state.lazyLoad('ll').then(() => {
         expect(objs['trans'] instanceof Transition).toBeTruthy();
@@ -205,9 +201,9 @@ describe('future state', function () {
 
       Promise.all([
         $state.lazyLoad('ll'),
-        $state.lazyLoad('ll')
+        $state.lazyLoad('ll'),
       ]).then((result) => {
-        expect(result).toEqual([1,1]);
+        expect(result).toEqual([1, 1]);
         expect(lazyLoadCount).toBe(1);
         done();
       });
@@ -227,12 +223,12 @@ describe('future state', function () {
         expect(err.message).toBe('doh');
         expect(stateDeclaration.lazyLoad['_promise']).toBeUndefined();
 
-        $state.lazyLoad('ll').catch(err => {
-          expect(err).toBeDefined();
-          expect(err.message).toBe('doh');
+        $state.lazyLoad('ll').catch(err2 => {
+          expect(err2).toBeDefined();
+          expect(err2.message).toBe('doh');
           expect(lazyLoadCount).toBe(2);
           done();
-        })
+        });
       });
 
       expect(stateDeclaration.lazyLoad['_promise']).toBeDefined();
@@ -245,37 +241,38 @@ describe('future state', function () {
 
     beforeEach(() => {
       futureStateDef = {
-        name: 'A.**', url: '/a',
-        lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyStateDefA] }); })
+        name: 'A.**',
+        url: '/a',
+        lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyStateDefA] }); }),
       };
 
-      $registry.register(futureStateDef)
+      $registry.register(futureStateDef);
     });
 
     it('should deregister the placeholder (future state)', (done) => {
-      expect($state.get().map(x=>x.name)).toEqual(["", "A.**"]);
+      expect($state.get().map(x => x.name)).toEqual(["", "A.**"]);
       expect($state.get('A')).toBe(futureStateDef);
       expect($state.get('A').lazyLoad).toBeDefined();
 
       $state.go('A').then(() => {
-        expect($state.get().map(x=>x.name)).toEqual(["", "A"]);
+        expect($state.get().map(x => x.name)).toEqual(["", "A"]);
         expect($state.get('A')).toBe(lazyStateDefA);
         expect($state.get('A').lazyLoad).toBeUndefined();
         expect($state.current.name).toBe('A');
         done();
-      })
+      });
     });
 
     it('should register newly loaded states returned in the `states: ` array', (done) => {
       expect($state.get('A')).toBe(futureStateDef);
 
       $state.go('A').then(() => {
-        expect($state.get().map(x=>x.name)).toEqual(["", "A"]);
+        expect($state.get().map(x => x.name)).toEqual(["", "A"]);
         expect($state.get('A')).toBe(lazyStateDefA);
         expect($state.get('A').lazyLoad).toBeUndefined();
         expect($state.current.name).toBe('A');
         done();
-      })
+      });
     });
 
     it('should retry the original $state.go()', (done) => {
@@ -283,7 +280,7 @@ describe('future state', function () {
         expect($state.current.name).toBe('A');
         expect($state.params).toEqualValues({ id: 'abc' });
         done();
-      })
+      });
     });
 
     it('triggered by a URL sync should re-parse the URL to activate the lazy loaded state', (done) => {
@@ -310,23 +307,23 @@ describe('future state', function () {
     beforeEach(() => {
       // Re-create each time because the state is mutated: the lazyLoad function is removed after success
       futureA = { name: 'A.**', url: '/a', lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyA, lazyAB] }); }) };
-      futureB = { name: 'B.**', url: '/b', lazyLoad: () => null, };
+      futureB = { name: 'B.**', url: '/b', lazyLoad: () => null };
 
-      $registry.register(futureA)
+      $registry.register(futureA);
     });
 
     it('should register all returned states and remove the placeholder', (done) => {
-      expect($state.get().map(x=>x.name)).toEqual(["", "A.**"]);
+      expect($state.get().map(x => x.name)).toEqual(["", "A.**"]);
       expect($state.get('A')).toBe(futureA);
       expect($state.get('A').lazyLoad).toBeDefined();
 
       $state.go('A').then(() => {
-        expect($state.get().map(x=>x.name)).toEqual(["", "A", "A.B"]);
+        expect($state.get().map(x => x.name)).toEqual(["", "A", "A.B"]);
         expect($state.get('A')).toBe(lazyA);
         expect($state.get('A').lazyLoad).toBeUndefined();
         expect($state.current.name).toBe('A');
         done();
-      })
+      });
     });
 
     it('should allow transitions to non-loaded child states', (done) => {
@@ -334,7 +331,7 @@ describe('future state', function () {
         expect($state.current.name).toBe('A.B');
         expect($state.params).toEqualValues({ id: 'abc' });
         done();
-      })
+      });
     });
 
     it('should re-parse the URL to activate the final state', (done) => {
@@ -383,11 +380,12 @@ describe('future state', function () {
 
     let count = 0;
     let futureStateDef = {
-      name: 'A.**', url: '/a',
+      name: 'A.**',
+      url: '/a',
       lazyLoad: () => new Promise(resolve => {
         count++;
         setTimeout(() => resolve({ states: [{ name: 'A', url: '/a' }] }), 50);
-      })
+      }),
     };
     $registry.register(futureStateDef);
 
@@ -414,10 +412,10 @@ describe('future state', function () {
           } else {
               resolve({ states: [{ name: 'A', url: '/a' }] });
           }
-        })
+        }),
       };
 
-      $registry.register(futureStateDef)
+      $registry.register(futureStateDef);
     });
 
     it('should not remove the placeholder', (done) => {
@@ -452,25 +450,25 @@ describe('future state', function () {
             expect($state.current.name).toBe('A');
 
             done();
-          })
-        })
-      })
+          });
+        });
+      });
     });
   });
 
   describe('with a nested future state', () => {
-    let count, futureStateDefA, futureStateDefB, errors;
+    let futureStateDefA, futureStateDefB;
     let lazyStateDefA = { name: 'A', url: '/a/:aid', params: {id: "adefault"} };
     let lazyStateDefB = { name: 'A.B', url: '/b/:bid', params: {id: "bdefault"} };
     beforeEach(() => {
       futureStateDefA = {
         name: 'A.**', url: '/a',
-        lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyStateDefA, futureStateDefB] }); })
+        lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyStateDefA, futureStateDefB] }); }),
       };
 
       futureStateDefB = {
         name: 'A.B.**', url: '/b',
-        lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyStateDefB] }); })
+        lazyLoad: () => new Promise(resolve => { resolve({ states: [lazyStateDefB] }); }),
       };
 
       $registry.register(futureStateDefA);

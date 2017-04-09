@@ -2,6 +2,7 @@ import { UIRouter, TransitionService, StateService, StateObject, PathNode } from
 import { tree2Array } from "./_testUtils";
 import { TransitionHookPhase } from "../src/transition/interface";
 import { TestingPlugin } from "./_testingPlugin";
+import {uniqR} from '../src/common/common';
 
 describe('HookBuilder:', function() {
   let uiRouter: UIRouter = null;
@@ -10,8 +11,7 @@ describe('HookBuilder:', function() {
   let root: StateObject = null;
 
   let log = "";
-  let hookNames = [ "onBefore", "onStart", "onExit", "onRetain", "onEnter", "onFinish", "onSuccess", "onError" ];
-  const hook = (name) => () => log += `${name};`;
+  const logHook = (name) => () => log += `${name};`;
 
   beforeEach(() => {
     log = "";
@@ -28,14 +28,16 @@ describe('HookBuilder:', function() {
           C: {
             D: {
 
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     };
 
     tree2Array(statetree, true).forEach(state => uiRouter.stateRegistry.register(state));
   });
+
+  afterEach(() => uiRouter.dispose());
 
   let trans, trans2, hb, hb2, callback;
   beforeEach(function() {
@@ -57,8 +59,8 @@ describe('HookBuilder:', function() {
     trans2 = $trans.create(fromPath, $state.target("A", null));
     hb2 = trans2._hookBuilder;
 
-    callback = hook('hook');
-    expect(typeof callback).toBe('function')
+    callback = logHook('hook');
+    expect(typeof callback).toBe('function');
   });
 
   const getFn = x => x['registeredHook']['callback'];
@@ -83,7 +85,7 @@ describe('HookBuilder:', function() {
       });
 
       it("should match a transition using a function", function() {
-        let deregister = trans.onBefore({to: (state) => state.name === 'A.B'}, callback);
+        trans.onBefore({to: (state) => state.name === 'A.B'}, callback);
         expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(getFn)).toEqual([]);
 
         trans.onBefore({to: (state) => state.name === 'A.B.C'}, callback);
@@ -104,7 +106,7 @@ describe('HookBuilder:', function() {
       });
 
       it("should match a transition using a function", function() {
-        let deregister = trans.onBefore({from: (state) => state.name === 'A.B'}, callback);
+        trans.onBefore({from: (state) => state.name === 'A.B'}, callback);
         expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(getFn)).toEqual([]);
 
         trans.onBefore({from: (state) => state.name === 'A'}, callback);
@@ -170,12 +172,12 @@ describe('HookBuilder:', function() {
 
       it('; onBefore should not have a state context', function() {
         trans.onBefore({}, callback);
-        expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(context)).toEqual([null]);
+        expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(context).reduce(uniqR, [])).toEqual([null]);
       });
 
       it('; onStart should not have a state context', function() {
         trans.onStart({}, callback);
-        expect(hb.buildHooks(hookTypeByName('onStart')).map(context)).toEqual([null]);
+        expect(hb.buildHooks(hookTypeByName('onStart')).map(context).reduce(uniqR, [])).toEqual([null]);
       });
 
       it('; onEnter should be bound to the entering state(s)', function() {
@@ -200,13 +202,13 @@ describe('HookBuilder:', function() {
 
       it('; onSuccess should not have a state context', function() {
         trans.onSuccess({}, callback);
-        expect(hb.buildHooksForPhase(TransitionHookPhase.SUCCESS).map(context)).toEqual([null]);
+        expect(hb.buildHooksForPhase(TransitionHookPhase.SUCCESS).map(context).reduce(uniqR, [])).toEqual([null]);
       });
 
       it('; onError should not have a state context', function() {
-        trans.onStart({}, () => { throw new Error('shuckydarn') });
+        trans.onStart({}, () => { throw new Error('shuckydarn'); });
         trans.onError({}, callback);
-        expect(hb.buildHooksForPhase(TransitionHookPhase.ERROR).map(context)).toEqual([null]);
+        expect(hb.buildHooksForPhase(TransitionHookPhase.ERROR).map(context).reduce(uniqR, [])).toEqual([null]);
       });
 
     });
