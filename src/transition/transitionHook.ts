@@ -15,7 +15,7 @@ import { TargetState } from '../state/targetState';
 import { Transition } from './transition';
 import { TransitionEventType } from './transitionEventType';
 import { RegisteredHook } from './hookRegistry';
-import { StateDeclaration } from '../state/interface'; // has or is using
+import { StateDeclaration } from '../state/interface';
 
 let defaultOptions: TransitionHookOptions = {
   current: noop,
@@ -79,7 +79,7 @@ export class TransitionHook {
     this.transition.router.stateService.defaultErrorHandler()(err);
   }
 
-  invokeHook(): Promise<HookResult> {
+  invokeHook(): Promise<HookResult> | void {
     let hook = this.registeredHook;
     if (hook._deregistered) return;
 
@@ -101,18 +101,19 @@ export class TransitionHook {
     const handleResult = result =>
         hook.eventType.getResultHandler(this)(result);
 
-    if (this.type.synchronous) {
-      try {
-        return handleResult(invokeCallback());
-      } catch (err) {
-        return handleError(Rejection.normalize(err));
-      }
-    }
+    try {
+      let result = invokeCallback();
 
-    return services.$q.when()
-        .then(invokeCallback)
-        .catch(normalizeErr)
-        .then(handleResult, handleError);
+      if (isPromise(result)) {
+        return result.catch(normalizeErr)
+            .then(handleResult, handleError);
+      } else {
+        return handleResult(result);
+      }
+    } catch (err) {
+      // If callback throws (synchronously)
+      return handleError(Rejection.normalize(err));
+    }
   }
 
   /**
@@ -204,6 +205,30 @@ export class TransitionHook {
     return hooks.reduce(createHookChainR, waitFor || services.$q.when());
   }
 
+
+  /**
+   * Invokes all the provided TransitionHooks, in order.
+   * Each hook's return value is checked.
+   * If any hook returns a promise, then the rest of the hooks are chained off that promise, and the promise is returned.
+   * If no hook returns a promise, then all hooks are processed synchronously.
+   *
+   * @param hooks the list of TransitionHooks to invoke
+   * @param done a callback that is invoked after all the hooks have successfully completed
+   *
+   * @returns a promise for the async result, or the result of the callback
+   */
+  static invokeHooks<T>(hooks: TransitionHook[], done: () => T): Promise<any> | T {
+    for (let idx = 0; idx < hooks.length; idx++) {
+      let hookResult = hooks[idx].invokeHook();
+
+      if (isPromise(hookResult)) {
+        let remainingHooks = hooks.slice(idx + 1);
+        return TransitionHook.chain(remainingHooks, hookResult).then(done);
+      }
+    }
+
+    return done();
+  }
 
   /**
    * Run all TransitionHooks, ignoring their return value.

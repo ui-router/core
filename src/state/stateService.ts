@@ -104,12 +104,18 @@ export class StateService {
       if (!(result instanceof TargetState)) {
         return;
       }
+
       let target = <TargetState> result;
       // Recreate the TargetState, in case the state is now defined.
       target = this.target(target.identifier(), target.params(), target.options());
 
-      if (!target.valid()) return Rejection.invalid(target.error()).toPromise();
-      if (latestThing() !== latest) return Rejection.superseded().toPromise();
+      if (!target.valid()) {
+        return Rejection.invalid(target.error()).toPromise();
+      }
+
+      if (latestThing() !== latest) {
+        return Rejection.superseded().toPromise();
+      }
 
       return this.transitionTo(target.identifier(), target.params(), target.options());
     };

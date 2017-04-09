@@ -17,7 +17,7 @@
     "no-any": false,
     "no-arg": true,
     "no-bitwise": true,
-    "no-conditional-assignment": true,
+    "no-conditional-assignment": false,
     "no-console": [true, "debug", "info", "time", "timeEnd", "trace" ],
     "no-construct": true,
     "no-constructor-vars": false,

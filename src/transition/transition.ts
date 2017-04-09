@@ -6,14 +6,14 @@
 import { trace } from '../common/trace';
 import { services } from '../common/coreservices';
 import {
-  map, find, extend, mergeR, tail, omit, toJson, arrayTuples, unnestR, identity, anyTrueR
+  map, find, extend, mergeR, tail, omit, toJson, arrayTuples, unnestR, identity, anyTrueR,
 } from '../common/common';
-import { isObject, isUndefined } from '../common/predicates';
+import { isObject } from '../common/predicates';
 import { prop, propEq, val, not, is } from '../common/hof';
 import { StateDeclaration, StateOrName } from '../state/interface';
 import {
   TransitionOptions, TreeChanges, IHookRegistry, TransitionHookPhase, RegisteredHooks, HookRegOptions,
-  HookMatchCriteria, TransitionStateHookFn, TransitionHookFn
+  HookMatchCriteria, TransitionStateHookFn, TransitionHookFn,
 } from './interface'; // has or is using
 import { TransitionHook } from './transitionHook';
 import { matchState, makeEvent, RegisteredHook } from './hookRegistry';
@@ -94,21 +94,21 @@ export class Transition implements IHookRegistry {
 
 
   /** @hidden */
-  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
+  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
+  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
+  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
 
   /** @hidden
    * Creates the transition-level hook registration functions
@@ -511,7 +511,7 @@ export class Transition implements IHookRegistry {
    */
   redirect(targetState: TargetState): Transition {
     let redirects = 1, trans: Transition = this;
-    while((trans = trans.redirectedFrom()) != null) {
+    while ((trans = trans.redirectedFrom()) != null) {
       if (++redirects > 20) throw new Error(`Too many consecutive Transition redirects (20+)`);
     }
 
@@ -620,13 +620,8 @@ export class Transition implements IHookRegistry {
     let runAllHooks = TransitionHook.runAllHooks;
 
     // Gets transition hooks array for the given phase
-    const hooksFor = (phase: TransitionHookPhase) =>
+    const getHooksFor = (phase: TransitionHookPhase) =>
         this._hookBuilder.buildHooksForPhase(phase);
-
-    // Builds a chain of transition hooks for the given phase
-    // Each hook is invoked after the previous one completes
-    const chainFor = (phase: TransitionHookPhase) =>
-        TransitionHook.chain(hooksFor(phase));
 
     const startTransition = () => {
       let globals = this.router.globals;
@@ -636,14 +631,17 @@ export class Transition implements IHookRegistry {
       globals.transitionHistory.enqueue(this);
 
       trace.traceTransitionStart(this);
+
+      return services.$q.when(undefined);
     };
+
 
     // When the chain is complete, then resolve or reject the deferred
     const transitionSuccess = () => {
       trace.traceSuccess(this.$to(), this);
       this.success = true;
       this._deferred.resolve(this.to());
-      runAllHooks(hooksFor(TransitionHookPhase.SUCCESS));
+      runAllHooks(getHooksFor(TransitionHookPhase.SUCCESS));
     };
 
     const transitionError = (reason: any) => {
@@ -651,16 +649,21 @@ export class Transition implements IHookRegistry {
       this.success = false;
       this._deferred.reject(reason);
       this._error = reason;
-      runAllHooks(hooksFor(TransitionHookPhase.ERROR));
+      runAllHooks(getHooksFor(TransitionHookPhase.ERROR));
     };
 
-    services.$q.when()
-        .then(() => chainFor(TransitionHookPhase.BEFORE))
-        .then(startTransition)
-        // This waits to build the RUN hook chain until after the "BEFORE" hooks complete
-        // This allows a BEFORE hook to dynamically add RUN hooks via the Transition object.
-        .then(() => chainFor(TransitionHookPhase.RUN))
-        .then(transitionSuccess, transitionError);
+    // This waits to build the RUN hook chain until after the "BEFORE" hooks complete
+    // This allows a BEFORE hook to dynamically add RUN hooks via the Transition object.
+    const runTransition = () => {
+      let allRunHooks = getHooksFor(TransitionHookPhase.RUN);
+      let done = () => services.$q.when(undefined);
+      TransitionHook.invokeHooks(allRunHooks, done)
+          .then(transitionSuccess, transitionError);
+    };
+
+    let allBeforeHooks = getHooksFor(TransitionHookPhase.BEFORE);
+    TransitionHook.invokeHooks(allBeforeHooks, startTransition)
+        .then(runTransition);
 
     return this.promise;
   }

@@ -542,8 +542,8 @@ describe('stateService', function () {
       done();
     });
 
-    fit('aborts pending transitions when superseded from callbacks', async(done) => {
-      // router.trace.enable();
+    it('aborts pending transitions when superseded from callbacks', async(done) => {
+      // router.trace.enable(1);
       $state.defaultErrorHandler(() => null);
       $registry.register({
         name: 'redir',
