@@ -1,5 +1,5 @@
 /** @module path */ /** for typedoc */
-import {extend, applyPairs, find, allTrueR} from "../common/common";
+import {extend, applyPairs, find, allTrueR, pairs, arrayTuples} from "../common/common";
 import {propEq} from "../common/hof";
 import {StateObject} from "../state/stateObject";
 import {RawParams} from "../params/interface";
@@ -8,6 +8,8 @@ import {Resolvable} from "../resolve/resolvable";
 import {ViewConfig} from "../view/interface";
 
 /**
+ * @internalapi
+ *
  * A node in a [[TreeChanges]] path
  *
  * For a [[TreeChanges]] path, this class holds the stateful information for a single node in the path.
@@ -27,19 +29,19 @@ export class PathNode {
   public views: ViewConfig[];
 
   /** Creates a copy of a PathNode */
-  constructor(state: PathNode);
+  constructor(node: PathNode);
   /** Creates a new (empty) PathNode for a State */
   constructor(state: StateObject);
-  constructor(stateOrPath: any) {
-    if (stateOrPath instanceof PathNode) {
-      let node: PathNode = stateOrPath;
+  constructor(stateOrNode: any) {
+    if (stateOrNode instanceof PathNode) {
+      let node: PathNode = stateOrNode;
       this.state = node.state;
       this.paramSchema = node.paramSchema.slice();
       this.paramValues = extend({}, node.paramValues);
       this.resolvables = node.resolvables.slice();
       this.views = node.views && node.views.slice();
     } else {
-      let state: StateObject = stateOrPath;
+      let state: StateObject = stateOrNode;
       this.state = state;
       this.paramSchema = state.parameters({ inherit: false });
       this.paramValues = {};
@@ -63,42 +65,35 @@ export class PathNode {
    * @returns true if the state and parameter values for another PathNode are
    * equal to the state and param values for this PathNode
    */
-  equals(node: PathNode, keys = this.paramSchema.map(p => p.id)): boolean {
-    const paramValsEq = (key: string) =>
-        this.parameter(key).type.equals(this.paramValues[key], node.paramValues[key]);
-    return this.state === node.state && keys.map(paramValsEq).reduce(allTrueR, true);
+  equals(node: PathNode, paramsFn?: GetParamsFn): boolean {
+    const diff = this.diff(node, paramsFn);
+    return diff && diff.length === 0;
+  }
+
+  /**
+   * Finds Params with different parameter values on another PathNode.
+   *
+   * Given another node (of the same state), finds the parameter values which differ.
+   * Returns the [[Param]] (schema objects) whose parameter values differ.
+   *
+   * Given another node for a different state, returns `false`
+   *
+   * @param node The node to compare to
+   * @param paramsFn A function that returns which parameters should be compared.
+   * @returns The [[Param]]s which differ, or null if the two nodes are for different states
+   */
+  diff(node: PathNode, paramsFn?: GetParamsFn): Param[] | false {
+    if (this.state !== node.state) return false;
+
+    const params: Param[] = paramsFn ? paramsFn(this) : this.paramSchema;
+    return Param.changed(params, this.paramValues, node.paramValues);
   }
 
   /** Returns a clone of the PathNode */
   static clone(node: PathNode) {
     return new PathNode(node);
   }
-
-  /**
-   * Returns a new path which is a subpath of the first path which matched the second path.
-   *
-   * The new path starts from root and contains any nodes that match the nodes in the second path.
-   * Nodes are compared using their state property and parameter values.
-   *
-   * @param pathA the first path
-   * @param pathB the second path
-   * @param ignoreDynamicParams don't compare dynamic parameter values
-   */
-  static matching(pathA: PathNode[], pathB: PathNode[], ignoreDynamicParams = true): PathNode[] {
-    let matching: PathNode[] = [];
-
-    for (let i = 0; i < pathA.length && i < pathB.length; i++) {
-      let a = pathA[i], b = pathB[i];
-
-      if (a.state !== b.state) break;
-
-      let changedParams = Param.changed(a.paramSchema, a.paramValues, b.paramValues)
-          .filter(param => !(ignoreDynamicParams && param.dynamic));
-      if (changedParams.length) break;
-
-      matching.push(a);
-    }
-
-    return matching
-  }
 }
+
+/** @hidden */
+export type GetParamsFn = (pathNode: PathNode) => Param[];

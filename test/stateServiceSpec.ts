@@ -7,7 +7,7 @@ import { isFunction } from '../src/common/predicates';
 import { StateRegistry } from '../src/state/stateRegistry';
 import { Transition } from '../src/transition/transition';
 import { Param } from '../src/params/param';
-import { RejectType } from '../src/transition/rejectFactory';
+import {Rejection, RejectType} from '../src/transition/rejectFactory';
 import { TestingPlugin } from './_testingPlugin';
 import { StateDeclaration } from '../src/state/interface';
 
@@ -529,16 +529,53 @@ describe('stateService', function () {
       done();
     });
 
+    it('ignores transitions that are equivalent to the pending transition', async (done) => {
+      $state.defaultErrorHandler(() => null);
+      await initStateTo(A);
+      router.transitionService.onStart({}, trans => new Promise<any>(resolve => setTimeout(resolve, 50)));
+
+      let trans1 = $state.go(B, {}).transition.promise.catch(err => err);
+      let trans2 = $state.go(B, {}).transition.promise.catch(err => err);
+
+      let result1 = await trans1;
+      let result2 = await trans2;
+
+      expect($state.current).toBe(B);
+      expect(result1).toBe(B);
+      expect(result2.type).toBe(RejectType.IGNORED);
+
+      done();
+    });
+
+    it('cancels pending transitions that are superseded by an ignored transition', async (done) => {
+      $state.defaultErrorHandler(() => null);
+      await initStateTo(A);
+      router.transitionService.onStart({}, trans => new Promise<any>(resolve => setTimeout(resolve, 50)));
+
+      let trans1 = $state.go(B, {}).transition.promise.catch(err => err);
+      let trans2 = $state.go(A, {}).transition.promise.catch(err => err);
+
+      let result1 = await trans1;
+      let result2 = await trans2;
+
+      expect($state.current).toBe(A);
+      expect(result1.type).toBe(RejectType.ABORTED);
+      expect(result2.type).toBe(RejectType.IGNORED);
+
+      done();
+    });
+
+
     it('aborts pending transitions even when going back to the current state', async(done) => {
       $state.defaultErrorHandler(() => null);
       await initStateTo(A);
 
-      let superseded = $state.transitionTo(B, {}).catch(err => err);
-      await $state.transitionTo(A, {});
+      let superseded = $state.go(B, {}).transition.promise.catch(err => err);
+      await $state.go(A, {});
       let result = await superseded;
 
       expect($state.current).toBe(A);
-      expect(result.type).toBe(RejectType.SUPERSEDED);
+      expect(result.type).toBe(RejectType.ABORTED);
 
       done();
     });

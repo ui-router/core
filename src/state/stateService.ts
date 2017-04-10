@@ -8,8 +8,8 @@ import { isDefined, isObject, isString } from '../common/predicates';
 import { Queue } from '../common/queue';
 import { services } from '../common/coreservices';
 
-import { PathFactory } from '../path/pathFactory';
-import { PathNode } from '../path/node';
+import { PathUtils } from '../path/pathFactory';
+import { PathNode } from '../path/pathNode';
 
 import { HookResult, TransitionOptions } from '../transition/interface';
 import { defaultTransOpts } from '../transition/transitionService';
@@ -93,7 +93,7 @@ export class StateService {
    * @internalapi
    */
   private _handleInvalidTargetState(fromPath: PathNode[], toState: TargetState) {
-    let fromState = PathFactory.makeTargetState(fromPath);
+    let fromState = PathUtils.makeTargetState(fromPath);
     let globals = this.router.globals;
     const latestThing = () => globals.transitionHistory.peekTail();
     let latest = latestThing();
@@ -340,9 +340,11 @@ export class StateService {
      */
     const rejectedTransitionHandler = (transition: Transition) => (error: any): Promise<any> => {
       if (error instanceof Rejection) {
+        const isLatest = router.globals.lastStartedTransitionId === transition.$id;
+
         if (error.type === RejectType.IGNORED) {
+          isLatest && router.urlRouter.update();
           // Consider ignored `Transition.run()` as a successful `transitionTo`
-          router.urlRouter.update();
           return services.$q.when(globals.current);
         }
 
@@ -355,7 +357,7 @@ export class StateService {
         }
 
         if (error.type === RejectType.ABORTED) {
-          router.urlRouter.update();
+          isLatest && router.urlRouter.update();
           return services.$q.reject(error);
         }
       }
@@ -593,7 +595,7 @@ export class StateService {
     if (!state || !state.lazyLoad) throw new Error("Can not lazy load " + stateOrName);
 
     let currentPath = this.getCurrentPath();
-    let target = PathFactory.makeTargetState(currentPath);
+    let target = PathUtils.makeTargetState(currentPath);
     transition = transition || this.router.transitionService.create(currentPath, target);
 
     return lazyLoadState(transition, state);

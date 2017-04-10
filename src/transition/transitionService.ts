@@ -10,7 +10,7 @@ import {
 import { Transition } from "./transition";
 import { makeEvent, RegisteredHook } from "./hookRegistry";
 import { TargetState } from "../state/targetState";
-import { PathNode } from "../path/node";
+import { PathNode } from "../path/pathNode";
 import { ViewService } from "../view/view";
 import { UIRouter } from "../router";
 import { registerAddCoreResolvables } from "../hooks/coreResolvables";

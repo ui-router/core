@@ -375,16 +375,19 @@ describe('Resolvables system:', function () {
       params: {
         param: { dynamic: true },
       },
+      resolvePolicy: { when: 'EAGER' },
       resolve: {
         data: () => {
-          new Promise(resolve => resolve('Expensive data ' + resolveCount++));
+          new Promise(resolve =>
+              resolve('Expensive data ' + resolveCount++));
         },
       },
     });
 
     $transitions.onEnter({entering: "dynamic"}, trans => {
-      if (trans.params()['param'] === 'initial')
+      if (trans.params()['param'] === 'initial') {
         return $state.target("dynamic", { param: 'redirected' });
+      }
     });
 
     $state.go("dynamic", { param: 'initial'}).then(() => {

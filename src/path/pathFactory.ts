@@ -1,6 +1,8 @@
 /** @module path */ /** for typedoc */
 
-import {extend, find, pick, omit, tail, mergeR, values, unnestR, Predicate, inArray} from "../common/common";
+import {
+  extend, find, pick, omit, tail, mergeR, values, unnestR, Predicate, inArray, arrayTuples,
+} from "../common/common";
 import {prop, propEq, not} from "../common/hof";
 
 import {RawParams} from "../params/interface";
@@ -10,13 +12,14 @@ import {_ViewDeclaration} from "../state/interface";
 
 import {StateObject} from "../state/stateObject";
 import {TargetState} from "../state/targetState";
-import {PathNode} from "../path/node";
+import {GetParamsFn, PathNode} from "./pathNode";
 import {ViewService} from "../view/view";
+import { Param } from '../params/param';
 
 /**
  * This class contains functions which convert TargetStates, Nodes and paths from one type to another.
  */
-export class PathFactory {
+export class PathUtils {
 
   constructor() { }
 
@@ -33,9 +36,9 @@ export class PathFactory {
 
   /** Given a fromPath: PathNode[] and a TargetState, builds a toPath: PathNode[] */
   static buildToPath(fromPath: PathNode[], targetState: TargetState): PathNode[] {
-    let toPath: PathNode[] = PathFactory.buildPath(targetState);
+    let toPath: PathNode[] = PathUtils.buildPath(targetState);
     if (targetState.options().inherit) {
-      return PathFactory.inheritParams(fromPath, toPath, Object.keys(targetState.params()));
+      return PathUtils.inheritParams(fromPath, toPath, Object.keys(targetState.params()));
     }
     return toPath;
   }
@@ -49,7 +52,7 @@ export class PathFactory {
     // Only apply the viewConfigs to the nodes for the given states
     path.filter(node => inArray(states, node.state)).forEach(node => {
       let viewDecls: _ViewDeclaration[] = values(node.state.views || {});
-      let subPath = PathFactory.subPath(path, n => n === node);
+      let subPath = PathUtils.subPath(path, n => n === node);
       let viewConfigs: ViewConfig[][] = viewDecls.map(view => $view.createViewConfig(subPath, view));
       node.views = viewConfigs.reduce(unnestR, []);
     });
@@ -97,15 +100,18 @@ export class PathFactory {
     return <PathNode[]> toPath.map(makeInheritedParamsNode);
   }
 
+  static nonDynamicParams = (node: PathNode): Param[] =>
+      node.state.parameters({ inherit: false })
+          .filter(param => !param.dynamic);
+
   /**
    * Computes the tree changes (entering, exiting) between a fromPath and toPath.
    */
   static treeChanges(fromPath: PathNode[], toPath: PathNode[], reloadState: StateObject): TreeChanges {
     let keep = 0, max = Math.min(fromPath.length, toPath.length);
-    const staticParams = (state: StateObject) =>
-        state.parameters({ inherit: false }).filter(not(prop('dynamic'))).map(prop('id'));
+
     const nodesMatch = (node1: PathNode, node2: PathNode) =>
-        node1.equals(node2, staticParams(node1.state));
+        node1.equals(node2, PathUtils.nonDynamicParams);
 
     while (keep < max && fromPath[keep].state !== reloadState && nodesMatch(fromPath[keep], toPath[keep])) {
       keep++;
@@ -133,6 +139,43 @@ export class PathFactory {
   }
 
   /**
+   * Returns a new path which is: the subpath of the first path which matches the second path.
+   *
+   * The new path starts from root and contains any nodes that match the nodes in the second path.
+   * It stops before the first non-matching node.
+   *
+   * Nodes are compared using their state property and their parameter values.
+   * If a `paramsFn` is provided, only the [[Param]] returned by the function will be considered when comparing nodes.
+   *
+   * @param pathA the first path
+   * @param pathB the second path
+   * @param paramsFn a function which returns the parameters to consider when comparing
+   *
+   * @returns an array of PathNodes from the first path which match the nodes in the second path
+   */
+  static matching(pathA: PathNode[], pathB: PathNode[], paramsFn?: GetParamsFn): PathNode[] {
+    let done = false;
+    let tuples: PathNode[][] = arrayTuples(pathA, pathB);
+    return tuples.reduce((matching, [nodeA, nodeB]) => {
+      done = done || !nodeA.equals(nodeB, paramsFn);
+      return done ? matching : matching.concat(nodeA);
+    }, []);
+  }
+
+  /**
+   * Returns true if two paths are identical.
+   *
+   * @param pathA
+   * @param pathB
+   * @param paramsFn a function which returns the parameters to consider when comparing
+   * @returns true if the the states and parameter values for both paths are identical
+   */
+  static equals(pathA: PathNode[], pathB: PathNode[], paramsFn?: GetParamsFn): boolean {
+    return pathA.length === pathB.length &&
+        PathUtils.matching(pathA, pathB, paramsFn).length === pathA.length;
+  }
+
+  /**
    * Return a subpath of a path, which stops at the first matching node
    *
    * Given an array of nodes, returns a subset of the array starting from the first node,
@@ -149,5 +192,6 @@ export class PathFactory {
   }
 
   /** Gets the raw parameter values from a path */
-  static paramValues = (path: PathNode[]) => path.reduce((acc, node) => extend(acc, node.paramValues), {});
+  static paramValues = (path: PathNode[]) =>
+      path.reduce((acc, node) => extend(acc, node.paramValues), {});
 }

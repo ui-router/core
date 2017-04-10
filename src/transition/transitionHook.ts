@@ -104,7 +104,7 @@ export class TransitionHook {
     try {
       let result = invokeCallback();
 
-      if (isPromise(result)) {
+      if (!this.type.synchronous && isPromise(result)) {
         return result.catch(normalizeErr)
             .then(handleResult, handleError);
       } else {
@@ -217,21 +217,23 @@ export class TransitionHook {
    * If no hook returns a promise, then all hooks are processed synchronously.
    *
    * @param hooks the list of TransitionHooks to invoke
-   * @param done a callback that is invoked after all the hooks have successfully completed
+   * @param doneCallback a callback that is invoked after all the hooks have successfully completed
    *
    * @returns a promise for the async result, or the result of the callback
    */
-  static invokeHooks<T>(hooks: TransitionHook[], done: () => T): Promise<any> | T {
+  static invokeHooks<T>(hooks: TransitionHook[], doneCallback: (result?: HookResult) => T): Promise<any> | T {
     for (let idx = 0; idx < hooks.length; idx++) {
       let hookResult = hooks[idx].invokeHook();
 
       if (isPromise(hookResult)) {
         let remainingHooks = hooks.slice(idx + 1);
-        return TransitionHook.chain(remainingHooks, hookResult).then(done);
+
+        return TransitionHook.chain(remainingHooks, hookResult)
+            .then(doneCallback);
       }
     }
 
-    return done();
+    return doneCallback();
   }
 
   /**

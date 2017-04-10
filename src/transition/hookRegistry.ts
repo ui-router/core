@@ -4,7 +4,7 @@
  */ /** for typedoc */
 import { extend, removeFrom, tail, values, identity, map } from "../common/common";
 import {isString, isFunction} from "../common/predicates";
-import {PathNode} from "../path/node";
+import {PathNode} from "../path/pathNode";
 import {
     TransitionStateHookFn, TransitionHookFn, TransitionHookPhase, TransitionHookScope, IHookRegistry, PathType
 } from "./interface"; // has or is using

@@ -39,7 +39,7 @@ import {Transition}  from "../transition/transition";
 import {ActiveUIView, ViewConfig, ViewContext}  from "../view/interface";
 import {stringify, functionToString, maxLength, padString} from "./strings";
 import {Resolvable} from "../resolve/resolvable";
-import {PathNode} from "../path/node";
+import {PathNode} from "../path/pathNode";
 import {PolicyWhen} from "../resolve/interface";
 import {TransitionHook} from "../transition/transitionHook";
 import {HookResult} from "../transition/interface";

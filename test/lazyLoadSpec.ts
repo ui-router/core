@@ -389,8 +389,7 @@ describe('future state', function () {
     };
     $registry.register(futureStateDef);
 
-    $state.go('A');
-    $state.go('A').then(() => {
+    Promise.all([$state.go('A'), $state.go('A')]).then(() => {
       expect(count).toBe(1);
       expect($state.current.name).toBe('A');
       done();

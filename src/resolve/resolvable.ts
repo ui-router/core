@@ -12,7 +12,7 @@ import {stringify} from "../common/strings";
 import {isFunction, isObject} from "../common/predicates";
 import {Transition} from "../transition/transition";
 import {StateObject} from "../state/stateObject";
-import {PathNode} from "../path/node";
+import {PathNode} from "../path/pathNode";
 
 
 // TODO: explicitly make this user configurable

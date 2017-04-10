@@ -3,6 +3,7 @@ import { trace } from '../common/trace';
 import { Rejection } from '../transition/rejectFactory';
 import { TransitionService } from '../transition/transitionService';
 import { Transition } from '../transition/transition';
+import {PathUtils} from '../path/pathFactory';
 
 /**
  * A [[TransitionHookFn]] that skips a transition if it should be ignored
@@ -13,10 +14,21 @@ import { Transition } from '../transition/transition';
  * then the transition is ignored and not processed.
  */
 function ignoredHook(trans: Transition) {
-  if (trans.ignored()) {
-    trace.traceTransitionIgnored(this);
-    return Rejection.ignored().toPromise();
+  const ignoredReason = trans._ignoredReason();
+  if (!ignoredReason) return;
+
+  trace.traceTransitionIgnored(trans);
+
+  const pending = trans.router.globals.transition;
+
+  // The user clicked a link going back to the *current state* ('A')
+  // However, there is also a pending transition in flight (to 'B')
+  // Abort the transition to 'B' because the user now wants to be back at 'A'.
+  if (ignoredReason === 'SameAsCurrent' && pending) {
+    pending.abort();
   }
+
+  return Rejection.ignored().toPromise();
 }
 
 export const registerIgnoredTransitionHook = (transitionService: TransitionService) =>

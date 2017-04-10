@@ -1,4 +1,4 @@
-import { PathNode } from "../src/path/node";
+import { PathNode } from "../src/path/pathNode";
 import {
     UIRouter, RejectType, Rejection, pluck, services, TransitionService, StateService, Resolvable, Transition,
 } from "../src/index";
@@ -131,7 +131,7 @@ describe('transition', function () {
       }));
 
       // Test for #2972 and https://github.com/ui-router/react/issues/3
-      fit('should reject transitions that are superseded by a new transition', ((done) => {
+      it('should reject transitions that are superseded by a new transition', ((done) => {
         $state.defaultErrorHandler(function() {});
         router.stateRegistry.register({
           name: 'slowResolve',
@@ -149,7 +149,7 @@ describe('transition', function () {
 
         _delay(20)
             .then(() =>
-                $state.go('slowResolve').transition.promise )
+                $state.go('A').transition.promise)
             .then(delay(50))
             .then(() =>
                 expect(results).toEqual({ success: 1, error: 1 }))

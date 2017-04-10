@@ -18,8 +18,8 @@ import {
 import { TransitionHook } from './transitionHook';
 import { matchState, makeEvent, RegisteredHook } from './hookRegistry';
 import { HookBuilder } from './hookBuilder';
-import { PathNode } from '../path/node';
-import { PathFactory } from '../path/pathFactory';
+import { PathNode } from '../path/pathNode';
+import { PathUtils } from '../path/pathFactory';
 import { StateObject } from '../state/stateObject';
 import { TargetState } from '../state/targetState';
 import { Param } from '../params/param';
@@ -152,19 +152,19 @@ export class Transition implements IHookRegistry {
     // current() is assumed to come from targetState.options, but provide a naive implementation otherwise.
     this._options = extend({ current: val(this) }, targetState.options());
     this.$id = router.transitionService._transitionCount++;
-    let toPath = PathFactory.buildToPath(fromPath, targetState);
-    this._treeChanges = PathFactory.treeChanges(fromPath, toPath, this._options.reloadState);
+    let toPath = PathUtils.buildToPath(fromPath, targetState);
+    this._treeChanges = PathUtils.treeChanges(fromPath, toPath, this._options.reloadState);
     this.createTransitionHookRegFns();
 
     let onCreateHooks = this._hookBuilder.buildHooksForPhase(TransitionHookPhase.CREATE);
-    TransitionHook.runAllHooks(onCreateHooks);
+    TransitionHook.invokeHooks(onCreateHooks, () => null);
 
     this.applyViewConfigs(router);
   }
 
   private applyViewConfigs(router: UIRouter) {
     let enteringStates = this._treeChanges.entering.map(node => node.state);
-    PathFactory.applyViewConfigs(router.transitionService.$view, this._treeChanges.to, enteringStates);
+    PathUtils.applyViewConfigs(router.transitionService.$view, this._treeChanges.to, enteringStates);
   }
 
   /**
@@ -311,7 +311,7 @@ export class Transition implements IHookRegistry {
    */
   injector(state?: StateOrName, pathName = "to"): UIInjector {
     let path: PathNode[] = this._treeChanges[pathName];
-    if (state) path = PathFactory.subPath(path, node => node.state === state || node.state.name === state);
+    if (state) path = PathUtils.subPath(path, node => node.state === state || node.state.name === state);
     return new ResolveContext(path).injector();
   }
 
@@ -551,7 +551,7 @@ export class Transition implements IHookRegistry {
     };
 
     // Find any "entering" nodes in the redirect path that match the original path and aren't being reloaded
-    let matchingEnteringNodes: PathNode[] = PathNode.matching(redirectEnteringNodes, originalEnteringNodes)
+    let matchingEnteringNodes: PathNode[] = PathUtils.matching(redirectEnteringNodes, originalEnteringNodes, PathUtils.nonDynamicParams)
         .filter(not(nodeIsReloading(targetState.options().reloadState)));
 
     // Use the existing (possibly pre-resolved) resolvables for the matching entering nodes.
@@ -607,8 +607,22 @@ export class Transition implements IHookRegistry {
    * @returns true if the Transition is ignored.
    */
   ignored(): boolean {
-    let changes = this._changedParams();
-    return !changes ? false : changes.length === 0;
+    return !!this._ignoredReason();
+  }
+
+  /** @hidden */
+  _ignoredReason(): "SameAsCurrent"|"SameAsPending"|undefined {
+    const pending = this.router.globals.transition;
+    const reloadState = this._options.reloadState;
+
+    const same = (pathA, pathB) => {
+      if (pathA.length !== pathB.length) return false;
+      const matching = PathUtils.matching(pathA, pathB);
+      return pathA.length === matching.filter(node => !reloadState || !node.state.includes[reloadState.name]).length;
+    };
+
+    if (same(this.treeChanges('from'), this.treeChanges('to'))) return "SameAsCurrent";
+    if (pending && same(pending.treeChanges('to'), this.treeChanges('to'))) return "SameAsPending";
   }
 
   /**
@@ -627,19 +641,6 @@ export class Transition implements IHookRegistry {
     const getHooksFor = (phase: TransitionHookPhase) =>
         this._hookBuilder.buildHooksForPhase(phase);
 
-    const startTransition = () => {
-      let globals = this.router.globals;
-
-      globals.lastStartedTransitionId = this.$id;
-      globals.transition = this;
-      globals.transitionHistory.enqueue(this);
-
-      trace.traceTransitionStart(this);
-
-      return services.$q.when(undefined);
-    };
-
-
     // When the chain is complete, then resolve or reject the deferred
     const transitionSuccess = () => {
       trace.traceSuccess(this.$to(), this);
@@ -656,18 +657,30 @@ export class Transition implements IHookRegistry {
       runAllHooks(getHooksFor(TransitionHookPhase.ERROR));
     };
 
-    // This waits to build the RUN hook chain until after the "BEFORE" hooks complete
-    // This allows a BEFORE hook to dynamically add RUN hooks via the Transition object.
     const runTransition = () => {
+      // Wait to build the RUN hook chain until the BEFORE hooks are done
+      // This allows a BEFORE hook to dynamically add additional RUN hooks via the Transition object.
       let allRunHooks = getHooksFor(TransitionHookPhase.RUN);
       let done = () => services.$q.when(undefined);
-      TransitionHook.invokeHooks(allRunHooks, done)
-          .then(transitionSuccess, transitionError);
+      return TransitionHook.invokeHooks(allRunHooks, done);
+    };
+
+    const startTransition = () => {
+      let globals = this.router.globals;
+
+      globals.lastStartedTransitionId = this.$id;
+      globals.transition = this;
+      globals.transitionHistory.enqueue(this);
+
+      trace.traceTransitionStart(this);
+
+      return services.$q.when(undefined);
     };
 
     let allBeforeHooks = getHooksFor(TransitionHookPhase.BEFORE);
     TransitionHook.invokeHooks(allBeforeHooks, startTransition)
-        .then(runTransition);
+        .then(runTransition)
+        .then(transitionSuccess, transitionError);
 
     return this.promise;
   }

@@ -14,7 +14,7 @@ import {
 import {Transition} from "./transition";
 import {TransitionHook} from "./transitionHook";
 import {StateObject} from "../state/stateObject";
-import {PathNode} from "../path/node";
+import {PathNode} from "../path/pathNode";
 import {TransitionService} from "./transitionService";
 import {TransitionEventType} from "./transitionEventType";
 import {RegisteredHook} from "./hookRegistry";

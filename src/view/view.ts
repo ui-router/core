@@ -6,7 +6,7 @@ import {equals, applyPairs, removeFrom, TypedMap} from "../common/common";
 import {curry, prop} from "../common/hof";
 import {isString, isArray} from "../common/predicates";
 import {trace} from "../common/trace";
-import {PathNode} from "../path/node";
+import {PathNode} from "../path/pathNode";
 
 import {ActiveUIView, ViewContext, ViewConfig} from "./interface";
 import {_ViewDeclaration} from "../state/interface";

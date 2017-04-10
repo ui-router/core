@@ -5,10 +5,10 @@ import { propEq, not } from "../common/hof";
 import { trace } from "../common/trace";
 import { services, $InjectorLike } from "../common/coreservices";
 import { resolvePolicies, PolicyWhen, ResolvePolicy } from "./interface";
-import { PathNode } from "../path/node";
+import { PathNode } from "../path/pathNode";
 import { Resolvable } from "./resolvable";
 import { StateObject } from "../state/stateObject";
-import { PathFactory } from "../path/pathFactory";
+import { PathUtils } from "../path/pathFactory";
 import { stringify } from "../common/strings";
 import { Transition } from "../transition/transition";
 import { UIInjector } from "../interface";
@@ -82,7 +82,7 @@ export class ResolveContext {
    * `let AB = ABCD.subcontext(a)`
    */
   subContext(state: StateObject): ResolveContext {
-    return new ResolveContext(PathFactory.subPath(this._path, node => node.state === state));
+    return new ResolveContext(PathUtils.subPath(this._path, node => node.state === state));
   }
 
   /**
@@ -164,7 +164,7 @@ export class ResolveContext {
     let node = this.findNode(resolvable);
     // Find which other resolvables are "visible" to the `resolvable` argument
     // subpath stopping at resolvable's node, or the whole path (if the resolvable isn't in the path)
-    let subPath: PathNode[] = PathFactory.subPath(this._path, x => x === node) || this._path;
+    let subPath: PathNode[] = PathUtils.subPath(this._path, x => x === node) || this._path;
     let availableResolvables: Resolvable[] = subPath
         .reduce((acc, node) => acc.concat(node.resolvables), []) //all of subpath's resolvables
         .filter(res => res !== resolvable); // filter out the `resolvable` argument
