@@ -21,7 +21,7 @@ let defaultOptions: TransitionHookOptions = {
   current: noop,
   transition: null,
   traceData: {},
-  bind: null
+  bind: null,
 };
 
 export type GetResultHandler = (hook: TransitionHook) => ResultHandler;
@@ -56,7 +56,7 @@ export class TransitionHook {
     isPromise(result) && result.catch(err =>
         hook.logError(Rejection.normalize(err)));
     return undefined;
-  };
+  }
 
   /**
    * These GetErrorHandler(s) are used by [[invokeHook]] below
@@ -70,7 +70,7 @@ export class TransitionHook {
 
   static THROW_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) => {
     throw error;
-  };
+  }
 
   private isSuperseded = () =>
     this.type.hookPhase === TransitionHookPhase.RUN && !this.options.transition.isActive();
@@ -162,6 +162,10 @@ export class TransitionHook {
     // The router is stopped
     if (router._disposed) {
       return Rejection.aborted(`UIRouter instance #${router.$id} has been stopped (disposed)`).toPromise();
+    }
+
+    if (this.transition._aborted) {
+      return Rejection.aborted().toPromise();
     }
 
     // This transition is no longer current.

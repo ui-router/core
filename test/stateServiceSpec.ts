@@ -497,7 +497,7 @@ describe('stateService', function () {
       done();
     });
 
-    it('is a no-op when passing the current state and identical parameters', async(done) => {
+    it('is ignored when passing the current state and identical parameters', async(done) => {
       let enterlog = "";
       $transitions.onEnter({ entering: 'A'}, (trans, state) => { enterlog += state.name + ";" });
       await initStateTo(A);
@@ -540,6 +540,30 @@ describe('stateService', function () {
       expect(result.type).toBe(RejectType.SUPERSEDED);
 
       done();
+    });
+
+    it('can be manually aborted', async(done) => {
+      $state.defaultErrorHandler(() => null);
+
+      await initStateTo(A);
+
+      router.transitionService.onStart({}, trans => {
+        if (trans.$id === 1) return new Promise(resolve => setTimeout(resolve, 50)) as any;
+      });
+
+      let promise = $state.transitionTo(B, {});
+      let transition = promise.transition;
+
+      setTimeout(() => transition.abort());
+
+      const expects = (result) => {
+        expect($state.current).toBe(A);
+        expect(result.type).toBe(RejectType.ABORTED);
+
+        done();
+      };
+
+      promise.then(expects, expects);
     });
 
     it('aborts pending transitions when superseded from callbacks', async(done) => {

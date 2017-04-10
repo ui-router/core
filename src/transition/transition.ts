@@ -8,7 +8,7 @@ import { services } from '../common/coreservices';
 import {
   map, find, extend, mergeR, tail, omit, toJson, arrayTuples, unnestR, identity, anyTrueR,
 } from '../common/common';
-import { isObject } from '../common/predicates';
+import {isObject, isUndefined} from '../common/predicates';
 import { prop, propEq, val, not, is } from '../common/hof';
 import { StateDeclaration, StateOrName } from '../state/interface';
 import {
@@ -74,9 +74,13 @@ export class Transition implements IHookRegistry {
    * A boolean which indicates if the transition was successful
    *
    * After a successful transition, this value is set to true.
-   * After a failed transition, this value is set to false.
+   * After an unsuccessful transition, this value is set to false.
+   *
+   * The value will be undefined if the transition is not complete
    */
   success: boolean;
+  /** @hidden */
+  _aborted: boolean;
   /** @hidden */
   private _error: any;
 
@@ -679,6 +683,19 @@ export class Transition implements IHookRegistry {
    */
   valid() {
     return !this.error() || this.success !== undefined;
+  }
+
+  /**
+   * Aborts this transition
+   *
+   * Imperative API to abort a Transition.
+   * This only applies to Transitions that are not yet complete.
+   */
+  abort() {
+    // Do not set flag if the transition is already complete
+    if (isUndefined(this.success))  {
+      this._aborted = true;
+    }
   }
 
   /**
