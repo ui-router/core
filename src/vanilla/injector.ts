@@ -19,7 +19,7 @@ let ARGUMENT_NAMES = /([^\s,]+)/g;
  * [angular 1 dependency injector](https://docs.angularjs.org/api/auto/service/$injector)
  *
  * UI-Router evolved from an angular 1 library to a framework agnostic library.
- * However, some of the `ui-router-core` code uses these ng1 style APIs to support ng1 style dependency injection.
+ * However, some of the `@uirouter/core` code uses these ng1 style APIs to support ng1 style dependency injection.
  *
  * This object provides a naive implementation of a globally scoped dependency injection system.
  * It supports the following DI approaches:

@@ -197,7 +197,7 @@ describe('StateBuilder', function() {
       expect(myBuiltState.parameter('foo').config.value).toBe('foo');
     });
 
-    // ui-router-core doesn't have views builder
+    // @uirouter/core doesn't have views builder
     // it('should use `views` from the prototype', () => {
     //   expect(myState.views).toBe(proto.views);
     //   expect(built.views).toBe(proto.views);

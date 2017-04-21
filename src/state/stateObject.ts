@@ -52,7 +52,7 @@ export class StateObject {
 
   /**
    * The views for the state.
-   * Note: `ui-router-core` does not register a builder for views.
+   * Note: `@uirouter/core` does not register a builder for views.
    * The framework specific code should register a `views` builder.
    */
   public views: { [key: string]: _ViewDeclaration; };

@@ -116,7 +116,7 @@ export type RedirectToResult = string | TargetState | { state?: string, params?:
  *
  * #### Example:
  * ```js
- * import { State } from "ui-router-core"
+ * import { State } from "@uirouter/core"
  * import { FolderService } from "../folder.service"
  * // StateDeclaration class
  * @State()

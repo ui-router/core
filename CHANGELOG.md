@@ -1,4 +1,4 @@
-### ui-router-core changes
+### @uirouter/core changes
 # [5.0.0](https://github.com/ui-router/core/compare/4.0.0...v5.0.0) (2017-04-21)
 
 
@@ -49,7 +49,7 @@
 #### Before:
 
 ```js
-import { State } from "ui-router-core";
+import { State } from "@uirouter/core";
 const match = { to: (state: State) => state.data.auth };
 transitionsvc.onEnter(match, (trans: Transition, state: State) => {
   // state is the internal State object
@@ -62,7 +62,7 @@ transitionsvc.onEnter(match, (trans: Transition, state: State) => {
 #### Now:
 
 ```js
-import { StateDeclaration } from "ui-router-core";
+import { StateDeclaration } from "@uirouter/core";
 const match = { to: (state: StateDeclaration) => state.data.auth };
 transitionsvc.onEnter(match, (trans: Transition, state: StateDeclaration) => {
   // state === the state object you registered
@@ -95,13 +95,13 @@ Low: Access to the internal api is still available using `$$state()`.
 #### Before:
 
 ```
-import {State} from "ui-router-core";
+import {State} from "@uirouter/core";
 ```
 
 #### Now:
 
 ```
-import {StateObject} from "ui-router-core";
+import {StateObject} from "@uirouter/core";
 ```
 
 #### Motivation:
@@ -283,7 +283,7 @@ register a `.onError` handler and filter/process accordingly.
 
 
 
-### ui-router-core changes
+### @uirouter/core changes
 # [4.0.0](https://github.com/ui-router/core/compare/3.1.1...v4.0.0) (2017-01-22)
 
 
@@ -294,7 +294,7 @@ register a `.onError` handler and filter/process accordingly.
 
 ### Features
 
-* **core:** Export all vanilla.* code from `ui-router-core` ([f3392d1](https://github.com/ui-router/core/commit/f3392d1))
+* **core:** Export all vanilla.* code from `@uirouter/core` ([f3392d1](https://github.com/ui-router/core/commit/f3392d1))
 * **globals:** Removed `UIRouterGlobals` interface. Renamed `Globals` class to `UIRouterGlobals` ([8719334](https://github.com/ui-router/core/commit/8719334))
 
 
@@ -333,7 +333,7 @@ Closes https://github.com/ui-router/core/issues/31
 
 
 
-### ui-router-core changes
+### @uirouter/core changes
 ## [3.1.1](https://github.com/ui-router/core/compare/3.1.0...v3.1.1) (2017-01-16)
 
 
@@ -351,7 +351,7 @@ Closes https://github.com/ui-router/core/issues/31
 
 
 
-### ui-router-core changes
+### @uirouter/core changes
 # [3.1.0](https://github.com/ui-router/core/compare/3.0.0...v3.1.0) (2017-01-09)
 
 
@@ -361,7 +361,7 @@ Closes https://github.com/ui-router/core/issues/31
 
 
 
-### ui-router-core changes
+### @uirouter/core changes
 # [3.0.0](https://github.com/ui-router/core/compare/2.0.0...3.0.0) (2017-01-08)
 
 
@@ -548,7 +548,7 @@ End users who were accessing `services.location` or `services.locationConfig` sh
 
 
 
-### ui-router-core changes
+### @uirouter/core changes
 # [2.0.0](https://github.com/ui-router/core/compare/1.0.1...2.0.0) (2016-12-09)
 
 
@@ -629,9 +629,9 @@ $state.go('foo').catch(err => { if (err.detail === "Error 123") .. });
 
 ### Features
 
-- This is the 1.0.0 release of ui-router-core.
-- We've moved ui-router-core to its new home at https://github.com/ui-router/core
-- ui-router-core will now follow SemVer.
+- This is the 1.0.0 release of @uirouter/core.
+- We've moved @uirouter/core to its new home at https://github.com/ui-router/core
+- @uirouter/core will now follow SemVer.
 
 # BREAKING CHANGE
 
@@ -674,7 +674,7 @@ This release fixes bugs for both ng1 and ng2
 
 #### BC in Core
 * Remove `UIInjector.native` infavor of `UIInjector.getNative()` ([d11b7dc](https://github.com/angular-ui/ui-router/commit/d11b7dc))
-* Remove `stateProvider` from ui-router-core. Use `stateRegistry` and `stateService` in 88c6494
+* Remove `stateProvider` from @uirouter/core. Use `stateRegistry` and `stateService` in 88c6494
 * We now enforce states with an explicit `parent:` may NOT ALSO specify a parent state in their name (i.e., `parent.child`)
 
 #### BC in Angular 2
@@ -766,7 +766,7 @@ class RootAppModule {}
 * **Trace:** Fix error in console after $trace.enable() ([013c77a](https://github.com/angular-ui/ui-router/commit/013c77a)), closes [#2752](https://github.com/angular-ui/ui-router/issues/2752)
 * **transitionHook:** Prevent queued hookFn to be called if deregistered ([#2939](https://github.com/angular-ui/ui-router/issues/2939)) ([39e1ba7](https://github.com/angular-ui/ui-router/commit/39e1ba7)), closes [#2928](https://github.com/angular-ui/ui-router/issues/2928)
 * **typescript:** Make UI-Router `noImplicitAny` safe. ([0769bc2](https://github.com/angular-ui/ui-router/commit/0769bc2)), closes [#2693](https://github.com/angular-ui/ui-router/issues/2693)
-* **typescript:** Remove angular1 specific types from ui-router-core methods ([30124bd](https://github.com/angular-ui/ui-router/commit/30124bd)), closes [#2693](https://github.com/angular-ui/ui-router/issues/2693)
+* **typescript:** Remove angular1 specific types from @uirouter/core methods ([30124bd](https://github.com/angular-ui/ui-router/commit/30124bd)), closes [#2693](https://github.com/angular-ui/ui-router/issues/2693)
 
 
 #### ng1

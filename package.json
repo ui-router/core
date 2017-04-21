@@ -1,5 +1,5 @@
 {
-  "name": "ui-router-core",
+  "name": "@uirouter/core",
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
   "version": "5.0.0",
   "scripts": {
