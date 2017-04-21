@@ -675,6 +675,25 @@ describe('transition', function () {
             .then(() => expect(log.join(';')).toBe("adding resolve;Entered#B;resolving;resolvedval;Entered#C;Entered#D;DONE!"))
             .then(done, done);
       }));
+
+      // Test for https://github.com/ui-router/core/issues/32
+      it('should match "" (empty string) to root state only', async (done) => {
+        const beforeLog = [], successLog = [];
+        router.transitionService.onBefore({ from: '', to: '**' }, trans => { beforeLog.push(trans.from().name); });
+        router.transitionService.onSuccess({ from: '', to: '**' }, trans => { successLog.push(trans.from().name); });
+
+        await $state.go('A');
+        expect(beforeLog).toEqual(successLog);
+        expect(beforeLog.length).toBe(1);
+        expect(beforeLog[0]).toBe("");
+
+        await $state.go('B');
+        expect(beforeLog).toEqual(successLog);
+        expect(beforeLog.length).toBe(1);
+        expect(beforeLog[0]).toBe("");
+
+        done();
+      });
     });
 
     describe('redirected transition', () => {
