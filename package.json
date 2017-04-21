@@ -1,12 +1,13 @@
 {
-  "name": "@router/core",
+  "name": "ui-router-core",
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
-  "version": "5.0.0",
+  "version": "5.0.0-pre.2",
   "scripts": {
     "clean": "shx rm -rf lib lib-esm",
     "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && npm run fixdts",
     "fixdts": "dts-downlevel 'lib/**/*.d.ts' 'lib-esm/**/*.d.ts'",
-    "prepublish": "npm run build",
+    "postinstall": "node ./scripts/migratewarn.js",
+    "prepare": "npm run build",
     "test": "karma start",
     "watch": "run-p watch:*",
     "watch:buildjs": "tsc -w",
