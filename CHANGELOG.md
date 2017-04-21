@@ -44,9 +44,9 @@
 
 ### BREAKING CHANGES
 
-* **TransitionHook:** Transition hooks no longer expose the internal `State` object (now named `StateObject`)
+## **TransitionHook:** Transition hooks no longer expose the internal `State` object (now named `StateObject`)
 
-- #### Before:
+#### Before:
 
 ```js
 import { State } from "ui-router-core";
@@ -59,7 +59,7 @@ transitionsvc.onEnter(match, (trans: Transition, state: State) => {
 }
 ```
 
-- #### Now:
+#### Now:
 
 ```js
 import { StateDeclaration } from "ui-router-core";
@@ -73,37 +73,38 @@ transitionsvc.onEnter(match, (trans: Transition, state: StateDeclaration) => {
 }
 ```
 
-- #### Motivation:
+#### Motivation:
 
 The `State` object (now named `StateObject`) is an internal API and should not be exposed via any public APIs.
 If you depend on the internal APIs, you can still access the internal object by calling `state.$$state()`.
 
-- #### BC Likelihood
+#### BC Likelihood
 
 How likely is this BC to affect me?
 
 Medium: You will likely be affected you 1) have transition hooks, 2) are using typescript and/or 3) use the internal ui-router State API.
 
-- #### BC Severity
+#### BC Severity
 
 How severe is this BC?
 
 Low: Access to the internal api is still available using `$$state()`.
-* **StateObject:** Renamed internal API `State` object to `StateObject`
 
-- #### Before:
+## **StateObject:** Renamed internal API `State` object to `StateObject`
+
+#### Before:
 
 ```
 import {State} from "ui-router-core";
 ```
 
-- #### Now:
+#### Now:
 
 ```
 import {StateObject} from "ui-router-core";
 ```
 
-- #### Motivation:
+#### Motivation:
 
 We'd like to use the `State` name/symbol as a public API.  It will be an
 ES7/TS decorator for ES6/TS state definition classes, i.e:
@@ -121,7 +122,7 @@ export class FooState implements StateDeclaration {
 }
 ```
 
-- #### BC Likelihood
+#### BC Likelihood
 
 How likely is this to affect me?
 
@@ -129,12 +130,14 @@ Low: This only affects code that imports the internal API symbol `State`.
 You will likely be affected you 1) import that symbol, 2) are using typescript and 3) explicitly
 typed a variable such as `let internalStateObject = state.$$state();`
 
-- #### BC Severity
+#### BC Severity
 
 How severe is this change?
 
 Low: Find all places where `State` is imported and rename to `StateObject`
-* **Transition:** All Transition errors are now wrapped in a Rejection object.
+
+
+## **Transition:** All Transition errors are now wrapped in a Rejection object.
 
 #### Before:
 
@@ -181,9 +184,10 @@ Medium: apps which have onError handlers for rejected values
 How severe is this change?
 
 Low: Find all error handlers (or .catch/.then chains) that do not understand Rejection. Add `err.detail` processing.
-* **onBefore:** `onBefore` hooks are now run asynchronously like all the other hooks.
 
-- #### Old behavior
+##  **onBefore:** `onBefore` hooks are now run asynchronously like all the other hooks.
+
+#### Old behavior
 
 Previously, the `onBefore` hooks were run in the same stackframe as `transitionTo`.
 If they threw an error, it could be caught using try/catch.
@@ -197,7 +201,7 @@ try {
 }
 ```
 
-- #### New behavior
+#### New behavior
 
 Now, `onBefore` hooks are processed asynchronously.
 To handle errors, use any of the async error handling paradigms:
@@ -220,7 +224,7 @@ To handle errors, use any of the async error handling paradigms:
   stateService.defaultErrorHandler(error => { // global error handler });
   ```
 
-- #### Motivation
+#### Motivation
 
 Why introduce a BC?
 
@@ -228,48 +232,49 @@ Why introduce a BC?
 - Simpler code and mental model
 - Fewer edge cases to account for
 
-- #### BC Liklihood
+#### BC Liklihood
 
 How likely is this to affect my app?
 
 Very Low: Apps that registered onBefore hooks and depend on
 synchronous execution are affected.
 
-- #### BC Severity
+#### BC Severity
 
 How severe is this BC?
 
 Low: Switch to asynchronous handling, such as chaining off the
 transition promise
-* **defaultErrorHandler:** ABORTED transitions do not invoke the `defaultErrorHandler`
+
+##  **defaultErrorHandler:** ABORTED transitions do not invoke the `defaultErrorHandler`
 
 Returning `false` from a transition hook will abort the transition.
 
-- #### Old behavior
+#### Old behavior
 
 Previously, this case was considered an error and was logged by
 `defaultErrorHandler`.
 After your feedback, we agree that this is not typically an error.
 
-- #### New behavior
+#### New behavior
 
 Now, aborted transitions do not trigger the `defaultErrorHandler`
 
-- #### Motivation:
+#### Motivation:
 
 > Why introduce a BC?
 
 Most users do not consider ABORT to be an error.  The default error
 handler should match this assumption.
 
-- #### BC liklihood
+#### BC liklihood
 
 > How likely am I to be affected?
 
 Low: Most users do not consider ABORT to be an error. For most users
 this will not be a BC.
 
-- #### BC severity
+#### BC severity
 
 > How severe is this BC?
 
