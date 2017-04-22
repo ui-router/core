@@ -4,7 +4,6 @@ build_packages
 site
 
 # common
-**/.*
 *~
 node_modules
 bower_components
