@@ -1,9 +1,9 @@
+/** @module hooks */ /** */
 
 import { trace } from '../common/trace';
 import { Rejection } from '../transition/rejectFactory';
 import { TransitionService } from '../transition/transitionService';
 import { Transition } from '../transition/transition';
-import {PathUtils} from '../path/pathFactory';
 
 /**
  * A [[TransitionHookFn]] that skips a transition if it should be ignored
