@@ -314,23 +314,23 @@ describe("UrlRouter", function () {
     });
 
     it("should prioritize a rule with a higher priority", () => {
-      urlRouter.when(matcher('/foo', '/:p1', '/:p2'), log(1), { priority: 1 });
-      urlRouter.when(matcher('/foo/123/456'), log(2));
+      urlRouter.when(matcher('/foo', '/:p1', '/:p2'), log('1'), { priority: 1 });
+      urlRouter.when(matcher('/foo/123/456'), log('2'));
       urlService.url("/foo/123/456");
 
-      expect(matchlog).toEqual([1]);
+      expect(matchlog).toEqual(['1']);
     });
 
     describe('rules which sort identically', () => {
       it("should prioritize the rule with the highest number of matched param values", () => {
-        urlRouter.when(matcher('/foo/:p1/:p2'), log(1));
-        urlRouter.when(matcher('/foo/:p1/:p2?query'), log(2));
+        urlRouter.when(matcher('/foo/:p1/:p2'), log('1'));
+        urlRouter.when(matcher('/foo/:p1/:p2?query'), log('2'));
 
         urlService.url("/foo/123/456");
-        expect(matchlog).toEqual([1]);
+        expect(matchlog).toEqual(['1']);
 
         urlService.url("/foo/123/456?query=blah");
-        expect(matchlog).toEqual([1, 2]);
+        expect(matchlog).toEqual(['1', '2']);
       });
     });
   });

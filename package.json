@@ -59,7 +59,7 @@
   "typings": "lib/index.d.ts",
   "license": "MIT",
   "devDependencies": {
-    "@types/jasmine": "^2.2.34",
+    "@types/jasmine": "^2.5.47",
     "@types/jquery": "^1.10.31",
     "awesome-typescript-loader": "3.0.0-beta.10",
     "conventional-changelog": "^1.1.0",

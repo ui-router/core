@@ -1,6 +1,6 @@
 
 declare namespace jasmine {
-  interface Matchers {
+  interface Matchers<T> {
     toEqualData(x: any): boolean;
     toEqualValues(x: any): boolean;
   }
