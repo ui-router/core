@@ -10,6 +10,7 @@ import { Param } from '../src/params/param';
 import {Rejection, RejectType} from '../src/transition/rejectFactory';
 import { TestingPlugin } from './_testingPlugin';
 import { StateDeclaration } from '../src/state/interface';
+import { PathNode } from '../src/path/pathNode';
 
 describe('stateService', function () {
   let router: UIRouter;
@@ -504,13 +505,65 @@ describe('stateService', function () {
       await initStateTo(A);
       expect(enterlog).toBe('A;');
 
-      let promise = $state.transitionTo(A, {}); // no-op
-      expect(promise).toBeDefined(); // but we still get a valid promise
-      let value = await promise;
+      try {
+        let promise = $state.transitionTo(A, {}); // no-op
+        await promise.transition.promise;
+      } catch (error) {
+        let reject = error as Rejection;
+        expect(reject.type).toBe(RejectType.IGNORED);
+        expect(reject.message).toMatch(/ignored/);
+        expect($state.current).toBe(A);
+        expect(enterlog).toBe('A;');
+
+        done();
+      }
+    });
+
+    it('is not ignored when reload: true option is set', async(done) => {
+      let enterlog = "";
+      $transitions.onEnter({ entering: 'A'}, (trans, state) => { enterlog += state.name + ";"; });
+      await initStateTo(A);
+      expect(enterlog).toBe('A;');
+
+      let value = await $state.transitionTo(A, {}, { reload: true });
 
       expect(value).toBe(A);
       expect($state.current).toBe(A);
+      expect(enterlog).toBe('A;A;');
+
+      done();
+    });
+
+    it('is not ignored if any nodes are found in treechanges.entering', async(done) => {
+      let enterlog = "";
+      $transitions.onEnter({ entering: 'A'}, (trans, state) => { enterlog += state.name + ";"; });
+      await initStateTo(A);
       expect(enterlog).toBe('A;');
+
+      let pathNode = new PathNode(A.$$state());
+      $transitions.onCreate({}, trans => trans.treeChanges().entering.push(pathNode));
+
+      let goPromise = $state.transitionTo(A);
+      await goPromise;
+      await goPromise.transition.promise;
+
+      expect(enterlog).toBe('A;A;');
+
+      done();
+    });
+
+    it('is not ignored if any nodes are found in treechanges.exiting', async(done) => {
+      let exitlog = "";
+      $transitions.onExit({ exiting: 'A'}, (trans, state) => { exitlog += state.name + ";"; });
+      await initStateTo(A);
+
+      let pathNode = new PathNode(A.$$state());
+      $transitions.onCreate({}, trans => trans.treeChanges().exiting.push(pathNode));
+      let goPromise = $state.transitionTo(A);
+      await goPromise;
+      await goPromise.transition.promise;
+
+      expect(exitlog).toBe('A;');
 
       done();
     });

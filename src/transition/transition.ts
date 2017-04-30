@@ -621,8 +621,11 @@ export class Transition implements IHookRegistry {
       return pathA.length === matching.filter(node => !reloadState || !node.state.includes[reloadState.name]).length;
     };
 
-    if (same(this.treeChanges('from'), this.treeChanges('to'))) return "SameAsCurrent";
-    if (pending && same(pending.treeChanges('to'), this.treeChanges('to'))) return "SameAsPending";
+    let newTC = this.treeChanges();
+    let pendTC = pending && pending.treeChanges();
+
+    if (pendTC && same(pendTC.to, newTC.to) && same(pendTC.exiting, newTC.exiting)) return "SameAsPending";
+    if (newTC.exiting.length === 0 && newTC.entering.length === 0 && same(newTC.from, newTC.to)) return "SameAsCurrent";
   }
 
   /**
