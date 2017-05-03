@@ -868,11 +868,11 @@ dot-prop@^4.1.0:
   dependencies:
     is-obj "^1.0.0"
 
-dts-downlevel@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/dts-downlevel/-/dts-downlevel-0.2.1.tgz#bdf650cf3965bce1ed414e9fff5110aff64d73c0"
+dts-downlevel@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/dts-downlevel/-/dts-downlevel-0.3.0.tgz#74af735427dbf8a9860ea692da02f9082167a1a5"
   dependencies:
-    replace-in-file "^2.0.3"
+    replace-in-file "^2.5.0"
 
 duplexer3@^0.1.4:
   version "0.1.4"
@@ -2660,7 +2660,7 @@ repeating@^2.0.0:
   dependencies:
     is-finite "^1.0.0"
 
-replace-in-file@^2.0.3:
+replace-in-file@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/replace-in-file/-/replace-in-file-2.5.0.tgz#1f6388225c8acb4db288a8189365e266f9824da4"
   dependencies:
