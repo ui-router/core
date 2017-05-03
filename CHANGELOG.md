@@ -1,4 +1,14 @@
 ### @uirouter/core changes
+## [5.0.1](https://github.com/ui-router/core/compare/5.0.0...5.0.1) (2017-05-03)
+
+
+### Bug Fixes
+
+* **transition:** Do not ignore transitions which have states being entered or exited ([175717e](https://github.com/ui-router/core/commit/175717e))
+
+
+
+### @uirouter/core changes
 # [5.0.0](https://github.com/ui-router/core/compare/4.0.0...v5.0.0) (2017-04-21)
 
 
