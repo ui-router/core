@@ -1,4 +1,19 @@
 ### @uirouter/core changes
+## [5.0.2](https://github.com/ui-router/core/compare/5.0.1...5.0.2) (2017-05-06)
+
+
+### Bug Fixes
+
+* **common:** Fix implementation of 'pick' -- use hasOwnProperty ([09848a4](https://github.com/ui-router/core/commit/09848a4))
+
+
+### Features
+
+* **build:** Build and distribute UMD bundles ([0a8da85](https://github.com/ui-router/core/commit/0a8da85))
+
+
+
+### @uirouter/core changes
 ## [5.0.1](https://github.com/ui-router/core/compare/5.0.0...5.0.1) (2017-05-03)
 
 
