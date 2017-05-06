@@ -1,7 +1,8 @@
-# master only
 build
 build_packages
+_bundles
 site
+stats.html
 
 # common
 **/.*
