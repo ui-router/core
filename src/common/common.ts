@@ -234,10 +234,9 @@ export function ancestors(first: StateObject, second: StateObject) {
 
 /**
  * Return a copy of the object only containing the whitelisted properties.
-
- * @example
- * ```
  *
+ * #### Example:
+ * ```
  * var foo = { a: 1, b: 2, c: 3 };
  * var ab = pick(foo, ['a', 'b']); // { a: 1, b: 2 }
  * ```
@@ -246,8 +245,7 @@ export function ancestors(first: StateObject, second: StateObject) {
  */
 export function pick(obj: Obj, propNames: string[]): Obj {
   let copy = {};
-  // propNames.forEach(prop => { if (obj.hasOwnProperty(prop)) copy[prop] = obj[prop] });
-  propNames.forEach(prop => { if (isDefined(obj[prop])) copy[prop] = obj[prop] });
+  propNames.forEach(prop => { if (obj.hasOwnProperty(prop)) copy[prop] = obj[prop] });
   return copy;
 }
 

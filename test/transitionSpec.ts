@@ -864,6 +864,21 @@ describe('transition', function () {
       done();
     });
 
+    it('should not inherit previous params when new params are passed', async(done) => {
+      router.stateRegistry.register({
+        name: 'foo',
+        url: '?fooParam',
+      });
+
+      await $state.go('foo', { fooParam: 'abc' });
+      expect(router.globals.params).toEqualValues({ fooParam: 'abc' });
+
+      await $state.go('foo', { fooParam: undefined });
+      expect(router.globals.params).toEqualValues({ fooParam: undefined });
+
+      done();
+    });
+
     it('should not inherit params whose type has inherit: false', async(done) => {
       router.urlService.config.type('inherit', {
         inherit: true, encode: x => x, decode: x => x, is: () => true, equals: equals, pattern: /.*/, raw: false,
