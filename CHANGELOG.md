@@ -1,4 +1,14 @@
 ### @uirouter/core changes
+## [5.0.3](https://github.com/ui-router/core/compare/5.0.2...5.0.3) (2017-05-07)
+
+
+### Bug Fixes
+
+* **common:** Re-fix implementation of 'pick' using for .. in ([f2da7f4](https://github.com/ui-router/core/commit/f2da7f4))
+
+
+
+### @uirouter/core changes
 ## [5.0.2](https://github.com/ui-router/core/compare/5.0.1...5.0.2) (2017-05-06)
 
 
