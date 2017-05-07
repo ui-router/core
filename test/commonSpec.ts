@@ -1,6 +1,7 @@
 import {
     defaults, filter, is, eq, not, pattern, val, isInjectable
 } from "../src/index";
+import { pick } from '../src/common/common';
 
 describe('common', function() {
   describe('filter', function() {
@@ -110,6 +111,19 @@ describe('common', function() {
     it('should accept ng1 array notation', function() {
       var fn = ['foo', 'bar', function(foo, bar) {}];
       expect(isInjectable(fn)).toBeTruthy();
+    });
+  });
+
+  describe('pick', () => {
+    it('should pick inherited properties', () => {
+      let parent = { foo: 'foo', bar: 'bar' };
+      let child = Object.create(parent);
+      expect(pick(child, ['foo'])).toEqual({ foo: 'foo' });
+    });
+
+    it('should not pick missing properties', () => {
+      let obj = { foo: 'foo', bar: 'bar' };
+      expect(pick(obj, ['baz'])).toEqual({ });
     });
   });
 });

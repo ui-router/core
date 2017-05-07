@@ -225,7 +225,7 @@ export const mergeR = (memo: Obj, item: Obj) => extend(memo, item);
 export function ancestors(first: StateObject, second: StateObject) {
   let path: StateObject[] = [];
 
-  for (var n in first.path) {
+  for (let n in first.path) {
     if (first.path[n] !== second.path[n]) break;
     path.push(first.path[n]);
   }
@@ -244,9 +244,13 @@ export function ancestors(first: StateObject, second: StateObject) {
  * @param propNames an Array of strings, which are the whitelisted property names
  */
 export function pick(obj: Obj, propNames: string[]): Obj {
-  let copy = {};
-  propNames.forEach(prop => { if (obj.hasOwnProperty(prop)) copy[prop] = obj[prop] });
-  return copy;
+  let objCopy = {};
+  for (let prop in obj) {
+    if (propNames.indexOf(prop) !== -1) {
+      objCopy[prop] = obj[prop];
+    }
+  }
+  return objCopy;
 }
 
 /**
