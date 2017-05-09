@@ -77,8 +77,11 @@ export class StateObject {
    */
   public data: any;
 
-  /** An array of strings of the parent States' names */
-  public includes: { [name: string] : boolean };
+  /** 
+   * An object containing the parent States' names as keys and 
+   * true as their values.
+   */
+  public includes: { [name: string]: boolean };
 
   /** Prototypally inherits from [[StateDeclaration.onExit]] */
   public onExit: TransitionStateHookFn;
