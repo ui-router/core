@@ -727,8 +727,13 @@ export class Transition implements IHookRegistry {
 
     if (state.self.abstract)
       return `Cannot transition to abstract state '${state.name}'`;
-    if (!Param.validates(state.parameters(), this.params()))
-      return `Param values not valid for state '${state.name}'`;
+
+    const paramDefs = state.parameters(), values = this.params();
+    const invalidParams = paramDefs.filter(param => !param.validates(values[param.id]));
+    if (invalidParams.length) {
+      return `Param values not valid for state '${state.name}'. Invalid params: [ ${invalidParams.map(param => param.id).join(', ')} ]`;
+    }
+
     if (this.success === false)
       return this._error;
   }
