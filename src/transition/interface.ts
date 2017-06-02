@@ -761,15 +761,15 @@ export interface HookMatchCriteria {
   [key: string]: HookMatchCriterion;
 
   /** A [[HookMatchCriterion]] to match the destination state */
-  to?: HookMatchCriterion | undefined;
+  to?: HookMatchCriterion;
   /** A [[HookMatchCriterion]] to match the original (from) state */
-  from?: HookMatchCriterion | undefined;
+  from?: HookMatchCriterion;
   /** A [[HookMatchCriterion]] to match any state that would be exiting */
-  exiting?: HookMatchCriterion | undefined;
+  exiting?: HookMatchCriterion;
   /** A [[HookMatchCriterion]] to match any state that would be retained */
-  retained?: HookMatchCriterion | undefined;
+  retained?: HookMatchCriterion;
   /** A [[HookMatchCriterion]] to match any state that would be entering */
-  entering?: HookMatchCriterion | undefined;
+  entering?: HookMatchCriterion;
 }
 
 export interface IMatchingNodes {
@@ -814,7 +814,7 @@ export interface PathType {
  *
  * Or, `true` to always match
  */
-export type HookMatchCriterion = (string|IStateMatch|boolean)
+export type HookMatchCriterion = (string|IStateMatch|boolean|undefined)
 
 export enum TransitionHookPhase { CREATE, BEFORE, RUN, SUCCESS, ERROR }
 export enum TransitionHookScope { TRANSITION, STATE }
