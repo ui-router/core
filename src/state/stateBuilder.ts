@@ -295,15 +295,21 @@ export class StateBuilder {
   }
 
   parentName(state: StateObject) {
+    // name = 'foo.bar.baz.**'
     let name = state.name || "";
-
+    // segments = ['foo', 'bar', 'baz', '.**']
     let segments = name.split('.');
-    if (segments.length > 1) {
+    // segments = ['foo', 'bar', 'baz']
+    let lastSegment = segments.pop();
+    // segments = ['foo', 'bar'] (ignore .** segment for future states)
+    if (lastSegment === '**') segments.pop();
+
+    if (segments.length) {
       if (state.parent) {
         throw new Error(`States that specify the 'parent:' property should not have a '.' in their name (${name})`);
       }
-      var lastSegment = segments.pop();
-      if (lastSegment === '**') segments.pop();
+
+      // 'foo.bar'
       return segments.join(".");
     }
 

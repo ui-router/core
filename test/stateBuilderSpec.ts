@@ -63,6 +63,10 @@ describe('StateBuilder', function() {
         let errorState = { name: 'home.error', parent: 'home' };
         expect(() => builder.parentName(errorState)).toThrowError();
       });
+      it('should not error if parent: is specified and the (future state) name ends in .**', function() {
+        let futureState = { name: 'child.**', parent: 'home' };
+        expect(builder.parentName(futureState)).toBe('home');
+      });
     });
   });
 
