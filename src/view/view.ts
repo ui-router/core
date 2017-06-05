@@ -161,7 +161,7 @@ export class ViewService {
     let fqnToFirstSegment = uivSegments.slice(0, negOffset).join(".");
     let uiViewContext = uiViewsByFqn[fqnToFirstSegment].creationContext;
     return vc.$uiViewContextAnchor === (uiViewContext && uiViewContext.name);
-  };
+  }
 
   sync() {
     let uiViewsByFqn: TypedMap<ActiveUIView> =
@@ -205,7 +205,11 @@ export class ViewService {
     };
 
     // Sort views by FQN and state depth. Process uiviews nearest the root first.
-    this._uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair).forEach(configureUIView);
+    const pairs = this._uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair);
+
+    trace.traceViewSync(pairs);
+
+    pairs.forEach(configureUIView);
   };
 
   /**

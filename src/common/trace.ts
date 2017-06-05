@@ -46,17 +46,18 @@ import {HookResult} from "../transition/interface";
 import {StateObject} from "../state/stateObject";
 
 /** @hidden */
-function uiViewString (viewData: ActiveUIView) {
-    if (!viewData) return 'ui-view (defunct)';
-    return `[ui-view#${viewData.id} tag ` +
-        `in template from '${viewData.creationContext && viewData.creationContext.name || '(root)'}' state]: ` +
-        `fqn: '${viewData.fqn}', ` +
-        `name: '${viewData.name}@${viewData.creationContext}')`;
+function uiViewString (uiview: ActiveUIView) {
+    if (!uiview) return 'ui-view (defunct)';
+    const state = uiview.creationContext ? uiview.creationContext.name || '(root)' : '(none)';
+    return `[ui-view#${uiview.id} ${uiview.$type}:${uiview.fqn} (${uiview.name}@${state})]`;
 }
 
 /** @hidden */
-const viewConfigString = (viewConfig: ViewConfig) =>
-    `[ViewConfig#${viewConfig.$id} from '${viewConfig.viewDecl.$context.name || '(root)'}' state]: target ui-view: '${viewConfig.viewDecl.$uiViewName}@${viewConfig.viewDecl.$uiViewContextAnchor}'`;
+const viewConfigString = (viewConfig: ViewConfig) => {
+  let view = viewConfig.viewDecl;
+  const state = view.$context.name || '(root)';
+  return `[View#${viewConfig.$id} from '${state}' state]: target ui-view: '${view.$uiViewName}@${view.$uiViewContextAnchor}'`;
+};
 
 /** @hidden */
 function normalizedCat(input: Category|string): string {
@@ -78,7 +79,7 @@ function normalizedCat(input: Category|string): string {
  * `trace.enable(1)`
  */
 export enum Category {
-  RESOLVE, TRANSITION, HOOK, UIVIEW, VIEWCONFIG
+  RESOLVE, TRANSITION, HOOK, UIVIEW, VIEWCONFIG,
 }
 
 /** @hidden */ const _tid = parse("$id");
@@ -121,7 +122,8 @@ export class Trace {
    * @param categories categories to enable. If `categories` is omitted, all categories are enabled.
    *        Also takes strings (category name) or ordinal (category position)
    */
-  enable(...categories: Category[]) { this._set(true, categories) }
+  enable(...categories: (Category|string|number)[]);
+  enable(...categories: any[]) { this._set(true, categories); }
   /**
    * Disables a trace [[Category]]
    *
@@ -132,7 +134,8 @@ export class Trace {
    * @param categories categories to disable. If `categories` is omitted, all categories are disabled.
    *        Also takes strings (category name) or ordinal (category position)
    */
-  disable(...categories: Category[]) { this._set(false, categories) }
+  disable(...categories: (Category|string|number)[]);
+  disable(...categories: any[]) { this._set(false, categories); }
 
   /**
    * Retrieves the enabled stateus of a [[Category]]
@@ -143,7 +146,7 @@ export class Trace {
    *
    * @returns boolean true if the category is enabled
    */
-  enabled(category: Category): boolean {
+  enabled(category: (Category|string|number)): boolean {
     return !!this._enabled[normalizedCat(category)];
   }
 
@@ -214,6 +217,19 @@ export class Trace {
   traceUIViewFill(viewData: ActiveUIView, html: string) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent("Fill", viewData, ` with: ${maxLength(200, html)}`);
+  }
+
+  /** @internalapi called by ui-router code */
+  traceViewSync(pairs: any[]) {
+    if (!this.enabled(Category.VIEWCONFIG)) return;
+    const mapping = pairs.map(([ uiViewData, config ]) => {
+      const uiView = `${uiViewData.$type}:${uiViewData.fqn}`;
+      const view = config && `${config.viewDecl.$context.name}: ${config.viewDecl.$name} (${config.viewDecl.$type})`;
+
+      return { 'ui-view fqn': uiView, 'state: view name': view };
+    }).sort((a, b) => a['ui-view fqn'].localeCompare(b['ui-view fqn']));
+
+    console.table(mapping);
   }
 
   /** @internalapi called by ui-router code */
