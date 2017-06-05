@@ -226,8 +226,8 @@ export class ViewService {
   registerUIView(uiView: ActiveUIView) {
     trace.traceViewServiceUIViewEvent("-> Registering", uiView);
     let uiViews = this._uiViews;
-    const fqnMatches = uiv => uiv.fqn === uiView.fqn;
-    if (uiViews.filter(fqnMatches).length)
+    const fqnAndTypeMatches = (uiv: ActiveUIView) => uiv.fqn === uiView.fqn && uiv.$type === uiView.$type;
+    if (uiViews.filter(fqnAndTypeMatches).length)
       trace.traceViewServiceUIViewEvent("!!!! duplicate uiView named:", uiView);
 
     uiViews.push(uiView);
