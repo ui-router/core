@@ -1,4 +1,21 @@
 ### @uirouter/core changes
+## [5.0.4](https://github.com/ui-router/core/compare/5.0.3...5.0.4) (2017-06-06)
+
+
+### Bug Fixes
+
+* **future:** Allow future states to specify a `parent:` ([de68fe1](https://github.com/ui-router/core/commit/de68fe1))
+* **view:** only sync views which are of the same name *and type* ([49b5594](https://github.com/ui-router/core/commit/49b5594))
+
+
+### Features
+
+* **invalidTransition:** Better error messaging when param values are invalid ([fd45f44](https://github.com/ui-router/core/commit/fd45f44))
+* **trace:** Trace view synchronization. Allow trace.enable(...string) ([29503a0](https://github.com/ui-router/core/commit/29503a0))
+
+
+
+### @uirouter/core changes
 ## [5.0.3](https://github.com/ui-router/core/compare/5.0.2...5.0.3) (2017-05-07)
 
 
