@@ -112,6 +112,15 @@ describe("UrlMatcher", function () {
       expect(m.exec('/document/', {})).toEqual({ path: '' });
     });
 
+    it("should capture catch-all parameters in multiline url", function () {
+      var m = $umf.compile('/document/*path');
+      expect(m.exec('/document/a/b/c\r\n/d', {})).toEqual({ path: 'a/b/c\r\n/d' });
+      expect(m.exec('/document/\r\na/b\r\n/c', {})).toEqual({ path: '\r\na/b\r\n/c' });
+      expect(m.exec('/document/a/b\r\n\r\n/c', {})).toEqual({ path: 'a/b\r\n\r\n/c' });
+      expect(m.exec('/document/a/\rb/c\n', {})).toEqual({ path: 'a/\rb/c\n' });
+      expect(m.exec('/document/\r\n', {})).toEqual({ path: '\r\n' });
+    });
+
     it("should use the optional regexp with curly brace placeholders", function () {
       var m = $umf.compile('/users/:id/details/{type}/{repeat:[0-9]+}?from&to');
       expect(m.exec('/users/123/details/what/thisShouldBeDigits', {})).toBeNull();
