@@ -160,7 +160,7 @@ export class UrlMatcher {
     const matchDetails = (m: RegExpExecArray, isSearch: boolean) => {
       // IE[78] returns '' for unmatched groups instead of null
       let id = m[2] || m[3];
-      let regexp = isSearch ? m[4] : m[4] || (m[1] === '*' ? '.*' : null);
+      let regexp = isSearch ? m[4] : m[4] || (m[1] === '*' ? '[\\s\\S]*' : null);
 
       const makeRegexpType = (regexp) => inherit(paramTypes.type(isSearch ? "query" : "path"), {
         pattern: new RegExp(regexp, this.config.caseInsensitive ? 'i' : undefined)
