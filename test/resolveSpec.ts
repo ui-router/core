@@ -462,7 +462,7 @@ describe('Resolvables system:', function () {
       $state.go('nowait');
     });
 
-    fit('NOWAIT should return a promise from .result()', async (done) => {
+    it('NOWAIT should return a promise from .result()', async (done) => {
       let promiseResolveFn, resolvePromise = new Promise(resolve => { promiseResolveFn = resolve; });
 
       $registry.register({
@@ -488,7 +488,7 @@ describe('Resolvables system:', function () {
       $state.go('nowait');
     });
 
-    fit('WAIT should return the resolved value from .result()', async (done) => {
+    it('WAIT should return the resolved value from .result()', async (done) => {
       let promiseResolveFn, resolvePromise = new Promise(resolve => { promiseResolveFn = resolve; });
 
       $registry.register({
