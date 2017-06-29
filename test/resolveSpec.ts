@@ -398,8 +398,8 @@ describe('Resolvables system:', function () {
     });
   });
 
-  describe('Resolve Policy', () => {
-    it('NOWAIT should allow a transition to complete before the resolve is settled', async (done) => {
+  describe('NOWAIT Resolve Policy', () => {
+    it('should allow a transition to complete before the resolve is settled', async (done) => {
       let resolve, resolvePromise = new Promise(_resolve => { resolve = _resolve; });
 
       $registry.register({
@@ -461,54 +461,6 @@ describe('Resolvables system:', function () {
 
       $state.go('nowait');
     });
-
-    it('NOWAIT should return a promise from .result()', async (done) => {
-      let promiseResolveFn, resolvePromise = new Promise(resolve => { promiseResolveFn = resolve; });
-
-      $registry.register({
-        name: 'nowait',
-        resolve: [
-          { token: 'nowait', policy: { async: 'NOWAIT' }, resolveFn: () => resolvePromise },
-          { token: 'wait', policy: { async: 'WAIT' }, resolveFn: () => new Promise(resolve => resolve('should wait')) },
-        ],
-      });
-
-      $transitions.onSuccess({  }, trans => {
-        let resolvable = tail(trans.treeChanges('to')).resolvables[0];
-        let result = resolvable.result();
-        expect(result instanceof Promise).toBeTruthy();
-        result.then(val => {
-          expect(val).toBe('foobar');
-          done();
-        });
-
-        promiseResolveFn('foobar');
-      });
-
-      $state.go('nowait');
-    });
-
-    it('WAIT should return the resolved value from .result()', async (done) => {
-      let promiseResolveFn, resolvePromise = new Promise(resolve => { promiseResolveFn = resolve; });
-
-      $registry.register({
-        name: 'nowait',
-        resolve: [
-          { token: 'nowait', policy: { async: 'NOWAIT' }, resolveFn: () => resolvePromise },
-          { token: 'wait', policy: { async: 'WAIT' }, resolveFn: () => new Promise(resolve => resolve('should wait')) },
-        ],
-      });
-
-      $transitions.onSuccess({  }, trans => {
-        let resolvable = tail(trans.treeChanges('to')).resolvables[1];
-        let result = resolvable.result();
-        expect(result).toBe('should wait');
-        done();
-      });
-
-      $state.go('nowait');
-    });
-
   });
 });
 

@@ -162,18 +162,6 @@ export class Resolvable implements ResolvableLiteral {
     return this.promise || this.resolve(resolveContext, trans);
   }
 
-  /**
-   * Gets the result of the resolvable.
-   *
-   * The return value depends on `policy.async`:
-   *
-   * * `WAIT`: Returns the resolved value of the promise, or undefined if it has not yet resolved
-   * * `NOWAIT`: Returns the promise for the result
-   */
-  result() {
-    return this.policy.async === 'NOWAIT' ? this.promise : this.data;
-  }
-
   toString() {
     return `Resolvable(token: ${stringify(this.token)}, requires: [${this.deps.map(stringify)}])`;
   }
