@@ -128,7 +128,7 @@ describe("hooks", () => {
 
     it("should not redirect if the redirectTo: function returns something other than a string, { state, params}, TargetState (or promise for)", (done) => {
       find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
-        setTimeout(() => resolve(12345), 50);
+        setTimeout(() => resolve(12345 as any), 50);
       });
       init();
 

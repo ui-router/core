@@ -167,9 +167,9 @@ describe('future state', function () {
     });
 
     it('should resolve to the lazyLoad result', (done) => {
-      $registry.register({name: 'll', url: '/ll', lazyLoad: () => Promise.resolve('abc')});
+      $registry.register({name: 'll', url: '/ll', lazyLoad: () => Promise.resolve({ states: [] })});
       $state.lazyLoad('ll').then((result) => {
-        expect(result).toBe('abc');
+        expect(result).toEqual({ states: [] });
         done();
       });
     });
@@ -186,7 +186,7 @@ describe('future state', function () {
     });
 
     it('should remove the lazyLoad function from the state definition', (done) => {
-      let llstate = {name: 'll', url: '/ll', lazyLoad: () => Promise.resolve('abc')};
+      let llstate = {name: 'll', url: '/ll', lazyLoad: () => Promise.resolve(null)};
       $registry.register(llstate);
       $state.lazyLoad('ll').then(() => {
         expect(llstate.lazyLoad).toBeUndefined();
@@ -203,7 +203,7 @@ describe('future state', function () {
         $state.lazyLoad('ll'),
         $state.lazyLoad('ll'),
       ]).then((result) => {
-        expect(result).toEqual([1, 1]);
+        expect(result as any).toEqual([1, 1]);
         expect(lazyLoadCount).toBe(1);
         done();
       });
