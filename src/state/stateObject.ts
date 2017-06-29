@@ -3,7 +3,7 @@
  * @module state
  */
 /** for typedoc */
-import { StateDeclaration, _ViewDeclaration, _StateDeclaration } from "./interface";
+import { StateDeclaration, _ViewDeclaration, _StateDeclaration, LazyLoadResult } from "./interface";
 import { defaults, values, find, inherit } from "../common/common";
 import { propEq } from "../common/hof";
 import { Param } from "../params/param";
@@ -91,7 +91,7 @@ export class StateObject {
   public onEnter: TransitionStateHookFn;
 
   /** Prototypally inherits from [[StateDeclaration.lazyLoad]] */
-  public lazyLoad: (transition: Transition, state: StateDeclaration) => Promise<StateDeclaration[]>;
+  public lazyLoad: (transition: Transition, state: StateDeclaration) => Promise<LazyLoadResult>;
 
   /** Prototypally inherits from [[StateDeclaration.redirectTo]] */
   redirectTo: (

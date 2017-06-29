@@ -25,7 +25,7 @@ export interface $QLikeDeferred {
 }
 
 export interface $QLike {
-  when<T>(val?: T): Promise<T>;
+  when<T>(value?: T | PromiseLike<T>): Promise<T>;
   reject<T>(reason: any): Promise<T>;
   defer(): $QLikeDeferred;
   all(promises: { [key: string]: Promise<any> }): Promise<any>;

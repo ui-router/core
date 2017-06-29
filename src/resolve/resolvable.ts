@@ -13,6 +13,7 @@ import {isFunction, isObject} from "../common/predicates";
 import {Transition} from "../transition/transition";
 import {StateObject} from "../state/stateObject";
 import {PathNode} from "../path/pathNode";
+import { isNullOrUndefined } from '../common';
 
 
 // TODO: explicitly make this user configurable
@@ -73,7 +74,7 @@ export class Resolvable implements ResolvableLiteral {
     if (arg1 instanceof Resolvable) {
       extend(this, arg1);
     } else if (isFunction(resolveFn)) {
-      if (arg1 == null || arg1 == undefined) throw new Error("new Resolvable(): token argument is required");
+      if (isNullOrUndefined(arg1)) throw new Error("new Resolvable(): token argument is required");
       if (!isFunction(resolveFn)) throw new Error("new Resolvable(): resolveFn argument must be a function");
 
       this.token = arg1;
@@ -90,13 +91,13 @@ export class Resolvable implements ResolvableLiteral {
     }
   }
 
-  getPolicy(state:StateObject): ResolvePolicy {
+  getPolicy(state: StateObject): ResolvePolicy {
     let thisPolicy = this.policy || {};
     let statePolicy = state && state.resolvePolicy || {};
     return {
       when: thisPolicy.when || statePolicy.when || defaultResolvePolicy.when,
       async: thisPolicy.async || statePolicy.async || defaultResolvePolicy.async,
-    }
+    };
   }
 
   /**
