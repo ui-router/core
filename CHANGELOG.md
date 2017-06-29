@@ -1,3 +1,18 @@
+## Changes in `@uirouter/core` between versions [5.0.4 and 5.0.5](https://github.com/ui-router/core/compare/5.0.4...5.0.5) (2017-06-29)
+
+
+### Bug Fixes
+
+* **typescript:** Update to typescript 2.4 ([ce1669b](https://github.com/ui-router/core/commit/ce1669b))
+
+
+### Features
+
+* **Resolvable:** Add `.value()`: returns value (WAIT) or promise (NOWAIT) ([8769449](https://github.com/ui-router/core/commit/8769449))
+* **urlMatcher:** add support for multiline urls ([5b11ce0](https://github.com/ui-router/core/commit/5b11ce0))
+
+
+
 ### @uirouter/core changes
 ## [5.0.4](https://github.com/ui-router/core/compare/5.0.3...5.0.4) (2017-06-06)
 
