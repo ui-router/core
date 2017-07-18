@@ -335,7 +335,7 @@ export interface UrlRulesApi {
    * #### Example:
    * When no other url rule matches, manually trigger a transition to the `home` state
    * ```js
-   * .otherwise((urlParts, router) => {
+   * .otherwise((matchValue, urlParts, router) => {
    *   router.stateService.go('home');
    * });
    * ```
@@ -343,7 +343,7 @@ export interface UrlRulesApi {
    * #### Example:
    * When no other url rule matches, go to `home` state
    * ```js
-   * .otherwise((urlParts, router) => {
+   * .otherwise((matchValue, urlParts, router) => {
    *   return { state: 'home' };
    * });
    * ```
@@ -379,7 +379,7 @@ export interface UrlRulesApi {
    * #### Example:
    * When no other url rule matches, go to `home` state
    * ```js
-   * .initial((url, router) => {
+   * .initial((matchValue, url, router) => {
    *   console.log('initial state');
    *   return { state: 'home' };
    * })
