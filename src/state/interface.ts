@@ -581,7 +581,7 @@ export interface StateDeclaration {
    *
    * The function should load the code that is required to activate the state.
    * For example, it may load a component class, or some service code.
-   * The function must retur a promise which resolves when loading is complete.
+   * The function must return a promise which resolves when loading is complete.
    *
    * For example, this code lazy loads a service before the `abc` state is activated:
    *
