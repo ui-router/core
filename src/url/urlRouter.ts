@@ -87,12 +87,25 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
   /** @inheritdoc */
   sort(compareFn?: (a: UrlRule, b: UrlRule) => number) {
-    this._rules.sort(this._sortFn = compareFn || this._sortFn);
+    this._rules = this.stableSort(this._rules, this._sortFn = compareFn || this._sortFn);
     this._sorted = true;
   }
 
   private ensureSorted() {
     this._sorted || this.sort();
+  }
+
+  private stableSort(arr, compareFn) {
+    const arrOfWrapper = arr.map((elem, idx) => ({ elem, idx }));
+
+    arrOfWrapper.sort((wrapperA, wrapperB) => {
+      const cmpDiff = compareFn(wrapperA.elem, wrapperB.elem);
+      return cmpDiff === 0
+        ? wrapperA.idx - wrapperB.idx
+        : cmpDiff;
+    });
+
+    return arrOfWrapper.map(wrapper => wrapper.elem);
   }
 
   /**
