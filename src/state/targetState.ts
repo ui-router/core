@@ -66,8 +66,8 @@ export class TargetState {
   }
 
   /** The name of the state this object targets */
-  name(): String {
-    return this._definition && this._definition.name || <String> this._identifier;
+  name(): string {
+    return this._definition && this._definition.name || <string> this._identifier;
   }
 
   /** The identifier used when creating this TargetState */
