@@ -135,7 +135,7 @@ export class PathUtils {
     entering              = toPath.slice(keep);
     to                    = (retainedWithToParams).concat(entering);
 
-    return { from, to, retained, exiting, entering };
+    return { from, to, retained: retainedWithToParams, exiting, entering };
   }
 
   /**
