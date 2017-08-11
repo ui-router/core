@@ -6,6 +6,7 @@ stats.html
 
 # common
 *~
+**/.*
 node_modules
 bower_components
 lib
