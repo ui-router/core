@@ -38,7 +38,7 @@ export class UrlRuleFactory {
     const makeRule = pattern([
       [isString,       (_what: string)         => makeRule(this.compile(_what))],
       [is(UrlMatcher), (_what: UrlMatcher)     => this.fromUrlMatcher(_what, handler)],
-      [isState,        (_what: StateObject)          => this.fromState(_what, this.router)],
+      [isState,        (_what: StateObject)    => this.fromState(_what, this.router)],
       [is(RegExp),     (_what: RegExp)         => this.fromRegExp(_what, handler)],
       [isFunction,     (_what: UrlRuleMatchFn) => new BaseUrlRule(_what, handler as UrlRuleHandlerFn)],
     ]);
