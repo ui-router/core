@@ -4,10 +4,11 @@
   "version": "5.0.5",
   "scripts": {
     "clean": "shx rm -rf lib lib-esm _bundles",
-    "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && npm run fixdts && npm run bundle",
+    "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && npm run fixdts && npm run bundle && npm run fixmaps",
     "bundle": "rollup -c && rollup -c --environment MINIFY",
     "fixdts": "dts-downlevel 'lib/**/*.d.ts' 'lib-esm/**/*.d.ts'",
-    "install": "node ./migrate/migratewarn.js",
+    "fixmaps": "node scripts/modify_sourcemap_paths.js",
+    "install": "node migrate/migratewarn.js",
     "prepare": "npm run build",
     "test": "karma start",
     "watch": "run-p watch:*",
@@ -55,8 +56,8 @@
   "engines": {
     "node": ">=4.0.0"
   },
+  "main": "_bundles/ui-router-core.js",
   "jsnext:main": "lib-esm/index.js",
-  "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "license": "MIT",
   "devDependencies": {
@@ -68,6 +69,7 @@
     "conventional-changelog-ui-router-core": "^1.4.1",
     "core-js": "^2.4.1",
     "dts-downlevel": "^0.3.0",
+    "glob": "^7.1.2",
     "jasmine-core": "^2.4.1",
     "karma": "^1.2.0",
     "karma-chrome-launcher": "~0.1.0",

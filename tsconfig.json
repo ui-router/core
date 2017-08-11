@@ -10,7 +10,8 @@
     "rootDir": "src",
     "outDir": "lib",
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "inlineSources": true
   },
   "files": [
     "src/index.ts", "src/vanilla.ts"
