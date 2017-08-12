@@ -1,8 +1,8 @@
-import { UrlMatcher } from "../src/index";
 import { UIRouter } from "../src/router";
 import { UrlService } from "../src/url/urlService";
 import * as vanilla from "../src/vanilla";
 import { UrlMatcherFactory } from "../src/url/urlMatcherFactory";
+import { BrowserLocationConfig } from '../src/vanilla';
 
 describe('browserHistory implementation', () => {
 
@@ -18,7 +18,7 @@ describe('browserHistory implementation', () => {
 
     mockHistory = {
       replaceState: (a, b, url) => mockLocation.href = url,
-      pushState: (a, b, url) => mockLocation.href = url
+      pushState: (a, b, url) => mockLocation.href = url,
     };
 
     mockLocation = {
@@ -26,14 +26,14 @@ describe('browserHistory implementation', () => {
       pathname: "/",
       search: "",
       get href() {
-        return this._href
+        return this._href;
       },
       set href(val) {
         this._href = val;
-        var [pathname, search] = val.split("?");
+        let [pathname, search] = val.split("?");
         this.pathname = pathname;
         this.search = search ? "?" + search : "";
-      }
+      },
     };
 
     plugin.service._history = mockHistory;
@@ -51,7 +51,7 @@ describe('browserHistory implementation', () => {
 
     router.stateRegistry.register({
       url: '/path/:urlParam?queryParam',
-      name: 'path'
+      name: 'path',
     });
   });
 
@@ -71,7 +71,8 @@ describe('browserHistory implementation', () => {
   });
 
   it('returns the correct url query', async(done) => {
-    let service = mockPushState(router);
+    mockPushState(router);
+
     expect(router.urlService.config.html5Mode()).toBe(true);
 
     await router.stateService.go('path', { urlParam: 'bar' });
@@ -89,8 +90,16 @@ describe('browserHistory implementation', () => {
 
     expect($url.path()).toBe('/path/bar');
     expect($url.search()).toEqual({ queryParam: 'query' });
+    expect($url.search()).toEqual({ queryParam: 'query' });
 
     done();
   });
 
+  it('returns URL portions from the location object', () => {
+    const blc = new BrowserLocationConfig();
+
+    expect(blc.host()).toBe(location.hostname);
+    expect(blc.port()).toBe(parseInt(location.port, 10));
+    expect(blc.protocol() + ":").toBe(location.protocol);
+  });
 });

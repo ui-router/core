@@ -235,6 +235,11 @@ describe("UrlRouter", function () {
     it('should return URLs with #fragments', function () {
       expect(urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' })).toBe('#/hello/world#frag');
     });
+
+    it('should return absolute URLs', function () {
+      let actual = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
+      expect(actual).toBe('http://localhost/#/hello/world#frag');
+    });
   });
 
   describe('Url Rule priority', () => {

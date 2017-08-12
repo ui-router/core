@@ -26,7 +26,7 @@ export class BrowserLocationConfig implements LocationConfig {
   }
 
   host(): string {
-    return location.host;
+    return location.hostname;
   }
 
   html5Mode(): boolean {
