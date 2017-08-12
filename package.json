@@ -63,7 +63,7 @@
   "devDependencies": {
     "@types/jasmine": "^2.5.47",
     "@types/jquery": "^1.10.31",
-    "@uirouter/publish-scripts": "^1.0.0",
+    "@uirouter/publish-scripts": "^1.0.5",
     "awesome-typescript-loader": "3.0.0-beta.10",
     "conventional-changelog": "^1.1.0",
     "conventional-changelog-cli": "^1.1.1",
