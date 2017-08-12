@@ -1,3 +1,15 @@
+## Changes in `@uirouter/core` between versions [5.0.5 and 5.0.6](https://github.com/ui-router/core/compare/5.0.5...5.0.6) (2017-08-12)
+
+
+### Bug Fixes
+
+* **sourceMaps:** Embed typescript sources in sourcemaps ([10558a3](https://github.com/ui-router/core/commit/10558a3))
+* **typescript:** Fix strictNullCheck type error ([0ae585e](https://github.com/ui-router/core/commit/0ae585e))
+* **urlRouter:** Fix absolute 'href' generation by using location.hostname (not location.host) ([a28b68a](https://github.com/ui-router/core/commit/a28b68a))
+* **urlService:** Fix priority sorting of URL rules ([73a1fe0](https://github.com/ui-router/core/commit/73a1fe0))
+
+
+
 ## Changes in `@uirouter/core` between versions [5.0.4 and 5.0.5](https://github.com/ui-router/core/compare/5.0.4...5.0.5) (2017-06-29)
 
 
