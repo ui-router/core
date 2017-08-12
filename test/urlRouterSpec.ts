@@ -12,15 +12,18 @@ let _anything = jasmine.anything();
 describe("UrlRouter", function () {
   let router: UIRouter;
   let urlRouter: UrlRouter,
-      urlService: UrlService,
-      urlMatcherFactory: UrlMatcherFactory,
-      stateService: StateService,
-      stateRegistry: StateRegistry,
-      locationService: LocationServices;
+    urlService: UrlService,
+    urlMatcherFactory: UrlMatcherFactory,
+    stateService: StateService,
+    stateRegistry: StateRegistry,
+    locationService: LocationServices;
 
   const matcher = (...strings: string[]) =>
-      strings.reduce((prev: UrlMatcher, str) =>
-          prev ? prev.append(urlMatcherFactory.compile(str)) : urlMatcherFactory.compile(str), undefined);
+    strings.reduce((prev: UrlMatcher, str) =>
+      prev ? prev.append(urlMatcherFactory.compile(str)) : urlMatcherFactory.compile(str), undefined);
+
+  const matcherRule = (...strings: string[]) =>
+    urlRouter.urlRuleFactory.create(matcher(...strings));
 
   beforeEach(function() {
     router = new UIRouter();
@@ -300,6 +303,31 @@ describe("UrlRouter", function () {
 
       urlService.url("/foo/xyz/123/tail");
       expect(matchlog).toEqual(['AAA', 'p1']);
+    });
+
+    // Tests for https://github.com/ui-router/core/issues/66
+    it("should sort shorter paths before longer paths, all else equal", () => {
+      const cmp = (urlRouter as any)._sortFn;
+      expect(cmp(matcherRule('/'), matcherRule('/a'))).toBeLessThan(0);
+      expect(cmp(matcherRule('/a'), matcherRule('/a/b'))).toBeLessThan(0);
+      expect(cmp(matcherRule('/a'), matcherRule('/a/:id'))).toBeLessThan(0);
+      expect(cmp(matcherRule('/a/b'), matcherRule('/a/b/c'))).toBeLessThan(0);
+    });
+
+    it("should sort static strings before params", () => {
+      const cmp = (urlRouter as any)._sortFn;
+      expect(cmp(matcherRule('/a'), matcherRule('/:id'))).toBeLessThan(0);
+      expect(cmp(matcherRule('/a/:id'), matcherRule('/:id2/:id3'))).toBeLessThan(0);
+      expect(cmp(matcherRule('/a/:id/:id2'), matcherRule('/:id3/:id4/:id5'))).toBeLessThan(0);
+      expect(cmp(matcherRule('/a/:id/b/c'), matcherRule('/d/:id2/e/:id3'))).toBeLessThan(0);
+    });
+
+    it("should sort same-level paths equally", () => {
+      const cmp = (urlRouter as any)._sortFn;
+      expect(cmp(matcherRule('/a'), matcherRule('/b'))).toBe(0);
+      expect(cmp(matcherRule('/a/x'), matcherRule('/b/x'))).toBe(0);
+      expect(cmp(matcherRule('/:id1'), matcherRule('/:id2'))).toBe(0);
+      expect(cmp(matcherRule('/a/:id1'), matcherRule('/b/:id2'))).toBe(0);
     });
 
     it("should prioritize a path with a static string over a param 6", () => {
