@@ -3,16 +3,16 @@
  * @module url
  */
 /** for typedoc */
-import { composeSort, createProxyFunctions, extend, inArray, removeFrom, sortBy } from '../common/common';
+import { createProxyFunctions, extend, removeFrom } from '../common/common';
 import { isDefined, isFunction, isString } from '../common/predicates';
 import { UrlMatcher } from './urlMatcher';
 import { RawParams } from '../params/interface';
 import { Disposable } from '../interface';
 import { UIRouter } from '../router';
-import { is, pattern, pipe, prop, val } from '../common/hof';
+import { is, pattern, val } from '../common/hof';
 import { UrlRuleFactory } from './urlRule';
 import { TargetState } from '../state/targetState';
-import { MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi, UrlSyncApi } from './interface';
+import { MatcherUrlRule, MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi, UrlSyncApi, } from './interface';
 import { TargetStateDef } from '../state/interface';
 
 /** @hidden */
@@ -24,7 +24,26 @@ function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHr
 }
 
 /** @hidden */
-const getMatcher = prop("urlMatcher");
+const prioritySort = (a: UrlRule, b: UrlRule) =>
+  (b.priority || 0) - (a.priority || 0);
+
+/** @hidden */
+const typeSort = (a: UrlRule, b: UrlRule) => {
+  const weights = { "STATE": 4, "URLMATCHER": 4, "REGEXP": 3, "RAW": 2, "OTHER": 1 };
+  return (weights[a.type] || 0) - (weights[b.type] || 0);
+};
+
+/** @hidden */
+const urlMatcherSort = (a: MatcherUrlRule, b: MatcherUrlRule) =>
+  !a.urlMatcher || !b.urlMatcher ? 0 : UrlMatcher.compare(a.urlMatcher, b.urlMatcher);
+
+/** @hidden */
+const idSort = (a: UrlRule, b: UrlRule) => {
+  // Identically sorted STATE and URLMATCHER best rule will be chosen by `matchPriority` after each rule matches the URL
+  const useMatchPriority = { STATE: true, URLMATCHER: true };
+  const equal = useMatchPriority[a.type] && useMatchPriority[b.type];
+  return equal ? 0 : (a.$id || 0) - (b.$id || 0);
+};
 
 /**
  * Default rule priority sorting function.
@@ -34,17 +53,25 @@ const getMatcher = prop("urlMatcher");
  * - Explicit priority (set rule priority using [[UrlRulesApi.when]])
  * - Rule type (STATE: 4, URLMATCHER: 4, REGEXP: 3, RAW: 2, OTHER: 1)
  * - `UrlMatcher` specificity ([[UrlMatcher.compare]]): works for STATE and URLMATCHER types to pick the most specific rule.
- * - Registration order (for rule types other than STATE and URLMATCHER)
+ * - Rule registration order (for rule types other than STATE and URLMATCHER)
+ *   - Equally sorted State and UrlMatcher rules will each match the URL.
+ *     Then, the *best* match is chosen based on how many parameter values were matched.
  *
  * @coreapi
  */
 let defaultRuleSortFn: (a: UrlRule, b: UrlRule) => number;
-defaultRuleSortFn = composeSort(
-    sortBy(pipe(prop("priority"), x => -x)),
-    sortBy(pipe(prop("type"), type => ({ "STATE": 4, "URLMATCHER": 4, "REGEXP": 3, "RAW": 2, "OTHER": 1 })[type])),
-    (a, b) => (getMatcher(a) && getMatcher(b)) ? UrlMatcher.compare(getMatcher(a), getMatcher(b)) : 0,
-    sortBy(prop("$id"), inArray([ "REGEXP", "RAW", "OTHER" ])),
-);
+defaultRuleSortFn = (a, b) => {
+  let cmp = prioritySort(a, b);
+  if (cmp !== 0) return cmp;
+
+  cmp = typeSort(a, b);
+  if (cmp !== 0) return cmp;
+
+  cmp = urlMatcherSort(a as MatcherUrlRule, b as MatcherUrlRule);
+  if (cmp !== 0) return cmp;
+
+  return idSort(a, b);
+};
 
 /**
  * Updates URL and responds to URL changes
@@ -229,7 +256,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   href(urlMatcher: UrlMatcher, params?: any, options?: { absolute: boolean }): string {
     let url = urlMatcher.format(params);
     if (url == null) return null;
-    
+
     options = options || { absolute: false };
 
     let cfg = this._router.urlService.config;

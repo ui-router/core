@@ -525,7 +525,18 @@ export class UrlMatcher {
               if (segment instanceof Param) return 3;
             });
 
-    let cmp, i, pairs = arrayTuples(weights(a), weights(b));
+    /**
+     * Pads shorter array in-place (mutates)
+     */
+    const padArrays = (l: any[], r: any[], padVal: any) => {
+      const len = Math.max(l.length, r.length);
+      while (l.length < len) l.push(padVal);
+      while (r.length < len) r.push(padVal);
+    };
+
+    const weightsA = weights(a), weightsB = weights(b);
+    padArrays(weightsA, weightsB, 0);
+    let cmp, i, pairs = arrayTuples(weightsA, weightsB);
 
     for (i = 0; i < pairs.length; i++) {
       cmp = pairs[i][0] - pairs[i][1];
