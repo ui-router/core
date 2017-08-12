@@ -7,8 +7,8 @@
  * @module common
  */
 /** for typedoc */
-import { isFunction, isString, isArray, isRegExp, isDate, isDefined } from "./predicates";
-import { all, any, prop, curry, val, not } from "./hof";
+import { isFunction, isString, isArray, isRegExp, isDate } from "./predicates";
+import { all, any, prop, curry, not } from "./hof";
 import { services } from "./coreservices";
 import { StateObject } from "../state/stateObject";
 
@@ -56,7 +56,7 @@ export type Predicate<X> = (x?: X) => boolean;
 export type IInjectable = (Function|any[]);
 
 export interface Obj extends Object {
-  [key: string]: any
+  [key: string]: any;
 }
 
 /**
@@ -139,32 +139,6 @@ export function createProxyFunctions(source: Function, target: Obj, bind: Functi
  */
 export const inherit = (parent: Obj, extra?: Obj) =>
     extend(Object.create(parent), extra);
-
-/**
- * Given an arguments object, converts the arguments at index idx and above to an array.
- * This is similar to es6 rest parameters.
- *
- * Optionally, the argument at index idx may itself already be an array.
- *
- * For example,
- * given either:
- *        arguments = [ obj, "foo", "bar" ]
- * or:
- *        arguments = [ obj, ["foo", "bar"] ]
- * then:
- *        restArgs(arguments, 1) == ["foo", "bar"]
- *
- * This allows functions like pick() to be implemented such that it allows either a bunch
- * of string arguments (like es6 rest parameters), or a single array of strings:
- *
- * given:
- *        var obj = { foo: 1, bar: 2, baz: 3 };
- * then:
- *        pick(obj, "foo", "bar");   // returns { foo: 1, bar: 2 }
- *        pick(obj, ["foo", "bar"]); // returns { foo: 1, bar: 2 }
- */
-const restArgs = (args: IArguments, idx = 0) =>
-    Array.prototype.concat.apply(Array.prototype, Array.prototype.slice.call(args, idx));
 
 /** Given an array, returns true if the object is found in the array, (using indexOf) */
 export const inArray: typeof _inArray = curry(_inArray) as any;
@@ -316,10 +290,10 @@ export function find(collection: any, callback: any) {
 }
 
 /** Given an object, returns a new object, where each property is transformed by the callback function */
-export let mapObj: <T,U>(collection: { [key: string]: T }, callback: Mapper<T,U>) => { [key: string]: U } = map;
+export let mapObj: <T, U>(collection: { [key: string]: T }, callback: Mapper<T, U>) => { [key: string]: U } = map;
 /** Given an array, returns a new array, where each element is transformed by the callback function */
 export function map<T, U>(collection: T[], callback: Mapper<T, U>): U[];
-export function map<T, U>(collection: { [key: string]: T }, callback: Mapper<T, U>): { [key: string]: U }
+export function map<T, U>(collection: { [key: string]: T }, callback: Mapper<T, U>): { [key: string]: U };
 /** Maps an array or object properties using a callback function */
 export function map(collection: any, callback: any): any {
   let result = isArray(collection) ? [] : {};
@@ -618,60 +592,6 @@ function _arraysEq(a1: any[], a2: any[]) {
   if (a1.length !== a2.length) return false;
   return arrayTuples(a1, a2).reduce((b, t) => b && _equals(t[0], t[1]), true);
 }
-
-export type sortfn = (a: any, b: any) => number;
-
-/**
- * Create a sort function
- *
- * Creates a sort function which sorts by a numeric property.
- *
- * The `propFn` should return the property as a number which can be sorted.
- *
- * #### Example:
- * This example returns the `priority` prop.
- * ```js
- * var sortfn = sortBy(obj => obj.priority)
- * // equivalent to:
- * var longhandSortFn = (a, b) => a.priority - b.priority;
- * ```
- *
- * #### Example:
- * This example uses [[prop]]
- * ```js
- * var sortfn = sortBy(prop('priority'))
- * ```
- *
- * The `checkFn` can be used to exclude objects from sorting.
- *
- * #### Example:
- * This example only sorts objects with type === 'FOO'
- * ```js
- * var sortfn = sortBy(prop('priority'), propEq('type', 'FOO'))
- * ```
- *
- * @param propFn a function that returns the property (as a number)
- * @param checkFn a predicate
- *
- * @return a sort function like: `(a, b) => (checkFn(a) && checkFn(b)) ? propFn(a) - propFn(b) : 0`
- */
-export const sortBy = (propFn: (a) => number, checkFn: Predicate<any> = val(true)) =>
-    (a, b) =>
-        (checkFn(a) && checkFn(b)) ? propFn(a) - propFn(b) : 0;
-
-/**
- * Composes a list of sort functions
- *
- * Creates a sort function composed of multiple sort functions.
- * Each sort function is invoked in series.
- * The first sort function to return non-zero "wins".
- *
- * @param sortFns list of sort functions
- */
-export const composeSort = (...sortFns: sortfn[]): sortfn =>
-    function composedSort(a, b) {
-      return sortFns.reduce((prev, fn) => prev || fn(a, b), 0);
-    };
 
 // issue #2676
 export const silenceUncaughtInPromise = (promise: Promise<any>) =>
