@@ -475,6 +475,17 @@ describe('transition', function () {
               .then(done);
         }));
 
+        it('should be called if an onBefore hook fails.', ((done) => {
+          let states = [];
+          $transitions.onBefore({ from: "A", entering: "C" }, function() { throw new Error("oops!");  });
+          $transitions.onError({ }, function(trans) { states.push(trans.to().name); });
+
+          Promise.resolve()
+              .then(goFail("A", "D"))
+              .then(() => expect(states).toEqual([ 'D' ]))
+              .then(done);
+        }));
+
         it('should be called for only handlers matching the transition.', ((done) => {
           let hooks = [];
           $transitions.onEnter({ from: "A", entering: "C" }, function() { throw new Error("oops!");  });
