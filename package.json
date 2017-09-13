@@ -67,7 +67,6 @@
     "awesome-typescript-loader": "3.0.0-beta.10",
     "conventional-changelog": "^1.1.0",
     "conventional-changelog-cli": "^1.1.1",
-    "conventional-changelog-ui-router-core": "^1.4.1",
     "core-js": "^2.4.1",
     "dts-downlevel": "^0.3.0",
     "glob": "^7.1.2",
