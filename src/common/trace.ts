@@ -34,7 +34,7 @@
  * @module trace
  */ /** for typedoc */
 import {parse} from "../common/hof";
-import {isNumber} from "../common/predicates";
+import {isFunction, isNumber} from "../common/predicates";
 import {Transition}  from "../transition/transition";
 import {ActiveUIView, ViewConfig, ViewContext}  from "../view/interface";
 import {stringify, functionToString, maxLength, padString} from "./strings";
@@ -64,6 +64,8 @@ function normalizedCat(input: Category|string): string {
   return isNumber(input) ? Category[input] : Category[Category[input]];
 }
 
+/** @hidden */
+const consoletable = isFunction(console.table) ? console.table.bind(console) : console.log.bind(console);
 
 /**
  * Trace categories Enum
@@ -229,7 +231,7 @@ export class Trace {
       return { 'ui-view fqn': uiView, 'state: view name': view };
     }).sort((a, b) => a['ui-view fqn'].localeCompare(b['ui-view fqn']));
 
-    console.table(mapping);
+    consoletable(mapping);
   }
 
   /** @internalapi called by ui-router code */

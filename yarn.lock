@@ -10,7 +10,7 @@
   version "1.10.33"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-1.10.33.tgz#6c4c279f8d06839b184950432e880e0a469a64a1"
 
-"@uirouter/publish-scripts@^1.0.5":
+"@uirouter/publish-scripts@^1.0.7":
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-1.0.7.tgz#99ffd6aeced41e96b92ccb007342eee5d14b0a9a"
   dependencies:
@@ -650,14 +650,6 @@ conventional-changelog-jshint@^0.1.0:
   resolved "https://registry.yarnpkg.com/conventional-changelog-jshint/-/conventional-changelog-jshint-0.1.0.tgz#00cab8e9a3317487abd94c4d84671342918d2a07"
   dependencies:
     compare-func "^1.3.1"
-    q "^1.4.1"
-
-conventional-changelog-ui-router-core@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/conventional-changelog-ui-router-core/-/conventional-changelog-ui-router-core-1.4.1.tgz#8ef76e7960458d9be2539fe673a4b6c853b9dbf3"
-  dependencies:
-    compare-func "^1.3.1"
-    github-url-from-git "^1.4.0"
     q "^1.4.1"
 
 conventional-changelog-ui-router-core@^1.4.2:
