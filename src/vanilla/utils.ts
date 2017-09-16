@@ -78,3 +78,20 @@ export function locationPluginFactory(
   };
 }
 
+export function getCustomEventCtor(): typeof CustomEvent {
+  // CustomEvent Polyfill
+  function _CustomEvent(event, params) {
+    params = params || { bubbles: false, cancelable: false, detail: undefined };
+    let evt = document.createEvent( 'CustomEvent' );
+    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+    return evt;
+  }
+  _CustomEvent.prototype = Event.prototype;
+
+  try {
+    new CustomEvent('foo');
+    return CustomEvent;
+  } catch (_err) {
+    return _CustomEvent as any;
+  }
+}

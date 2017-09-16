@@ -7,9 +7,12 @@ import { LocationServices } from "../common/coreservices";
 import { Disposable } from "../interface";
 import { UIRouter } from "../router";
 import { LocationLike, HistoryLike } from "./interface";
-import { parseUrl, getParams, buildUrl } from "./utils";
+import { parseUrl, getParams, buildUrl, getCustomEventCtor } from "./utils";
 import { isDefined } from "../common/predicates";
 import { extend, deregAll, removeFrom } from "../common/common";
+
+const Evt: typeof CustomEvent = getCustomEventCtor();
+
 /** A base `LocationServices` */
 export abstract class BaseLocationServices implements LocationServices, Disposable {
   constructor(router: UIRouter, public fireAfterUpdate: boolean) {
@@ -59,7 +62,7 @@ export abstract class BaseLocationServices implements LocationServices, Disposab
       this._set(null, null, url, replace);
 
       if (this.fireAfterUpdate) {
-        let evt = extend(new Event("locationchange"), { url });
+        let evt = extend(new Evt("locationchange"), { url });
         this._listeners.forEach(cb => cb(evt));
       }
     }
