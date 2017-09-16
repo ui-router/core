@@ -348,7 +348,7 @@ describe('transition', function () {
       });
 
       describe('.onExit()', function() {
-        it('should get Transition, the state being exited, and Injector as arguments', ((done) => {
+        it('should get Transition and the state being exited as arguments', ((done) => {
           let args = { trans: undefined, state: undefined, third: undefined };
           let states = [];
 

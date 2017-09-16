@@ -12,10 +12,11 @@ import { PathUtils } from "../path/pathFactory";
 import { stringify } from "../common/strings";
 import { Transition } from "../transition/transition";
 import { UIInjector } from "../interface";
+import { isUndefined } from '../common';
 
-const when = resolvePolicies.when;
-const ALL_WHENS = [when.EAGER, when.LAZY];
-const EAGER_WHENS = [when.EAGER];
+const whens = resolvePolicies.when;
+const ALL_WHENS = [whens.EAGER, whens.LAZY];
+const EAGER_WHENS = [whens.EAGER];
 
 export const NATIVE_INJECTOR_TOKEN: string = "Native Injector";
 
@@ -105,7 +106,7 @@ export class ResolveContext {
     let keys = newResolvables.map(r => r.token);
     node.resolvables = node.resolvables.filter(r => keys.indexOf(r.token) === -1).concat(newResolvables);
   }
-  
+
   /**
    * Returns a promise for an array of resolved path Element promises
    *
@@ -119,7 +120,7 @@ export class ResolveContext {
     // If the caller specified EAGER, only the EAGER Resolvables are fetched.
     // if the caller specified LAZY, both EAGER and LAZY Resolvables are fetched.`
     let matchedWhens = whenOption === resolvePolicies.when.EAGER ? EAGER_WHENS : ALL_WHENS;
-    
+
     // get the subpath to the state argument, if provided
     trace.traceResolvePath(this._path, when, trans);
 
@@ -166,7 +167,7 @@ export class ResolveContext {
     // subpath stopping at resolvable's node, or the whole path (if the resolvable isn't in the path)
     let subPath: PathNode[] = PathUtils.subPath(this._path, x => x === node) || this._path;
     let availableResolvables: Resolvable[] = subPath
-        .reduce((acc, node) => acc.concat(node.resolvables), []) //all of subpath's resolvables
+        .reduce((acc, _node) => acc.concat(_node.resolvables), []) //all of subpath's resolvables
         .filter(res => res !== resolvable); // filter out the `resolvable` argument
 
     const getDependency = (token: any) => {
@@ -174,7 +175,7 @@ export class ResolveContext {
       if (matching.length) return tail(matching);
 
       let fromInjector = this.injector().getNative(token);
-      if (!fromInjector) {
+      if (isUndefined(fromInjector)) {
         throw new Error("Could not find Dependency Injection token: " + stringify(token));
       }
 
@@ -204,7 +205,8 @@ class UIInjectorImpl implements UIInjector {
       }
       return resolvable.data;
     }
-    return this.native && this.native.get(token);
+
+    return this.getNative(token);
   }
 
   getAsync(token: any) {
