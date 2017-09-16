@@ -7,8 +7,8 @@ import { StateDeclaration, StateOrName, TargetStateDef } from "./interface";
 import { ParamsOrArray } from "../params/interface";
 import { TransitionOptions } from "../transition/interface";
 import { StateObject } from "./stateObject";
-import { toJson } from "../common/common";
 import { isString } from "../common/predicates";
+import { stringify } from '../common/strings';
 
 /**
  * Encapsulate the target (destination) state/params/options of a [[Transition]].
@@ -119,7 +119,7 @@ export class TargetState {
   }
 
   toString() {
-    return `'${this.name()}'${toJson(this.params())}`;
+    return `'${this.name()}'${stringify(this.params())}`;
   }
 
   /** Returns true if the object has a state property that might be a state or state name */

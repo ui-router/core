@@ -5,9 +5,8 @@
 /** for typedoc */
 import { trace } from '../common/trace';
 import { services } from '../common/coreservices';
-import {
-  map, find, extend, mergeR, tail, omit, toJson, arrayTuples, unnestR, identity, anyTrueR,
-} from '../common/common';
+import { stringify } from '../common/strings';
+import { map, find, extend, mergeR, tail, omit, arrayTuples, unnestR, identity, anyTrueR } from '../common/common';
 import {isObject, isUndefined} from '../common/predicates';
 import { prop, propEq, val, not, is } from '../common/hof';
 import { StateDeclaration, StateOrName } from '../state/interface';
@@ -753,10 +752,10 @@ export class Transition implements IHookRegistry {
     // (X) means the to state is invalid.
     let id = this.$id,
         from = isObject(fromStateOrName) ? fromStateOrName.name : fromStateOrName,
-        fromParams = toJson(avoidEmptyHash(this._treeChanges.from.map(prop('paramValues')).reduce(mergeR, {}))),
+        fromParams = stringify(avoidEmptyHash(this._treeChanges.from.map(prop('paramValues')).reduce(mergeR, {}))),
         toValid = this.valid() ? "" : "(X) ",
         to = isObject(toStateOrName) ? toStateOrName.name : toStateOrName,
-        toParams = toJson(avoidEmptyHash(this.params()));
+        toParams = stringify(avoidEmptyHash(this.params()));
 
     return `Transition#${id}( '${from}'${fromParams} -> ${toValid}'${to}'${toParams} )`;
   }

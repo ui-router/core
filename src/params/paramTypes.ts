@@ -286,7 +286,7 @@ function initDefaultTypes() {
       encode: (val: any) => val && 1 || 0,
       decode: (val: string) => parseInt(val, 10) !== 0,
       is: is(Boolean),
-      pattern: /0|1/
+      pattern: /0|1/,
     }),
 
     date: makeDefaultType({
@@ -294,7 +294,7 @@ function initDefaultTypes() {
         return !this.is(val) ? undefined : [
           val.getFullYear(),
           ('0' + (val.getMonth() + 1)).slice(-2),
-          ('0' + val.getDate()).slice(-2)
+          ('0' + val.getDate()).slice(-2),
         ].join("-");
       },
       decode: function(val: string) {
@@ -305,10 +305,10 @@ function initDefaultTypes() {
       is: (val: any) => val instanceof Date && !isNaN(val.valueOf()),
       equals(l: any, r: any) {
         return ['getFullYear', 'getMonth', 'getDate']
-            .reduce((acc, fn) => acc && l[fn]() === r[fn](), true)
+            .reduce((acc, fn) => acc && l[fn]() === r[fn](), true);
       },
       pattern: /[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[1-2][0-9]|3[0-1])/,
-      capture: /([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/
+      capture: /([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/,
     }),
 
     json: makeDefaultType({
@@ -316,7 +316,7 @@ function initDefaultTypes() {
       decode: fromJson,
       is: is(Object),
       equals: equals,
-      pattern: /[^/]*/
+      pattern: /[^/]*/,
     }),
 
     // does not encode/decode
@@ -326,8 +326,7 @@ function initDefaultTypes() {
       is: () => true,
       equals: equals,
     }),
-  })
-
+  });
 }
 
 initDefaultTypes();
