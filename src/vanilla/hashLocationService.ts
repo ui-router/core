@@ -11,7 +11,7 @@ import { BaseLocationServices } from "./baseLocationService";
 export class HashLocationService extends BaseLocationServices {
   constructor(router: UIRouter) {
     super(router, false);
-    window.addEventListener('hashchange', this._listener, false);
+    self.addEventListener('hashchange', this._listener, false);
   }
 
   _get() {
@@ -23,7 +23,7 @@ export class HashLocationService extends BaseLocationServices {
 
   dispose (router: UIRouter) {
     super.dispose(router);
-    window.removeEventListener('hashchange', this._listener);
+    self.removeEventListener('hashchange', this._listener);
   }
 }
 

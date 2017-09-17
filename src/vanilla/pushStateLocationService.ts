@@ -19,7 +19,7 @@ export class PushStateLocationService extends BaseLocationServices {
   constructor(router: UIRouter) {
     super(router, true);
     this._config = router.urlService.config;
-    window.addEventListener("popstate", this._listener, false);
+    self.addEventListener("popstate", this._listener, false);
   };
 
   _get() {
@@ -42,7 +42,7 @@ export class PushStateLocationService extends BaseLocationServices {
 
   dispose(router: UIRouter) {
     super.dispose(router);
-    window.removeEventListener("popstate", this._listener);
+    self.removeEventListener("popstate", this._listener);
   }
 }
 

@@ -16,8 +16,8 @@ const Evt: typeof CustomEvent = getCustomEventCtor();
 /** A base `LocationServices` */
 export abstract class BaseLocationServices implements LocationServices, Disposable {
   constructor(router: UIRouter, public fireAfterUpdate: boolean) {
-    this._location = window && window.location;
-    this._history = window && window.history;
+    this._location = self && self.location;
+    this._history = self && self.history;
   }
 
   _listener = evt => this._listeners.forEach(cb => cb(evt));
