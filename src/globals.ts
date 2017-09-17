@@ -7,8 +7,6 @@ import {StateDeclaration} from "./state/interface";
 import {StateObject} from "./state/stateObject";
 import {Transition} from "./transition/transition";
 import {Queue} from "./common/queue";
-import {TransitionService} from "./transition/transitionService";
-import {copy} from "./common/common";
 import { Disposable } from './interface';
 
 /**

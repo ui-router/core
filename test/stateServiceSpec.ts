@@ -426,6 +426,27 @@ describe('stateService', function () {
 
           done();
         });
+
+        it('performs a shallow copy to $stateParams (for object parameters)', async (done) => {
+          const x = { foo: '123' }, y = { bar: 'abc' };
+          await $state.go('D', { x, y });
+
+          expect($state.params.x).toBe(x);
+          expect($state.params.y).toBe(y);
+
+          done();
+        });
+
+        it('updates the object reference in-place', async (done) => {
+          const params = $state.params;
+          const x = { foo: '123' };
+          await $state.go('D', { x });
+
+          expect($state.params.x).toBe(x);
+          expect(params).toBe($state.params);
+
+          done();
+        });
       });
     });
 

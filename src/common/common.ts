@@ -16,7 +16,6 @@ let w: any = typeof window === 'undefined' ? {} : window;
 let angular = w.angular || {};
 export const fromJson = angular.fromJson || JSON.parse.bind(JSON);
 export const toJson = angular.toJson || JSON.stringify.bind(JSON);
-export const copy = angular.copy || _copy;
 export const forEach = angular.forEach || _forEach;
 export const extend = Object.assign || _extend;
 export const equals = angular.equals || _equals;
@@ -528,11 +527,8 @@ export function tail<T>(arr: T[]): T {
 
 /**
  * shallow copy from src to dest
- *
- * note: This is a shallow copy, while angular.copy is a deep copy.
- * ui-router uses `copy` only to make copies of state parameters.
  */
-function _copy(src: Obj, dest: Obj) {
+export function copy(src: Obj, dest?: Obj) {
   if (dest) Object.keys(dest).forEach(key => delete dest[key]);
   if (!dest) dest = {};
   return extend(dest, src);
