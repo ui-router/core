@@ -4,9 +4,9 @@
  */
 /** */
 import { LocationConfig } from "../common/coreservices";
-import { splitQuery, splitHash } from "./utils";
 import { UIRouter } from "../router";
 import { BaseLocationServices } from "./baseLocationService";
+import { splitQuery, splitHash, stripFile } from "../common/strings";
 
 /**
  * A `LocationServices` that gets/sets the current location using the browser's `location` and `history` apis
@@ -22,21 +22,41 @@ export class PushStateLocationService extends BaseLocationServices {
     self.addEventListener("popstate", this._listener, false);
   };
 
+  /**
+   * Gets the base prefix without:
+   * - trailing slash
+   * - trailing filename
+   * - protocol and hostname
+   *
+   * If <base href='/base/index.html'>, this returns '/base'.
+   * If <base href='http://localhost:8080/base/index.html'>, this returns '/base'.
+   *
+   * See: https://html.spec.whatwg.org/dev/semantics.html#the-base-element
+   */
+  _getBasePrefix() {
+    return stripFile(this._config.baseHref());
+  }
+
   _get() {
     let { pathname, hash, search } = this._location;
     search = splitQuery(search)[1]; // strip ? if found
     hash = splitHash(hash)[1]; // strip # if found
-    return pathname + (search ? "?" + search : "") + (hash ? "$" + search : "");
+
+    const basePrefix = this._getBasePrefix();
+    let exactMatch = pathname === this._config.baseHref();
+    let startsWith = pathname.startsWith(basePrefix);
+    pathname = exactMatch ? '/' : startsWith ? pathname.substring(basePrefix.length) : pathname;
+
+    return pathname + (search ? "?" + search : "") + (hash ? "#" + hash : "");
   }
 
   _set(state: any, title: string, url: string, replace: boolean) {
-    let { _config, _history } = this;
-    let fullUrl = _config.baseHref() + url;
+    let fullUrl = this._getBasePrefix() + url;
 
     if (replace) {
-      _history.replaceState(state, title, fullUrl);
+      this._history.replaceState(state, title, fullUrl);
     } else {
-      _history.pushState(state, title, fullUrl);
+      this._history.pushState(state, title, fullUrl);
     }
   }
 

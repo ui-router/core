@@ -6,6 +6,7 @@ import { UrlRouter } from "../src/url/urlRouter";
 import {StateDeclaration} from "../src/state/interface";
 import {tail} from "../src/common/common";
 import {Transition} from "../src/transition/transition";
+import { TestingPlugin } from './_testingPlugin';
 
 describe('future state', function () {
   let router: UIRouter;
@@ -16,8 +17,7 @@ describe('future state', function () {
 
   beforeEach(() => {
     router = new UIRouter();
-    router.plugin(vanilla.servicesPlugin);
-    router.plugin(vanilla.hashLocationPlugin);
+    router.plugin(TestingPlugin);
     $registry = router.stateRegistry;
     $state = router.stateService;
     $transitions = router.transitionService;

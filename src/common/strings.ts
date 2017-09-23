@@ -111,12 +111,19 @@ export function stringify(o: any) {
 }
 
 /** Returns a function that splits a string on a character or substring */
-export const beforeAfterSubstr = (char: string) => (str: string) => {
+export const beforeAfterSubstr = (char: string) => (str: string): string[] => {
   if (!str) return ["", ""];
   let idx = str.indexOf(char);
   if (idx === -1) return [str, ""];
   return [str.substr(0, idx), str.substr(idx + 1)];
 };
+
+export const hostRegex = new RegExp('^(?:[a-z]+:)?//[^/]+/');
+export const stripFile = (str: string) => str.replace(/\/[^/]*$/, '');
+export const splitHash = beforeAfterSubstr("#");
+export const splitQuery = beforeAfterSubstr("?");
+export const splitEqual = beforeAfterSubstr("=");
+export const trimHashVal = (str: string) => str ? str.replace(/^#/, "") : "";
 
 /**
  * Splits on a delimiter, but returns the delimiters in the array

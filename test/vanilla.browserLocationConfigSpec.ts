@@ -3,8 +3,10 @@ import { UrlService } from "../src/url/urlService";
 import * as vanilla from "../src/vanilla";
 import { UrlMatcherFactory } from "../src/url/urlMatcherFactory";
 import { BrowserLocationConfig } from '../src/vanilla';
+import { resetBrowserUrl } from './_testUtils';
 
-describe('browserHistory implementation', () => {
+describe('BrowserLocationConfig implementation', () => {
+  afterAll(() => resetBrowserUrl())
 
   let router: UIRouter;
   let $url: UrlService;

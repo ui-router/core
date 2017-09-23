@@ -3,7 +3,7 @@
  * @module vanilla
  */
 /** */
-import { trimHashVal } from "./utils";
+import { trimHashVal } from "../common/strings";
 import { UIRouter } from "../router";
 import { BaseLocationServices } from "./baseLocationService";
 

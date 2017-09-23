@@ -3,25 +3,10 @@
  * @module vanilla
  */
 /** */
-import { isArray } from "../common/index";
-import { LocationServices, LocationConfig } from "../common/coreservices";
+import {
+  LocationConfig, LocationServices, identity, unnestR, isArray, splitEqual, splitHash, splitQuery
+} from "../common";
 import { UIRouter } from "../router";
-import { identity, unnestR, removeFrom, deregAll, extend } from "../common/common";
-import { LocationLike, HistoryLike } from "./interface";
-import { isDefined } from "../common/predicates";
-import { Disposable } from "../interface";
-
-const beforeAfterSubstr = (char: string) => (str: string): string[] => {
-  if (!str) return ["", ""];
-  let idx = str.indexOf(char);
-  if (idx === -1) return [str, ""];
-  return [str.substr(0, idx), str.substr(idx + 1)];
-};
-
-export const splitHash = beforeAfterSubstr("#");
-export const splitQuery = beforeAfterSubstr("?");
-export const splitEqual = beforeAfterSubstr("=");
-export const trimHashVal = (str) => str ? str.replace(/^#/, "") : "";
 
 export const keyValsToObjectR = (accum, [key, val]) => {
   if (!accum.hasOwnProperty(key)) {

@@ -5,6 +5,7 @@ import { UrlService } from "../src/url/urlService";
 import { StateRegistry } from "../src/state/stateRegistry";
 import { noop } from "../src/common/common";
 import { UrlRule, MatchResult } from "../src/url/interface";
+import { pushStateLocationPlugin } from '../src/vanilla';
 
 declare let jasmine;
 let _anything = jasmine.anything();
@@ -239,6 +240,134 @@ describe("UrlRouter", function () {
     it('should return absolute URLs', function () {
       let actual = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
       expect(actual).toBe('http://localhost/#/hello/world#frag');
+    });
+
+    describe('in html5mode', () => {
+      let baseTag: HTMLBaseElement;
+      const applyBaseTag = (href: string) => {
+        baseTag = document.createElement('base');
+        baseTag.href = href;
+        document.head.appendChild(baseTag);
+      };
+
+      afterEach(() => baseTag.parentElement.removeChild(baseTag));
+
+      beforeEach(() => {
+        router.dispose(router.getPlugin('vanilla.memoryLocation'));
+        router.plugin(pushStateLocationPlugin);
+        router.urlService = new UrlService(router, false);
+      });
+
+      describe('with base="/base/"', () => {
+        beforeEach(() => applyBaseTag('/base/'));
+
+        it("should prefix the href with /base/", function () {
+          expect(urlRouter.href(matcher("/foo"))).toBe('/base/foo');
+        });
+
+        it('should include #fragments', function () {
+          expect(urlRouter.href(matcher("/foo"), { '#': "hello"})).toBe('/base/foo#hello');
+        });
+
+        it('should return absolute URLs', function () {
+          // don't use urlService var
+          const cfg = router.urlService.config;
+          const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
+          const prot = cfg.protocol();
+          const host = cfg.host();
+          const port = cfg.port();
+          let portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          expect(href).toBe(`${prot}://${host}${portStr}/base/hello/world#frag`);
+        });
+      });
+
+      describe('with base="/base/index.html"', () => {
+        beforeEach(() => applyBaseTag('/base/index.html'));
+
+        it("should prefix the href with /base/ but not with index.html", function () {
+          expect(urlRouter.href(matcher("/foo"))).toBe('/base/foo');
+        });
+
+        it('should include #fragments', function () {
+          expect(urlRouter.href(matcher("/foo"), { '#': "hello"})).toBe('/base/foo#hello');
+        });
+
+        it('should return absolute URLs', function () {
+          // don't use urlService var
+          const cfg = router.urlService.config;
+          const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
+          const prot = cfg.protocol();
+          const host = cfg.host();
+          const port = cfg.port();
+          let portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          expect(href).toBe(`${prot}://${host}${portStr}/base/hello/world#frag`);
+        });
+      });
+
+      describe('with base="http://localhost:8080/base/"', () => {
+        beforeEach(() => applyBaseTag('http://localhost:8080/base/'));
+
+        it("should prefix the href with /base/", function () {
+          expect(urlRouter.href(matcher("/foo"))).toBe('/base/foo');
+        });
+
+        it('should include #fragments', function () {
+          expect(urlRouter.href(matcher("/foo"), { '#': "hello"})).toBe('/base/foo#hello');
+        });
+
+        it('should return absolute URLs', function () {
+          // don't use urlService var
+          const cfg = router.urlService.config;
+          const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
+          const prot = cfg.protocol();
+          const host = cfg.host();
+          const port = cfg.port();
+          let portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          expect(href).toBe(`${prot}://${host}${portStr}/base/hello/world#frag`);
+        });
+      });
+
+      describe('with base="http://localhost:8080/base"', () => {
+        beforeEach(() => applyBaseTag('http://localhost:8080/base'));
+
+        it("should not prefix the href with /base", function () {
+          expect(urlRouter.href(matcher("/foo"))).toBe('/foo');
+        });
+
+        it('should return absolute URLs', function () {
+          // don't use urlService var
+          const cfg = router.urlService.config;
+          const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
+          const prot = cfg.protocol();
+          const host = cfg.host();
+          const port = cfg.port();
+          let portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          expect(href).toBe(`${prot}://${host}${portStr}/hello/world#frag`);
+        });
+      });
+
+      describe('with base="http://localhost:8080/base/index.html"', () => {
+        beforeEach(() => applyBaseTag('http://localhost:8080/base/index.html'));
+
+        it("should prefix the href with /base/", function () {
+          expect(urlRouter.href(matcher("/foo"))).toBe('/base/foo');
+        });
+
+        it('should include #fragments', function () {
+          expect(urlRouter.href(matcher("/foo"), { '#': "hello"})).toBe('/base/foo#hello');
+        });
+
+        it('should return absolute URLs', function () {
+          // don't use urlService var
+          const cfg = router.urlService.config;
+          const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
+          const prot = cfg.protocol();
+          const host = cfg.host();
+          const port = cfg.port();
+          let portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          expect(href).toBe(`${prot}://${host}${portStr}/base/hello/world#frag`);
+        });
+      });
     });
   });
 

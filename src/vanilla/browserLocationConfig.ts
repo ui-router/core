@@ -39,12 +39,13 @@ export class BrowserLocationConfig implements LocationConfig {
   };
 
   baseHref(href?: string): string {
-    return isDefined(href) ? this._baseHref = href : this._baseHref || this.applyDocumentBaseHref();
+    return isDefined(href) ? this._baseHref = href :
+      isDefined(this._baseHref) ? this._baseHref : this.applyDocumentBaseHref();
   }
 
   applyDocumentBaseHref() {
-    let baseTags = document.getElementsByTagName("base");
-    return this._baseHref = baseTags.length ? baseTags[0].href.substr(location.origin.length) : "";
+    let baseTag: HTMLBaseElement = document.getElementsByTagName("base")[0];
+    return this._baseHref = baseTag ? baseTag.href.substr(location.origin.length) : "";
   }
 
   dispose() {}

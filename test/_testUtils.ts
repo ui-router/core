@@ -3,6 +3,10 @@ import { map } from "../src/common/common";
 
 let stateProps = ["resolve", "resolvePolicy", "data", "template", "templateUrl", "url", "name", "params"];
 
+const initialUrl = document.location.href;
+export const resetBrowserUrl = () =>
+  history.replaceState(null, null, initialUrl);
+
 export const delay = (ms) =>
     new Promise<any>(resolve => setTimeout(resolve, ms));
 export const _delay = (ms) => () => delay(ms);
