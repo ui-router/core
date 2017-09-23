@@ -1,3 +1,18 @@
+## 5.0.7 (2017-09-23)
+[Compare `@uirouter/core` versions 5.0.6 and 5.0.7](https://github.com/ui-router/core/compare/5.0.6...5.0.7)
+
+### Bug Fixes
+
+* **globals:** Use shallow copy to update the globals.params / $state.params object ([e883afc](https://github.com/ui-router/core/commit/e883afc))
+* **Injector:** When getting tokens from native injector, only throw on undefined (not on falsey values) ([ada9ca2](https://github.com/ui-router/core/commit/ada9ca2))
+* **trace:** Fall back to console.log if .table is unavailable (IE) ([c8110fc](https://github.com/ui-router/core/commit/c8110fc))
+* **trace:** Support tracing of object-parameters with circular references ([2f1ae9a](https://github.com/ui-router/core/commit/2f1ae9a))
+* **url:** Add CustomEvent polyfill for IE ([a50db21](https://github.com/ui-router/core/commit/a50db21))
+* **vanilla:** fix base path handling for vanilla push state ([ad61d74](https://github.com/ui-router/core/commit/ad61d74))
+* **vanilla:** Use `self` instead of `window` for webworker compat ([a4629ee](https://github.com/ui-router/core/commit/a4629ee))
+
+
+
 ## Changes in `@uirouter/core` between versions [5.0.5 and 5.0.6](https://github.com/ui-router/core/compare/5.0.5...5.0.6) (2017-08-12)
 
 
