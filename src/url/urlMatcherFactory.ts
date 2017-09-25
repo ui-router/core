@@ -16,7 +16,7 @@ import { ParamFactory, UrlMatcherConfig } from "./interface";
  * Factory for [[UrlMatcher]] instances.
  *
  * The factory is available to ng1 services as
- * `$urlMatcherFactor` or ng1 providers as `$urlMatcherFactoryProvider`.
+ * `$urlMatcherFactory` or ng1 providers as `$urlMatcherFactoryProvider`.
  */
 export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
   /** @hidden */ paramTypes = new ParamTypes();
