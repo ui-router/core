@@ -1,7 +1,7 @@
 {
   "name": "@uirouter/core",
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
-  "version": "5.0.7",
+  "version": "5.0.8",
   "scripts": {
     "clean": "shx rm -rf lib lib-esm _bundles",
     "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && npm run fixdts && npm run bundle && npm run fixmaps",

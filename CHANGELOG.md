@@ -1,3 +1,18 @@
+## 5.0.8 (2017-09-30)
+[Compare `@uirouter/core` versions 5.0.7 and 5.0.8](https://github.com/ui-router/core/compare/5.0.7...5.0.8)
+
+### Bug Fixes
+
+* **bundle:** Rollup: Do not warn on THIS_IS_UNDEFINED ([a4581b1](https://github.com/ui-router/core/commit/a4581b1))
+* **redirectTo:** Fix typings for redirectTo. Allow a function that returns a target state or a promise for one. ([3904487](https://github.com/ui-router/core/commit/3904487))
+
+
+### Features
+
+* **TargetState:** Add builder methods .withState, .withParams, and .withOptions ([6b93142](https://github.com/ui-router/core/commit/6b93142))
+
+
+
 ## 5.0.7 (2017-09-23)
 [Compare `@uirouter/core` versions 5.0.6 and 5.0.7](https://github.com/ui-router/core/compare/5.0.6...5.0.7)
 
