@@ -24,9 +24,6 @@ export interface RawParams {
   [key: string]: any;
 }
 
-/** @internalapi */
-export type ParamsOrArray = (RawParams|RawParams[]);
-
 /**
  * Configuration for a single Parameter
  *
@@ -465,15 +462,15 @@ export interface Replace {
  * // Changes URL to '/list/3', logs "Ringo" to the console
  * $state.go('list', { item: "Ringo" });
  * ```
- * 
+ *
  * See: [[UrlConfigApi.type]]
  * @coreapi
  */
 export interface ParamTypeDefinition {
   /**
    * Tests if some object type is compatible with this parameter type
-   * 
-   * Detects whether some value is of this particular type. 
+   *
+   * Detects whether some value is of this particular type.
    * Accepts a decoded value and determines whether it matches this `ParamType` object.
    *
    * If your custom type encodes the parameter to a specific type, check for that type here.

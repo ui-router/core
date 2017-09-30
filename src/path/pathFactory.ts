@@ -15,6 +15,7 @@ import {TargetState} from "../state/targetState";
 import {GetParamsFn, PathNode} from "./pathNode";
 import {ViewService} from "../view/view";
 import { Param } from '../params/param';
+import { StateRegistry } from '../state';
 
 /**
  * This class contains functions which convert TargetStates, Nodes and paths from one type to another.
@@ -24,9 +25,9 @@ export class PathUtils {
   constructor() { }
 
   /** Given a PathNode[], create an TargetState */
-  static makeTargetState(path: PathNode[]): TargetState {
+  static makeTargetState(registry: StateRegistry, path: PathNode[]): TargetState {
     let state = tail(path).state;
-    return new TargetState(state, state, path.map(prop("paramValues")).reduce(mergeR, {}));
+    return new TargetState(registry, state, path.map(prop("paramValues")).reduce(mergeR, {}), {});
   }
 
   static buildPath(targetState: TargetState) {

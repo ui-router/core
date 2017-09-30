@@ -2,7 +2,7 @@
  * @coreapi
  * @module state
  */ /** for typedoc */
-import { ParamDeclaration, RawParams, ParamsOrArray } from "../params/interface";
+import { ParamDeclaration, RawParams } from "../params/interface";
 import { StateObject } from "./stateObject";
 import { ViewContext } from "../view/interface";
 import { IInjectable } from "../common/common";
@@ -21,7 +21,7 @@ export interface TransitionPromise extends Promise<StateObject> {
 
 export interface TargetStateDef {
   state: StateOrName;
-  params?: ParamsOrArray;
+  params?: RawParams;
   options?: TransitionOptions;
 }
 

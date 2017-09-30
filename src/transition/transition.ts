@@ -528,8 +528,7 @@ export class Transition implements IHookRegistry {
     }
 
     let newOptions = extend({}, this.options(), targetState.options(), redirectOpts);
-
-    targetState = new TargetState(targetState.identifier(), targetState.$state(), targetState.params(), newOptions);
+    targetState = targetState.withOptions(newOptions, true);
 
     let newTransition = this.router.transitionService.create(this._treeChanges.from, targetState);
     let originalEnteringNodes = this._treeChanges.entering;

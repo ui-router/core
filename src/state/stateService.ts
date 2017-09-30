@@ -20,7 +20,7 @@ import { HrefOptions, LazyLoadResult, StateDeclaration, StateOrName, TransitionP
 import { StateObject } from './stateObject';
 import { TargetState } from './targetState';
 
-import { ParamsOrArray, RawParams } from '../params/interface';
+import { RawParams } from '../params/interface';
 import { Param } from '../params/param';
 import { Glob } from '../common/glob';
 import { UIRouter } from '../router';
@@ -93,7 +93,7 @@ export class StateService {
    * @internalapi
    */
   private _handleInvalidTargetState(fromPath: PathNode[], toState: TargetState) {
-    let fromState = PathUtils.makeTargetState(fromPath);
+    let fromState = PathUtils.makeTargetState(this.router.stateRegistry, fromPath);
     let globals = this.router.globals;
     const latestThing = () => globals.transitionHistory.peekTail();
     let latest = latestThing();
@@ -268,7 +268,7 @@ export class StateService {
    *
    * This may be returned from a Transition Hook to redirect a transition, for example.
    */
-  target(identifier: StateOrName, params?: ParamsOrArray, options: TransitionOptions = {}): TargetState {
+  target(identifier: StateOrName, params?: RawParams, options: TransitionOptions = {}): TargetState {
     // If we're reloading, find the state object to reload from
     if (isObject(options.reload) && !(<any>options.reload).name)
       throw new Error('Invalid reload state object');
@@ -278,8 +278,7 @@ export class StateService {
     if (options.reload && !options.reloadState)
       throw new Error(`No such reload state '${(isString(options.reload) ? options.reload : (<any>options.reload).name)}'`);
 
-    let stateDefinition = reg.matcher.find(identifier, options.relative);
-    return new TargetState(identifier, stateDefinition, params, options);
+    return new TargetState(this.router.stateRegistry, identifier, params, options);
   };
 
   private getCurrentPath(): PathNode[] {
@@ -595,7 +594,7 @@ export class StateService {
     if (!state || !state.lazyLoad) throw new Error("Can not lazy load " + stateOrName);
 
     let currentPath = this.getCurrentPath();
-    let target = PathUtils.makeTargetState(currentPath);
+    let target = PathUtils.makeTargetState(this.router.stateRegistry, currentPath);
     transition = transition || this.router.transitionService.create(currentPath, target);
 
     return lazyLoadState(transition, state);

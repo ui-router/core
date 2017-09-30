@@ -188,11 +188,12 @@ export class StateRegistry {
    * Note: this does not return states that are *queued* but not yet registered.
    *
    * @param stateOrName either the name of a state, or a state object.
+   * @param base the base state to use when stateOrName is relative.
    * @return a registered [[StateDeclaration]] that matched the `stateOrName`, or null if the state isn't registered.
    */
   get(stateOrName: StateOrName, base?: StateOrName): StateDeclaration;
   get(stateOrName?: StateOrName, base?: StateOrName): any {
-    if (arguments.length === 0) 
+    if (arguments.length === 0)
       return <StateDeclaration[]> Object.keys(this.states).map(name => this.states[name].self);
     let found = this.matcher.find(stateOrName, base);
     return found && found.self || null;
