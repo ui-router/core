@@ -117,7 +117,7 @@ describe("hooks", () => {
 
     // Test for #3117
     it("should not redirect if the redirectTo: function returns undefined", (done) => {
-      find(states, s => s.name === 'A').redirectTo = function() {};
+      find(states, s => s.name === 'A').redirectTo = function() {} as any;
       init();
 
       $state.go('A').then(() => {

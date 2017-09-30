@@ -54,7 +54,7 @@ export interface _ViewDeclaration {
    * @internalapi
    */
   $uiViewName?: string;
-  
+
   /**
    * The normalized context anchor (state name) for the `uiViewName`
    *
@@ -314,13 +314,13 @@ export interface StateDeclaration {
   /**
    * Sets the resolve policy defaults for all resolves on this state
    *
-   * This should be an [[ResolvePolicy]] object. 
-   * 
+   * This should be an [[ResolvePolicy]] object.
+   *
    * It can contain the following optional keys/values:
-   * 
+   *
    * - `when`: (optional) defines when the resolve is fetched. Accepted values: "LAZY" or "EAGER"
    * - `async`: (optional) if the transition waits for the resolve. Accepted values: "WAIT", "NOWAIT", "RXWAIT"
-   * 
+   *
    * See [[ResolvePolicy]] for more details.
    */
   resolvePolicy?: ResolvePolicy
@@ -504,6 +504,7 @@ export interface StateDeclaration {
    * ```
    */
   redirectTo?: RedirectToResult |
+      ((transition: Transition) => RedirectToResult) |
       ((transition: Transition) => Promise<RedirectToResult>);
 
   /**
