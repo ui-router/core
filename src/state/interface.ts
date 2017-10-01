@@ -86,7 +86,7 @@ export interface _ViewDeclaration {
  * - TargetState: a target state, parameters, and options
  * - object: an object with a state name and parameters
  */
-export type RedirectToResult = string | TargetState | { state?: string, params?: RawParams };
+export type RedirectToResult = string | TargetState | { state?: string, params?: RawParams } | void;
 
 /**
  * The StateDeclaration object is used to define a state or nested state.
