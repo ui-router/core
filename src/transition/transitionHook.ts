@@ -113,6 +113,10 @@ export class TransitionHook {
     } catch (err) {
       // If callback throws (synchronously)
       return handleError(Rejection.normalize(err));
+    } finally {
+      if (hook.invokeLimit && ++hook.invokeCount >= hook.invokeLimit) {
+        hook.deregister();
+      }
     }
   }
 

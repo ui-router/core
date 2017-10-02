@@ -262,6 +262,12 @@ export interface HookRegOptions {
    * Specifies what `this` is bound to during hook invocation.
    */
   bind?: any;
+
+  /**
+   * Limits the number of times that the hook will be invoked.
+   * Once the hook has been invoked this many times, it is automatically deregistered.
+   */
+  invokeLimit?: number;
 }
 
 /**
@@ -443,7 +449,7 @@ export interface IHookRegistry {
    * Registers a lifecycle hook, which is invoked (during a transition) when a specific state is being entered.
    *
    * Since this hook is run only when the specific state is being *entered*, it can be useful for
-   * performing tasks when entering a submodule/feature area such as initializing a stateful service, 
+   * performing tasks when entering a submodule/feature area such as initializing a stateful service,
    * or for guarding access to a submodule/feature area.
    *
    * See [[TransitionStateHookFn]] for the signature of the function.
@@ -470,7 +476,7 @@ export interface IHookRegistry {
    *
    * Instead of registering `onEnter` hooks using the [[TransitionService]], you may define an `onEnter` hook
    * directly on a state declaration (see: [[StateDeclaration.onEnter]]).
-   * 
+   *
    *
    * ### Examples
    *
@@ -514,7 +520,7 @@ export interface IHookRegistry {
    *
    * Registers a lifecycle hook, which is invoked (during a transition) for
    * a specific state that was previously active will remain active (is not being entered nor exited).
-   * 
+   *
    * This hook is invoked when a state is "retained" or "kept".
    * It means the transition is coming *from* a substate of the retained state *to* a substate of the retained state.
    * This hook can be used to perform actions when the user moves from one substate to another, such as between steps in a wizard.
@@ -553,7 +559,7 @@ export interface IHookRegistry {
    * Registers a lifecycle hook, which is invoked (during a transition) when a specific state is being exited.
    *
    * Since this hook is run only when the specific state is being *exited*, it can be useful for
-   * performing tasks when leaving a submodule/feature area such as cleaning up a stateful service, 
+   * performing tasks when leaving a submodule/feature area such as cleaning up a stateful service,
    * or for preventing the user from leaving a state or submodule until some criteria is satisfied.
    *
    * See [[TransitionStateHookFn]] for the signature of the function.
@@ -671,7 +677,7 @@ export interface IHookRegistry {
    * - A resolve function returned a rejected promise
    *
    * To check the failure reason, inspect the return value of [[Transition.error]].
-   * 
+   *
    * Note: `onError` should be used for targeted error handling, or error recovery.
    * For simple catch-all error reporting, use [[StateService.defaultErrorHandler]].
    *

@@ -705,6 +705,40 @@ describe('transition', function () {
 
         done();
       });
+
+      it('should be invoked only once if invokeLimit is 1', (done) => {
+        let count = 0;
+        $transitions.onStart({ }, function() { count++; }, { invokeLimit: 1 });
+
+        Promise.resolve()
+          .then(() => expect(count).toBe(0))
+          .then(go("A", "D"))
+          .then(() => expect(count).toBe(1))
+          .then(go("D", "A"))
+          .then(() => expect(count).toBe(1))
+          .then(go("A", "D"))
+          .then(() => expect(count).toBe(1))
+          .then(done);
+      });
+
+      it('should be invoked only twice if invokeLimit is 2', (done) => {
+        let count = 0;
+        $transitions.onStart({ }, () => {
+          count++; }, { invokeLimit: 2 });
+
+        Promise.resolve()
+          .then(() => expect(count).toBe(0))
+          .then(go("A", "D"))
+          .then(() =>
+            expect(count).toBe(1))
+          .then(go("D", "A"))
+          .then(() =>
+            expect(count).toBe(2))
+          .then(go("A", "D"))
+          .then(() =>
+            expect(count).toBe(2))
+          .then(done);
+      });
     });
 
     describe('redirected transition', () => {

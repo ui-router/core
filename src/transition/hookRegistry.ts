@@ -6,12 +6,12 @@ import { extend, removeFrom, tail, values, identity, map } from "../common/commo
 import {isString, isFunction} from "../common/predicates";
 import {PathNode} from "../path/pathNode";
 import {
-    TransitionStateHookFn, TransitionHookFn, TransitionHookPhase, TransitionHookScope, IHookRegistry, PathType
+    TransitionStateHookFn, TransitionHookFn, TransitionHookPhase, TransitionHookScope, IHookRegistry, PathType,
 } from "./interface"; // has or is using
 
 import {
     HookRegOptions, HookMatchCriteria, TreeChanges,
-    HookMatchCriterion, IMatchingNodes, HookFn
+    HookMatchCriterion, IMatchingNodes, HookFn,
 } from "./interface";
 import {Glob} from "../common/glob";
 import {StateObject} from "../state/stateObject";
@@ -57,16 +57,19 @@ export function matchState(state: StateObject, criterion: HookMatchCriterion) {
 export class RegisteredHook {
   priority: number;
   bind: any;
-  _deregistered: boolean;
+  invokeCount = 0;
+  invokeLimit: number;
+  _deregistered = false;
 
   constructor(public tranSvc: TransitionService,
               public eventType: TransitionEventType,
               public callback: HookFn,
               public matchCriteria: HookMatchCriteria,
+              public removeHookFromRegistry: (hook: RegisteredHook) => void,
               options: HookRegOptions = {} as any) {
     this.priority = options.priority || 0;
     this.bind = options.bind || null;
-    this._deregistered = false;
+    this.invokeLimit = options.invokeLimit;
   }
 
   /**
@@ -152,25 +155,27 @@ export class RegisteredHook {
     let allMatched = values(matches).every(identity);
     return allMatched ? matches : null;
   }
+
+  deregister() {
+    this.removeHookFromRegistry(this);
+    this._deregistered = true;
+  }
 }
 
 /** @hidden Return a registration function of the requested type. */
 export function makeEvent(registry: IHookRegistry, transitionService: TransitionService, eventType: TransitionEventType) {
   // Create the object which holds the registered transition hooks.
-  let _registeredHooks = registry._registeredHooks = (registry._registeredHooks || {});
-  let hooks = _registeredHooks[eventType.name] = [];
+  const _registeredHooks = registry._registeredHooks = (registry._registeredHooks || {});
+  const hooks = _registeredHooks[eventType.name] = [];
+  const removeHookFn: (hook: RegisteredHook) => void = removeFrom(hooks);
 
   // Create hook registration function on the IHookRegistry for the event
   registry[eventType.name] = hookRegistrationFn;
 
   function hookRegistrationFn(matchObject, callback, options = {}) {
-    let registeredHook = new RegisteredHook(transitionService, eventType, callback, matchObject, options);
+    const registeredHook = new RegisteredHook(transitionService, eventType, callback, matchObject, removeHookFn, options);
     hooks.push(registeredHook);
-
-    return function deregisterEventHook() {
-      registeredHook._deregistered = true;
-      removeFrom(hooks)(registeredHook);
-    };
+    return registeredHook.deregister.bind(registeredHook);
   }
 
   return hookRegistrationFn;
