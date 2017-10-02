@@ -5,6 +5,8 @@ import { StateService } from "../src/state/stateService";
 import { UrlService } from "../src/url/urlService";
 import { resetBrowserUrl } from './_testUtils';
 
+const origin = window.location.origin;
+
 describe('pushStateLocationService', () => {
   afterEach(() => resetBrowserUrl());
 
@@ -23,7 +25,7 @@ describe('pushStateLocationService', () => {
 
     router.stateRegistry.register({
       url: '/path/:urlParam?queryParam',
-      name: 'path'
+      name: 'path',
     });
   });
 
@@ -105,8 +107,8 @@ describe('pushStateLocationService', () => {
       });
     });
 
-    describe('http://localhost:8080/debug.html', () => {
-      beforeEach(() => applyBaseTag("http://localhost:8080/debug.html"));
+    describe(origin + '/debug.html', () => {
+      beforeEach(() => applyBaseTag(origin + '/debug.html'));
 
       it('returns the correct url', async(done) => {
         await $state.go('path', { urlParam: 'bar' });
@@ -118,8 +120,8 @@ describe('pushStateLocationService', () => {
       });
     });
 
-    describe('http://localhost:8080/base/debug.html', () => {
-      beforeEach(() => applyBaseTag("http://localhost:8080/base/debug.html"));
+    describe(origin + '/base/debug.html', () => {
+      beforeEach(() => applyBaseTag(origin + '/base/debug.html'));
 
       it('returns the correct url', async(done) => {
         await $state.go('path', { urlParam: 'bar' });
