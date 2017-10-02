@@ -1,3 +1,15 @@
+## 5.0.9 (2017-10-02)
+[Compare `@uirouter/core` versions 5.0.8 and 5.0.9](https://github.com/ui-router/core/compare/5.0.8...5.0.9)
+
+### Bug Fixes
+
+* **redirectTo:** Allow void in RedirectToResult
+
+### Features
+
+* **TransitionHook:** Add hook registration option `invokeLimit` to limit the number of times a hook is invoked before being auto-deregistered. ([2cb17ef](https://github.com/ui-router/core/commit/2cb17ef))
+
+
 ## 5.0.8 (2017-09-30)
 [Compare `@uirouter/core` versions 5.0.7 and 5.0.8](https://github.com/ui-router/core/compare/5.0.7...5.0.8)
 
