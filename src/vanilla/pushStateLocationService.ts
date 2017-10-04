@@ -3,10 +3,9 @@
  * @module vanilla
  */
 /** */
-import { LocationConfig } from "../common/coreservices";
-import { UIRouter } from "../router";
-import { BaseLocationServices } from "./baseLocationService";
-import { splitQuery, splitHash, stripFile } from "../common/strings";
+import { UIRouter } from '../router';
+import { BaseLocationServices } from './baseLocationService';
+import { LocationConfig, root, splitHash, splitQuery, stripFile } from '../common';
 
 /**
  * A `LocationServices` that gets/sets the current location using the browser's `location` and `history` apis
@@ -19,7 +18,7 @@ export class PushStateLocationService extends BaseLocationServices {
   constructor(router: UIRouter) {
     super(router, true);
     this._config = router.urlService.config;
-    self.addEventListener("popstate", this._listener, false);
+    root.addEventListener('popstate', this._listener, false);
   };
 
   /**
@@ -47,7 +46,7 @@ export class PushStateLocationService extends BaseLocationServices {
     let startsWith = pathname.startsWith(basePrefix);
     pathname = exactMatch ? '/' : startsWith ? pathname.substring(basePrefix.length) : pathname;
 
-    return pathname + (search ? "?" + search : "") + (hash ? "#" + hash : "");
+    return pathname + (search ? '?' + search : '') + (hash ? '#' + hash : '');
   }
 
   _set(state: any, title: string, url: string, replace: boolean) {
@@ -62,7 +61,7 @@ export class PushStateLocationService extends BaseLocationServices {
 
   dispose(router: UIRouter) {
     super.dispose(router);
-    self.removeEventListener("popstate", this._listener);
+    root.removeEventListener('popstate', this._listener);
   }
 }
 

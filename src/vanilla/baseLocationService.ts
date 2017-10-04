@@ -3,21 +3,17 @@
  * @module vanilla
  */ /** */
 
-import { LocationServices } from "../common/coreservices";
-import { Disposable } from "../interface";
-import { UIRouter } from "../router";
-import { LocationLike, HistoryLike } from "./interface";
-import { parseUrl, getParams, buildUrl, getCustomEventCtor } from "./utils";
-import { isDefined } from "../common/predicates";
-import { extend, deregAll, removeFrom } from "../common/common";
-
-const Evt: typeof CustomEvent = getCustomEventCtor();
+import { deregAll, isDefined, LocationServices, removeFrom, root } from '../common';
+import { Disposable } from '../interface';
+import { UIRouter } from '../router';
+import { HistoryLike, LocationLike } from './interface';
+import { buildUrl, getParams, parseUrl } from './utils';
 
 /** A base `LocationServices` */
 export abstract class BaseLocationServices implements LocationServices, Disposable {
   constructor(router: UIRouter, public fireAfterUpdate: boolean) {
-    this._location = self && self.location;
-    this._history = self && self.history;
+    this._location = root.location;
+    this._history = root.history;
   }
 
   _listener = evt => this._listeners.forEach(cb => cb(evt));
@@ -62,8 +58,7 @@ export abstract class BaseLocationServices implements LocationServices, Disposab
       this._set(null, null, url, replace);
 
       if (this.fireAfterUpdate) {
-        let evt = extend(new Evt("locationchange"), { url });
-        this._listeners.forEach(cb => cb(evt));
+        this._listeners.forEach(cb => cb({ url }));
       }
     }
 

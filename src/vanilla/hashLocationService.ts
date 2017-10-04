@@ -3,15 +3,15 @@
  * @module vanilla
  */
 /** */
-import { trimHashVal } from "../common/strings";
-import { UIRouter } from "../router";
-import { BaseLocationServices } from "./baseLocationService";
+import { root, trimHashVal } from '../common';
+import { UIRouter } from '../router';
+import { BaseLocationServices } from './baseLocationService';
 
 /** A `LocationServices` that uses the browser hash "#" to get/set the current location */
 export class HashLocationService extends BaseLocationServices {
   constructor(router: UIRouter) {
     super(router, false);
-    self.addEventListener('hashchange', this._listener, false);
+    root.addEventListener('hashchange', this._listener, false);
   }
 
   _get() {
@@ -23,7 +23,7 @@ export class HashLocationService extends BaseLocationServices {
 
   dispose (router: UIRouter) {
     super.dispose(router);
-    self.removeEventListener('hashchange', this._listener);
+    root.removeEventListener('hashchange', this._listener);
   }
 }
 

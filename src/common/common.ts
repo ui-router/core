@@ -12,8 +12,11 @@ import { all, any, prop, curry, not } from "./hof";
 import { services } from "./coreservices";
 import { StateObject } from "../state/stateObject";
 
-let w: any = typeof window === 'undefined' ? {} : window;
-let angular = w.angular || {};
+declare const global;
+export const root: any = (typeof self === 'object' && self.self === self && self) ||
+  (typeof global === 'object' && global.global === global && global) || this;
+const angular = root.angular || {};
+
 export const fromJson = angular.fromJson || JSON.parse.bind(JSON);
 export const toJson = angular.toJson || JSON.stringify.bind(JSON);
 export const forEach = angular.forEach || _forEach;

@@ -3,8 +3,8 @@
  * @module vanilla
  */
 /** */
-import { BaseLocationServices } from "./baseLocationService";
-import { UIRouter } from "../router";
+import { BaseLocationServices } from './baseLocationService';
+import { UIRouter } from '../router';
 
 /** A `LocationServices` that gets/sets the current location from an in-memory object */
 export class MemoryLocationService extends BaseLocationServices {
