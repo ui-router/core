@@ -56,9 +56,9 @@
   "engines": {
     "node": ">=4.0.0"
   },
-  "main": "_bundles/ui-router-core.js",
-  "jsnext:main": "lib-esm/index.js",
   "typings": "lib/index.d.ts",
+  "main": "lib/index.js",
+  "jsnext:main": "lib-esm/index.js",
   "license": "MIT",
   "devDependencies": {
     "@types/jasmine": "^2.5.47",
