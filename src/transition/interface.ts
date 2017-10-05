@@ -705,8 +705,8 @@ export interface IHookRegistry {
   _registeredHooks: { [key: string]: RegisteredHook[] };
 }
 
-/** A predicate type which tests if a [[StateDeclaration]] passes some test. Returns a boolean. */
-export type IStateMatch = Predicate<StateDeclaration>
+/** A predicate type which tests if a [[StateObject]] passes some test. Returns a boolean. */
+export type IStateMatch = Predicate<StateObject>;
 
 /**
  * This object is used to configure whether or not a Transition Hook is invoked for a particular transition,
