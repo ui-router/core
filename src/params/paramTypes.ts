@@ -270,7 +270,9 @@ function initDefaultTypes() {
 
   // Default Parameter Type Definitions
   extend(ParamTypes.prototype, {
-    string: makeDefaultType({}),
+    string: makeDefaultType({
+      decode: (val: any) => val != null ? decodeURIComponent(val.toString()) : val,
+    }),
 
     path: makeDefaultType({
       pattern: /[^/]*/,
