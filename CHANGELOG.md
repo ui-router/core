@@ -1,3 +1,14 @@
+## 5.0.10 (2017-10-06)
+[Compare `@uirouter/core` versions 5.0.9 and 5.0.10](https://github.com/ui-router/core/compare/5.0.9...5.0.10)
+
+### Bug Fixes
+
+* **angular/cli:** Use package.json fields: 'typings', 'main', 'jsnext:main' ([74143d9](https://github.com/ui-router/core/commit/74143d9))
+* **isomorphic:** Remove use of CustomEvent. Detect root scope (global/window/self) for nodejs, browser, or web-worker. ([2d206ba](https://github.com/ui-router/core/commit/2d206ba))
+* **typings:** Use StateObject for parameter to hook criteria functions ([5b58566](https://github.com/ui-router/core/commit/5b58566))
+
+
+
 ## 5.0.9 (2017-10-02)
 [Compare `@uirouter/core` versions 5.0.8 and 5.0.9](https://github.com/ui-router/core/compare/5.0.8...5.0.9)
 
