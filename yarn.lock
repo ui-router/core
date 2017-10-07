@@ -10,9 +10,9 @@
   version "1.10.33"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-1.10.33.tgz#6c4c279f8d06839b184950432e880e0a469a64a1"
 
-"@uirouter/publish-scripts@1.0.8":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-1.0.8.tgz#8ccdea0b6bca1e63b759df73a7b63eb444f1de04"
+"@uirouter/publish-scripts@1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-1.0.9.tgz#e4e95f4acf4b1678d70189db741c0431ab6c724f"
   dependencies:
     conventional-changelog "^1.1.4"
     conventional-changelog-ui-router-core "^1.4.2"
