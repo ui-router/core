@@ -9,7 +9,7 @@
     "fixdts": "dts-downlevel 'lib/**/*.d.ts' 'lib-esm/**/*.d.ts'",
     "fixmaps": "modify_sourcemap_paths",
     "install": "node migrate/migratewarn.js",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "test": "karma start",
     "watch": "run-p watch:*",
     "watch:buildjs": "tsc -w",
