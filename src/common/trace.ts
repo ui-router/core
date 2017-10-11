@@ -65,7 +65,11 @@ function normalizedCat(input: Category|string): string {
 }
 
 /** @hidden */
-const consoletable = isFunction(console.table) ? console.table.bind(console) : console.log.bind(console);
+const consoleLog = Function.prototype.bind.call(console.log, console);
+
+/** @hidden */
+const consoletable = isFunction(console.table) ? console.table.bind(console) : consoleLog.bind(console);
+
 
 /**
  * Trace categories Enum
