@@ -239,7 +239,18 @@ export class Transition implements IHookRegistry {
    * This object is immutable.
    *
    * By default, returns the new parameter values (for the "to state").
+   *
+   * #### Example:
+   * ```js
+   * var toParams = transition.params();
+   * ```
+   *
    * To return the previous parameter values,  supply `'from'` as the `pathname` argument.
+   *
+   * #### Example:
+   * ```js
+   * var fromParams = transition.params('from');
+   * ```
    *
    * @param pathname the name of the treeChanges path to get parameter values for:
    *   (`'to'`, `'from'`, `'entering'`, `'exiting'`, `'retained'`)
