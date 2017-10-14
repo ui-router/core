@@ -10,9 +10,9 @@
   version "1.10.33"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-1.10.33.tgz#6c4c279f8d06839b184950432e880e0a469a64a1"
 
-"@uirouter/publish-scripts@1.0.9":
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-1.0.9.tgz#e4e95f4acf4b1678d70189db741c0431ab6c724f"
+"@uirouter/publish-scripts@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-1.1.1.tgz#33a8e52408d7382c2a4ce97edde664f626dc6448"
   dependencies:
     conventional-changelog "^1.1.4"
     conventional-changelog-ui-router-core "^1.4.2"
@@ -20,6 +20,7 @@
     git-semver-tags "^1.2.1"
     readline-sync "^1.4.7"
     shelljs "^0.7.8"
+    tweak-sourcemap-paths "^0.0.2"
 
 JSONStream@^1.0.4:
   version "1.3.1"
@@ -3433,6 +3434,13 @@ tunnel-agent@~0.4.1:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.4.3.tgz#6373db76909fe570e08d73583365ed828a74eeeb"
 
+tweak-sourcemap-paths@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/tweak-sourcemap-paths/-/tweak-sourcemap-paths-0.0.2.tgz#ee92a68cef2aad0b82e129f24c2d1222b20fd45f"
+  dependencies:
+    glob "^7.1.2"
+    yargs "^9.0.1"
+
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
@@ -3725,6 +3733,24 @@ yargs-parser@^7.0.0:
 yargs@^8.0.2:
   version "8.0.2"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-8.0.2.tgz#6299a9055b1cefc969ff7e79c1d918dceb22c360"
+  dependencies:
+    camelcase "^4.1.0"
+    cliui "^3.2.0"
+    decamelize "^1.1.1"
+    get-caller-file "^1.0.1"
+    os-locale "^2.0.0"
+    read-pkg-up "^2.0.0"
+    require-directory "^2.1.1"
+    require-main-filename "^1.0.1"
+    set-blocking "^2.0.0"
+    string-width "^2.0.0"
+    which-module "^2.0.0"
+    y18n "^3.2.1"
+    yargs-parser "^7.0.0"
+
+yargs@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-9.0.1.tgz#52acc23feecac34042078ee78c0c007f5085db4c"
   dependencies:
     camelcase "^4.1.0"
     cliui "^3.2.0"
