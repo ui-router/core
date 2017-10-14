@@ -1,3 +1,12 @@
+## 5.0.11 (2017-10-14)
+[Compare `@uirouter/core` versions 5.0.10 and 5.0.11](https://github.com/ui-router/core/compare/5.0.10...5.0.11)
+
+### Bug Fixes
+
+* **ie9:** make console.bind work in ie9 ([#85](https://github.com/ui-router/core/issues/85)) ([318214b](https://github.com/ui-router/core/commit/318214b))
+
+
+
 ## 5.0.10 (2017-10-06)
 [Compare `@uirouter/core` versions 5.0.9 and 5.0.10](https://github.com/ui-router/core/compare/5.0.9...5.0.10)
 
