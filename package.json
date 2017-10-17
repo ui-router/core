@@ -4,7 +4,8 @@
   "version": "5.0.11",
   "scripts": {
     "clean": "shx rm -rf lib lib-esm _bundles",
-    "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && npm run fixdts && npm run bundle && npm run fixmaps:lib && npm run fixmaps:bundle",
+    "compile": "npm run clean && tsc && tsc -m es6 --outDir lib-esm",
+    "build": "run-s compile fixdts bundle fixmaps:*",
     "bundle": "rollup -c && rollup -c --environment MINIFY",
     "fixdts": "dts-downlevel 'lib/**/*.d.ts' 'lib-esm/**/*.d.ts'",
     "fixmaps:lib": "tweak_sourcemap_paths -a --include 'lib/**/*.js.map' 'lib-esm/**/*.js.map'",
