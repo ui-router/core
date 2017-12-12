@@ -212,10 +212,10 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   update(read?: boolean) {
     let $url = this._router.locationService;
     if (read) {
-      this.location = $url.path();
+      this.location = $url.url();
       return;
     }
-    if ($url.path() === this.location) return;
+    if ($url.url() === this.location) return;
 
     $url.url(this.location, true);
   }

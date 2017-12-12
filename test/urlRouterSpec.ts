@@ -222,6 +222,20 @@ describe("UrlRouter", function () {
 
       expect(urlService.path()).toBe('/old');
     });
+
+    // Test for https://github.com/ui-router/core/issues/94
+    it('can read and reset URL including query parameters', function () {
+      urlService.url('/old?param1=hey');
+
+      expect(urlService.url()).toBe('/old?param1=hey');
+
+      urlRouter.update(true); // save url
+      urlService.url('/new');
+      urlRouter.update(); // reset url
+
+      expect(urlService.url()).toBe('/old?param1=hey');
+    });
+
   });
 
   describe("URL generation", function() {
