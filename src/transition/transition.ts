@@ -297,9 +297,9 @@ export class Transition implements IHookRegistry {
    * #### Example:
    * ```js
    * .onEnter({ to: 'foo.bar' }, trans => {
-   *   // returns result of `foo` state's `data` resolve
-   *   // even though `foo.bar` also has a `data` resolve
-   *   var fooData = trans.injector('foo').get('data');
+   *   // returns result of `foo` state's `myResolve` resolve
+   *   // even though `foo.bar` also has a `myResolve` resolve
+   *   var fooData = trans.injector('foo').get('myResolve');
    * });
    * ```
    *
@@ -308,8 +308,8 @@ export class Transition implements IHookRegistry {
    * #### Example:
    * ```js
    * .onExit({ exiting: 'foo.bar' }, trans => {
-   *   // Gets the resolve value of `data` from the exiting state.
-   *   var fooData = trans.injector(null, 'foo.bar').get('data');
+   *   // Gets the resolve value of `myResolve` from the state being exited
+   *   var fooData = trans.injector(null, 'from').get('myResolve');
    * });
    * ```
    *
