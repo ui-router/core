@@ -1,3 +1,13 @@
+## 5.0.12 (2017-12-18)
+[Compare `@uirouter/core` versions 5.0.11 and 5.0.12](https://github.com/ui-router/core/compare/5.0.11...5.0.12)
+
+### Bug Fixes
+
+* **urlRouter:** Update query params when resetting url via .update() ([7664cd0](https://github.com/ui-router/core/commit/7664cd0))
+
+
+
+
 ## 5.0.11 (2017-10-14)
 [Compare `@uirouter/core` versions 5.0.10 and 5.0.11](https://github.com/ui-router/core/compare/5.0.10...5.0.11)
 
