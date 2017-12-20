@@ -57,7 +57,7 @@ export class PushStateLocationService extends BaseLocationServices {
   protected _set(state: any, title: string, url: string, replace: boolean) {
     const basePrefix = this._getBasePrefix();
     const slash = url && url[0] !== '/' ? '/' : '';
-    const fullUrl = url === '' ? this._config.baseHref() : basePrefix + slash + url;
+    const fullUrl = (url === '' || url === '/') ? this._config.baseHref() : basePrefix + slash + url;
 
     if (replace) {
       this._history.replaceState(state, title, fullUrl);
