@@ -104,4 +104,34 @@ describe('BrowserLocationConfig implementation', () => {
     expect(blc.port()).toBe(parseInt(location.port, 10));
     expect(blc.protocol() + ":").toBe(location.protocol);
   });
+
+  describe('base href', () => {
+    let baseTag: HTMLBaseElement;
+    const applyBaseTag = (href: string) => {
+      baseTag = document.createElement('base');
+      baseTag.href = href;
+      document.head.appendChild(baseTag);
+    };
+
+    afterEach(() => baseTag && baseTag.parentElement && baseTag.parentElement.removeChild(baseTag));
+
+    it('can be set programmatically', () => {
+      const blc = new BrowserLocationConfig();
+      blc.baseHref('/asdfasdf');
+      expect(blc.baseHref()).toBe('/asdfasdf');
+    });
+
+    it('reads the <base> tag (if present)', () => {
+      applyBaseTag('/base');
+      const blc = new BrowserLocationConfig();
+      expect(blc.baseHref()).toBe('/base');
+    });
+
+    it('uses location.href if <base> is not present', () => {
+      const blc = new BrowserLocationConfig();
+      expect(blc.baseHref()).toBe(location.href);
+    });
+  });
+
+
 });
