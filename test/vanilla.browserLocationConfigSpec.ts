@@ -1,12 +1,13 @@
-import { UIRouter } from "../src/router";
-import { UrlService } from "../src/url/urlService";
+import { stripLastPathElement } from '../src/common';
+import { UIRouter } from '../src/router';
+import { UrlService } from '../src/url/urlService';
 import * as vanilla from "../src/vanilla";
-import { UrlMatcherFactory } from "../src/url/urlMatcherFactory";
+import { UrlMatcherFactory } from '../src/url/urlMatcherFactory';
 import { BrowserLocationConfig } from '../src/vanilla';
 import { resetBrowserUrl } from './_testUtils';
 
 describe('BrowserLocationConfig implementation', () => {
-  afterAll(() => resetBrowserUrl())
+  afterAll(() => resetBrowserUrl());
 
   let router: UIRouter;
   let $url: UrlService;
@@ -62,14 +63,14 @@ describe('BrowserLocationConfig implementation', () => {
     expect(router.urlService.config.html5Mode()).toBe(true);
     let stub = spyOn(service._history, 'pushState');
     router.urlRouter.push($umf.compile('/hello/:name'), { name: 'world' }, {});
-    expect(stub.calls.first().args[2]).toBe('/hello/world');
+    expect(stub.calls.first().args[2]).toBe(stripLastPathElement($url.config.baseHref()) + '/hello/world');
   });
 
   it('uses history.replaceState when setting a url with replace', () => {
     let service = mockPushState(router);
     let stub = spyOn(service._history, 'replaceState');
     router.urlRouter.push($umf.compile('/hello/:name'), { name: 'world' }, { replace: true });
-    expect(stub.calls.first().args[2]).toBe('/hello/world');
+    expect(stub.calls.first().args[2]).toBe(stripLastPathElement($url.config.baseHref()) + '/hello/world');
   });
 
   it('returns the correct url query', async(done) => {
@@ -127,9 +128,9 @@ describe('BrowserLocationConfig implementation', () => {
       expect(blc.baseHref()).toBe('/base');
     });
 
-    it('uses location.href if <base> is not present', () => {
+    it('uses location.pathname if <base> is not present', () => {
       const blc = new BrowserLocationConfig();
-      expect(blc.baseHref()).toBe(location.href);
+      expect(blc.baseHref()).toBe(location.pathname);
     });
   });
 
