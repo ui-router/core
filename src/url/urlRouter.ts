@@ -14,12 +14,12 @@ import { UrlRuleFactory } from './urlRule';
 import { TargetState } from '../state/targetState';
 import { MatcherUrlRule, MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi, UrlSyncApi, } from './interface';
 import { TargetStateDef } from '../state/interface';
-import { stripFile } from '../common';
+import { stripLastPathElement } from '../common';
 
 /** @hidden */
 function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHref: string): string {
   if (baseHref === '/') return url;
-  if (isHtml5) return stripFile(baseHref) + url;
+  if (isHtml5) return stripLastPathElement(baseHref) + url;
   if (absolute) return baseHref.slice(1) + url;
   return url;
 }

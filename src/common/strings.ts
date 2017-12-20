@@ -119,7 +119,7 @@ export const beforeAfterSubstr = (char: string) => (str: string): string[] => {
 };
 
 export const hostRegex = new RegExp('^(?:[a-z]+:)?//[^/]+/');
-export const stripFile = (str: string) => str.replace(/\/[^/]*$/, '');
+export const stripLastPathElement = (str: string) => str.replace(/\/[^/]*$/, '');
 export const splitHash = beforeAfterSubstr("#");
 export const splitQuery = beforeAfterSubstr("?");
 export const splitEqual = beforeAfterSubstr("=");

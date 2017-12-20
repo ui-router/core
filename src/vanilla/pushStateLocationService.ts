@@ -5,7 +5,7 @@
 /** */
 import { UIRouter } from '../router';
 import { BaseLocationServices } from './baseLocationService';
-import { LocationConfig, root, splitHash, splitQuery, stripFile } from '../common';
+import { LocationConfig, root, splitHash, splitQuery, stripLastPathElement } from '../common';
 
 /**
  * A `LocationServices` that gets/sets the current location using the browser's `location` and `history` apis
@@ -33,7 +33,7 @@ export class PushStateLocationService extends BaseLocationServices {
    * See: https://html.spec.whatwg.org/dev/semantics.html#the-base-element
    */
   _getBasePrefix() {
-    return stripFile(this._config.baseHref());
+    return stripLastPathElement(this._config.baseHref());
   }
 
   _get() {
