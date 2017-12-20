@@ -27,30 +27,37 @@ export class PushStateLocationService extends BaseLocationServices {
    * - trailing filename
    * - protocol and hostname
    *
+   * If <base href='/base/'>, this returns '/base'.
+   * If <base href='/foo/base/'>, this returns '/foo/base'.
    * If <base href='/base/index.html'>, this returns '/base'.
    * If <base href='http://localhost:8080/base/index.html'>, this returns '/base'.
+   * If <base href='/base'>, this returns ''.
+   * If <base href='http://localhost:8080'>, this returns ''.
+   * If <base href='http://localhost:8080/'>, this returns ''.
    *
    * See: https://html.spec.whatwg.org/dev/semantics.html#the-base-element
    */
-  _getBasePrefix() {
+  private _getBasePrefix() {
     return stripLastPathElement(this._config.baseHref());
   }
 
-  _get() {
+  protected _get() {
     let { pathname, hash, search } = this._location;
     search = splitQuery(search)[1]; // strip ? if found
     hash = splitHash(hash)[1]; // strip # if found
 
     const basePrefix = this._getBasePrefix();
-    let exactMatch = pathname === this._config.baseHref();
-    let startsWith = pathname.startsWith(basePrefix);
-    pathname = exactMatch ? '/' : startsWith ? pathname.substring(basePrefix.length) : pathname;
+    const exactBaseHrefMatch = pathname === this._config.baseHref();
+    const startsWithBase = pathname.substr(0, basePrefix.length) === basePrefix;
+    pathname = exactBaseHrefMatch ? '/' : startsWithBase ? pathname.substring(basePrefix.length) : pathname;
 
     return pathname + (search ? '?' + search : '') + (hash ? '#' + hash : '');
   }
 
-  _set(state: any, title: string, url: string, replace: boolean) {
-    let fullUrl = this._getBasePrefix() + url;
+  protected _set(state: any, title: string, url: string, replace: boolean) {
+    const basePrefix = this._getBasePrefix();
+    const slash = url && url[0] !== '/' ? '/' : '';
+    const fullUrl = url === '' ? this._config.baseHref() : basePrefix + slash + url;
 
     if (replace) {
       this._history.replaceState(state, title, fullUrl);
@@ -59,7 +66,7 @@ export class PushStateLocationService extends BaseLocationServices {
     }
   }
 
-  dispose(router: UIRouter) {
+  public dispose(router: UIRouter) {
     super.dispose(router);
     root.removeEventListener('popstate', this._listener);
   }

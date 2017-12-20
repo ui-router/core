@@ -32,7 +32,7 @@ export abstract class BaseLocationServices implements LocationServices, Disposab
    * - port
    * - base href or hash
    */
-  abstract _get(): string;
+  protected abstract _get(): string;
 
   /**
    * This should set the current URL.
@@ -47,7 +47,7 @@ export abstract class BaseLocationServices implements LocationServices, Disposab
    * However, after this function completes, the browser URL should reflect the entire (fully qualified)
    * HREF including those data.
    */
-  abstract _set(state: any, title: string, url: string, replace: boolean);
+  protected abstract _set(state: any, title: string, url: string, replace: boolean);
 
   hash   = () => parseUrl(this._get()).hash;
   path   = () => parseUrl(this._get()).path;
