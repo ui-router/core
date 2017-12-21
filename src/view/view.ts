@@ -2,14 +2,13 @@
  * @coreapi
  * @module view
  */ /** for typedoc */
-import {equals, applyPairs, removeFrom, TypedMap} from "../common/common";
-import {curry, prop} from "../common/hof";
-import {isString, isArray} from "../common/predicates";
-import {trace} from "../common/trace";
-import {PathNode} from "../path/pathNode";
-
-import {ActiveUIView, ViewContext, ViewConfig} from "./interface";
-import {_ViewDeclaration} from "../state/interface";
+import { equals, applyPairs, removeFrom, TypedMap, inArray } from "../common/common";
+import { curry, prop } from "../common/hof";
+import { isString, isArray } from "../common/predicates";
+import { trace } from "../common/trace";
+import { PathNode } from "../path/pathNode";
+import { ActiveUIView, ViewContext, ViewConfig } from "./interface";
+import { _ViewDeclaration } from "../state/interface";
 
 export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig|ViewConfig[];
 
@@ -18,6 +17,17 @@ export interface ViewServicePluginAPI {
   _viewConfigFactory(viewType: string, factory: ViewConfigFactory);
   _registeredUIViews(): ActiveUIView[];
   _activeViewConfigs(): ViewConfig[];
+  _onSync(listener: ViewSyncListener): Function;
+}
+
+// A uiView and its matching viewConfig
+export interface ViewTuple {
+  uiView: ActiveUIView;
+  viewConfig: ViewConfig;
+}
+
+export interface ViewSyncListener {
+  (viewTuples: ViewTuple[]): void;
 }
 
 /**
@@ -41,6 +51,7 @@ export class ViewService {
   private _viewConfigs: ViewConfig[] = [];
   private _rootContext: ViewContext;
   private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
+  private _listeners: ViewSyncListener[] = [];
 
   constructor() { }
 
@@ -49,6 +60,10 @@ export class ViewService {
     _viewConfigFactory: this._viewConfigFactory.bind(this),
     _registeredUIViews: () => this._uiViews,
     _activeViewConfigs: () => this._viewConfigs,
+    _onSync: (listener: ViewSyncListener) => {
+      this._listeners.push(listener);
+      return () => removeFrom(this._listeners, listener);
+    },
   };
 
   private _rootViewContext(context?: ViewContext): ViewContext {
@@ -65,7 +80,7 @@ export class ViewService {
     let cfgs = cfgFactory(path, decl);
     return isArray(cfgs) ? cfgs : [cfgs];
   }
-  
+
   /**
    * Deactivates a ViewConfig.
    *
@@ -186,7 +201,7 @@ export class ViewService {
     // Given a depth function, returns a compare function which can return either ascending or descending order
     const depthCompare = curry((depthFn, posNeg, left, right) => posNeg * (depthFn(left) - depthFn(right)));
 
-    const matchingConfigPair = (uiView: ActiveUIView) => {
+    const matchingConfigPair = (uiView: ActiveUIView): ViewTuple => {
       let matchingConfigs = this._viewConfigs.filter(ViewService.matches(uiViewsByFqn, uiView));
       if (matchingConfigs.length > 1) {
         // This is OK.  Child states can target a ui-view that the parent state also targets (the child wins)
@@ -194,22 +209,29 @@ export class ViewService {
         // console.log(`Multiple matching view configs for ${uiView.fqn}`, matchingConfigs);
         matchingConfigs.sort(depthCompare(viewConfigDepth, -1)); // descending
       }
-      return [uiView, matchingConfigs[0]];
+      return { uiView, viewConfig: matchingConfigs[0] };
     };
 
-    const configureUIView = ([uiView, viewConfig]) => {
+    const configureUIView = (tuple: ViewTuple) => {
       // If a parent ui-view is reconfigured, it could destroy child ui-views.
       // Before configuring a child ui-view, make sure it's still in the active uiViews array.
-      if (this._uiViews.indexOf(uiView) !== -1)
-        uiView.configUpdated(viewConfig);
+      if (this._uiViews.indexOf(tuple.uiView) !== -1)
+        tuple.uiView.configUpdated(tuple.viewConfig);
     };
 
     // Sort views by FQN and state depth. Process uiviews nearest the root first.
-    const pairs = this._uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair);
+    const uiViewTuples = this._uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair);
+    const matchedViewConfigs = uiViewTuples.map(tuple => tuple.viewConfig);
+    const unmatchedConfigTuples = this._viewConfigs
+      .filter(config => inArray(matchedViewConfigs, config))
+      .map(viewConfig => ({ uiView: undefined, viewConfig }));
 
-    trace.traceViewSync(pairs);
+    const allTuples: ViewTuple[] = uiViewTuples.concat(unmatchedConfigTuples);
 
-    pairs.forEach(configureUIView);
+    uiViewTuples.forEach(configureUIView);
+
+    this._listeners.forEach(cb => cb(allTuples));
+    trace.traceViewSync(allTuples);
   };
 
   /**

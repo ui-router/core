@@ -33,17 +33,18 @@
  * @coreapi
  * @module trace
  */ /** for typedoc */
-import {parse} from "../common/hof";
-import {isFunction, isNumber} from "../common/predicates";
-import {Transition}  from "../transition/transition";
-import {ActiveUIView, ViewConfig, ViewContext}  from "../view/interface";
-import {stringify, functionToString, maxLength, padString} from "./strings";
-import {Resolvable} from "../resolve/resolvable";
-import {PathNode} from "../path/pathNode";
-import {PolicyWhen} from "../resolve/interface";
-import {TransitionHook} from "../transition/transitionHook";
-import {HookResult} from "../transition/interface";
-import {StateObject} from "../state/stateObject";
+import { parse } from "../common/hof";
+import { isFunction, isNumber } from "../common/predicates";
+import { Transition } from "../transition/transition";
+import { ViewTuple } from '../view';
+import { ActiveUIView, ViewConfig, ViewContext } from "../view/interface";
+import { stringify, functionToString, maxLength, padString } from "./strings";
+import { Resolvable } from "../resolve/resolvable";
+import { PathNode } from "../path/pathNode";
+import { PolicyWhen } from "../resolve/interface";
+import { TransitionHook } from "../transition/transitionHook";
+import { HookResult } from "../transition/interface";
+import { StateObject } from "../state/stateObject";
 
 /** @hidden */
 function uiViewString (uiview: ActiveUIView) {
@@ -226,13 +227,13 @@ export class Trace {
   }
 
   /** @internalapi called by ui-router code */
-  traceViewSync(pairs: any[]) {
+  traceViewSync(pairs: ViewTuple[]) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
-    const mapping = pairs.map(([ uiViewData, config ]) => {
-      const uiView = `${uiViewData.$type}:${uiViewData.fqn}`;
-      const view = config && `${config.viewDecl.$context.name}: ${config.viewDecl.$name} (${config.viewDecl.$type})`;
+    const mapping = pairs.map(({ uiView, viewConfig }) => {
+      const uiv = uiView && uiView.fqn;
+      const cfg = viewConfig && `${viewConfig.viewDecl.$context.name}: ${viewConfig.viewDecl.$name}`;
 
-      return { 'ui-view fqn': uiView, 'state: view name': view };
+      return { 'ui-view fqn': uiv, 'state: view name': cfg };
     }).sort((a, b) => a['ui-view fqn'].localeCompare(b['ui-view fqn']));
 
     consoletable(mapping);
