@@ -1,3 +1,22 @@
+## 5.0.13 (2017-12-22)
+[Compare `@uirouter/core` versions 5.0.12 and 5.0.13](https://github.com/ui-router/core/compare/5.0.12...5.0.13)
+
+### Bug Fixes
+
+* **browserLocation:** Use location.pathname (not href) or '/' when no base tag found ([db461d6](https://github.com/ui-router/core/commit/db461d6))
+* **browserLocationConfig:** If no base href found, use location.href (not empty string) ([0251424](https://github.com/ui-router/core/commit/0251424))
+* **pushStateLocation:** Fix URLs: add slash between base and path when necessary ([bfa5755](https://github.com/ui-router/core/commit/bfa5755))
+* **pushStateLocation:** When url is "" or "/", use baseHref for pushState ([042a950](https://github.com/ui-router/core/commit/042a950))
+* **resolve:** Add onFinish hook to resolve any dynamicly added resolvables ([7d1ca54](https://github.com/ui-router/core/commit/7d1ca54))
+
+
+### Features
+
+* **view:** Add onSync callback API to plugin API ([9544ae5](https://github.com/ui-router/core/commit/9544ae5))
+
+
+
+
 ## 5.0.12 (2017-12-18)
 [Compare `@uirouter/core` versions 5.0.11 and 5.0.12](https://github.com/ui-router/core/compare/5.0.11...5.0.12)
 
