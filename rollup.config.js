@@ -1,8 +1,6 @@
 import nodeResolve from 'rollup-plugin-node-resolve';
 import uglify from 'rollup-plugin-uglify';
-import progress from 'rollup-plugin-progress';
 import sourcemaps from 'rollup-plugin-sourcemaps';
-import visualizer from 'rollup-plugin-visualizer';
 
 const MINIFY = process.env.MINIFY;
 
@@ -30,9 +28,7 @@ const onwarn = (warning) => {
 
 const plugins = [
   nodeResolve({jsnext: true}),
-  progress({ clearLine: false }),
   sourcemaps(),
-  visualizer({ sourcemap: true }),
 ];
 
 if (MINIFY) plugins.push(uglify(uglifyOpts));
@@ -40,12 +36,14 @@ if (MINIFY) plugins.push(uglify(uglifyOpts));
 const extension = MINIFY ? ".min.js" : ".js";
 
 const CONFIG = {
-  moduleName: '@uirouter/core',
-  entry: 'lib-esm/index.js',
-  dest: '_bundles/ui-router-core' + extension,
+  input: 'lib-esm/index.js',
+  output: {
+    name: '@uirouter/core',
+    file: '_bundles/ui-router-core' + extension,
+    sourcemap: true,
+    format: 'umd',
+  },
 
-  sourceMap: true,
-  format: 'umd',
   exports: 'named',
   plugins: plugins,
   banner: banner,
