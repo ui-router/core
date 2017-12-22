@@ -5,7 +5,7 @@
 /** for typedoc */
 import {
   IHookRegistry, TransitionOptions, TransitionHookScope, TransitionHookPhase, TransitionCreateHookFn, HookMatchCriteria,
-  HookRegOptions, PathTypes, PathType, RegisteredHooks, TransitionHookFn, TransitionStateHookFn
+  HookRegOptions, PathTypes, PathType, RegisteredHooks, TransitionHookFn, TransitionStateHookFn,
 } from "./interface";
 import { Transition } from "./transition";
 import { makeEvent, RegisteredHook } from "./hookRegistry";
@@ -45,7 +45,7 @@ export let defaultTransOpts: TransitionOptions = {
   reload      : false,
   custom      : {},
   current     : () => null,
-  source      : "unknown"
+  source      : "unknown",
 };
 
 
@@ -131,23 +131,23 @@ export class TransitionService implements IHookRegistry, Disposable {
    * @param options the registration options
    * @returns a function which deregisters the hook.
    */
-  onCreate(criteria: HookMatchCriteria, callback: TransitionCreateHookFn, options?: HookRegOptions): Function { return }
+  onCreate(criteria: HookMatchCriteria, callback: TransitionCreateHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
+  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
+  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return }
+  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
   /** @inheritdoc */
-  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return }
+  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
 
   /** @hidden */
   public $view: ViewService;
@@ -237,7 +237,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     const TH = TransitionHook;
     const paths = this._criteriaPaths;
     const NORMAL_SORT = false, REVERSE_SORT = true;
-    const ASYNCHRONOUS = false, SYNCHRONOUS = true;
+    const SYNCHRONOUS = true;
 
     this._defineEvent("onCreate",  Phase.CREATE,  0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.THROW_ERROR, SYNCHRONOUS);
 
@@ -272,15 +272,14 @@ export class TransitionService implements IHookRegistry, Disposable {
                reverseSort: boolean = false,
                getResultHandler: GetResultHandler = TransitionHook.HANDLE_RESULT,
                getErrorHandler: GetErrorHandler = TransitionHook.REJECT_ERROR,
-               synchronous: boolean = false)
-  {
+               synchronous: boolean = false) {
     let eventType = new TransitionEventType(name, hookPhase, hookOrder, criteriaMatchPath, reverseSort, getResultHandler, getErrorHandler, synchronous);
 
     this._eventTypes.push(eventType);
     makeEvent(this, this, eventType);
-  };
+  }
 
-  /** @hidden */
+  /** @hidden */ // tslint:disable-next-line
   private _getEvents(phase?: TransitionHookPhase): TransitionEventType[] {
     let transitionHookTypes = isDefined(phase) ?
         this._eventTypes.filter(type => type.hookPhase === phase) :
@@ -289,7 +288,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     return transitionHookTypes.sort((l, r) => {
       let cmpByPhase = l.hookPhase - r.hookPhase;
       return cmpByPhase === 0 ? l.hookOrder - r.hookOrder : cmpByPhase;
-    })
+    });
   }
 
   /**
@@ -309,7 +308,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     this._criteriaPaths[name] = { name, scope: hookScope };
   }
 
-  /** * @hidden */
+  /** * @hidden */ // tslint:disable-next-line
   private _getPathTypes(): PathTypes {
     return this._criteriaPaths;
   }
