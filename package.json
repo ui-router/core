@@ -73,15 +73,14 @@
     "dts-downlevel": "^0.3.0",
     "glob": "^7.1.2",
     "jasmine-core": "^2.4.1",
-    "karma": "^1.2.0",
-    "karma-chrome-launcher": "~0.1.0",
-    "karma-coverage": "^0.5.3",
+    "karma": "2.0.0",
+    "karma-chrome-launcher": "2.2.0",
     "karma-firefox-launcher": "^1.0.1",
     "karma-jasmine": "^1.0.2",
     "karma-phantomjs-launcher": "^1.0.4",
-    "karma-script-launcher": "~0.1.0",
+    "karma-script-launcher": "~1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^1.8.0",
+    "karma-webpack": "^2.0.9",
     "npm-run-all": "^3.1.1",
     "readline-sync": "^1.4.4",
     "rollup": "^0.41.6",
@@ -94,6 +93,6 @@
     "shx": "^0.1.4",
     "tslint": "^4.5.1",
     "typescript": "2.5.3",
-    "webpack": "^1.13.3"
+    "webpack": "^3.10.0"
   }
 }

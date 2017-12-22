@@ -38,8 +38,7 @@ module.exports = function (karma) {
       devtool: 'inline-source-map',
 
       resolve: {
-        modulesDirectories: ['node_modules'],
-        extensions: ['', '.js', '.ts']
+        extensions: ['.js', '.ts']
       },
 
       module: {
