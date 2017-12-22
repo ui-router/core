@@ -1,5 +1,6 @@
 // Karma configuration file
 var karma = require('karma');
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = function (karma) {
   var config = {
@@ -42,11 +43,21 @@ module.exports = function (karma) {
       },
 
       module: {
-        loaders: [
-          { test: /\.ts$/, loader: "awesome-typescript-loader?noEmit=true&configFileName=test/tsconfig.json" }
+        rules: [
+          { 
+            test: /\.ts$/,
+            loader: 'ts-loader',
+            options: {
+              configFile: 'test/tsconfig.json',
+              transpileOnly: true,
+            },
+          }
         ]
       },
 
+      plugins: [
+        new ForkTsCheckerWebpackPlugin()
+      ],
     },
 
     webpackMiddleware: {
