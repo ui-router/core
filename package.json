@@ -81,7 +81,7 @@
     "karma-script-launcher": "~1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.9",
-    "npm-run-all": "^3.1.1",
+    "npm-run-all": "^4.1.2",
     "readline-sync": "^1.4.4",
     "rollup": "^0.41.6",
     "rollup-plugin-node-resolve": "^3.0.0",
