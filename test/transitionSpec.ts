@@ -657,7 +657,7 @@ describe('transition', function () {
             .then(done, done);
       }));
 
-      it("hooks can add resolves to a $transition$ and they will be available to be injected elsewhere", ((done) => {
+      it("hooks can add resolves to a $transition$ and they will be available to be injected in nested states", ((done) => {
         let log = [], transition = makeTransition("A", "D");
         let $q = services.$q;
         let defer = $q.defer();
@@ -684,6 +684,38 @@ describe('transition', function () {
             .then(() => defer.resolve("resolvedval"))
             .then(tick, tick)
             .then(() => expect(log.join(';')).toBe("adding resolve;Entered#B;resolving;resolvedval;Entered#C;Entered#D;DONE!"))
+            .then(done, done);
+      }));
+
+      // test for https://github.com/angular-ui/ui-router/issues/3544
+      it("hooks can add resolves to a $transition$ and they will be available in onSuccess", ((done) => {
+        let log = [], transition = makeTransition("A", "B");
+        let $q = services.$q;
+        let defer = $q.defer();
+
+        $transitions.onEnter({ entering: '**'}, function logEnter(trans, state) {
+          log.push("Entered#" + state.name);
+        }, { priority: -1 });
+
+        $transitions.onEnter({ entering: "B" }, function addResolves($transition$: Transition) {
+          log.push("adding resolve");
+          let resolveFn = function () { log.push("resolving"); return defer.promise; };
+          $transition$.addResolvable(new Resolvable('newResolve', resolveFn));
+        });
+
+        $transitions.onSuccess({}, function useTheNewResolve(trans) {
+          log.push('SUCCESS!');
+          log.push(trans.injector().get('newResolve'));
+        });
+
+        transition.promise.then(function() { log.push("DONE!"); });
+
+        transition.run();
+
+        tick().then(() => expect(log.join(';')).toBe("adding resolve;Entered#B;resolving"))
+            .then(() => defer.resolve("resolvedval"))
+            .then(tick, tick)
+            .then(() => expect(log.join(';')).toBe("adding resolve;Entered#B;resolving;SUCCESS!;resolvedval;DONE!"))
             .then(done, done);
       }));
 

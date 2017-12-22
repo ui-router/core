@@ -16,7 +16,7 @@ import { UIRouter } from "../router";
 import { registerAddCoreResolvables } from "../hooks/coreResolvables";
 import { registerRedirectToHook } from "../hooks/redirectTo";
 import { registerOnExitHook, registerOnRetainHook, registerOnEnterHook } from "../hooks/onEnterExitRetain";
-import { registerEagerResolvePath, registerLazyResolveState } from "../hooks/resolve";
+import { registerEagerResolvePath, registerLazyResolveState, registerResolveRemaining } from "../hooks/resolve";
 import { registerLoadEnteringViews, registerActivateViews } from "../hooks/views";
 import { registerUpdateGlobalState } from "../hooks/updateGlobals";
 import { registerUpdateUrl } from "../hooks/url";
@@ -180,6 +180,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     onEnter: Function;
     eagerResolve: Function;
     lazyResolve: Function;
+    resolveAll: Function;
     loadViews: Function;
     activateViews: Function;
     updateGlobals: Function;
@@ -328,7 +329,7 @@ export class TransitionService implements IHookRegistry, Disposable {
 
     // Wire up redirectTo hook
     fns.redirectTo      = registerRedirectToHook(this);
-    
+
     // Wire up onExit/Retain/Enter state hooks
     fns.onExit          = registerOnExitHook(this);
     fns.onRetain        = registerOnRetainHook(this);
@@ -337,7 +338,8 @@ export class TransitionService implements IHookRegistry, Disposable {
     // Wire up Resolve hooks
     fns.eagerResolve    = registerEagerResolvePath(this);
     fns.lazyResolve     = registerLazyResolveState(this);
-                                 
+    fns.resolveAll      = registerResolveRemaining(this);
+
     // Wire up the View management hooks
     fns.loadViews       = registerLoadEnteringViews(this);
     fns.activateViews   = registerActivateViews(this);
