@@ -1,5 +1,7 @@
 # UI-Router Core &nbsp;[![Build Status](https://travis-ci.org/ui-router/core.svg?branch=master)](https://travis-ci.org/ui-router/core)
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ui-router/core.svg)](https://greenkeeper.io/)
+
 UI-Router core provides client-side [Single Page Application](https://en.wikipedia.org/wiki/Single-page_application) 
 routing for JavaScript.
 This core is framework agnostic.
