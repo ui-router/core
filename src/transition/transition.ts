@@ -364,6 +364,18 @@ export class Transition implements IHookRegistry {
   /**
    * Dynamically adds a new [[Resolvable]] (i.e., [[StateDeclaration.resolve]]) to this transition.
    *
+   * Allows a transition hook to dynamically add a Resolvable to this Transition.
+   *
+   * Use the [[Transition.injector]] to retrieve the resolved data in subsequent hooks ([[UIInjector.get]]).
+   *
+   * If a `state` argument is provided, the Resolvable is processed when that state is being entered.
+   * If no `state` is provided then the root state is used.
+   * If the given `state` has already been entered, the Resolvable is processed when any child state is entered.
+   * If no child states will be entered, the Resolvable is processed during the `onFinish` phase of the Transition.
+   *
+   * The `state` argument also scopes the resolved data.
+   * The resolved data is available from the injector for that `state` and any children states.
+   *
    * #### Example:
    * ```js
    * transitionService.onBefore({}, transition => {
