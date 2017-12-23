@@ -229,12 +229,13 @@ export class Trace {
   /** @internalapi called by ui-router code */
   traceViewSync(pairs: ViewTuple[]) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
+    const uivheader = 'uiview component fqn';
+    const cfgheader = 'view config state (view name)';
     const mapping = pairs.map(({ uiView, viewConfig }) => {
       const uiv = uiView && uiView.fqn;
-      const cfg = viewConfig && `${viewConfig.viewDecl.$context.name}: ${viewConfig.viewDecl.$name}`;
-
-      return { 'ui-view fqn': uiv, 'state: view name': cfg };
-    }).sort((a, b) => a['ui-view fqn'].localeCompare(b['ui-view fqn']));
+      const cfg = viewConfig && `${viewConfig.viewDecl.$context.name}: (${viewConfig.viewDecl.$name})`;
+      return { [uivheader]: uiv, [cfgheader]: cfg };
+    }).sort((a, b) => (a[uivheader] || '').localeCompare(b[uivheader] || ''));
 
     consoletable(mapping);
   }

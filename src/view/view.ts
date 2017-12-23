@@ -223,16 +223,15 @@ export class ViewService {
     const uiViewTuples = this._uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair);
     const matchedViewConfigs = uiViewTuples.map(tuple => tuple.viewConfig);
     const unmatchedConfigTuples = this._viewConfigs
-      .filter(config => inArray(matchedViewConfigs, config))
+      .filter(config => !inArray(matchedViewConfigs, config))
       .map(viewConfig => ({ uiView: undefined, viewConfig }));
-
-    const allTuples: ViewTuple[] = uiViewTuples.concat(unmatchedConfigTuples);
 
     uiViewTuples.forEach(configureUIView);
 
+    const allTuples: ViewTuple[] = uiViewTuples.concat(unmatchedConfigTuples);
     this._listeners.forEach(cb => cb(allTuples));
     trace.traceViewSync(allTuples);
-  };
+  }
 
   /**
    * Registers a `ui-view` component
