@@ -1,3 +1,4 @@
 {
-  "angular": "https://github.com/ui-router/angular.git"
+  "angular": "https://github.com/ui-router/angular.git",
+  "angularjs": "https://github.com/angular-ui/ui-router.git"
 }
