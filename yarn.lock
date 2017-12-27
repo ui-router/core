@@ -10,9 +10,9 @@
   version "3.2.17"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.2.17.tgz#01df9805dd5cf83a14cf5bfd81adced7d4fbd970"
 
-"@uirouter/publish-scripts@2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.1.1.tgz#c9975d3984677d8c5d48417ad0f3b9c2d526343b"
+"@uirouter/publish-scripts@2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.1.2.tgz#1fb8617461dc8e12add7ec00f499eb5bd32eb070"
   dependencies:
     conventional-changelog "^1.1.4"
     conventional-changelog-ui-router-core "^1.4.2"
