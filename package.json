@@ -12,7 +12,7 @@
     "fixmaps:bundle": "tweak_sourcemap_paths -a --include '_bundles/**/*.js.map'",
     "install": "node migrate/migratewarn.js",
     "prepublishOnly": "npm run build",
-    "test": "karma start && npm run test:downstream",
+    "test": "karma start",
     "test:downstream": "npm run build && test_downstream_projects",
     "watch": "run-p watch:*",
     "watch:buildjs": "tsc -w",
