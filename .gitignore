@@ -9,6 +9,7 @@ stats.html
 **/.*
 node_modules
 bower_components
+downstream_projects
 lib
 lib-esm
 

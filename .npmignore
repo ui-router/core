@@ -6,6 +6,7 @@ src
 test
 scripts
 node_modules
+downstream_projects
 
 karma.**.js
 tslint.json
