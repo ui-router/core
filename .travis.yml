@@ -26,6 +26,14 @@ env:
   - DOWNSTREAM_PKGS=
   - DOWNSTREAM_PKGS=angular,sample-app-angular
   - DOWNSTREAM_PKGS=angularjs,sample-app-angularjs
+  - DOWNSTREAM_PKGS=react
+  - DOWNSTREAM_PKGS=react,sample-app-react
+
+matrix:
+  fast_finish: true
+  allow_failures:
+  - env: DOWNSTREAM_PKGS=react,sample-app-react
+
 
 sudo: false
 

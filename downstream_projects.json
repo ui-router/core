@@ -1,4 +1,5 @@
 {
   "angular": "https://github.com/ui-router/angular.git",
-  "angularjs": "https://github.com/angular-ui/ui-router.git"
+  "angularjs": "https://github.com/angular-ui/ui-router.git",
+  "react": "https://github.com/ui-router/react.git"
 }
