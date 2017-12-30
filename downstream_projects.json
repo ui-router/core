@@ -1,5 +1,10 @@
 {
   "angular": "https://github.com/ui-router/angular.git",
   "angularjs": "https://github.com/angular-ui/ui-router.git",
-  "react": "https://github.com/ui-router/react.git"
+  "react": "https://github.com/ui-router/react.git",
+  "typescript2.2": "./test/typescript2.2",
+  "typescript2.3": "./test/typescript2.3",
+  "typescript2.4": "./test/typescript2.4",
+  "typescript2.5": "./test/typescript2.5",
+  "typescript2.6": "./test/typescript2.6"
 }

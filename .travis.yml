@@ -1,21 +1,10 @@
 language: node_js
 node_js: '8.9.1'
 
-cache:
-  yarn: true
-  directories:
-  - node_modules
-  - downstream_projects
-
-before_install:
-- curl -o- -L https://yarnpkg.com/install.sh | bash
-- export PATH="$HOME/.yarn/bin:$PATH"
-- yarn global add greenkeeper-lockfile@1 yalc
-
+before_install: yarn global add greenkeeper-lockfile@1 yalc
 install: yarn --check-files
 
 before_script: greenkeeper-lockfile-update && greenkeeper-lockfile-upload
-
 script:
 - if [ "x${DOWNSTREAM_PKGS}x" != "xx" ] ; then npm run test:downstream ; else tsc && npm test ; fi
 
@@ -24,6 +13,7 @@ env:
     secure: bEGHePu9rkjcy5Pq3RQQfCIRzAfCSxH7dZsdOJd3pAXEGbkhuCOAGFV0v+NVbRBWNYv0yIExwwu2VOVfAPGqmmuhzE8Uq/WZeLWUbUA1oSIN7t9IkYRKIdoE36o85eyRxSTP6w3dtMHXLeMvPbgtgEUVrgPztBVe3ySoQ+nA3jbgZ/fBpuEevJ2dAxwybbtRwZBflplUumpwmy1pSiLHptdFXsxmmLr0hOjx+WZd38jMZo4H4vV9zo6wz34hjf+j1f0jsjmsKgpRVPLADtLTcqIfEegSG7vLmlFJLGBtBZ6UhIioZseZTVOi2wq1hK0E+3SzPJVXhu3h7VsIBVgCaaYJQ07p7q9LszwWwxHHzePLBtV77J6mJ1zZFbS/PHmVHnfU/gz5+l2Te2KSkvFYbq9uVXd4CLLeR1xdECwX8qiXMtUOk7IauVVzFtLCPRVksmEjClJNf1tAi+j9nKezYHQ8LPSqTyoxo/0PhQJ0U3pCQuKGTxO9lDi63Gks9lr87N+yrn81W+2wbGKL6iqItKPAQ5Tcl5FbhmwUk40p0Sz1KNjBWepREQAeCgRKFN4y/Xhi6Mn1TydwE9zHXdfIiWNYaxl0LjXMnAMahvO2+m5NClDWhzBii21JsdMyUS3TUFGyVIfok2M+uaM2NZn7GLNRSOGarBpLhF/5lci/9kY=
   matrix:
   - DOWNSTREAM_PKGS=
+  - DOWNSTREAM_PKGS=typescript2.2,typescript2.3,typescript2.4,typescript2.5,typescript2.6
   - DOWNSTREAM_PKGS=angular,sample-app-angular
   - DOWNSTREAM_PKGS=angularjs,sample-app-angularjs
   - DOWNSTREAM_PKGS=react
@@ -33,13 +23,23 @@ matrix:
   fast_finish: true
   allow_failures:
   - env: DOWNSTREAM_PKGS=react,sample-app-react
+  - env: DOWNSTREAM_PKGS=angular,sample-app-angular
+  - env: DOWNSTREAM_PKGS=angularjs,sample-app-angularjs
+  - env: DOWNSTREAM_PKGS=react
+  - env: DOWNSTREAM_PKGS=react,sample-app-react
 
+notifications:
+  slack:
+    secure: VlSFXHFYU4jlc5OSX0JZcZfXY73uIELlQJ7sYadyW7Cu3SqeTGSTxhGxDBir5aLVgONXFXXW2JJTKIXK3Sdl7+IpCetR5cgqoYNaINMgOU9uw4XVwZ4BEQoQlYeP6YaR5GJNaF1tz5H/8aon/RlNqiaRzaUUHsmmI7tTvGuceT0d77IxwmWZbSQKK3cxRK0LtlOzD0yAlVE+3omei94DXlDMcUi3wy83UjOhc+SJHp9w5Z0CsAjRe8pD1nMDfaYG2F7TssAqdnbfb9EE9m3GqIoJXensQtoBkAQjUdAb5Zr4Zfdo+sR73vzN8EM1TVL7C84CU8SmEOG88AVjbJldOzfW3jor2hM839AjXQ0yQlUONP1TfI5YqfnrfA2N6Xw2yABXp1A/dePzz78RgfhchesKfUeS8Rm8kDp/J2Dqq0UMyt7P3COckJK04TfRjzZeX1egWVDlLgDWt2/sxjk97vppkPrjAg6m/wQK/ImZaAqMgkNaXXp+D3EB8AWuoq3aOp4iITMZ4Xy1IC+sXF4RWqPxnz3W0TaY8fYJvAC3PAfydLGy2bKJ/ZXsAQHwHt9wDUOiKbAHHfo8lUMv2SVvqXbQQMFUuk6WtZg/YV6IQNnwkQW7q9FgvopnI8sSFek9R4h+2+IB6R+jQ7+nBRAcXGftOsiNXVymmLQfAX8FYYc=
 
 sudo: false
 
 git:
   depth: 3
 
-notifications:
-  slack:
-    secure: VlSFXHFYU4jlc5OSX0JZcZfXY73uIELlQJ7sYadyW7Cu3SqeTGSTxhGxDBir5aLVgONXFXXW2JJTKIXK3Sdl7+IpCetR5cgqoYNaINMgOU9uw4XVwZ4BEQoQlYeP6YaR5GJNaF1tz5H/8aon/RlNqiaRzaUUHsmmI7tTvGuceT0d77IxwmWZbSQKK3cxRK0LtlOzD0yAlVE+3omei94DXlDMcUi3wy83UjOhc+SJHp9w5Z0CsAjRe8pD1nMDfaYG2F7TssAqdnbfb9EE9m3GqIoJXensQtoBkAQjUdAb5Zr4Zfdo+sR73vzN8EM1TVL7C84CU8SmEOG88AVjbJldOzfW3jor2hM839AjXQ0yQlUONP1TfI5YqfnrfA2N6Xw2yABXp1A/dePzz78RgfhchesKfUeS8Rm8kDp/J2Dqq0UMyt7P3COckJK04TfRjzZeX1egWVDlLgDWt2/sxjk97vppkPrjAg6m/wQK/ImZaAqMgkNaXXp+D3EB8AWuoq3aOp4iITMZ4Xy1IC+sXF4RWqPxnz3W0TaY8fYJvAC3PAfydLGy2bKJ/ZXsAQHwHt9wDUOiKbAHHfo8lUMv2SVvqXbQQMFUuk6WtZg/YV6IQNnwkQW7q9FgvopnI8sSFek9R4h+2+IB6R+jQ7+nBRAcXGftOsiNXVymmLQfAX8FYYc=
+cache:
+  yarn: true
+  directories:
+  - node_modules
+  - .downstream_cache
+
