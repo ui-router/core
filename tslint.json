@@ -1,6 +1,6 @@
-{ 
+{
   "rules": {
-    "align": [true, "parameters", "statements"],
+    "align": false,
     "ban": false,
     "class-name": true,
     "comment-format": [false, "check-space", "check-lowercase" ],
