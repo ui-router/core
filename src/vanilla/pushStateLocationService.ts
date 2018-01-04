@@ -19,7 +19,7 @@ export class PushStateLocationService extends BaseLocationServices {
     super(router, true);
     this._config = router.urlService.config;
     root.addEventListener('popstate', this._listener, false);
-  };
+  }
 
   /**
    * Gets the base prefix without:

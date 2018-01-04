@@ -319,7 +319,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
     this._otherwiseFn = this.urlRuleFactory.create(val(true), handlerFn);
     this._sorted = false;
-  };
+  }
 
   /** @inheritdoc */
   initial(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef) {
@@ -329,7 +329,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
         router.globals.transitionHistory.size() === 0 && !!/^\/?$/.exec(urlParts.path);
 
     this.rule(this.urlRuleFactory.create(matchFn, handlerFn));
-  };
+  }
 
   /** @inheritdoc */
   when(matcher: (RegExp|UrlMatcher|string), handler: string|UrlRuleHandlerFn, options?: { priority: number }): UrlRule {
@@ -337,13 +337,13 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
     if (isDefined(options && options.priority)) rule.priority = options.priority;
     this.rule(rule);
     return rule;
-  };
+  }
 
   /** @inheritdoc */
   deferIntercept(defer?: boolean) {
     if (defer === undefined) defer = true;
     this.interceptDeferred = defer;
-  };
+  }
 }
 
 function getHandlerFn(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef): UrlRuleHandlerFn {

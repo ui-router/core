@@ -14,7 +14,7 @@ export const keyValsToObjectR = (accum, [key, val]) => {
   } else if (isArray(accum[key])) {
     accum[key].push(val);
   } else {
-    accum[key] = [accum[key], val]
+    accum[key] = [accum[key], val];
   }
   return accum;
 };

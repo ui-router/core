@@ -91,7 +91,7 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
       if (isFunction(val)) result = result && (isDefined(object[name]) && isFunction(object[name]));
     });
     return result;
-  };
+  }
 
   /**
    * Creates and registers a custom [[ParamType]] object
@@ -115,14 +115,14 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
   type(name: string, definition?: ParamTypeDefinition, definitionFn?: () => ParamTypeDefinition) {
     const type = this.paramTypes.type(name, definition, definitionFn);
     return !isDefined(definition) ? type : this;
-  };
+  }
 
   /** @hidden */
   $get() {
     this.paramTypes.enqueue = false;
     this.paramTypes._flushTypeQueue();
     return this;
-  };
+  }
 
   /** @internalapi */
   dispose() {

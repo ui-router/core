@@ -193,7 +193,7 @@ export class UrlRuleFactory {
         regexp.exec(url.path);
 
     const details = { regexp, type: 'REGEXP' };
-    return extend(new BaseUrlRule(matchParamsFromRegexp, _handler), details) as RegExpRule
+    return extend(new BaseUrlRule(matchParamsFromRegexp, _handler), details) as RegExpRule;
   }
 }
 

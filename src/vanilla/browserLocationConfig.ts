@@ -36,7 +36,7 @@ export class BrowserLocationConfig implements LocationConfig {
   hashPrefix(): string;
   hashPrefix(newprefix?: string): string {
     return isDefined(newprefix) ? this._hashPrefix = newprefix : this._hashPrefix;
-  };
+  }
 
   baseHref(href?: string): string {
     return isDefined(href) ? this._baseHref = href :

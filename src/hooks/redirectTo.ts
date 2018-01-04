@@ -1,5 +1,5 @@
 /** @module hooks */ /** */
-import { isString, isFunction } from '../common/predicates'
+import { isString, isFunction } from '../common/predicates';
 import { Transition } from '../transition/transition';
 import { services } from '../common/coreservices';
 import { TargetState } from '../state/targetState';

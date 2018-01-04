@@ -193,7 +193,7 @@ export class ViewService {
 
   private _rootViewContext(context?: ViewContext): ViewContext {
     return this._rootContext = context || this._rootContext;
-  };
+  }
 
   private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
     this._viewConfigFactories[viewType] = factory;
@@ -314,7 +314,7 @@ export class ViewService {
       trace.traceViewServiceUIViewEvent('<- Deregistering', uiView);
       removeFrom(uiViews)(uiView);
     };
-  };
+  }
 
   /**
    * Returns the list of views currently available on the page, by fully-qualified name.

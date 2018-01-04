@@ -19,7 +19,7 @@ function makeEnterExitRetainHook(hookName: string): TransitionStateHookFn {
     const _state: StateObject = state.$$state();
     const hookFn: TransitionStateHookFn = _state[hookName];
     return hookFn(transition, state);
-  }
+  };
 }
 
 /**

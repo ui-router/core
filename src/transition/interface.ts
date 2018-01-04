@@ -820,7 +820,7 @@ export interface PathType {
  *
  * Or, `true` to always match
  */
-export type HookMatchCriterion = (string|IStateMatch|boolean)
+export type HookMatchCriterion = (string|IStateMatch|boolean);
 
 export enum TransitionHookPhase { CREATE, BEFORE, RUN, SUCCESS, ERROR }
 export enum TransitionHookScope { TRANSITION, STATE }

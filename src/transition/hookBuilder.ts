@@ -132,5 +132,5 @@ function tupleSort(reverseDepthSort = false) {
     const factor = reverseDepthSort ? -1 : 1;
     const depthDelta = (l.node.state.path.length - r.node.state.path.length) * factor;
     return depthDelta !== 0 ? depthDelta : r.hook.priority - l.hook.priority;
-  }
+  };
 }

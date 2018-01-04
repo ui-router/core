@@ -40,6 +40,6 @@ export class StateParams {
       }
     }
     return extend({}, inherited, newParams);
-  };
+  }
 }
 

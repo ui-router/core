@@ -191,7 +191,7 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
     [isResolveLiteral,              literal2Resolvable],
     [isLikeNg2Provider,             literal2Resolvable],
     [isTupleFromObj,                tuple2Resolvable],
-    [val(true),                     (obj: any) => { throw new Error('Invalid resolve value: ' + stringify(obj)) }],
+    [val(true),                     (obj: any) => { throw new Error('Invalid resolve value: ' + stringify(obj)); }],
   ]);
 
   // If resolveBlock is already an array, use it as-is.

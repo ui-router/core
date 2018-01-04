@@ -202,7 +202,7 @@ class UIInjectorImpl implements UIInjector {
       }
 
       if (!resolvable.resolved) {
-        throw new Error('Resolvable async .get() not complete:' + stringify(resolvable.token))
+        throw new Error('Resolvable async .get() not complete:' + stringify(resolvable.token));
       }
       return resolvable.data;
     }
