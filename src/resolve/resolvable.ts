@@ -2,24 +2,24 @@
  * @coreapi
  * @module resolve
  */ /** for typedoc */
-import {extend, equals, inArray, identity} from "../common/common";
-import {services} from "../common/coreservices";
-import {trace} from "../common/trace";
-import {ResolvePolicy, ResolvableLiteral, resolvePolicies} from "./interface";
+import {extend, equals, inArray, identity} from '../common/common';
+import {services} from '../common/coreservices';
+import {trace} from '../common/trace';
+import {ResolvePolicy, ResolvableLiteral, resolvePolicies} from './interface';
 
-import {ResolveContext} from "./resolveContext";
-import {stringify} from "../common/strings";
-import {isFunction, isObject} from "../common/predicates";
-import {Transition} from "../transition/transition";
-import {StateObject} from "../state/stateObject";
-import {PathNode} from "../path/pathNode";
+import {ResolveContext} from './resolveContext';
+import {stringify} from '../common/strings';
+import {isFunction, isObject} from '../common/predicates';
+import {Transition} from '../transition/transition';
+import {StateObject} from '../state/stateObject';
+import {PathNode} from '../path/pathNode';
 import { isNullOrUndefined } from '../common';
 
 
 // TODO: explicitly make this user configurable
 export let defaultResolvePolicy: ResolvePolicy = {
-  when: "LAZY",
-  async: "WAIT"
+  when: 'LAZY',
+  async: 'WAIT'
 };
 
 /**
@@ -77,8 +77,8 @@ export class Resolvable implements ResolvableLiteral {
     if (arg1 instanceof Resolvable) {
       extend(this, arg1);
     } else if (isFunction(resolveFn)) {
-      if (isNullOrUndefined(arg1)) throw new Error("new Resolvable(): token argument is required");
-      if (!isFunction(resolveFn)) throw new Error("new Resolvable(): resolveFn argument must be a function");
+      if (isNullOrUndefined(arg1)) throw new Error('new Resolvable(): token argument is required');
+      if (!isFunction(resolveFn)) throw new Error('new Resolvable(): resolveFn argument must be a function');
 
       this.token = arg1;
       this.policy = policy;
@@ -138,7 +138,7 @@ export class Resolvable implements ResolvableLiteral {
     // If the resolve policy is RXWAIT, wait for the observable to emit something. otherwise pass through.
     const node: PathNode = resolveContext.findNode(this);
     const state: StateObject = node && node.state;
-    const maybeWaitForRx = this.getPolicy(state).async === "RXWAIT" ? waitForRx : identity;
+    const maybeWaitForRx = this.getPolicy(state).async === 'RXWAIT' ? waitForRx : identity;
 
     // After the final value has been resolved, update the state of the Resolvable
     const applyResolvedValue = (resolvedValue: any) => {

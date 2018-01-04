@@ -30,7 +30,7 @@ const prioritySort = (a: UrlRule, b: UrlRule) =>
 
 /** @hidden */
 const typeSort = (a: UrlRule, b: UrlRule) => {
-  const weights = { "STATE": 4, "URLMATCHER": 4, "REGEXP": 3, "RAW": 2, "OTHER": 1 };
+  const weights = { 'STATE': 4, 'URLMATCHER': 4, 'REGEXP': 3, 'RAW': 2, 'OTHER': 1 };
   return (weights[a.type] || 0) - (weights[b.type] || 0);
 };
 
@@ -263,7 +263,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
     const cfg = this._router.urlService.config;
     const isHtml5 = cfg.html5Mode();
     if (!isHtml5 && url !== null) {
-      url = "#" + cfg.hashPrefix() + url;
+      url = '#' + cfg.hashPrefix() + url;
     }
     url = appendBasePath(url, isHtml5, options.absolute, cfg.baseHref());
 
@@ -292,7 +292,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * @return a function that deregisters the rule
    */
   rule(rule: UrlRule): Function {
-    if (!UrlRuleFactory.isUrlRule(rule)) throw new Error("invalid rule");
+    if (!UrlRuleFactory.isUrlRule(rule)) throw new Error('invalid rule');
     rule.$id = this._id++;
     rule.priority = rule.priority || 0;
 

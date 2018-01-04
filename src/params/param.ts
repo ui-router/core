@@ -2,18 +2,18 @@
  * @coreapi
  * @module params
  */ /** for typedoc */
-import { extend, filter, map, allTrueR } from "../common/common";
-import { prop } from "../common/hof";
-import { isInjectable, isDefined, isString, isArray, isUndefined } from "../common/predicates";
-import { RawParams, ParamDeclaration } from "../params/interface";
-import { services } from "../common/coreservices";
-import { ParamType } from "./paramType";
-import { ParamTypes } from "./paramTypes";
-import { UrlMatcherFactory } from "../url/urlMatcherFactory";
+import { extend, filter, map, allTrueR } from '../common/common';
+import { prop } from '../common/hof';
+import { isInjectable, isDefined, isString, isArray, isUndefined } from '../common/predicates';
+import { RawParams, ParamDeclaration } from '../params/interface';
+import { services } from '../common/coreservices';
+import { ParamType } from './paramType';
+import { ParamTypes } from './paramTypes';
+import { UrlMatcherFactory } from '../url/urlMatcherFactory';
 
 /** @hidden */ const hasOwn = Object.prototype.hasOwnProperty;
 /** @hidden */ const isShorthand = (cfg: ParamDeclaration) =>
-    ["value", "type", "squash", "array", "dynamic"].filter(hasOwn.bind(cfg || {})).length === 0;
+    ['value', 'type', 'squash', 'array', 'dynamic'].filter(hasOwn.bind(cfg || {})).length === 0;
 
 /** @internalapi */
 export enum DefType {
@@ -42,9 +42,9 @@ function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, i
   if (cfg.type && urlType && urlType.name === 'string' && paramTypes.type(cfg.type as string)) return paramTypes.type(cfg.type as string);
   if (urlType) return urlType;
   if (!cfg.type) {
-    const type = location === DefType.CONFIG ? "any" :
-        location === DefType.PATH ? "path" :
-        location === DefType.SEARCH ? "query" : "string";
+    const type = location === DefType.CONFIG ? 'any' :
+        location === DefType.PATH ? 'path' :
+        location === DefType.SEARCH ? 'query' : 'string';
     return paramTypes.type(type);
   }
   return cfg.type instanceof ParamType ? cfg.type : paramTypes.type(cfg.type as string);
@@ -65,14 +65,14 @@ function getSquashPolicy(config: ParamDeclaration, isOptional: boolean, defaultP
 /** @internalapi */
 function getReplace(config: ParamDeclaration, arrayMode: boolean, isOptional: boolean, squash: (string|boolean)) {
   const defaultPolicy = [
-    { from: "", to: (isOptional || arrayMode ? undefined : "") },
-    { from: null, to: (isOptional || arrayMode ? undefined : "") },
+    { from: '', to: (isOptional || arrayMode ? undefined : '') },
+    { from: null, to: (isOptional || arrayMode ? undefined : '') },
   ];
 
   const replace = isArray(config.replace) ? config.replace : [];
   if (isString(squash)) replace.push({ from: squash, to: undefined });
 
-  const configuredKeys = map(replace, prop("from"));
+  const configuredKeys = map(replace, prop('from'));
   return filter(defaultPolicy, item => configuredKeys.indexOf(item.from) === -1).concat(replace);
 }
 
@@ -150,7 +150,7 @@ export class Param {
 
     // array config: param name (param[]) overrides default settings.  explicit config overrides param name.
     function getArrayMode() {
-      const arrayDefaults = { array: (location === DefType.SEARCH ? "auto" : false) };
+      const arrayDefaults = { array: (location === DefType.SEARCH ? 'auto' : false) };
       const arrayParamNomenclature = id.match(/\[\]$/) ? { array: true } : {};
       return extend(arrayDefaults, arrayParamNomenclature, config).array;
     }
@@ -173,7 +173,7 @@ export class Param {
     const getDefaultValue = () => {
       if (this._defaultValueCache) return this._defaultValueCache.defaultValue;
 
-      if (!services.$injector) throw new Error("Injectable functions cannot be called at configuration time");
+      if (!services.$injector) throw new Error('Injectable functions cannot be called at configuration time');
 
       const defaultValue = services.$injector.invoke(this.config.$$fn);
 

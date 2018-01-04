@@ -6,7 +6,7 @@
  * @module common_hof
  */ /** */
 
-import {Predicate} from "./common";
+import {Predicate} from './common';
 /**
  * Returns a new function for [Partial Application](https://en.wikipedia.org/wiki/Partial_application) of the original function.
  *
@@ -119,7 +119,7 @@ export const propEq = curry((name: string, val: any, obj: any) => obj && obj[nam
  * propNotFound(obj) === undefined
  */
 export const parse = (name: string) =>
-    pipe.apply(null, name.split(".").map(prop));
+    pipe.apply(null, name.split('.').map(prop));
 
 /**
  * Given a function that returns a truthy or falsey value, returns a

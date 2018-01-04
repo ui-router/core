@@ -2,11 +2,11 @@
  * @coreapi
  * @module core
  */ /** */
-import {StateParams} from "./params/stateParams";
-import {StateDeclaration} from "./state/interface";
-import {StateObject} from "./state/stateObject";
-import {Transition} from "./transition/transition";
-import {Queue} from "./common/queue";
+import {StateParams} from './params/stateParams';
+import {StateDeclaration} from './state/interface';
+import {StateObject} from './state/stateObject';
+import {Transition} from './transition/transition';
+import {Queue} from './common/queue';
 import { Disposable } from './interface';
 
 /**

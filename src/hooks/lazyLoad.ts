@@ -1,10 +1,10 @@
 /** @module hooks */ /** */
-import {Transition} from "../transition/transition";
-import {TransitionService} from "../transition/transitionService";
-import {TransitionHookFn} from "../transition/interface";
-import {StateDeclaration, LazyLoadResult} from "../state/interface";
-import {services} from "../common/coreservices";
-import { StateRule } from "../url/interface";
+import {Transition} from '../transition/transition';
+import {TransitionService} from '../transition/transitionService';
+import {TransitionHookFn} from '../transition/interface';
+import {StateDeclaration, LazyLoadResult} from '../state/interface';
+import {services} from '../common/coreservices';
+import { StateRule } from '../url/interface';
 
 /**
  * A [[TransitionHookFn]] that performs lazy loading
@@ -49,7 +49,7 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
 
     // If the best match is a state, redirect the transition (instead
     // of calling sync() which supersedes the current transition)
-    if (rule && rule.type === "STATE") {
+    if (rule && rule.type === 'STATE') {
       const state = (rule as StateRule).state;
       const params = result.match;
       return router.stateService.target(state, params, transition.options());

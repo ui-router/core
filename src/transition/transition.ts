@@ -31,7 +31,7 @@ import { RawParams } from '../params/interface';
 import { ResolvableLiteral } from '../resolve/interface';
 
 /** @hidden */
-const stateSelf: (_state: StateObject) => StateDeclaration = prop("self");
+const stateSelf: (_state: StateObject) => StateDeclaration = prop('self');
 
 /**
  * Represents a transition between two states.
@@ -259,8 +259,8 @@ export class Transition implements IHookRegistry {
    */
   params(pathname?: string): any;
   params<T>(pathname?: string): T;
-  params(pathname = "to") {
-    return Object.freeze(this._treeChanges[pathname].map(prop("paramValues")).reduce(mergeR, {}));
+  params(pathname = 'to') {
+    return Object.freeze(this._treeChanges[pathname].map(prop('paramValues')).reduce(mergeR, {}));
   }
 
 
@@ -319,7 +319,7 @@ export class Transition implements IHookRegistry {
    *
    * @returns a [[UIInjector]]
    */
-  injector(state?: StateOrName, pathName = "to"): UIInjector {
+  injector(state?: StateOrName, pathName = 'to'): UIInjector {
     let path: PathNode[] = this._treeChanges[pathName];
     if (state) path = PathUtils.subPath(path, node => node.state === state || node.state.name === state);
     return new ResolveContext(path).injector();
@@ -357,7 +357,7 @@ export class Transition implements IHookRegistry {
    *
    * @returns an array of resolve tokens (keys)
    */
-  getResolveTokens(pathname = "to"): any[] {
+  getResolveTokens(pathname = 'to'): any[] {
     return new ResolveContext(this._treeChanges[pathname]).getTokens();
   }
 
@@ -390,10 +390,10 @@ export class Transition implements IHookRegistry {
    * @param resolvable a [[ResolvableLiteral]] object (or a [[Resolvable]])
    * @param state the state in the "to path" which should receive the new resolve (otherwise, the root state)
    */
-  addResolvable(resolvable: Resolvable|ResolvableLiteral, state: StateOrName = ""): void {
+  addResolvable(resolvable: Resolvable|ResolvableLiteral, state: StateOrName = ''): void {
     resolvable = is(Resolvable)(resolvable) ? resolvable : new Resolvable(resolvable);
 
-    const stateName: string = (typeof state === "string") ? state : state.name;
+    const stateName: string = (typeof state === 'string') ? state : state.name;
     const topath = this._treeChanges.to;
     const targetNode = find(topath, node => node.state.name === stateName);
     const resolveContext: ResolveContext = new ResolveContext(topath);
@@ -501,10 +501,10 @@ export class Transition implements IHookRegistry {
    *
    * @returns a list of ViewConfig objects for the given path.
    */
-  views(pathname = "entering", state?: StateObject): ViewConfig[] {
+  views(pathname = 'entering', state?: StateObject): ViewConfig[] {
     let path = this._treeChanges[pathname];
     path = !state ? path : path.filter(propEq('state', state));
-    return path.map(prop("views")).filter(identity).reduce(unnestR, []);
+    return path.map(prop('views')).filter(identity).reduce(unnestR, []);
   }
 
   /**
@@ -541,7 +541,7 @@ export class Transition implements IHookRegistry {
       if (++redirects > 20) throw new Error(`Too many consecutive Transition redirects (20+)`);
     }
 
-    const redirectOpts: TransitionOptions = { redirectedFrom: this, source: "redirect" };
+    const redirectOpts: TransitionOptions = { redirectedFrom: this, source: 'redirect' };
     // If the original transition was caused by URL sync, then use { location: 'replace' }
     // on the new transition (unless the target state explicitly specifies location: false).
     // This causes the original url to be replaced with the url for the redirect target
@@ -632,7 +632,7 @@ export class Transition implements IHookRegistry {
   }
 
   /** @hidden */
-  _ignoredReason(): "SameAsCurrent"|"SameAsPending"|undefined {
+  _ignoredReason(): 'SameAsCurrent'|'SameAsPending'|undefined {
     const pending = this.router.globals.transition;
     const reloadState = this._options.reloadState;
 
@@ -645,8 +645,8 @@ export class Transition implements IHookRegistry {
     const newTC = this.treeChanges();
     const pendTC = pending && pending.treeChanges();
 
-    if (pendTC && same(pendTC.to, newTC.to) && same(pendTC.exiting, newTC.exiting)) return "SameAsPending";
-    if (newTC.exiting.length === 0 && newTC.entering.length === 0 && same(newTC.from, newTC.to)) return "SameAsCurrent";
+    if (pendTC && same(pendTC.to, newTC.to) && same(pendTC.exiting, newTC.exiting)) return 'SameAsPending';
+    if (newTC.exiting.length === 0 && newTC.entering.length === 0 && same(newTC.from, newTC.to)) return 'SameAsCurrent';
   }
 
   /**
@@ -769,13 +769,13 @@ export class Transition implements IHookRegistry {
     const toStateOrName = this.to();
 
     const avoidEmptyHash = (params: RawParams) =>
-      (params["#"] !== null && params["#"] !== undefined) ? params : omit(params, ["#"]);
+      (params['#'] !== null && params['#'] !== undefined) ? params : omit(params, ['#']);
 
     // (X) means the to state is invalid.
     const id = this.$id,
         from = isObject(fromStateOrName) ? fromStateOrName.name : fromStateOrName,
         fromParams = stringify(avoidEmptyHash(this._treeChanges.from.map(prop('paramValues')).reduce(mergeR, {}))),
-        toValid = this.valid() ? "" : "(X) ",
+        toValid = this.valid() ? '' : '(X) ',
         to = isObject(toStateOrName) ? toStateOrName.name : toStateOrName,
         toParams = stringify(avoidEmptyHash(this.params()));
 

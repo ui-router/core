@@ -3,12 +3,12 @@
  * @module params
  */
 /** */
-import { fromJson, toJson, identity, equals, inherit, map, extend, pick } from "../common/common";
-import { isDefined, isNullOrUndefined } from "../common/predicates";
-import { is } from "../common/hof";
-import { services } from "../common/coreservices";
-import { ParamType } from "./paramType";
-import { ParamTypeDefinition } from "./interface";
+import { fromJson, toJson, identity, equals, inherit, map, extend, pick } from '../common/common';
+import { isDefined, isNullOrUndefined } from '../common/predicates';
+import { is } from '../common/hof';
+import { services } from '../common/coreservices';
+import { ParamType } from './paramType';
+import { ParamTypeDefinition } from './interface';
 
 /**
  * A registry for parameter types.
@@ -198,7 +198,7 @@ export class ParamTypes {
   typeQueue: any[] = [];
 
   /** @internalapi */
-  private defaultTypes: any = pick(ParamTypes.prototype, ["hash", "string", "query", "path", "int", "bool", "date", "json", "any"]);
+  private defaultTypes: any = pick(ParamTypes.prototype, ['hash', 'string', 'query', 'path', 'int', 'bool', 'date', 'json', 'any']);
 
   /** @internalapi */
   constructor() {
@@ -295,7 +295,7 @@ function initDefaultTypes() {
           val.getFullYear(),
           ('0' + (val.getMonth() + 1)).slice(-2),
           ('0' + val.getDate()).slice(-2),
-        ].join("-");
+        ].join('-');
       },
       decode: function(val: string) {
         if (this.is(val)) return <any> val as Date;

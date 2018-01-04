@@ -5,9 +5,9 @@
  * @module common
  */
 /** for typedoc */
-import {IInjectable, Obj} from "./common";
-import { Disposable } from "../interface";
-import { UrlParts } from "../url/interface";
+import {IInjectable, Obj} from './common';
+import { Disposable } from '../interface';
+import { UrlParts } from '../url/interface';
 
 export let notImplemented = (fnname: string) => () => {
   throw new Error(`${fnname}(): No coreservices implementation for UI-Router is loaded.`);

@@ -5,18 +5,18 @@
 /** for typedoc */
 import {
   map, defaults, inherit, identity, unnest, tail, find, Obj, pairs, allTrueR, unnestR, arrayTuples
-} from "../common/common";
-import { prop, propEq } from "../common/hof";
-import { isArray, isString, isDefined } from "../common/predicates";
-import { Param, DefType } from "../params/param";
-import { ParamTypes } from "../params/paramTypes";
-import { RawParams } from "../params/interface";
-import { ParamFactory } from "./interface";
-import { joinNeighborsR, splitOnDelim } from "../common/strings";
+} from '../common/common';
+import { prop, propEq } from '../common/hof';
+import { isArray, isString, isDefined } from '../common/predicates';
+import { Param, DefType } from '../params/param';
+import { ParamTypes } from '../params/paramTypes';
+import { RawParams } from '../params/interface';
+import { ParamFactory } from './interface';
+import { joinNeighborsR, splitOnDelim } from '../common/strings';
 
 /** @hidden */
 function quoteRegExp(string: any, param?: any) {
-  let surroundPattern = ['', ''], result = string.replace(/[\\\[\]\^$*+?.()|{}]/g, "\\$&");
+  let surroundPattern = ['', ''], result = string.replace(/[\\\[\]\^$*+?.()|{}]/g, '\\$&');
   if (!param) return result;
 
   switch (param.squash) {
@@ -128,7 +128,7 @@ export class UrlMatcher {
     const pathParams = matcher._params.filter(p => p.location === DefType.PATH);
     return arrayTuples(staticSegments, pathParams.concat(undefined))
       .reduce(unnestR, [])
-      .filter(x => x !== "" && isDefined(x));
+      .filter(x => x !== '' && isDefined(x));
   }
 
   /** @hidden Given a matcher, return an array with the matcher's query params */
@@ -247,7 +247,7 @@ export class UrlMatcher {
       const id: string = m[2] || m[3];
       const regexp: string = isSearch ? m[4] : m[4] || (m[1] === '*' ? '[\\s\\S]*' : null);
 
-      const makeRegexpType = (str) => inherit(paramTypes.type(isSearch ? "query" : "path"), {
+      const makeRegexpType = (str) => inherit(paramTypes.type(isSearch ? 'query' : 'path'), {
         pattern: new RegExp(str, this.config.caseInsensitive ? 'i' : undefined)
       });
 
@@ -375,8 +375,8 @@ export class UrlMatcher {
       throw new Error(`Unbalanced capture group in route '${this.pattern}'`);
 
     function decodePathArray(string: string) {
-      const reverseString = (str: string) => str.split("").reverse().join("");
-      const unquoteDashes = (str: string) => str.replace(/\\-/g, "-");
+      const reverseString = (str: string) => str.split('').reverse().join('');
+      const unquoteDashes = (str: string) => str.replace(/\\-/g, '-');
 
       const split = reverseString(string).split(/-(?!\\)/);
       const allReversed = map(split, reverseString);
@@ -404,7 +404,7 @@ export class UrlMatcher {
       values[param.id] = param.value(value);
     });
 
-    if (hash) values["#"] = hash;
+    if (hash) values['#'] = hash;
 
     return values;
   }
@@ -526,12 +526,12 @@ export class UrlMatcher {
       if (squash !== false) return acc; // ?
       if (encoded == null) return acc;
       // If this parameter value is an array, encode the value using encodeDashes
-      if (isArray(encoded)) return acc + map(<string[]> encoded, UrlMatcher.encodeDashes).join("-");
+      if (isArray(encoded)) return acc + map(<string[]> encoded, UrlMatcher.encodeDashes).join('-');
       // If the parameter type is "raw", then do not encodeURIComponent
       if (param.raw) return acc + encoded;
       // Encode the value
       return acc + encodeURIComponent(<string> encoded);
-    }, "");
+    }, '');
 
     // Build the query string by applying parameter values (array or regular)
     // then mapping to key=value, then flattening and joining using "&"
@@ -543,10 +543,10 @@ export class UrlMatcher {
       if (!param.raw) encoded = map(<string[]> encoded, encodeURIComponent);
 
       return (<string[]> encoded).map(val => `${param.id}=${val}`);
-    }).filter(identity).reduce(unnestR, []).join("&");
+    }).filter(identity).reduce(unnestR, []).join('&');
 
     // Concat the pathstring with the queryString (if exists) and the hashString (if exists)
-    return pathString + (queryString ? `?${queryString}` : "") + (values["#"] ? "#" + values["#"] : "");
+    return pathString + (queryString ? `?${queryString}` : '') + (values['#'] ? '#' + values['#'] : '');
   }
 }
 

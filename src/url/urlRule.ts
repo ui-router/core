@@ -2,16 +2,16 @@
  * @coreapi
  * @module url
  */ /** */
-import { UrlMatcher } from "./urlMatcher";
-import { isString, isDefined, isFunction, isState } from "../common/predicates";
-import { UIRouter } from "../router";
-import { identity, extend } from "../common/common";
-import { is, pattern } from "../common/hof";
-import { StateObject } from "../state/stateObject";
-import { RawParams } from "../params/interface";
+import { UrlMatcher } from './urlMatcher';
+import { isString, isDefined, isFunction, isState } from '../common/predicates';
+import { UIRouter } from '../router';
+import { identity, extend } from '../common/common';
+import { is, pattern } from '../common/hof';
+import { StateObject } from '../state/stateObject';
+import { RawParams } from '../params/interface';
 import {
     UrlRule, UrlRuleMatchFn, UrlRuleHandlerFn, UrlRuleType, UrlParts, MatcherUrlRule, StateRule, RegExpRule
-} from "./interface";
+} from './interface';
 
 /**
  * Creates a [[UrlRule]]
@@ -106,7 +106,7 @@ export class UrlRuleFactory {
       return matched.length / optional.length;
     }
 
-    const details = { urlMatcher, matchPriority, type: "URLMATCHER" };
+    const details = { urlMatcher, matchPriority, type: 'URLMATCHER' };
     return extend(new BaseUrlRule(match, _handler), details) as MatcherUrlRule;
   }
 
@@ -134,11 +134,11 @@ export class UrlRuleFactory {
       const $state = router.stateService;
       const globals = router.globals;
       if ($state.href(state, match) !== $state.href(globals.current, globals.params)) {
-        $state.transitionTo(state, match, { inherit: true, source: "url" });
+        $state.transitionTo(state, match, { inherit: true, source: 'url' });
       }
     };
 
-    const details = { state, type: "STATE" };
+    const details = { state, type: 'STATE' };
     return extend(this.fromUrlMatcher(state.url, handler), details) as StateRule;
   }
 
@@ -175,7 +175,7 @@ export class UrlRuleFactory {
    * ```
    */
   fromRegExp(regexp: RegExp, handler: string|UrlRuleHandlerFn): RegExpRule {
-    if (regexp.global || regexp.sticky) throw new Error("Rule RegExp must not be global or sticky");
+    if (regexp.global || regexp.sticky) throw new Error('Rule RegExp must not be global or sticky');
 
     /**
      * If handler is a string, the url will be replaced by the string.
@@ -192,7 +192,7 @@ export class UrlRuleFactory {
     const match = (url: UrlParts): RegExpExecArray =>
         regexp.exec(url.path);
 
-    const details = { regexp, type: "REGEXP" };
+    const details = { regexp, type: 'REGEXP' };
     return extend(new BaseUrlRule(match, _handler), details) as RegExpRule
   }
 }
@@ -206,7 +206,7 @@ export class UrlRuleFactory {
 export class BaseUrlRule implements UrlRule {
   $id: number;
   priority: number;
-  type: UrlRuleType = "RAW";
+  type: UrlRuleType = 'RAW';
   handler: UrlRuleHandlerFn;
   matchPriority = (match) => 0 - this.$id;
 

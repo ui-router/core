@@ -3,9 +3,9 @@
  * @module vanilla
  */
 /** */
-import { LocationConfig } from "../common/coreservices";
-import { isDefined } from "../common/predicates";
-import { noop } from "../common/common";
+import { LocationConfig } from '../common/coreservices';
+import { isDefined } from '../common/predicates';
+import { noop } from '../common/common';
 
 /** A `LocationConfig` mock that gets/sets all config from an in-memory object */
 export class MemoryLocationConfig implements LocationConfig {
@@ -13,9 +13,9 @@ export class MemoryLocationConfig implements LocationConfig {
 
   _baseHref = '';
   _port = 80;
-  _protocol = "http";
-  _host = "localhost";
-  _hashPrefix = "";
+  _protocol = 'http';
+  _host = 'localhost';
+  _hashPrefix = '';
 
   port = () => this._port;
   protocol = () => this._protocol;

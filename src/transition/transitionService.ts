@@ -6,27 +6,27 @@
 import {
   IHookRegistry, TransitionOptions, TransitionHookScope, TransitionHookPhase, TransitionCreateHookFn, HookMatchCriteria,
   HookRegOptions, PathTypes, PathType, RegisteredHooks, TransitionHookFn, TransitionStateHookFn,
-} from "./interface";
-import { Transition } from "./transition";
-import { makeEvent, RegisteredHook } from "./hookRegistry";
-import { TargetState } from "../state/targetState";
-import { PathNode } from "../path/pathNode";
-import { ViewService } from "../view/view";
-import { UIRouter } from "../router";
-import { registerAddCoreResolvables } from "../hooks/coreResolvables";
-import { registerRedirectToHook } from "../hooks/redirectTo";
-import { registerOnExitHook, registerOnRetainHook, registerOnEnterHook } from "../hooks/onEnterExitRetain";
-import { registerEagerResolvePath, registerLazyResolveState, registerResolveRemaining } from "../hooks/resolve";
-import { registerLoadEnteringViews, registerActivateViews } from "../hooks/views";
-import { registerUpdateGlobalState } from "../hooks/updateGlobals";
-import { registerUpdateUrl } from "../hooks/url";
-import { registerLazyLoadHook } from "../hooks/lazyLoad";
-import { TransitionEventType } from "./transitionEventType";
-import { TransitionHook, GetResultHandler, GetErrorHandler } from "./transitionHook";
-import { isDefined } from "../common/predicates";
-import { removeFrom, values, createProxyFunctions } from "../common/common";
-import { Disposable } from "../interface"; // has or is using
-import { val } from "../common/hof";
+} from './interface';
+import { Transition } from './transition';
+import { makeEvent, RegisteredHook } from './hookRegistry';
+import { TargetState } from '../state/targetState';
+import { PathNode } from '../path/pathNode';
+import { ViewService } from '../view/view';
+import { UIRouter } from '../router';
+import { registerAddCoreResolvables } from '../hooks/coreResolvables';
+import { registerRedirectToHook } from '../hooks/redirectTo';
+import { registerOnExitHook, registerOnRetainHook, registerOnEnterHook } from '../hooks/onEnterExitRetain';
+import { registerEagerResolvePath, registerLazyResolveState, registerResolveRemaining } from '../hooks/resolve';
+import { registerLoadEnteringViews, registerActivateViews } from '../hooks/views';
+import { registerUpdateGlobalState } from '../hooks/updateGlobals';
+import { registerUpdateUrl } from '../hooks/url';
+import { registerLazyLoadHook } from '../hooks/lazyLoad';
+import { TransitionEventType } from './transitionEventType';
+import { TransitionHook, GetResultHandler, GetErrorHandler } from './transitionHook';
+import { isDefined } from '../common/predicates';
+import { removeFrom, values, createProxyFunctions } from '../common/common';
+import { Disposable } from '../interface'; // has or is using
+import { val } from '../common/hof';
 import { registerIgnoredTransitionHook } from '../hooks/ignoredTransition';
 import { registerInvalidTransitionHook } from '../hooks/invalidTransition';
 
@@ -45,7 +45,7 @@ export let defaultTransOpts: TransitionOptions = {
   reload      : false,
   custom      : {},
   current     : () => null,
-  source      : "unknown",
+  source      : 'unknown',
 };
 
 
@@ -239,29 +239,29 @@ export class TransitionService implements IHookRegistry, Disposable {
     const NORMAL_SORT = false, REVERSE_SORT = true;
     const SYNCHRONOUS = true;
 
-    this._defineEvent("onCreate",  Phase.CREATE,  0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.THROW_ERROR, SYNCHRONOUS);
+    this._defineEvent('onCreate',  Phase.CREATE,  0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.THROW_ERROR, SYNCHRONOUS);
 
-    this._defineEvent("onBefore",  Phase.BEFORE,  0,   paths.to);
+    this._defineEvent('onBefore',  Phase.BEFORE,  0,   paths.to);
 
-    this._defineEvent("onStart",   Phase.RUN,     0,   paths.to);
-    this._defineEvent("onExit",    Phase.RUN,     100, paths.exiting, REVERSE_SORT);
-    this._defineEvent("onRetain",  Phase.RUN,     200, paths.retained);
-    this._defineEvent("onEnter",   Phase.RUN,     300, paths.entering);
-    this._defineEvent("onFinish",  Phase.RUN,     400, paths.to);
+    this._defineEvent('onStart',   Phase.RUN,     0,   paths.to);
+    this._defineEvent('onExit',    Phase.RUN,     100, paths.exiting, REVERSE_SORT);
+    this._defineEvent('onRetain',  Phase.RUN,     200, paths.retained);
+    this._defineEvent('onEnter',   Phase.RUN,     300, paths.entering);
+    this._defineEvent('onFinish',  Phase.RUN,     400, paths.to);
 
-    this._defineEvent("onSuccess", Phase.SUCCESS, 0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.LOG_ERROR, SYNCHRONOUS);
-    this._defineEvent("onError",   Phase.ERROR,   0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.LOG_ERROR, SYNCHRONOUS);
+    this._defineEvent('onSuccess', Phase.SUCCESS, 0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.LOG_ERROR, SYNCHRONOUS);
+    this._defineEvent('onError',   Phase.ERROR,   0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.LOG_ERROR, SYNCHRONOUS);
   }
 
   /** @hidden */
   private _defineCorePaths() {
     const { STATE, TRANSITION } = TransitionHookScope;
 
-    this._definePathType("to", TRANSITION);
-    this._definePathType("from", TRANSITION);
-    this._definePathType("exiting", STATE);
-    this._definePathType("retained", STATE);
-    this._definePathType("entering", STATE);
+    this._definePathType('to', TRANSITION);
+    this._definePathType('from', TRANSITION);
+    this._definePathType('exiting', STATE);
+    this._definePathType('retained', STATE);
+    this._definePathType('entering', STATE);
   }
 
   /** @hidden */

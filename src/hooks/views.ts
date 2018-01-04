@@ -1,11 +1,11 @@
 /** @module hooks */ /** for typedoc */
-import {noop} from "../common/common";
-import {services} from "../common/coreservices";
-import {Transition} from "../transition/transition";
-import {ViewService} from "../view/view";
-import {ViewConfig} from "../view/interface";
-import {TransitionHookFn} from "../transition/interface";
-import {TransitionService} from "../transition/transitionService";
+import {noop} from '../common/common';
+import {services} from '../common/coreservices';
+import {Transition} from '../transition/transition';
+import {ViewService} from '../view/view';
+import {ViewConfig} from '../view/interface';
+import {TransitionHookFn} from '../transition/interface';
+import {TransitionService} from '../transition/transitionService';
 
 
 /**
@@ -18,7 +18,7 @@ import {TransitionService} from "../transition/transitionService";
  */
 const loadEnteringViews: TransitionHookFn = (transition: Transition) => {
   const $q = services.$q;
-  const enteringViews = transition.views("entering");
+  const enteringViews = transition.views('entering');
   if (!enteringViews.length) return;
   return $q.all(enteringViews.map(view => $q.when(view.load()))).then(noop);
 };
@@ -37,8 +37,8 @@ export const registerLoadEnteringViews = (transitionService: TransitionService) 
  * See [[ViewService]]
  */
 const activateViews: TransitionHookFn = (transition: Transition) => {
-  const enteringViews = transition.views("entering");
-  const exitingViews = transition.views("exiting");
+  const enteringViews = transition.views('entering');
+  const exitingViews = transition.views('exiting');
   if (!enteringViews.length && !exitingViews.length) return;
 
   const $view: ViewService = transition.router.viewService;

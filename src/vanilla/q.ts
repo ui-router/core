@@ -3,7 +3,7 @@
  * @module vanilla
  */
 /** */
-import { isArray, isObject, $QLike } from "../common/index";
+import { isArray, isObject, $QLike } from '../common/index';
 
 /**
  * An angular1-like promise api

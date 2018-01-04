@@ -3,7 +3,7 @@
  * @module params
  */ /** for typedoc */
 
-import {ParamType} from "./paramType";
+import {ParamType} from './paramType';
 
 /**
  * Parameter values

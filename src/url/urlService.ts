@@ -3,20 +3,20 @@
  * @module url
  */ /** */
 
-import { UIRouter } from "../router";
-import { LocationServices, notImplemented, LocationConfig } from "../common/coreservices";
-import { noop, createProxyFunctions } from "../common/common";
-import { UrlConfigApi, UrlSyncApi, UrlRulesApi, UrlParts, MatchResult } from "./interface";
+import { UIRouter } from '../router';
+import { LocationServices, notImplemented, LocationConfig } from '../common/coreservices';
+import { noop, createProxyFunctions } from '../common/common';
+import { UrlConfigApi, UrlSyncApi, UrlRulesApi, UrlParts, MatchResult } from './interface';
 
 /** @hidden */
 const makeStub = (keys: string[]): any =>
     keys.reduce((acc, key) => (acc[key] = notImplemented(key), acc), { dispose: noop });
 
-/** @hidden */ const locationServicesFns = ["url", "path", "search", "hash", "onChange"];
-/** @hidden */ const locationConfigFns = ["port", "protocol", "host", "baseHref", "html5Mode", "hashPrefix"];
-/** @hidden */ const umfFns = ["type", "caseInsensitive", "strictMode", "defaultSquashPolicy"];
-/** @hidden */ const rulesFns = ["sort", "when", "initial", "otherwise", "rules", "rule", "removeRule"];
-/** @hidden */ const syncFns = ["deferIntercept", "listen", "sync", "match"];
+/** @hidden */ const locationServicesFns = ['url', 'path', 'search', 'hash', 'onChange'];
+/** @hidden */ const locationConfigFns = ['port', 'protocol', 'host', 'baseHref', 'html5Mode', 'hashPrefix'];
+/** @hidden */ const umfFns = ['type', 'caseInsensitive', 'strictMode', 'defaultSquashPolicy'];
+/** @hidden */ const rulesFns = ['sort', 'when', 'initial', 'otherwise', 'rules', 'rule', 'removeRule'];
+/** @hidden */ const syncFns = ['deferIntercept', 'listen', 'sync', 'match'];
 
 /**
  * API for URL management

@@ -2,15 +2,15 @@
  * @internalapi
  * @module url
  */ /** for typedoc */
-import { forEach, extend } from "../common/common";
-import { isObject, isDefined, isFunction, isString } from "../common/predicates";
-import { UrlMatcher } from "./urlMatcher";
-import { Param, DefType } from "../params/param";
-import { ParamTypes } from "../params/paramTypes";
-import { ParamTypeDefinition } from "../params/interface";
-import { Disposable } from "../interface";
-import { ParamType } from "../params/paramType";
-import { ParamFactory, UrlMatcherConfig } from "./interface";
+import { forEach, extend } from '../common/common';
+import { isObject, isDefined, isFunction, isString } from '../common/predicates';
+import { UrlMatcher } from './urlMatcher';
+import { Param, DefType } from '../params/param';
+import { ParamTypes } from '../params/paramTypes';
+import { ParamTypeDefinition } from '../params/interface';
+import { Disposable } from '../interface';
+import { ParamType } from '../params/paramType';
+import { ParamFactory, UrlMatcherConfig } from './interface';
 
 /**
  * Factory for [[UrlMatcher]] instances.

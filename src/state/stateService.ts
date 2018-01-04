@@ -591,7 +591,7 @@ export class StateService {
    */
   lazyLoad(stateOrName: StateOrName, transition?: Transition): Promise<LazyLoadResult> {
     const state: StateDeclaration = this.get(stateOrName);
-    if (!state || !state.lazyLoad) throw new Error("Can not lazy load " + stateOrName);
+    if (!state || !state.lazyLoad) throw new Error('Can not lazy load ' + stateOrName);
 
     const currentPath = this.getCurrentPath();
     const target = PathUtils.makeTargetState(this.router.stateRegistry, currentPath);

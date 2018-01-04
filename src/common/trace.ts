@@ -34,18 +34,18 @@
  * @module trace
  */
 /* tslint:disable:no-console */
-import { parse } from "../common/hof";
-import { isFunction, isNumber } from "../common/predicates";
-import { Transition } from "../transition/transition";
+import { parse } from '../common/hof';
+import { isFunction, isNumber } from '../common/predicates';
+import { Transition } from '../transition/transition';
 import { ViewTuple } from '../view';
-import { ActiveUIView, ViewConfig, ViewContext } from "../view/interface";
-import { stringify, functionToString, maxLength, padString } from "./strings";
-import { Resolvable } from "../resolve/resolvable";
-import { PathNode } from "../path/pathNode";
-import { PolicyWhen } from "../resolve/interface";
-import { TransitionHook } from "../transition/transitionHook";
-import { HookResult } from "../transition/interface";
-import { StateObject } from "../state/stateObject";
+import { ActiveUIView, ViewConfig, ViewContext } from '../view/interface';
+import { stringify, functionToString, maxLength, padString } from './strings';
+import { Resolvable } from '../resolve/resolvable';
+import { PathNode } from '../path/pathNode';
+import { PolicyWhen } from '../resolve/interface';
+import { TransitionHook } from '../transition/transitionHook';
+import { HookResult } from '../transition/interface';
+import { StateObject } from '../state/stateObject';
 
 /** @hidden */
 function uiViewString (uiview: ActiveUIView) {
@@ -90,8 +90,8 @@ export enum Category {
   RESOLVE, TRANSITION, HOOK, UIVIEW, VIEWCONFIG,
 }
 
-/** @hidden */ const _tid = parse("$id");
-/** @hidden */ const _rid = parse("router.$id");
+/** @hidden */ const _tid = parse('$id');
+/** @hidden */ const _rid = parse('router.$id');
 /** @hidden */ const transLbl = (trans) => `Transition #${_tid(trans)}-${_rid(trans)}`;
 
 /**
@@ -173,8 +173,8 @@ export class Trace {
   /** @internalapi called by ui-router code */
   traceHookInvocation(step: TransitionHook, trans: Transition, options: any) {
     if (!this.enabled(Category.HOOK)) return;
-    const event = parse("traceData.hookType")(options) || "internal",
-        context = parse("traceData.context.state.name")(options) || parse("traceData.context")(options) || "unknown",
+    const event = parse('traceData.hookType')(options) || 'internal',
+        context = parse('traceData.context.state.name')(options) || parse('traceData.context')(options) || 'unknown',
         name = functionToString((step as any).registeredHook.callback);
     console.log(`${transLbl(trans)}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
   }
@@ -210,7 +210,7 @@ export class Trace {
   }
 
   /** @internalapi called by ui-router code */
-  traceUIViewEvent(event: string, viewData: ActiveUIView, extra = "") {
+  traceUIViewEvent(event: string, viewData: ActiveUIView, extra = '') {
     if (!this.enabled(Category.UIVIEW)) return;
     console.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
   }
@@ -218,13 +218,13 @@ export class Trace {
   /** @internalapi called by ui-router code */
   traceUIViewConfigUpdated(viewData: ActiveUIView, context: ViewContext) {
     if (!this.enabled(Category.UIVIEW)) return;
-    this.traceUIViewEvent("Updating", viewData, ` with ViewConfig from context='${context}'`);
+    this.traceUIViewEvent('Updating', viewData, ` with ViewConfig from context='${context}'`);
   }
 
   /** @internalapi called by ui-router code */
   traceUIViewFill(viewData: ActiveUIView, html: string) {
     if (!this.enabled(Category.UIVIEW)) return;
-    this.traceUIViewEvent("Fill", viewData, ` with: ${maxLength(200, html)}`);
+    this.traceUIViewEvent('Fill', viewData, ` with: ${maxLength(200, html)}`);
   }
 
   /** @internalapi called by ui-router code */

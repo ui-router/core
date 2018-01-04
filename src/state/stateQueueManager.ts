@@ -1,14 +1,14 @@
 /** @module state */ /** for typedoc */
-import { inArray } from "../common/common";
-import { isString } from "../common/predicates";
-import { StateDeclaration, _StateDeclaration } from "./interface";
-import { StateObject } from "./stateObject";
-import { StateBuilder } from "./stateBuilder";
-import { StateRegistryListener, StateRegistry } from "./stateRegistry";
-import { Disposable } from "../interface";
-import { UrlRouter } from "../url/urlRouter";
-import { prop } from "../common/hof";
-import { StateMatcher } from "./stateMatcher";
+import { inArray } from '../common/common';
+import { isString } from '../common/predicates';
+import { StateDeclaration, _StateDeclaration } from './interface';
+import { StateObject } from './stateObject';
+import { StateBuilder } from './stateBuilder';
+import { StateRegistryListener, StateRegistry } from './stateRegistry';
+import { Disposable } from '../interface';
+import { UrlRouter } from '../url/urlRouter';
+import { prop } from '../common/hof';
+import { StateMatcher } from './stateMatcher';
 
 /** @internalapi */
 export class StateQueueManager implements Disposable {
@@ -35,7 +35,7 @@ export class StateQueueManager implements Disposable {
     const state = StateObject.create(stateDecl);
     const name = state.name;
 
-    if (!isString(name)) throw new Error("State must have a valid name");
+    if (!isString(name)) throw new Error('State must have a valid name');
     if (this.states.hasOwnProperty(name) || inArray(queue.map(prop('name')), name))
       throw new Error(`State '${name}' is already defined`);
 
@@ -65,7 +65,7 @@ export class StateQueueManager implements Disposable {
           throw new Error(`State '${name}' is already defined`);
         }
 
-        const existingFutureState = getState(name + ".**");
+        const existingFutureState = getState(name + '.**');
         if (existingFutureState) {
           // Remove future state of the same name
           this.$registry.deregister(existingFutureState);
@@ -93,7 +93,7 @@ export class StateQueueManager implements Disposable {
     }
 
     if (registered.length) {
-      this.listeners.forEach(listener => listener("registered", registered.map(s => s.self)));
+      this.listeners.forEach(listener => listener('registered', registered.map(s => s.self)));
     }
 
     return states;

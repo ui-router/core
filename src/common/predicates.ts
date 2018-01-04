@@ -6,9 +6,9 @@
  * @module common_predicates
  */
 /** */
-import { and, not, pipe, prop, or } from "./hof";
-import { Predicate } from "./common"; // has or is using
-import { StateObject } from "../state/stateObject";
+import { and, not, pipe, prop, or } from './hof';
+import { Predicate } from './common'; // has or is using
+import { StateObject } from '../state/stateObject';
 
 const toStr = Object.prototype.toString;
 const tis = (t: string) => (x: any) => typeof(x) === t;

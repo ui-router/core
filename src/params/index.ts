@@ -7,8 +7,8 @@
  * @preferred
  * @module params
  */ /** for typedoc */
-export * from "./interface";
-export * from "./param";
-export * from "./paramTypes";
-export * from "./stateParams";
-export * from "./paramType";
+export * from './interface';
+export * from './param';
+export * from './paramTypes';
+export * from './stateParams';
+export * from './paramType';

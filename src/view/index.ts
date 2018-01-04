@@ -2,5 +2,5 @@
  * @coreapi
  * @module view
  */ /** for typedoc */
-export * from "./interface";
-export * from "./view";
+export * from './interface';
+export * from './view';

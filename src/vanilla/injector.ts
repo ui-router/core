@@ -5,7 +5,7 @@
 /** */
 import {
   extend, assertPredicate, isFunction, isArray, isInjectable, $InjectorLike, IInjectable
-} from "../common/index";
+} from '../common/index';
 
 // globally available injectables
 const globals = {};

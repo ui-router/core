@@ -2,15 +2,15 @@
  * @coreapi
  * @module state
  */ /** for typedoc */
-import { ParamDeclaration, RawParams } from "../params/interface";
-import { StateObject } from "./stateObject";
-import { ViewContext } from "../view/interface";
-import { IInjectable } from "../common/common";
-import { Transition } from "../transition/transition";
-import { TransitionStateHookFn, TransitionOptions } from "../transition/interface";
-import { ResolvePolicy, ResolvableLiteral, ProviderLike } from "../resolve/interface";
-import { Resolvable } from "../resolve/resolvable";
-import { TargetState } from "./targetState";
+import { ParamDeclaration, RawParams } from '../params/interface';
+import { StateObject } from './stateObject';
+import { ViewContext } from '../view/interface';
+import { IInjectable } from '../common/common';
+import { Transition } from '../transition/transition';
+import { TransitionStateHookFn, TransitionOptions } from '../transition/interface';
+import { ResolvePolicy, ResolvableLiteral, ProviderLike } from '../resolve/interface';
+import { Resolvable } from '../resolve/resolvable';
+import { TargetState } from './targetState';
 
 export type StateOrName = (string|StateDeclaration|StateObject);
 

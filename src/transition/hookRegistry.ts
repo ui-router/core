@@ -2,21 +2,21 @@
  * @coreapi
  * @module transition
  */ /** for typedoc */
-import { extend, removeFrom, tail, values, identity, map } from "../common/common";
-import {isString, isFunction} from "../common/predicates";
-import {PathNode} from "../path/pathNode";
+import { extend, removeFrom, tail, values, identity, map } from '../common/common';
+import {isString, isFunction} from '../common/predicates';
+import {PathNode} from '../path/pathNode';
 import {
     TransitionStateHookFn, TransitionHookFn, TransitionHookPhase, TransitionHookScope, IHookRegistry, PathType,
-} from "./interface"; // has or is using
+} from './interface'; // has or is using
 
 import {
     HookRegOptions, HookMatchCriteria, TreeChanges,
     HookMatchCriterion, IMatchingNodes, HookFn,
-} from "./interface";
-import {Glob} from "../common/glob";
-import {StateObject} from "../state/stateObject";
-import {TransitionEventType} from "./transitionEventType";
-import { TransitionService } from "./transitionService";
+} from './interface';
+import {Glob} from '../common/glob';
+import {StateObject} from '../state/stateObject';
+import {TransitionEventType} from './transitionEventType';
+import { TransitionService } from './transitionService';
 
 /**
  * Determines if the given state matches the matchCriteria

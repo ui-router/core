@@ -1,20 +1,20 @@
 /** @module state */ /** for typedoc */
-import { isString } from "../common/predicates";
-import { StateOrName } from "./interface";
-import { StateObject } from "./stateObject";
-import { values } from "../common/common";
+import { isString } from '../common/predicates';
+import { StateOrName } from './interface';
+import { StateObject } from './stateObject';
+import { values } from '../common/common';
 
 export class StateMatcher {
   constructor (private _states: { [key: string]: StateObject }) { }
 
   isRelative(stateName: string) {
-    stateName = stateName || "";
-    return stateName.indexOf(".") === 0 || stateName.indexOf("^") === 0;
+    stateName = stateName || '';
+    return stateName.indexOf('.') === 0 || stateName.indexOf('^') === 0;
   }
 
 
   find(stateOrName: StateOrName, base?: StateOrName, matchGlob = true): StateObject {
-    if (!stateOrName && stateOrName !== "") return undefined;
+    if (!stateOrName && stateOrName !== '') return undefined;
     const isStr = isString(stateOrName);
     let name: string = isStr ? stateOrName : (<any>stateOrName).name;
 
@@ -44,23 +44,23 @@ export class StateMatcher {
 
     const baseState: StateObject = this.find(base);
 
-    const splitName = name.split(".");
+    const splitName = name.split('.');
     const pathLength = splitName.length;
     let i = 0, current = baseState;
 
     for (; i < pathLength; i++) {
-      if (splitName[i] === "" && i === 0) {
+      if (splitName[i] === '' && i === 0) {
         current = baseState;
         continue;
       }
-      if (splitName[i] === "^") {
+      if (splitName[i] === '^') {
         if (!current.parent) throw new Error(`Path '${name}' not valid for state '${baseState.name}'`);
         current = current.parent;
         continue;
       }
       break;
     }
-    const relName = splitName.slice(i).join(".");
-    return current.name + (current.name && relName ? "." : "") + relName;
+    const relName = splitName.slice(i).join('.');
+    return current.name + (current.name && relName ? '.' : '') + relName;
   }
 }

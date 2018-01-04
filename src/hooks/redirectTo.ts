@@ -1,10 +1,10 @@
 /** @module hooks */ /** */
-import {isString, isFunction} from "../common/predicates"
-import {Transition} from "../transition/transition";
-import {services} from "../common/coreservices";
-import {TargetState} from "../state/targetState";
-import {TransitionService} from "../transition/transitionService";
-import {TransitionHookFn} from "../transition/interface";
+import {isString, isFunction} from '../common/predicates'
+import {Transition} from '../transition/transition';
+import {services} from '../common/coreservices';
+import {TargetState} from '../state/targetState';
+import {TransitionService} from '../transition/transitionService';
+import {TransitionHookFn} from '../transition/interface';
 
 /**
  * A [[TransitionHookFn]] that redirects to a different state or params

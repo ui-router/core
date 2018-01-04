@@ -3,16 +3,16 @@
  * @module state
  */ /** for typedoc */
 
-import { StateObject } from "./stateObject";
-import { StateMatcher } from "./stateMatcher";
-import { StateBuilder } from "./stateBuilder";
-import { StateQueueManager } from "./stateQueueManager";
-import { StateDeclaration, _StateDeclaration } from "./interface";
-import { BuilderFunction } from "./stateBuilder";
-import { StateOrName } from "./interface";
-import { removeFrom } from "../common/common";
-import { UIRouter } from "../router";
-import { propEq } from "../common/hof";
+import { StateObject } from './stateObject';
+import { StateMatcher } from './stateMatcher';
+import { StateBuilder } from './stateBuilder';
+import { StateQueueManager } from './stateQueueManager';
+import { StateDeclaration, _StateDeclaration } from './interface';
+import { BuilderFunction } from './stateBuilder';
+import { StateOrName } from './interface';
+import { removeFrom } from '../common/common';
+import { UIRouter } from '../router';
+import { propEq } from '../common/hof';
 
 /**
  * The signature for the callback function provided to [[StateRegistry.onStatesChanged]].
@@ -22,7 +22,7 @@ import { propEq } from "../common/hof";
  * @param event a string; either "registered" or "deregistered"
  * @param states the list of [[StateDeclaration]]s that were registered (or deregistered).
  */
-export type StateRegistryListener = (event: "registered"|"deregistered", states: StateDeclaration[]) => void;
+export type StateRegistryListener = (event: 'registered'|'deregistered', states: StateDeclaration[]) => void;
 
 export class StateRegistry {
   private _root: StateObject;
@@ -145,7 +145,7 @@ export class StateRegistry {
     deregistered.forEach(_state => {
       const $ur = this._router.urlRouter;
       // Remove URL rule
-      $ur.rules().filter(propEq("state", _state)).forEach($ur.removeRule.bind($ur));
+      $ur.rules().filter(propEq('state', _state)).forEach($ur.removeRule.bind($ur));
       // Remove state from registry
       delete this.states[_state.name];
     });
@@ -167,7 +167,7 @@ export class StateRegistry {
     if (!_state) throw new Error("Can't deregister state; not found: " + stateOrName);
     const deregisteredStates = this._deregisterTree(_state.$$state());
 
-    this.listeners.forEach(listener => listener("deregistered", deregisteredStates.map(s => s.self)));
+    this.listeners.forEach(listener => listener('deregistered', deregisteredStates.map(s => s.self)));
     return deregisteredStates;
   }
 

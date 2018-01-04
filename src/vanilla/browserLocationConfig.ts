@@ -3,13 +3,13 @@
  * @module vanilla
  */
 /** */
-import { isDefined } from "../common/predicates";
-import { LocationConfig } from "../common/coreservices";
+import { isDefined } from '../common/predicates';
+import { LocationConfig } from '../common/coreservices';
 
 /** A `LocationConfig` that delegates to the browser's `location` object */
 export class BrowserLocationConfig implements LocationConfig {
   private _baseHref = undefined;
-  private _hashPrefix = "";
+  private _hashPrefix = '';
 
   constructor(router?, private _isHtml5 = false) { }
 
@@ -44,7 +44,7 @@ export class BrowserLocationConfig implements LocationConfig {
   }
 
   applyDocumentBaseHref() {
-    const baseTag: HTMLBaseElement = document.getElementsByTagName("base")[0];
+    const baseTag: HTMLBaseElement = document.getElementsByTagName('base')[0];
     return this._baseHref = baseTag ? baseTag.href.substr(location.origin.length) : location.pathname || '/';
   }
 

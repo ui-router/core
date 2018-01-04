@@ -1,19 +1,19 @@
 /** @module state */ /** for typedoc */
-import {Obj, omit, noop, extend, inherit, values, applyPairs, tail, mapObj, identity} from "../common/common";
-import {isDefined, isFunction, isString, isArray} from "../common/predicates";
-import {stringify} from "../common/strings";
-import {prop, pattern, is, pipe, val} from "../common/hof";
-import {StateDeclaration} from "./interface";
+import {Obj, omit, noop, extend, inherit, values, applyPairs, tail, mapObj, identity} from '../common/common';
+import {isDefined, isFunction, isString, isArray} from '../common/predicates';
+import {stringify} from '../common/strings';
+import {prop, pattern, is, pipe, val} from '../common/hof';
+import {StateDeclaration} from './interface';
 
-import {StateObject} from "./stateObject";
-import {StateMatcher} from "./stateMatcher";
-import {Param} from "../params/param";
-import {UrlMatcherFactory} from "../url/urlMatcherFactory";
-import {UrlMatcher} from "../url/urlMatcher";
-import {Resolvable} from "../resolve/resolvable";
-import {services} from "../common/coreservices";
-import {ResolvePolicy} from "../resolve/interface";
-import { ParamFactory } from "../url/interface";
+import {StateObject} from './stateObject';
+import {StateMatcher} from './stateMatcher';
+import {Param} from '../params/param';
+import {UrlMatcherFactory} from '../url/urlMatcherFactory';
+import {UrlMatcher} from '../url/urlMatcher';
+import {Resolvable} from '../resolve/resolvable';
+import {services} from '../common/coreservices';
+import {ResolvePolicy} from '../resolve/interface';
+import { ParamFactory } from '../url/interface';
 
 const parseUrl = (url: string): any => {
   if (!isString(url)) return false;
@@ -62,7 +62,7 @@ function urlBuilder(state: StateObject) {
   // For future states, i.e., states whose name ends with `.**`,
   // match anything that starts with the url prefix
   if (stateDec && stateDec.url && stateDec.name && stateDec.name.match(/\.\*\*$/)) {
-    stateDec.url += "{remainder:any}"; // match any path (.*)
+    stateDec.url += '{remainder:any}'; // match any path (.*)
   }
 
   const parsed = parseUrl(stateDec.url), parent = state.parent;
@@ -156,7 +156,7 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
     // ng1 doesn't have an $injector until runtime.
     // If the $injector doesn't exist, use "deferred" literal as a
     // marker indicating they should be annotated when runtime starts
-    return fn['$inject'] || ($injector && $injector.annotate(fn, $injector.strictDi)) || <any> "deferred";
+    return fn['$inject'] || ($injector && $injector.annotate(fn, $injector.strictDi)) || <any> 'deferred';
   };
 
   /** true if the object has both `token` and `resolveFn`, and is probably a [[ResolveLiteral]] */
@@ -181,9 +181,9 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
   ]);
 
   const tuple2Resolvable = pattern([
-    [pipe(prop("val"), isString),   (tuple: Tuple) => new Resolvable(tuple.token, identity, [ tuple.val ], tuple.policy)],
-    [pipe(prop("val"), isArray),    (tuple: Tuple) => new Resolvable(tuple.token, tail(<any[]> tuple.val), tuple.val.slice(0, -1), tuple.policy)],
-    [pipe(prop("val"), isFunction), (tuple: Tuple) => new Resolvable(tuple.token, tuple.val, annotate(tuple.val), tuple.policy)],
+    [pipe(prop('val'), isString),   (tuple: Tuple) => new Resolvable(tuple.token, identity, [ tuple.val ], tuple.policy)],
+    [pipe(prop('val'), isArray),    (tuple: Tuple) => new Resolvable(tuple.token, tail(<any[]> tuple.val), tuple.val.slice(0, -1), tuple.policy)],
+    [pipe(prop('val'), isFunction), (tuple: Tuple) => new Resolvable(tuple.token, tuple.val, annotate(tuple.val), tuple.policy)],
   ]);
 
   const item2Resolvable = <(obj: any) => Resolvable> pattern([
@@ -191,7 +191,7 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
     [isResolveLiteral,              literal2Resolvable],
     [isLikeNg2Provider,             literal2Resolvable],
     [isTupleFromObj,                tuple2Resolvable],
-    [val(true),                     (obj: any) => { throw new Error("Invalid resolve value: " + stringify(obj)) }]
+    [val(true),                     (obj: any) => { throw new Error('Invalid resolve value: ' + stringify(obj)) }]
   ]);
 
   // If resolveBlock is already an array, use it as-is.
@@ -220,8 +220,8 @@ export class StateBuilder {
   constructor(private matcher: StateMatcher, urlMatcherFactory: UrlMatcherFactory) {
     const self = this;
 
-    const root = () => matcher.find("");
-    const isRoot = (state: StateObject) => state.name === "";
+    const root = () => matcher.find('');
+    const isRoot = (state: StateObject) => state.name === '';
 
     function parentBuilder(state: StateObject) {
       if (isRoot(state)) return null;
@@ -296,7 +296,7 @@ export class StateBuilder {
 
   parentName(state: StateObject) {
     // name = 'foo.bar.baz.**'
-    const name = state.name || "";
+    const name = state.name || '';
     // segments = ['foo', 'bar', 'baz', '.**']
     const segments = name.split('.');
     // segments = ['foo', 'bar', 'baz']
@@ -310,10 +310,10 @@ export class StateBuilder {
       }
 
       // 'foo.bar'
-      return segments.join(".");
+      return segments.join('.');
     }
 
-    if (!state.parent) return "";
+    if (!state.parent) return '';
     return isString(state.parent) ? state.parent : state.parent.name;
   }
 
@@ -322,6 +322,6 @@ export class StateBuilder {
     if (name.indexOf('.') !== -1 || !state.parent) return name;
 
     const parentName = isString(state.parent) ? state.parent : state.parent.name;
-    return parentName ? parentName + "." + name : name;
+    return parentName ? parentName + '.' + name : name;
   }
 }

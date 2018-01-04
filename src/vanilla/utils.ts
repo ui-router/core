@@ -5,8 +5,8 @@
 /** */
 import {
   LocationConfig, LocationServices, identity, unnestR, isArray, splitEqual, splitHash, splitQuery
-} from "../common";
-import { UIRouter } from "../router";
+} from '../common';
+import { UIRouter } from '../router';
 
 export const keyValsToObjectR = (accum, [key, val]) => {
   if (!accum.hasOwnProperty(key)) {
@@ -20,10 +20,10 @@ export const keyValsToObjectR = (accum, [key, val]) => {
 };
 
 export const getParams = (queryString: string): any =>
-    queryString.split("&").filter(identity).map(splitEqual).reduce(keyValsToObjectR, {});
+    queryString.split('&').filter(identity).map(splitEqual).reduce(keyValsToObjectR, {});
 
 export function parseUrl(url: string) {
-  const orEmptyString = x => x || "";
+  const orEmptyString = x => x || '';
   const [beforehash, hash] = splitHash(url).map(orEmptyString);
   const [path, search] = splitQuery(beforehash).map(orEmptyString);
 
@@ -38,10 +38,10 @@ export const buildUrl = (loc: LocationServices) => {
   const search = Object.keys(searchObject).map(key => {
     const param = searchObject[key];
     const vals = isArray(param) ? param : [param];
-    return vals.map(val => key + "=" + val);
-  }).reduce(unnestR, []).join("&");
+    return vals.map(val => key + '=' + val);
+  }).reduce(unnestR, []).join('&');
 
-  return path + (search ? "?" + search : "") + (hash ? "#" + hash : "");
+  return path + (search ? '?' + search : '') + (hash ? '#' + hash : '');
 };
 
 export function locationPluginFactory(

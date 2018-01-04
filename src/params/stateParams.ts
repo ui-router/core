@@ -3,8 +3,8 @@
  * @module params
  */
 /** */
-import {extend, ancestors, Obj} from "../common/common";
-import { StateObject } from "../state/stateObject";
+import {extend, ancestors, Obj} from '../common/common';
+import { StateObject } from '../state/stateObject';
 
 /** @internalapi */
 export class StateParams {

@@ -3,17 +3,17 @@
  * @module state
  */
 /** for typedoc */
-import { StateDeclaration, _ViewDeclaration, _StateDeclaration, LazyLoadResult } from "./interface";
-import { defaults, values, find, inherit } from "../common/common";
-import { propEq } from "../common/hof";
-import { Param } from "../params/param";
-import { UrlMatcher } from "../url/urlMatcher";
-import { Resolvable } from "../resolve/resolvable";
-import { TransitionStateHookFn } from "../transition/interface";
-import { TargetState } from "./targetState";
-import { Transition } from "../transition/transition";
-import { Glob } from "../common/glob";
-import { isObject, isFunction } from "../common/predicates";
+import { StateDeclaration, _ViewDeclaration, _StateDeclaration, LazyLoadResult } from './interface';
+import { defaults, values, find, inherit } from '../common/common';
+import { propEq } from '../common/hof';
+import { Param } from '../params/param';
+import { UrlMatcher } from '../url/urlMatcher';
+import { Resolvable } from '../resolve/resolvable';
+import { TransitionStateHookFn } from '../transition/interface';
+import { TargetState } from './targetState';
+import { Transition } from '../transition/transition';
+import { Glob } from '../common/glob';
+import { isObject, isFunction } from '../common/predicates';
 
 /**
  * Internal representation of a UI-Router state.
@@ -162,7 +162,7 @@ export class StateObject {
   fqn(): string {
     if (!this.parent || !(this.parent instanceof this.constructor)) return this.name;
     const name = this.parent.fqn();
-    return name ? name + "." + this.name : this.name;
+    return name ? name + '.' + this.name : this.name;
   }
 
   /**

@@ -9,15 +9,15 @@
  * @coreapi
  * @module url
  */ /** */
-import { LocationConfig } from "../common/coreservices";
-import { ParamType } from "../params/paramType";
-import { Param } from "../params/param";
-import { UIRouter } from "../router";
-import { TargetState } from "../state/targetState";
-import { TargetStateDef } from "../state/interface";
-import { UrlMatcher } from "./urlMatcher";
-import { StateObject } from "../state/stateObject";
-import { ParamTypeDefinition } from "../params/interface";
+import { LocationConfig } from '../common/coreservices';
+import { ParamType } from '../params/paramType';
+import { Param } from '../params/param';
+import { UIRouter } from '../router';
+import { TargetState } from '../state/targetState';
+import { TargetStateDef } from '../state/interface';
+import { UrlMatcher } from './urlMatcher';
+import { StateObject } from '../state/stateObject';
+import { ParamTypeDefinition } from '../params/interface';
 
 /** @internalapi */
 export interface ParamFactory {
@@ -463,7 +463,7 @@ export interface UrlRuleHandlerFn {
 }
 
 /** @internalapi */
-export type UrlRuleType = "STATE" | "URLMATCHER" | "REGEXP" | "RAW" | "OTHER";
+export type UrlRuleType = 'STATE' | 'URLMATCHER' | 'REGEXP' | 'RAW' | 'OTHER';
 
 /**
  * The interface for a URL Rule
@@ -518,18 +518,18 @@ export interface UrlRule {
 
 /** @internalapi */
 export interface MatcherUrlRule extends UrlRule {
-  type: "URLMATCHER"|"STATE";
+  type: 'URLMATCHER'|'STATE';
   urlMatcher: UrlMatcher;
 }
 
 /** @internalapi */
 export interface StateRule extends MatcherUrlRule {
-  type: "STATE";
+  type: 'STATE';
   state: StateObject;
 }
 
 /** @internalapi */
 export interface RegExpRule extends UrlRule {
-  type: "REGEXP";
+  type: 'REGEXP';
   regexp: RegExp;
 }

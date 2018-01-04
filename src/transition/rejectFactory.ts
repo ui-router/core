@@ -2,9 +2,9 @@
  * @coreapi
  * @module transition
  */ /** for typedoc */
-"use strict";
-import {extend, silentRejection} from "../common/common";
-import {stringify} from "../common/strings";
+'use strict';
+import {extend, silentRejection} from '../common/common';
+import {stringify} from '../common/strings';
 import { is } from '../common/hof';
 
 export enum RejectType {
@@ -27,7 +27,7 @@ export class Rejection {
 
   /** Returns a Rejection due to transition superseded */
   static superseded(detail?: any, options?: any): Rejection {
-    const message = "The transition has been superseded by a different transition";
+    const message = 'The transition has been superseded by a different transition';
     const rejection = new Rejection(RejectType.SUPERSEDED, message, detail);
     if (options && options.redirected) {
       rejection.redirected = true;
@@ -42,25 +42,25 @@ export class Rejection {
 
   /** Returns a Rejection due to invalid transition */
   static invalid(detail?: any): Rejection {
-    const message = "This transition is invalid";
+    const message = 'This transition is invalid';
     return new Rejection(RejectType.INVALID, message, detail);
   }
 
   /** Returns a Rejection due to ignored transition */
   static ignored(detail?: any): Rejection {
-    const message = "The transition was ignored";
+    const message = 'The transition was ignored';
     return new Rejection(RejectType.IGNORED, message, detail);
   }
 
   /** Returns a Rejection due to aborted transition */
   static aborted(detail?: any): Rejection {
-    const message = "The transition has been aborted";
+    const message = 'The transition has been aborted';
     return new Rejection(RejectType.ABORTED, message, detail);
   }
 
   /** Returns a Rejection due to aborted transition */
   static errored(detail?: any): Rejection {
-    const message = "The transition errored";
+    const message = 'The transition errored';
     return new Rejection(RejectType.ERROR, message, detail);
   }
 

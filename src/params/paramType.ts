@@ -3,9 +3,9 @@
  * @module params
  */
 /** */
-import {extend, filter, map} from "../common/common";
-import {isArray, isDefined} from "../common/predicates";
-import {ParamTypeDefinition} from "./interface";
+import {extend, filter, map} from '../common/common';
+import {isArray, isDefined} from '../common/predicates';
+import {ParamTypeDefinition} from './interface';
 
 /**
  * An internal class which implements [[ParamTypeDefinition]].
@@ -88,9 +88,9 @@ export class ParamType implements ParamTypeDefinition {
    * - url: "/path?queryParam=1 will create $stateParams.queryParam: 1
    * - url: "/path?queryParam=1&queryParam=2 will create $stateParams.queryParam: [1, 2]
    */
-  $asArray(mode: (boolean|"auto"), isSearch: boolean) {
+  $asArray(mode: (boolean|'auto'), isSearch: boolean) {
     if (!mode) return this;
-    if (mode === "auto" && !isSearch) throw new Error("'auto' array mode is for query parameters only");
+    if (mode === 'auto' && !isSearch) throw new Error("'auto' array mode is for query parameters only");
     return new (<any> ArrayType)(this, mode);
   }
 }
@@ -99,7 +99,7 @@ export class ParamType implements ParamTypeDefinition {
  * Wraps up a `ParamType` object to handle array values.
  * @internalapi
  */
-function ArrayType(type: ParamType, mode: (boolean|"auto")) {
+function ArrayType(type: ParamType, mode: (boolean|'auto')) {
   // Wrap non-array value as array
   function arrayWrap(val: any): any[] {
     return isArray(val) ? val : (isDefined(val) ? [ val ] : []);
@@ -109,7 +109,7 @@ function ArrayType(type: ParamType, mode: (boolean|"auto")) {
   function arrayUnwrap(val: any) {
     switch (val.length) {
       case 0: return undefined;
-      case 1: return mode === "auto" ? val[0] : val;
+      case 1: return mode === 'auto' ? val[0] : val;
       default: return val;
     }
   }

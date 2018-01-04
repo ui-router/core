@@ -204,7 +204,7 @@ export class TransitionHook {
     // Hook returned false
     if (result === false) {
       // Abort this Transition
-      return Rejection.aborted("Hook aborted transition").toPromise();
+      return Rejection.aborted('Hook aborted transition').toPromise();
     }
 
     const isTargetState = is(TargetState);
@@ -242,8 +242,8 @@ export class TransitionHook {
 
   toString() {
     const { options, registeredHook } = this;
-    const event = parse("traceData.hookType")(options) || "internal",
-        context = parse("traceData.context.state.name")(options) || parse("traceData.context")(options) || "unknown",
+    const event = parse('traceData.hookType')(options) || 'internal',
+        context = parse('traceData.context.state.name')(options) || parse('traceData.context')(options) || 'unknown',
         name = fnToString(registeredHook.callback);
     return `${event} context: ${context}, ${maxLength(200, name)}`;
   }

@@ -8,7 +8,7 @@
  * @coreapi
  * @module resolve
  */ /** for typedoc */
-import {Resolvable} from "./resolvable";
+import {Resolvable} from './resolvable';
 
 /**
  * An interface which is similar to an Angular 2 `Provider`
@@ -200,18 +200,18 @@ export interface ResolvePolicy {
   async?: PolicyAsync;
 }
 
-export type PolicyWhen = "LAZY" | "EAGER" ;
-export type PolicyAsync = "WAIT" | "NOWAIT" | "RXWAIT" ;
+export type PolicyWhen = 'LAZY' | 'EAGER' ;
+export type PolicyAsync = 'WAIT' | 'NOWAIT' | 'RXWAIT' ;
 
 /** @internalapi */
 export let resolvePolicies = {
   when: {
-    LAZY: "LAZY",
-    EAGER: "EAGER"
+    LAZY: 'LAZY',
+    EAGER: 'EAGER'
   },
   async: {
-    WAIT: "WAIT",
-    NOWAIT: "NOWAIT",
-    RXWAIT: "RXWAIT"
+    WAIT: 'WAIT',
+    NOWAIT: 'NOWAIT',
+    RXWAIT: 'RXWAIT'
   }
 };

@@ -2,19 +2,19 @@
  * @coreapi
  * @module core
  */ /** */
-import { UrlMatcherFactory } from "./url/urlMatcherFactory";
-import { UrlRouter } from "./url/urlRouter";
-import { TransitionService } from "./transition/transitionService";
-import { ViewService } from "./view/view";
-import { StateRegistry } from "./state/stateRegistry";
-import { StateService } from "./state/stateService";
-import { UIRouterGlobals } from "./globals";
-import { UIRouterPlugin, Disposable } from "./interface";
-import { values, removeFrom } from "./common/common";
-import { isFunction } from "./common/predicates";
-import { UrlService } from "./url/urlService";
-import { LocationServices, LocationConfig } from "./common/coreservices";
-import { Trace, trace } from "./common/trace";
+import { UrlMatcherFactory } from './url/urlMatcherFactory';
+import { UrlRouter } from './url/urlRouter';
+import { TransitionService } from './transition/transitionService';
+import { ViewService } from './view/view';
+import { StateRegistry } from './state/stateRegistry';
+import { StateService } from './state/stateService';
+import { UIRouterGlobals } from './globals';
+import { UIRouterPlugin, Disposable } from './interface';
+import { values, removeFrom } from './common/common';
+import { isFunction } from './common/predicates';
+import { UrlService } from './url/urlService';
+import { LocationServices, LocationConfig } from './common/coreservices';
+import { Trace, trace } from './common/trace';
 
 /** @hidden */
 let _routerInstance = 0;
@@ -192,7 +192,7 @@ export class UIRouter {
    */
   plugin<T extends UIRouterPlugin>(plugin: any, options: any = {}): T {
     const pluginInstance = new plugin(this, options);
-    if (!pluginInstance.name) throw new Error("Required property `name` missing on plugin: " + pluginInstance);
+    if (!pluginInstance.name) throw new Error('Required property `name` missing on plugin: ' + pluginInstance);
     this._disposables.push(pluginInstance);
     return this._plugins[pluginInstance.name] = pluginInstance;
   }

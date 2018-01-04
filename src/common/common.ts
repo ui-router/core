@@ -7,10 +7,10 @@
  * @module common
  */
 /** for typedoc */
-import { isFunction, isString, isArray, isRegExp, isDate } from "./predicates";
-import { all, any, prop, curry, not } from "./hof";
-import { services } from "./coreservices";
-import { StateObject } from "../state/stateObject";
+import { isFunction, isString, isArray, isRegExp, isDate } from './predicates';
+import { all, any, prop, curry, not } from './hof';
+import { services } from './coreservices';
+import { StateObject } from '../state/stateObject';
 
 declare const global;
 export const root: any = (typeof self === 'object' && self.self === self && self) ||
@@ -437,7 +437,7 @@ export const assertPredicate: <T> (predicate: Predicate<T>, errMsg: (string|Func
  * ```
  */
 export const assertMap: <T, U> (mapFn: (t: T) => U, errMsg: (string|Function)) => (t: T) => U = assertFn;
-export function assertFn(predicateOrMap: Function, errMsg: (string|Function) = "assert failure"): any {
+export function assertFn(predicateOrMap: Function, errMsg: (string|Function) = 'assert failure'): any {
   return (obj) => {
     const result = predicateOrMap(obj);
     if (!result) {
@@ -517,7 +517,7 @@ export function arrayTuples(...args: any[]): any[] {
 export function applyPairs(memo: TypedMap<any>, keyValTuple: any[]) {
   let key: string, value: any;
   if (isArray(keyValTuple)) [key, value] = keyValTuple;
-  if (!isString(key)) throw new Error("invalid parameters to applyPairs");
+  if (!isString(key)) throw new Error('invalid parameters to applyPairs');
   memo[key] = value;
   return memo;
 }

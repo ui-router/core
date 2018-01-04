@@ -3,10 +3,10 @@
  * @module state
  */ /** for typedoc */
 
-import { StateDeclaration, StateOrName, TargetStateDef } from "./interface";
-import { TransitionOptions } from "../transition/interface";
-import { StateObject } from "./stateObject";
-import { isString } from "../common/predicates";
+import { StateDeclaration, StateOrName, TargetStateDef } from './interface';
+import { TransitionOptions } from '../transition/interface';
+import { StateObject } from './stateObject';
+import { isString } from '../common/predicates';
 import { stringify } from '../common/strings';
 import { extend } from '../common';
 import { StateRegistry } from './stateRegistry';

@@ -1,17 +1,17 @@
 /** @module resolve */
 /** for typedoc */
-import { find, tail, uniqR, unnestR, inArray } from "../common/common";
-import { propEq, not } from "../common/hof";
-import { trace } from "../common/trace";
-import { services, $InjectorLike } from "../common/coreservices";
-import { resolvePolicies, PolicyWhen, ResolvePolicy } from "./interface";
-import { PathNode } from "../path/pathNode";
-import { Resolvable } from "./resolvable";
-import { StateObject } from "../state/stateObject";
-import { PathUtils } from "../path/pathFactory";
-import { stringify } from "../common/strings";
-import { Transition } from "../transition/transition";
-import { UIInjector } from "../interface";
+import { find, tail, uniqR, unnestR, inArray } from '../common/common';
+import { propEq, not } from '../common/hof';
+import { trace } from '../common/trace';
+import { services, $InjectorLike } from '../common/coreservices';
+import { resolvePolicies, PolicyWhen, ResolvePolicy } from './interface';
+import { PathNode } from '../path/pathNode';
+import { Resolvable } from './resolvable';
+import { StateObject } from '../state/stateObject';
+import { PathUtils } from '../path/pathFactory';
+import { stringify } from '../common/strings';
+import { Transition } from '../transition/transition';
+import { UIInjector } from '../interface';
 import { isUndefined } from '../common';
 
 const whens = resolvePolicies.when;
@@ -19,7 +19,7 @@ const ALL_WHENS = [whens.EAGER, whens.LAZY];
 const EAGER_WHENS = [whens.EAGER];
 
 // tslint:disable-next-line:no-inferrable-types
-export const NATIVE_INJECTOR_TOKEN: string = "Native Injector";
+export const NATIVE_INJECTOR_TOKEN: string = 'Native Injector';
 
 /**
  * Encapsulates Dependency Injection for a path of nodes
@@ -115,9 +115,9 @@ export class ResolveContext {
    * @param trans
    * @returns {Promise<any>|any}
    */
-  resolvePath(when: PolicyWhen = "LAZY", trans?: Transition): Promise<{ token: any, value: any }[]> {
+  resolvePath(when: PolicyWhen = 'LAZY', trans?: Transition): Promise<{ token: any, value: any }[]> {
     // This option determines which 'when' policy Resolvables we are about to fetch.
-    const whenOption: string = inArray(ALL_WHENS, when) ? when : "LAZY";
+    const whenOption: string = inArray(ALL_WHENS, when) ? when : 'LAZY';
     // If the caller specified EAGER, only the EAGER Resolvables are fetched.
     // if the caller specified LAZY, both EAGER and LAZY Resolvables are fetched.`
     const matchedWhens = whenOption === resolvePolicies.when.EAGER ? EAGER_WHENS : ALL_WHENS;
@@ -125,7 +125,7 @@ export class ResolveContext {
     // get the subpath to the state argument, if provided
     trace.traceResolvePath(this._path, when, trans);
 
-    const matchesPolicy = (acceptedVals: string[], whenOrAsync: "when"|"async") =>
+    const matchesPolicy = (acceptedVals: string[], whenOrAsync: 'when'|'async') =>
         (resolvable: Resolvable) =>
             inArray(acceptedVals, this.getPolicy(resolvable)[whenOrAsync]);
 
@@ -177,7 +177,7 @@ export class ResolveContext {
 
       const fromInjector = this.injector().getNative(token);
       if (isUndefined(fromInjector)) {
-        throw new Error("Could not find Dependency Injection token: " + stringify(token));
+        throw new Error('Could not find Dependency Injection token: ' + stringify(token));
       }
 
       return new Resolvable(token, () => fromInjector, [], fromInjector);
@@ -202,7 +202,7 @@ class UIInjectorImpl implements UIInjector {
       }
 
       if (!resolvable.resolved) {
-        throw new Error("Resolvable async .get() not complete:" + stringify(resolvable.token))
+        throw new Error('Resolvable async .get() not complete:' + stringify(resolvable.token))
       }
       return resolvable.data;
     }

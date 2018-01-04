@@ -2,13 +2,13 @@
  * @coreapi
  * @module view
  */ /** for typedoc */
-import { equals, applyPairs, removeFrom, TypedMap, inArray } from "../common/common";
-import { curry, prop } from "../common/hof";
-import { isString, isArray } from "../common/predicates";
-import { trace } from "../common/trace";
-import { PathNode } from "../path/pathNode";
-import { ActiveUIView, ViewContext, ViewConfig } from "./interface";
-import { _ViewDeclaration } from "../state/interface";
+import { equals, applyPairs, removeFrom, TypedMap, inArray } from '../common/common';
+import { curry, prop } from '../common/hof';
+import { isString, isArray } from '../common/predicates';
+import { trace } from '../common/trace';
+import { PathNode } from '../path/pathNode';
+import { ActiveUIView, ViewContext, ViewConfig } from './interface';
+import { _ViewDeclaration } from '../state/interface';
 
 export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig|ViewConfig[];
 
@@ -127,8 +127,8 @@ export class ViewService {
 
     // Split names apart from both viewConfig and uiView into segments
     const vc = viewConfig.viewDecl;
-    const vcSegments = vc.$uiViewName.split(".");
-    const uivSegments = uiView.fqn.split(".");
+    const vcSegments = vc.$uiViewName.split('.');
+    const uivSegments = uiView.fqn.split('.');
 
     // Check if the tails of the segment arrays match. ex, these arrays' tails match:
     // vc: ["foo", "bar"], uiv fqn: ["$default", "foo", "bar"]
@@ -138,7 +138,7 @@ export class ViewService {
     // Now check if the fqn ending at the first segment of the viewConfig matches the context:
     // ["$default", "foo"].join(".") == "$default.foo", does the ui-view $default.foo context match?
     const negOffset = (1 - vcSegments.length) || undefined;
-    const fqnToFirstSegment = uivSegments.slice(0, negOffset).join(".");
+    const fqnToFirstSegment = uivSegments.slice(0, negOffset).join('.');
     const uiViewContext = uiViewsByFqn[fqnToFirstSegment].creationContext;
     return vc.$uiViewContextAnchor === (uiViewContext && uiViewContext.name);
   }
@@ -154,13 +154,13 @@ export class ViewService {
    *
    * @returns the normalized uiViewName and uiViewContextAnchor that the view targets
    */
-  static normalizeUIViewTarget(context: ViewContext, rawViewName = "") {
+  static normalizeUIViewTarget(context: ViewContext, rawViewName = '') {
     // TODO: Validate incoming view name with a regexp to allow:
     // ex: "view.name@foo.bar" , "^.^.view.name" , "view.name@^.^" , "" ,
     // "@" , "$default@^" , "!$default.$default" , "!foo.bar"
-    const viewAtContext: string[] = rawViewName.split("@");
-    let uiViewName = viewAtContext[0] || "$default";  // default to unnamed view
-    let uiViewContextAnchor = isString(viewAtContext[1]) ? viewAtContext[1] : "^";    // default to parent context
+    const viewAtContext: string[] = rawViewName.split('@');
+    let uiViewName = viewAtContext[0] || '$default';  // default to unnamed view
+    let uiViewContextAnchor = isString(viewAtContext[1]) ? viewAtContext[1] : '^';    // default to parent context
 
     // Handle relative view-name sugar syntax.
     // Matches rawViewName "^.^.^.foo.bar" into array: ["^.^.^.foo.bar", "^.^.^", "foo.bar"],
@@ -173,13 +173,13 @@ export class ViewService {
 
     if (uiViewName.charAt(0) === '!') {
       uiViewName = uiViewName.substr(1);
-      uiViewContextAnchor = ""; // target absolutely from root
+      uiViewContextAnchor = ''; // target absolutely from root
     }
 
     // handle parent relative targeting "^.^.^"
     const relativeMatch = /^(\^(?:\.\^)*)$/;
     if (relativeMatch.exec(uiViewContextAnchor)) {
-      const anchorState = uiViewContextAnchor.split(".")
+      const anchorState = uiViewContextAnchor.split('.')
         .reduce(((anchor, x) => anchor.parent), context);
       uiViewContextAnchor = anchorState.name;
     } else if (uiViewContextAnchor === '.') {
@@ -201,7 +201,7 @@ export class ViewService {
 
   createViewConfig(path: PathNode[], decl: _ViewDeclaration): ViewConfig[] {
     const cfgFactory = this._viewConfigFactories[decl.$type];
-    if (!cfgFactory) throw new Error("ViewService: No view config factory registered for type " + decl.$type);
+    if (!cfgFactory) throw new Error('ViewService: No view config factory registered for type ' + decl.$type);
     const cfgs = cfgFactory(path, decl);
     return isArray(cfgs) ? cfgs : [cfgs];
   }
@@ -215,12 +215,12 @@ export class ViewService {
    * @param viewConfig The ViewConfig view to deregister.
    */
   deactivateViewConfig(viewConfig: ViewConfig) {
-    trace.traceViewServiceEvent("<- Removing", viewConfig);
+    trace.traceViewServiceEvent('<- Removing', viewConfig);
     removeFrom(this._viewConfigs, viewConfig);
   }
 
   activateViewConfig(viewConfig: ViewConfig) {
-    trace.traceViewServiceEvent("-> Registering", <any> viewConfig);
+    trace.traceViewServiceEvent('-> Registering', <any> viewConfig);
     this._viewConfigs.push(viewConfig);
   }
 
@@ -235,7 +235,7 @@ export class ViewService {
     function uiViewDepth(uiView: ActiveUIView) {
       const stateDepth = (context: ViewContext) =>
           context && context.parent ? stateDepth(context.parent) + 1 : 1;
-      return (uiView.fqn.split(".").length * 10000) + stateDepth(uiView.creationContext);
+      return (uiView.fqn.split('.').length * 10000) + stateDepth(uiView.creationContext);
     }
 
     // Return the ViewConfig's context's depth in the context tree.
@@ -296,11 +296,11 @@ export class ViewService {
    * @return a de-registration function used when the view is destroyed.
    */
   registerUIView(uiView: ActiveUIView) {
-    trace.traceViewServiceUIViewEvent("-> Registering", uiView);
+    trace.traceViewServiceUIViewEvent('-> Registering', uiView);
     const uiViews = this._uiViews;
     const fqnAndTypeMatches = (uiv: ActiveUIView) => uiv.fqn === uiView.fqn && uiv.$type === uiView.$type;
     if (uiViews.filter(fqnAndTypeMatches).length)
-      trace.traceViewServiceUIViewEvent("!!!! duplicate uiView named:", uiView);
+      trace.traceViewServiceUIViewEvent('!!!! duplicate uiView named:', uiView);
 
     uiViews.push(uiView);
     this.sync();
@@ -308,10 +308,10 @@ export class ViewService {
     return () => {
       const idx = uiViews.indexOf(uiView);
       if (idx === -1) {
-        trace.traceViewServiceUIViewEvent("Tried removing non-registered uiView", uiView);
+        trace.traceViewServiceUIViewEvent('Tried removing non-registered uiView', uiView);
         return;
       }
-      trace.traceViewServiceUIViewEvent("<- Deregistering", uiView);
+      trace.traceViewServiceUIViewEvent('<- Deregistering', uiView);
       removeFrom(uiViews)(uiView);
     };
   };
@@ -322,7 +322,7 @@ export class ViewService {
    * @return {Array} Returns an array of fully-qualified view names.
    */
   available() {
-    return this._uiViews.map(prop("fqn"));
+    return this._uiViews.map(prop('fqn'));
   }
 
   /**
@@ -331,7 +331,7 @@ export class ViewService {
    * @return {Array} Returns an array of fully-qualified view names.
    */
   active() {
-    return this._uiViews.filter(prop("$config")).map(prop("name"));
+    return this._uiViews.filter(prop('$config')).map(prop('name'));
   }
 
 }

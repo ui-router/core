@@ -76,7 +76,7 @@ export class Glob {
           return                   '\\.' + seg;
         }).join('');
 
-    this.regexp = new RegExp("^" + regexpString + "$");
+    this.regexp = new RegExp('^' + regexpString + '$');
   }
 
   matches(name: string) {
