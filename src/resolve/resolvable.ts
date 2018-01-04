@@ -89,14 +89,14 @@ export class Resolvable implements ResolvableLiteral {
       this.resolved = data !== undefined;
       this.promise = this.resolved ? services.$q.when(this.data) : undefined;
     } else if (isObject(arg1) && arg1.token && isFunction(arg1.resolveFn)) {
-      let literal = <ResolvableLiteral> arg1;
+      const literal = <ResolvableLiteral> arg1;
       return new Resolvable(literal.token, literal.resolveFn, literal.deps, literal.policy, literal.data);
     }
   }
 
   getPolicy(state: StateObject): ResolvePolicy {
-    let thisPolicy = this.policy || {};
-    let statePolicy = state && state.resolvePolicy || {};
+    const thisPolicy = this.policy || {};
+    const statePolicy = state && state.resolvePolicy || {};
     return {
       when: thisPolicy.when || statePolicy.when || defaultResolvePolicy.when,
       async: thisPolicy.async || statePolicy.async || defaultResolvePolicy.async,
@@ -111,7 +111,7 @@ export class Resolvable implements ResolvableLiteral {
    * and update the Resolvable's state
    */
   resolve(resolveContext: ResolveContext, trans?: Transition) {
-    let $q = services.$q;
+    const $q = services.$q;
 
     // Gets all dependencies from ResolveContext and wait for them to be resolved
     const getResolvableDependencies = () =>
@@ -131,14 +131,14 @@ export class Resolvable implements ResolvableLiteral {
      * - Waits for the promise, then return the cached observable (not the first emitted value).
      */
     const waitForRx = (observable$: any) => {
-      let cached = observable$.cache(1);
+      const cached = observable$.cache(1);
       return cached.take(1).toPromise().then(() => cached);
     };
 
     // If the resolve policy is RXWAIT, wait for the observable to emit something. otherwise pass through.
-    let node: PathNode = resolveContext.findNode(this);
-    let state: StateObject = node && node.state;
-    let maybeWaitForRx = this.getPolicy(state).async === "RXWAIT" ? waitForRx : identity;
+    const node: PathNode = resolveContext.findNode(this);
+    const state: StateObject = node && node.state;
+    const maybeWaitForRx = this.getPolicy(state).async === "RXWAIT" ? waitForRx : identity;
 
     // After the final value has been resolved, update the state of the Resolvable
     const applyResolvedValue = (resolvedValue: any) => {

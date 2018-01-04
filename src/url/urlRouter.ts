@@ -144,14 +144,14 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   match(url: UrlParts): MatchResult {
     this.ensureSorted();
 
-    url = extend({path: '', search: {}, hash: '' }, url);
-    let rules = this.rules();
+    url = extend({ path: '', search: {}, hash: '' }, url);
+    const rules = this.rules();
     if (this._otherwiseFn) rules.push(this._otherwiseFn);
 
     // Checks a single rule. Returns { rule: rule, match: match, weight: weight } if it matched, or undefined
 
-    let checkRule = (rule: UrlRule): MatchResult => {
-      let match = rule.match(url, this._router);
+    const checkRule = (rule: UrlRule): MatchResult => {
+      const match = rule.match(url, this._router);
       return match && { match, rule, weight: rule.matchPriority(match) };
     };
 
@@ -164,7 +164,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
       // Stop when there is a 'best' rule and the next rule sorts differently than it.
       if (best && this._sortFn(rules[i], best.rule) !== 0) break;
 
-      let current = checkRule(rules[i]);
+      const current = checkRule(rules[i]);
       // Pick the best MatchResult
       best = (!best || current && current.weight > best.weight) ? current : best;
     }
@@ -176,17 +176,17 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   sync(evt?) {
     if (evt && evt.defaultPrevented) return;
 
-    let router = this._router,
+    const router = this._router,
         $url = router.urlService,
         $state = router.stateService;
 
-    let url: UrlParts = {
+    const url: UrlParts = {
       path: $url.path(), search: $url.search(), hash: $url.hash(),
     };
 
-    let best = this.match(url);
+    const best = this.match(url);
 
-    let applyResult = pattern([
+    const applyResult = pattern([
       [isString, (newurl: string) => $url.url(newurl, true)],
       [TargetState.isDef, (def: TargetStateDef) => $state.go(def.state, def.params, def.options)],
       [is(TargetState), (target: TargetState) => $state.go(target.state(), target.params(), target.options())],
@@ -210,7 +210,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * @internalapi
    */
   update(read?: boolean) {
-    let $url = this._router.locationService;
+    const $url = this._router.locationService;
     if (read) {
       this.location = $url.url();
       return;
@@ -231,7 +231,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * @param options
    */
   push(urlMatcher: UrlMatcher, params?: RawParams, options?: { replace?: (string|boolean) }) {
-    let replace = options && !!options.replace;
+    const replace = options && !!options.replace;
     this._router.urlService.url(urlMatcher.format(params || {}), replace);
   }
 
@@ -260,8 +260,8 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
     options = options || { absolute: false };
 
-    let cfg = this._router.urlService.config;
-    let isHtml5 = cfg.html5Mode();
+    const cfg = this._router.urlService.config;
+    const isHtml5 = cfg.html5Mode();
     if (!isHtml5 && url !== null) {
       url = "#" + cfg.hashPrefix() + url;
     }
@@ -271,8 +271,9 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
       return url;
     }
 
-    let slash = (!isHtml5 && url ? '/' : ''), port = cfg.port();
-    port = <any> (port === 80 || port === 443 ? '' : ':' + port);
+    const slash = (!isHtml5 && url ? '/' : '');
+    const cfgPort = cfg.port();
+    const port = <any> (cfgPort === 80 || cfgPort === 443 ? '' : ':' + cfgPort);
 
     return [cfg.protocol(), '://', cfg.host(), port, slash, url].join('');
   }
@@ -314,7 +315,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
   /** @inheritdoc */
   otherwise(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef) {
-    let handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
+    const handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
 
     this._otherwiseFn = this.urlRuleFactory.create(val(true), handlerFn);
     this._sorted = false;
@@ -322,9 +323,9 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
   /** @inheritdoc */
   initial(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef) {
-    let handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
+    const handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
 
-    let matchFn: UrlRuleMatchFn = (urlParts, router) =>
+    const matchFn: UrlRuleMatchFn = (urlParts, router) =>
         router.globals.transitionHistory.size() === 0 && !!/^\/?$/.exec(urlParts.path);
 
     this.rule(this.urlRuleFactory.create(matchFn, handlerFn));
@@ -332,7 +333,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
   /** @inheritdoc */
   when(matcher: (RegExp|UrlMatcher|string), handler: string|UrlRuleHandlerFn, options?: { priority: number }): UrlRule {
-    let rule = this.urlRuleFactory.create(matcher, handler);
+    const rule = this.urlRuleFactory.create(matcher, handler);
     if (isDefined(options && options.priority)) rule.priority = options.priority;
     this.rule(rule);
     return rule;

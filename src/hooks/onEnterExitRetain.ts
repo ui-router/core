@@ -16,8 +16,8 @@ import { StateObject } from '../state/stateObject';
  */
 function makeEnterExitRetainHook(hookName: string): TransitionStateHookFn {
   return (transition: Transition, state: StateDeclaration) => {
-    let _state: StateObject = state.$$state();
-    let hookFn: TransitionStateHookFn = _state[hookName];
+    const _state: StateObject = state.$$state();
+    const hookFn: TransitionStateHookFn = _state[hookName];
     return hookFn(transition, state);
   }
 }

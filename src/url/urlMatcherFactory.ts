@@ -113,7 +113,7 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
    * See [[ParamTypeDefinition]] for examples
    */
   type(name: string, definition?: ParamTypeDefinition, definitionFn?: () => ParamTypeDefinition) {
-    let type = this.paramTypes.type(name, definition, definitionFn);
+    const type = this.paramTypes.type(name, definition, definitionFn);
     return !isDefined(definition) ? type : this;
   };
 

@@ -31,9 +31,9 @@ export class StateQueueManager implements Disposable {
   }
 
   register(stateDecl: _StateDeclaration) {
-    let queue = this.queue;
-    let state = StateObject.create(stateDecl);
-    let name = state.name;
+    const queue = this.queue;
+    const state = StateObject.create(stateDecl);
+    const name = state.name;
 
     if (!isString(name)) throw new Error("State must have a valid name");
     if (this.states.hasOwnProperty(name) || inArray(queue.map(prop('name')), name))
@@ -46,26 +46,26 @@ export class StateQueueManager implements Disposable {
   }
 
   flush() {
-    let {queue, states, builder} = this;
-    let registered: StateObject[] = [], // states that got registered
+    const {queue, states, builder} = this;
+    const registered: StateObject[] = [], // states that got registered
         orphans: StateObject[] = [], // states that don't yet have a parent registered
         previousQueueLength = {}; // keep track of how long the queue when an orphan was first encountered
     const getState = (name) =>
         this.states.hasOwnProperty(name) && this.states[name];
 
     while (queue.length > 0) {
-      let state: StateObject = queue.shift();
-      let name = state.name;
-      let result: StateObject = builder.build(state);
-      let orphanIdx: number = orphans.indexOf(state);
+      const state: StateObject = queue.shift();
+      const name = state.name;
+      const result: StateObject = builder.build(state);
+      const orphanIdx: number = orphans.indexOf(state);
 
       if (result) {
-        let existingState = getState(name);
+        const existingState = getState(name);
         if (existingState && existingState.name === name) {
           throw new Error(`State '${name}' is already defined`);
         }
 
-        let existingFutureState = getState(name + ".**");
+        const existingFutureState = getState(name + ".**");
         if (existingFutureState) {
           // Remove future state of the same name
           this.$registry.deregister(existingFutureState);
@@ -78,7 +78,7 @@ export class StateQueueManager implements Disposable {
         continue;
       }
 
-      let prev = previousQueueLength[name];
+      const prev = previousQueueLength[name];
       previousQueueLength[name] = queue.length;
       if (orphanIdx >= 0 && prev === queue.length) {
         // Wait until two consecutive iterations where no additional states were dequeued successfully.

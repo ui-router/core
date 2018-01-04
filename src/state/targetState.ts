@@ -118,9 +118,9 @@ export class TargetState {
 
   /** If the object is invalid, returns the reason why */
   error(): string {
-    let base = <any> this.options().relative;
+    const base = <any> this.options().relative;
     if (!this._definition && !!base) {
-      let stateName = base.name ? base.name : base;
+      const stateName = base.name ? base.name : base;
       return `Could not resolve '${this.name()}' from state '${stateName}'`;
     }
     if (!this._definition)

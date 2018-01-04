@@ -126,9 +126,9 @@ export class ViewService {
     if (uiView.$type !== viewConfig.viewDecl.$type) return false;
 
     // Split names apart from both viewConfig and uiView into segments
-    let vc = viewConfig.viewDecl;
-    let vcSegments = vc.$uiViewName.split(".");
-    let uivSegments = uiView.fqn.split(".");
+    const vc = viewConfig.viewDecl;
+    const vcSegments = vc.$uiViewName.split(".");
+    const uivSegments = uiView.fqn.split(".");
 
     // Check if the tails of the segment arrays match. ex, these arrays' tails match:
     // vc: ["foo", "bar"], uiv fqn: ["$default", "foo", "bar"]
@@ -137,9 +137,9 @@ export class ViewService {
 
     // Now check if the fqn ending at the first segment of the viewConfig matches the context:
     // ["$default", "foo"].join(".") == "$default.foo", does the ui-view $default.foo context match?
-    let negOffset = (1 - vcSegments.length) || undefined;
-    let fqnToFirstSegment = uivSegments.slice(0, negOffset).join(".");
-    let uiViewContext = uiViewsByFqn[fqnToFirstSegment].creationContext;
+    const negOffset = (1 - vcSegments.length) || undefined;
+    const fqnToFirstSegment = uivSegments.slice(0, negOffset).join(".");
+    const uiViewContext = uiViewsByFqn[fqnToFirstSegment].creationContext;
     return vc.$uiViewContextAnchor === (uiViewContext && uiViewContext.name);
   }
 
@@ -158,13 +158,13 @@ export class ViewService {
     // TODO: Validate incoming view name with a regexp to allow:
     // ex: "view.name@foo.bar" , "^.^.view.name" , "view.name@^.^" , "" ,
     // "@" , "$default@^" , "!$default.$default" , "!foo.bar"
-    let viewAtContext: string[] = rawViewName.split("@");
+    const viewAtContext: string[] = rawViewName.split("@");
     let uiViewName = viewAtContext[0] || "$default";  // default to unnamed view
     let uiViewContextAnchor = isString(viewAtContext[1]) ? viewAtContext[1] : "^";    // default to parent context
 
     // Handle relative view-name sugar syntax.
     // Matches rawViewName "^.^.^.foo.bar" into array: ["^.^.^.foo.bar", "^.^.^", "foo.bar"],
-    let relativeViewNameSugar = /^(\^(?:\.\^)*)\.(.*$)/.exec(uiViewName);
+    const relativeViewNameSugar = /^(\^(?:\.\^)*)\.(.*$)/.exec(uiViewName);
     if (relativeViewNameSugar) {
       // Clobbers existing contextAnchor (rawViewName validation will fix this)
       uiViewContextAnchor = relativeViewNameSugar[1]; // set anchor to "^.^.^"
@@ -177,9 +177,9 @@ export class ViewService {
     }
 
     // handle parent relative targeting "^.^.^"
-    let relativeMatch = /^(\^(?:\.\^)*)$/;
+    const relativeMatch = /^(\^(?:\.\^)*)$/;
     if (relativeMatch.exec(uiViewContextAnchor)) {
-      let anchorState = uiViewContextAnchor.split(".")
+      const anchorState = uiViewContextAnchor.split(".")
         .reduce(((anchor, x) => anchor.parent), context);
       uiViewContextAnchor = anchorState.name;
     } else if (uiViewContextAnchor === '.') {
@@ -200,9 +200,9 @@ export class ViewService {
   }
 
   createViewConfig(path: PathNode[], decl: _ViewDeclaration): ViewConfig[] {
-    let cfgFactory = this._viewConfigFactories[decl.$type];
+    const cfgFactory = this._viewConfigFactories[decl.$type];
     if (!cfgFactory) throw new Error("ViewService: No view config factory registered for type " + decl.$type);
-    let cfgs = cfgFactory(path, decl);
+    const cfgs = cfgFactory(path, decl);
     return isArray(cfgs) ? cfgs : [cfgs];
   }
 
@@ -226,7 +226,7 @@ export class ViewService {
 
 
   sync() {
-    let uiViewsByFqn: TypedMap<ActiveUIView> =
+    const uiViewsByFqn: TypedMap<ActiveUIView> =
         this._uiViews.map(uiv => [uiv.fqn, uiv]).reduce(applyPairs, <any> {});
 
     // Return a weighted depth value for a uiView.
@@ -249,7 +249,7 @@ export class ViewService {
     const depthCompare = curry((depthFn, posNeg, left, right) => posNeg * (depthFn(left) - depthFn(right)));
 
     const matchingConfigPair = (uiView: ActiveUIView): ViewTuple => {
-      let matchingConfigs = this._viewConfigs.filter(ViewService.matches(uiViewsByFqn, uiView));
+      const matchingConfigs = this._viewConfigs.filter(ViewService.matches(uiViewsByFqn, uiView));
       if (matchingConfigs.length > 1) {
         // This is OK.  Child states can target a ui-view that the parent state also targets (the child wins)
         // Sort by depth and return the match from the deepest child
@@ -297,7 +297,7 @@ export class ViewService {
    */
   registerUIView(uiView: ActiveUIView) {
     trace.traceViewServiceUIViewEvent("-> Registering", uiView);
-    let uiViews = this._uiViews;
+    const uiViews = this._uiViews;
     const fqnAndTypeMatches = (uiv: ActiveUIView) => uiv.fqn === uiView.fqn && uiv.$type === uiView.$type;
     if (uiViews.filter(fqnAndTypeMatches).length)
       trace.traceViewServiceUIViewEvent("!!!! duplicate uiView named:", uiView);
@@ -306,7 +306,7 @@ export class ViewService {
     this.sync();
 
     return () => {
-      let idx = uiViews.indexOf(uiView);
+      const idx = uiViews.indexOf(uiView);
       if (idx === -1) {
         trace.traceViewServiceUIViewEvent("Tried removing non-registered uiView", uiView);
         return;

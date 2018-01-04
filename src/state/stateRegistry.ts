@@ -44,7 +44,7 @@ export class StateRegistry {
 
   /** @internalapi */
   private _registerRoot() {
-    let rootStateDef: StateDeclaration = {
+    const rootStateDef: StateDeclaration = {
       name: '',
       url: '^',
       views: null,
@@ -54,7 +54,7 @@ export class StateRegistry {
       abstract: true
     };
 
-    let _root = this._root = this.stateQueue.register(rootStateDef);
+    const _root = this._root = this.stateQueue.register(rootStateDef);
     _root.navigable = null;
   }
 
@@ -133,17 +133,17 @@ export class StateRegistry {
 
   /** @hidden */
   private _deregisterTree(state: StateObject) {
-    let all = this.get().map(s => s.$$state());
+    const all = this.get().map(s => s.$$state());
     const getChildren = (states: StateObject[]) => {
-      let _children = all.filter(s => states.indexOf(s.parent) !== -1);
+      const _children = all.filter(s => states.indexOf(s.parent) !== -1);
       return _children.length === 0 ? _children : _children.concat(getChildren(_children));
     };
 
-    let children = getChildren([state]);
-    let deregistered: StateObject[] = [state].concat(children).reverse();
+    const children = getChildren([state]);
+    const deregistered: StateObject[] = [state].concat(children).reverse();
 
     deregistered.forEach(_state => {
-      let $ur = this._router.urlRouter;
+      const $ur = this._router.urlRouter;
       // Remove URL rule
       $ur.rules().filter(propEq("state", _state)).forEach($ur.removeRule.bind($ur));
       // Remove state from registry
@@ -163,9 +163,9 @@ export class StateRegistry {
    * @returns {StateObject[]} a list of removed states
    */
   deregister(stateOrName: StateOrName) {
-    let _state = this.get(stateOrName);
+    const _state = this.get(stateOrName);
     if (!_state) throw new Error("Can't deregister state; not found: " + stateOrName);
-    let deregisteredStates = this._deregisterTree(_state.$$state());
+    const deregisteredStates = this._deregisterTree(_state.$$state());
 
     this.listeners.forEach(listener => listener("deregistered", deregisteredStates.map(s => s.self)));
     return deregisteredStates;
@@ -195,7 +195,7 @@ export class StateRegistry {
   get(stateOrName?: StateOrName, base?: StateOrName): any {
     if (arguments.length === 0)
       return <StateDeclaration[]> Object.keys(this.states).map(name => this.states[name].self);
-    let found = this.matcher.find(stateOrName, base);
+    const found = this.matcher.find(stateOrName, base);
     return found && found.self || null;
   }
 

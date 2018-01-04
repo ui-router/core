@@ -191,7 +191,7 @@ export class UIRouter {
    * @returns the registered plugin instance
    */
   plugin<T extends UIRouterPlugin>(plugin: any, options: any = {}): T {
-    let pluginInstance = new plugin(this, options);
+    const pluginInstance = new plugin(this, options);
     if (!pluginInstance.name) throw new Error("Required property `name` missing on plugin: " + pluginInstance);
     this._disposables.push(pluginInstance);
     return this._plugins[pluginInstance.name] = pluginInstance;

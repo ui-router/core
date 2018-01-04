@@ -235,7 +235,7 @@ export class ParamTypes {
   /** @internalapi */
   _flushTypeQueue() {
     while (this.typeQueue.length) {
-      let type = this.typeQueue.shift();
+      const type = this.typeQueue.shift();
       if (type.pattern) throw new Error("You cannot override a type's .pattern at runtime.");
       extend(this.types[type.name], services.$injector.invoke(type.def));
     }
@@ -299,7 +299,7 @@ function initDefaultTypes() {
       },
       decode: function(val: string) {
         if (this.is(val)) return <any> val as Date;
-        let match = this.capture.exec(val);
+        const match = this.capture.exec(val);
         return match ? new Date(match[1], match[2] - 1, match[3]) : undefined;
       },
       is: (val: any) => val instanceof Date && !isNaN(val.valueOf()),

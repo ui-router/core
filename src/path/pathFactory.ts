@@ -23,18 +23,18 @@ import { StateRegistry } from '../state';
 export class PathUtils {
   /** Given a PathNode[], create an TargetState */
   static makeTargetState(registry: StateRegistry, path: PathNode[]): TargetState {
-    let state = tail(path).state;
+    const state = tail(path).state;
     return new TargetState(registry, state, path.map(prop("paramValues")).reduce(mergeR, {}), {});
   }
 
   static buildPath(targetState: TargetState) {
-    let toParams = targetState.params();
+    const toParams = targetState.params();
     return targetState.$state().path.map(state => new PathNode(state).applyRawParams(toParams));
   }
 
   /** Given a fromPath: PathNode[] and a TargetState, builds a toPath: PathNode[] */
   static buildToPath(fromPath: PathNode[], targetState: TargetState): PathNode[] {
-    let toPath: PathNode[] = PathUtils.buildPath(targetState);
+    const toPath: PathNode[] = PathUtils.buildPath(targetState);
     if (targetState.options().inherit) {
       return PathUtils.inheritParams(fromPath, toPath, Object.keys(targetState.params()));
     }
@@ -49,9 +49,9 @@ export class PathUtils {
   static applyViewConfigs($view: ViewService, path: PathNode[], states: StateObject[]) {
     // Only apply the viewConfigs to the nodes for the given states
     path.filter(node => inArray(states, node.state)).forEach(node => {
-      let viewDecls: _ViewDeclaration[] = values(node.state.views || {});
-      let subPath = PathUtils.subPath(path, n => n === node);
-      let viewConfigs: ViewConfig[][] = viewDecls.map(view => $view.createViewConfig(subPath, view));
+      const viewDecls: _ViewDeclaration[] = values(node.state.views || {});
+      const subPath = PathUtils.subPath(path, n => n === node);
+      const viewConfigs: ViewConfig[][] = viewDecls.map(view => $view.createViewConfig(subPath, view));
       node.views = viewConfigs.reduce(unnestR, []);
     });
   }
@@ -69,11 +69,11 @@ export class PathUtils {
    */
   static inheritParams(fromPath: PathNode[], toPath: PathNode[], toKeys: string[] = []): PathNode[] {
     function nodeParamVals(path: PathNode[], state: StateObject): RawParams {
-      let node: PathNode = find(path, propEq('state', state));
+      const node: PathNode = find(path, propEq('state', state));
       return extend({}, node && node.paramValues);
     }
 
-    let noInherit = fromPath.map(node => node.paramSchema)
+    const noInherit = fromPath.map(node => node.paramSchema)
         .reduce(unnestR, [])
         .filter(param => !param.inherit)
         .map(prop('id'));
@@ -86,11 +86,11 @@ export class PathUtils {
       // All param values for the node (may include default key/vals, when key was not found in toParams)
       let toParamVals = extend({}, toNode && toNode.paramValues);
       // limited to only those keys found in toParams
-      let incomingParamVals = pick(toParamVals, toKeys);
+      const incomingParamVals = pick(toParamVals, toKeys);
       toParamVals = omit(toParamVals, toKeys);
-      let fromParamVals = omit(nodeParamVals(fromPath, toNode.state) || {}, noInherit);
+      const fromParamVals = omit(nodeParamVals(fromPath, toNode.state) || {}, noInherit);
       // extend toParamVals with any fromParamVals, then override any of those those with incomingParamVals
-      let ownParamVals: RawParams = extend(toParamVals, fromParamVals, incomingParamVals);
+      const ownParamVals: RawParams = extend(toParamVals, fromParamVals, incomingParamVals);
       return new PathNode(toNode.state).applyRawParams(ownParamVals);
     }
 
@@ -106,7 +106,8 @@ export class PathUtils {
    * Computes the tree changes (entering, exiting) between a fromPath and toPath.
    */
   static treeChanges(fromPath: PathNode[], toPath: PathNode[], reloadState: StateObject): TreeChanges {
-    let keep = 0, max = Math.min(fromPath.length, toPath.length);
+    const max = Math.min(fromPath.length, toPath.length);
+    let keep = 0;
 
     const nodesMatch = (node1: PathNode, node2: PathNode) =>
         node1.equals(node2, PathUtils.nonDynamicParams);
@@ -117,7 +118,7 @@ export class PathUtils {
 
     /** Given a retained node, return a new node which uses the to node's param values */
     function applyToParams(retainedNode: PathNode, idx: number): PathNode {
-      let cloned = PathNode.clone(retainedNode);
+      const cloned = PathNode.clone(retainedNode);
       cloned.paramValues = toPath[idx].paramValues;
       return cloned;
     }
@@ -129,7 +130,7 @@ export class PathUtils {
     exiting               = from.slice(keep);
 
     // Create a new retained path (with shallow copies of nodes) which have the params of the toPath mapped
-    let retainedWithToParams  = retained.map(applyToParams);
+    const retainedWithToParams  = retained.map(applyToParams);
     entering              = toPath.slice(keep);
     to                    = (retainedWithToParams).concat(entering);
 
@@ -153,7 +154,7 @@ export class PathUtils {
    */
   static matching(pathA: PathNode[], pathB: PathNode[], paramsFn?: GetParamsFn): PathNode[] {
     let done = false;
-    let tuples: PathNode[][] = arrayTuples(pathA, pathB);
+    const tuples: PathNode[][] = arrayTuples(pathA, pathB);
     return tuples.reduce((matching, [nodeA, nodeB]) => {
       done = done || !nodeA.equals(nodeB, paramsFn);
       return done ? matching : matching.concat(nodeA);
@@ -184,8 +185,8 @@ export class PathUtils {
    * @returns a subpath up to the matching node, or undefined if no match is found
    */
   static subPath(path: PathNode[], predicate: Predicate<PathNode>): PathNode[] {
-    let node = find(path, predicate);
-    let elementIdx = path.indexOf(node);
+    const node = find(path, predicate);
+    const elementIdx = path.indexOf(node);
     return elementIdx === -1 ? undefined : path.slice(0, elementIdx + 1);
   }
 

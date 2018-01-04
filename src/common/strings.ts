@@ -61,11 +61,11 @@ function promiseToString(p: Promise<any>) {
 }
 
 export function functionToString(fn: Function) {
-  let fnStr = fnToString(fn);
-  let namedFunctionMatch = fnStr.match(/^(function [^ ]+\([^)]*\))/);
-  let toStr = namedFunctionMatch ? namedFunctionMatch[1] : fnStr;
+  const fnStr = fnToString(fn);
+  const namedFunctionMatch = fnStr.match(/^(function [^ ]+\([^)]*\))/);
+  const toStr = namedFunctionMatch ? namedFunctionMatch[1] : fnStr;
 
-  let fnName = fn['name'] || "";
+  const fnName = fn['name'] || "";
   if (fnName && toStr.match(/function \(/)) {
     return 'function ' + fnName + toStr.substr(9);
   }
@@ -73,13 +73,13 @@ export function functionToString(fn: Function) {
 }
 
 export function fnToString(fn: IInjectable) {
-  let _fn = isArray(fn) ? fn.slice(-1)[0] : fn;
+  const _fn = isArray(fn) ? fn.slice(-1)[0] : fn;
   return _fn && _fn.toString() || "undefined";
 }
 
 let stringifyPatternFn: (val: any) => string = null;
-let stringifyPattern = function(value: any) {
-  let isRejection = Rejection.isRejectionPromise;
+const stringifyPattern = function(value: any) {
+  const isRejection = Rejection.isRejectionPromise;
 
   stringifyPatternFn = <any> stringifyPatternFn || pattern([
     [not(isDefined),  val("undefined")],
@@ -97,7 +97,7 @@ let stringifyPattern = function(value: any) {
 };
 
 export function stringify(o: any) {
-  let seen: any[] = [];
+  const seen: any[] = [];
 
   function format(val: any) {
     if (isObject(val)) {
@@ -113,7 +113,7 @@ export function stringify(o: any) {
 /** Returns a function that splits a string on a character or substring */
 export const beforeAfterSubstr = (char: string) => (str: string): string[] => {
   if (!str) return ["", ""];
-  let idx = str.indexOf(char);
+  const idx = str.indexOf(char);
   if (idx === -1) return [str, ""];
   return [str.substr(0, idx), str.substr(idx + 1)];
 };
@@ -136,7 +136,7 @@ export const trimHashVal = (str: string) => str ? str.replace(/^#/, "") : "";
  * ```
  */
 export function splitOnDelim(delim: string) {
-  let re = new RegExp("(" + delim + ")", "g");
+  const re = new RegExp("(" + delim + ")", "g");
   return (str: string) =>
       str.split(re).filter(identity);
 };

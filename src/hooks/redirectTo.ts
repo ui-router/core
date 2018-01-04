@@ -14,10 +14,10 @@ import {TransitionHookFn} from "../transition/interface";
  * See [[StateDeclaration.redirectTo]]
  */
 const redirectToHook: TransitionHookFn = (trans: Transition) => {
-  let redirect = trans.to().redirectTo;
+  const redirect = trans.to().redirectTo;
   if (!redirect) return;
 
-  let $state = trans.router.stateService;
+  const $state = trans.router.stateService;
 
   function handleResult(result: any) {
     if (!result) return;

@@ -32,12 +32,12 @@ import { TransitionService } from "./transitionService";
  * @returns {boolean}
  */
 export function matchState(state: StateObject, criterion: HookMatchCriterion) {
-  let toMatch = isString(criterion) ? [criterion] : criterion;
+  const toMatch = isString(criterion) ? [criterion] : criterion;
 
   function matchGlobs(_state: StateObject) {
-    let globStrings = <string[]> toMatch;
+    const globStrings = <string[]> toMatch;
     for (let i = 0; i < globStrings.length; i++) {
-      let glob = new Glob(globStrings[i]);
+      const glob = new Glob(globStrings[i]);
 
       if ((glob && glob.matches(_state.name)) || (!glob && globStrings[i] === _state.name)) {
         return true;
@@ -46,7 +46,7 @@ export function matchState(state: StateObject, criterion: HookMatchCriterion) {
     return false;
   }
 
-  let matchFn = <any> (isFunction(toMatch) ? toMatch : matchGlobs);
+  const matchFn = <any> (isFunction(toMatch) ? toMatch : matchGlobs);
   return !!matchFn(state);
 }
 
@@ -89,7 +89,7 @@ export class RegisteredHook {
    */
   private _matchingNodes(nodes: PathNode[], criterion: HookMatchCriterion): PathNode[] {
     if (criterion === true) return nodes;
-    let matching = nodes.filter(node => matchState(node.state, criterion));
+    const matching = nodes.filter(node => matchState(node.state, criterion));
     return matching.length ? matching : null;
   }
 
@@ -127,15 +127,15 @@ export class RegisteredHook {
    * ```
    */
   private _getMatchingNodes(treeChanges: TreeChanges): IMatchingNodes {
-    let criteria = extend(this._getDefaultMatchCriteria(), this.matchCriteria);
-    let paths: PathType[] = values(this.tranSvc._pluginapi._getPathTypes());
+    const criteria = extend(this._getDefaultMatchCriteria(), this.matchCriteria);
+    const paths: PathType[] = values(this.tranSvc._pluginapi._getPathTypes());
 
     return paths.reduce((mn: IMatchingNodes, pathtype: PathType) => {
       // STATE scope criteria matches against every node in the path.
       // TRANSITION scope criteria matches against only the last node in the path
-      let isStateHook = pathtype.scope === TransitionHookScope.STATE;
-      let path = treeChanges[pathtype.name] || [];
-      let nodes: PathNode[] = isStateHook ? path : [tail(path)];
+      const isStateHook = pathtype.scope === TransitionHookScope.STATE;
+      const path = treeChanges[pathtype.name] || [];
+      const nodes: PathNode[] = isStateHook ? path : [tail(path)];
 
       mn[pathtype.name] = this._matchingNodes(nodes, criteria[pathtype.name]);
       return mn;
@@ -149,10 +149,10 @@ export class RegisteredHook {
    * are the matching [[PathNode]]s for each [[HookMatchCriterion]] (to, from, exiting, retained, entering)
    */
   matches(treeChanges: TreeChanges): IMatchingNodes {
-    let matches = this._getMatchingNodes(treeChanges);
+    const matches = this._getMatchingNodes(treeChanges);
 
     // Check if all the criteria matched the TreeChanges object
-    let allMatched = values(matches).every(identity);
+    const allMatched = values(matches).every(identity);
     return allMatched ? matches : null;
   }
 

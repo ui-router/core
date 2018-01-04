@@ -4,7 +4,7 @@
  */
 /** */
 import {extend, ancestors, Obj} from "../common/common";
-import {StateObject} from "../state/stateObject";
+import { StateObject } from "../state/stateObject";
 
 /** @internalapi */
 export class StateParams {
@@ -23,17 +23,17 @@ export class StateParams {
    * @param {Object} $to Internal definition of object representing state to transition to.
    */
   $inherit(newParams: Obj, $current: StateObject, $to: StateObject) {
-    let parents = ancestors($current, $to),
-        parentParams: string[],
+    let parentParams: string[];
+    const parents = ancestors($current, $to),
         inherited: Obj = {},
         inheritList: string[] = [];
 
-    for (let i in parents) {
+    for (const i in parents) {
       if (!parents[i] || !parents[i].params) continue;
       parentParams = Object.keys(parents[i].params);
       if (!parentParams.length) continue;
 
-      for (let j in parentParams) {
+      for (const j in parentParams) {
         if (inheritList.indexOf(parentParams[j]) >= 0) continue;
         inheritList.push(parentParams[j]);
         inherited[parentParams[j]] = this[parentParams[j]];

@@ -117,7 +117,7 @@ export class StateObject {
   static create(stateDecl: _StateDeclaration): StateObject {
     stateDecl = StateObject.isStateClass(stateDecl) ? new stateDecl() : stateDecl;
 
-    let state = inherit(inherit(stateDecl, StateObject.prototype)) as StateObject;
+    const state = inherit(inherit(stateDecl, StateObject.prototype)) as StateObject;
     stateDecl.$$state = () => state;
     state.self = stateDecl;
     state.__stateObjectCache = {
@@ -161,7 +161,7 @@ export class StateObject {
    */
   fqn(): string {
     if (!this.parent || !(this.parent instanceof this.constructor)) return this.name;
-    let name = this.parent.fqn();
+    const name = this.parent.fqn();
     return name ? name + "." + this.name : this.name;
   }
 
@@ -185,7 +185,7 @@ export class StateObject {
    */
   parameters(opts?: { inherit?: boolean, matchingKeys?: any }): Param[] {
     opts = defaults(opts, { inherit: true, matchingKeys: null });
-    let inherited = opts.inherit && this.parent && this.parent.parameters() || [];
+    const inherited = opts.inherit && this.parent && this.parent.parameters() || [];
     return inherited.concat(values(this.params))
         .filter(param => !opts.matchingKeys || opts.matchingKeys.hasOwnProperty(param.id));
   }

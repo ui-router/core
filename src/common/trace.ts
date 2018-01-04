@@ -56,7 +56,7 @@ function uiViewString (uiview: ActiveUIView) {
 
 /** @hidden */
 const viewConfigString = (viewConfig: ViewConfig) => {
-  let view = viewConfig.viewDecl;
+  const view = viewConfig.viewDecl;
   const state = view.$context.name || '(root)';
   return `[View#${viewConfig.$id} from '${state}' state]: target ui-view: '${view.$uiViewName}@${view.$uiViewContextAnchor}'`;
 };
@@ -173,7 +173,7 @@ export class Trace {
   /** @internalapi called by ui-router code */
   traceHookInvocation(step: TransitionHook, trans: Transition, options: any) {
     if (!this.enabled(Category.HOOK)) return;
-    let event = parse("traceData.hookType")(options) || "internal",
+    const event = parse("traceData.hookType")(options) || "internal",
         context = parse("traceData.context.state.name")(options) || parse("traceData.context")(options) || "unknown",
         name = functionToString((step as any).registeredHook.callback);
     console.log(`${transLbl(trans)}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
@@ -263,5 +263,5 @@ export class Trace {
  * trace.enable(1, 5);
  * ```
  */
-let trace = new Trace();
+const trace = new Trace();
 export {trace};

@@ -124,8 +124,8 @@ export class UrlMatcher {
 
   /** @hidden Given a matcher, return an array with the matcher's path segments and path params, in order */
   static pathSegmentsAndParams(matcher: UrlMatcher) {
-    let staticSegments = matcher._segments;
-    let pathParams = matcher._params.filter(p => p.location === DefType.PATH);
+    const staticSegments = matcher._segments;
+    const pathParams = matcher._params.filter(p => p.location === DefType.PATH);
     return arrayTuples(staticSegments, pathParams.concat(undefined))
       .reduce(unnestR, [])
       .filter(x => x !== "" && isDefined(x));
@@ -189,7 +189,9 @@ export class UrlMatcher {
 
     const weightsA = weights(a), weightsB = weights(b);
     padArrays(weightsA, weightsB, 0);
-    let cmp, i, _pairs = arrayTuples(weightsA, weightsB);
+
+    const _pairs = arrayTuples(weightsA, weightsB);
+    let cmp, i;
 
     for (i = 0; i < _pairs.length; i++) {
       cmp = _pairs[i][0] - _pairs[i][1];
@@ -228,9 +230,10 @@ export class UrlMatcher {
     //    [^{}\\]+                       - anything other than curly braces or backslash
     //    \\.                            - a backslash escape
     //    \{(?:[^{}\\]+|\\.)*\}          - a matched set of curly braces containing other atoms
-    let placeholder = /([:*])([\w\[\]]+)|\{([\w\[\]]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g,
-        searchPlaceholder = /([:]?)([\w\[\].-]+)|\{([\w\[\].-]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g,
-        last = 0, matchArray: RegExpExecArray, patterns: any[][] = [];
+    const placeholder = /([:*])([\w\[\]]+)|\{([\w\[\]]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g;
+    const searchPlaceholder = /([:]?)([\w\[\].-]+)|\{([\w\[\].-]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g;
+    const patterns: any[][] = [];
+    let last = 0, matchArray: RegExpExecArray;
 
     const checkParamErrors = (id: string) => {
       if (!UrlMatcher.nameValidator.test(id)) throw new Error(`Invalid parameter name '${id}' in pattern '${pattern}'`);
@@ -241,8 +244,8 @@ export class UrlMatcher {
     // The number of segments is always 1 more than the number of parameters.
     const matchDetails = (m: RegExpExecArray, isSearch: boolean) => {
       // IE[78] returns '' for unmatched groups instead of null
-      let id: string = m[2] || m[3];
-      let regexp: string = isSearch ? m[4] : m[4] || (m[1] === '*' ? '[\\s\\S]*' : null);
+      const id: string = m[2] || m[3];
+      const regexp: string = isSearch ? m[4] : m[4] || (m[1] === '*' ? '[\\s\\S]*' : null);
 
       const makeRegexpType = (str) => inherit(paramTypes.type(isSearch ? "query" : "path"), {
         pattern: new RegExp(str, this.config.caseInsensitive ? 'i' : undefined)
@@ -272,10 +275,10 @@ export class UrlMatcher {
     segment = pattern.substring(last);
 
     // Find any search parameter names and remove them from the last segment
-    let i = segment.indexOf('?');
+    const i = segment.indexOf('?');
 
     if (i >= 0) {
-      let search = segment.substring(i);
+      const search = segment.substring(i);
       segment = segment.substring(0, i);
 
       if (search.length > 0) {
@@ -349,7 +352,7 @@ export class UrlMatcher {
    * @returns The captured parameter values.
    */
   exec(path: string, search: any = {}, hash?: string, options: any = {}): RawParams {
-    let match = memoizeTo(this._cache, 'pattern', () => {
+    const match = memoizeTo(this._cache, 'pattern', () => {
       return new RegExp([
         '^',
         unnest(this._cache.path.map(prop('_compiled'))).join(''),
@@ -362,7 +365,7 @@ export class UrlMatcher {
 
     // options = defaults(options, { isolate: false });
 
-    let allParams:    Param[] = this.parameters(),
+    const allParams:    Param[] = this.parameters(),
         pathParams:   Param[] = allParams.filter(param => !param.isSearch()),
         searchParams: Param[] = allParams.filter(param => param.isSearch()),
         nPathSegments  = this._cache.path.map(urlm => urlm._segments.length - 1).reduce((a, x) => a + x),
@@ -375,13 +378,13 @@ export class UrlMatcher {
       const reverseString = (str: string) => str.split("").reverse().join("");
       const unquoteDashes = (str: string) => str.replace(/\\-/g, "-");
 
-      let split = reverseString(string).split(/-(?!\\)/);
-      let allReversed = map(split, reverseString);
+      const split = reverseString(string).split(/-(?!\\)/);
+      const allReversed = map(split, reverseString);
       return map(allReversed, unquoteDashes).reverse();
     }
 
     for (let i = 0; i < nPathSegments; i++) {
-      let param: Param = pathParams[i];
+      const param: Param = pathParams[i];
       let value: (any|any[]) = match[i + 1];
 
       // if the param value matches a pre-replace pair, replace the value before decoding.
@@ -428,12 +431,12 @@ export class UrlMatcher {
    */
   parameter(id: string, opts: any = {}): Param {
     const findParam = () => {
-      for (let param of this._params) {
+      for (const param of this._params) {
         if (param.id === id) return param;
       }
     };
 
-    let parent = this._cache.parent;
+    const parent = this._cache.parent;
     return findParam() || (opts.inherit !== false && parent && parent.parameter(id, opts)) || null;
   }
 
@@ -453,7 +456,7 @@ export class UrlMatcher {
     params = params || {};
 
     // I'm not sure why this checks only the param keys passed in, and not all the params known to the matcher
-    let paramSchema = this.parameters().filter(paramDef => params.hasOwnProperty(paramDef.id));
+    const paramSchema = this.parameters().filter(paramDef => params.hasOwnProperty(paramDef.id));
     return paramSchema.map(paramDef => validParamVal(paramDef, params[paramDef.id])).reduce(allTrueR, true);
   }
 
@@ -474,16 +477,16 @@ export class UrlMatcher {
    */
   format(values: RawParams = {}) {
     // Build the full path of UrlMatchers (including all parent UrlMatchers)
-    let urlMatchers = this._cache.path;
+    const urlMatchers = this._cache.path;
 
     // Extract all the static segments and Params (processed as ParamDetails)
     // into an ordered array
-    let pathSegmentsAndParams: Array<string|ParamDetails> = urlMatchers.map(UrlMatcher.pathSegmentsAndParams)
+    const pathSegmentsAndParams: Array<string|ParamDetails> = urlMatchers.map(UrlMatcher.pathSegmentsAndParams)
             .reduce(unnestR, [])
             .map(x => isString(x) ? x : getDetails(x));
 
     // Extract the query params into a separate array
-    let queryParams: Array<ParamDetails> = urlMatchers.map(UrlMatcher.queryParams)
+    const queryParams: Array<ParamDetails> = urlMatchers.map(UrlMatcher.queryParams)
             .reduce(unnestR, [])
             .map(getDetails);
 
@@ -497,24 +500,24 @@ export class UrlMatcher {
      */
     function getDetails(param: Param): ParamDetails {
       // Normalize to typed value
-      let value = param.value(values[param.id]);
-      let isValid = param.validates(value);
-      let isDefaultValue = param.isDefaultValue(value);
+      const value = param.value(values[param.id]);
+      const isValid = param.validates(value);
+      const isDefaultValue = param.isDefaultValue(value);
       // Check if we're in squash mode for the parameter
-      let squash = isDefaultValue ? param.squash : false;
+      const squash = isDefaultValue ? param.squash : false;
       // Allow the Parameter's Type to encode the value
-      let encoded = param.type.encode(value);
+      const encoded = param.type.encode(value);
 
       return { param, value, isValid, isDefaultValue, squash, encoded };
     }
 
     // Build up the path-portion from the list of static segments and parameters
-    let pathString = pathSegmentsAndParams.reduce((acc: string, x: string|ParamDetails) => {
+    const pathString = pathSegmentsAndParams.reduce((acc: string, x: string|ParamDetails) => {
       // The element is a static segment (a raw string); just append it
       if (isString(x)) return acc + x;
 
       // Otherwise, it's a ParamDetails.
-      let { squash, encoded, param } = x;
+      const { squash, encoded, param } = x;
 
       // If squash is === true, try to remove a slash from the path
       if (squash === true) return (acc.match(/\/$/)) ? acc.slice(0, -1) : acc;
@@ -532,7 +535,7 @@ export class UrlMatcher {
 
     // Build the query string by applying parameter values (array or regular)
     // then mapping to key=value, then flattening and joining using "&"
-    let queryString = queryParams.map((paramDetails: ParamDetails) => {
+    const queryString = queryParams.map((paramDetails: ParamDetails) => {
       let { param, squash, encoded, isDefaultValue } = paramDetails;
       if (encoded == null || (isDefaultValue && squash !== false)) return;
       if (!isArray(encoded)) encoded = [<string> encoded];

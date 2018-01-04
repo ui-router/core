@@ -11,16 +11,16 @@ import {TransitionService} from "../transition/transitionService";
  * Registered using `transitionService.onSuccess({}, updateUrl);`
  */
 const updateUrl: TransitionHookFn = (transition: Transition) => {
-  let options = transition.options();
-  let $state: StateService = transition.router.stateService;
-  let $urlRouter: UrlRouter = transition.router.urlRouter;
+  const options = transition.options();
+  const $state: StateService = transition.router.stateService;
+  const $urlRouter: UrlRouter = transition.router.urlRouter;
 
   // Dont update the url in these situations:
   // The transition was triggered by a URL sync (options.source === 'url')
   // The user doesn't want the url to update (options.location === false)
   // The destination state, and all parents have no navigable url
   if (options.source !== 'url' && options.location && $state.$current.navigable) {
-    let urlOptions = {replace: options.location === 'replace'};
+    const urlOptions = {replace: options.location === 'replace'};
     $urlRouter.push($state.$current.navigable.url, $state.params, urlOptions);
   }
 

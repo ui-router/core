@@ -31,27 +31,27 @@ import { StateRule } from "../url/interface";
  * See [[StateDeclaration.lazyLoad]]
  */
 const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
-  let router = transition.router;
+  const router = transition.router;
 
   function retryTransition() {
     if (transition.originalTransition().options().source !== 'url') {
       // The original transition was not triggered via url sync
       // The lazy state should be loaded now, so re-try the original transition
-      let orig = transition.targetState();
+      const orig = transition.targetState();
       return router.stateService.target(orig.identifier(), orig.params(), orig.options());
     }
 
     // The original transition was triggered via url sync
     // Run the URL rules and find the best match
-    let $url = router.urlService;
-    let result = $url.match($url.parts());
-    let rule = result && result.rule;
+    const $url = router.urlService;
+    const result = $url.match($url.parts());
+    const rule = result && result.rule;
 
     // If the best match is a state, redirect the transition (instead
     // of calling sync() which supersedes the current transition)
     if (rule && rule.type === "STATE") {
-      let state = (rule as StateRule).state;
-      let params = result.match;
+      const state = (rule as StateRule).state;
+      const params = result.match;
       return router.stateService.target(state, params, transition.options());
     }
 
@@ -59,7 +59,7 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
     router.urlService.sync();
   }
 
-  let promises = transition.entering()
+  const promises = transition.entering()
       .filter(state => !!state.$$state().lazyLoad)
       .map(state => lazyLoadState(transition, state));
 
@@ -78,7 +78,7 @@ export const registerLazyLoadHook = (transitionService: TransitionService) =>
  * @returns A promise for the lazy load result
  */
 export function lazyLoadState(transition: Transition, state: StateDeclaration): Promise<LazyLoadResult> {
-  let lazyLoadFn = state.$$state().lazyLoad;
+  const lazyLoadFn = state.$$state().lazyLoad;
 
   // Store/get the lazy load promise on/from the hookfn so it doesn't get re-invoked
   let promise = lazyLoadFn['_promise'];

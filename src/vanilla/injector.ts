@@ -8,9 +8,9 @@ import {
 } from "../common/index";
 
 // globally available injectables
-let globals = {};
-let STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-let ARGUMENT_NAMES = /([^\s,]+)/g;
+const globals = {};
+const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+const ARGUMENT_NAMES = /([^\s,]+)/g;
 
 /**
  * A basic angular1-like injector api
@@ -74,10 +74,10 @@ export const $injector = {
    * @param locals An object with additional DI tokens and values, such as `{ someToken: { foo: 1 } }`
    */
   invoke: (fn: IInjectable, context?, locals?) => {
-    let all = extend({}, globals, locals || {});
-    let params = $injector.annotate(fn);
-    let ensureExist = assertPredicate((key: string) => all.hasOwnProperty(key), key => `DI can't find injectable: '${key}'`);
-    let args = params.filter(ensureExist).map(x => all[x]);
+    const all = extend({}, globals, locals || {});
+    const params = $injector.annotate(fn);
+    const ensureExist = assertPredicate((key: string) => all.hasOwnProperty(key), key => `DI can't find injectable: '${key}'`);
+    const args = params.filter(ensureExist).map(x => all[x]);
     if (isFunction(fn)) return fn.apply(context, args);
     else return (fn as any[]).slice(-1)[0].apply(context, args);
   },
@@ -92,8 +92,8 @@ export const $injector = {
     if (!isInjectable(fn)) throw new Error(`Not an injectable function: ${fn}`);
     if (fn && (fn as any).$inject) return (fn as any).$inject;
     if (isArray(fn)) return fn.slice(0, -1);
-    let fnStr = fn.toString().replace(STRIP_COMMENTS, '');
-    let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+    const fnStr = fn.toString().replace(STRIP_COMMENTS, '');
+    const result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
     return result || [];
   }
 } as $InjectorLike;

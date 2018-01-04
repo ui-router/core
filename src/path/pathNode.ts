@@ -39,14 +39,14 @@ export class PathNode {
   constructor(state: StateObject);
   constructor(stateOrNode: any) {
     if (stateOrNode instanceof PathNode) {
-      let node: PathNode = stateOrNode;
+      const node: PathNode = stateOrNode;
       this.state = node.state;
       this.paramSchema = node.paramSchema.slice();
       this.paramValues = extend({}, node.paramValues);
       this.resolvables = node.resolvables.slice();
       this.views = node.views && node.views.slice();
     } else {
-      let state: StateObject = stateOrNode;
+      const state: StateObject = stateOrNode;
       this.state = state;
       this.paramSchema = state.parameters({ inherit: false });
       this.paramValues = {};

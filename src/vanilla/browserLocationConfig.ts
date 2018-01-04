@@ -44,7 +44,7 @@ export class BrowserLocationConfig implements LocationConfig {
   }
 
   applyDocumentBaseHref() {
-    let baseTag: HTMLBaseElement = document.getElementsByTagName("base")[0];
+    const baseTag: HTMLBaseElement = document.getElementsByTagName("base")[0];
     return this._baseHref = baseTag ? baseTag.href.substr(location.origin.length) : location.pathname || '/';
   }
 

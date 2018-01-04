@@ -1,8 +1,8 @@
 /** @module state */ /** for typedoc */
-import {isString} from "../common/predicates";
-import {StateOrName} from "./interface";
-import {StateObject} from "./stateObject";
-import {values} from "../common/common";
+import { isString } from "../common/predicates";
+import { StateOrName } from "./interface";
+import { StateObject } from "./stateObject";
+import { values } from "../common/common";
 
 export class StateMatcher {
   constructor (private _states: { [key: string]: StateObject }) { }
@@ -15,17 +15,17 @@ export class StateMatcher {
 
   find(stateOrName: StateOrName, base?: StateOrName, matchGlob = true): StateObject {
     if (!stateOrName && stateOrName !== "") return undefined;
-    let isStr = isString(stateOrName);
+    const isStr = isString(stateOrName);
     let name: string = isStr ? stateOrName : (<any>stateOrName).name;
 
     if (this.isRelative(name)) name = this.resolvePath(name, base);
-    let state = this._states[name];
+    const state = this._states[name];
 
     if (state && (isStr || (!isStr && (state === stateOrName || state.self === stateOrName)))) {
       return state;
     } else if (isStr && matchGlob) {
-      let _states = values(this._states);
-      let matches = _states.filter(_state =>
+      const _states = values(this._states);
+      const matches = _states.filter(_state =>
           _state.__stateObjectCache.nameGlob &&
           _state.__stateObjectCache.nameGlob.matches(name)
       );
@@ -42,9 +42,11 @@ export class StateMatcher {
   resolvePath(name: string, base: StateOrName) {
     if (!base) throw new Error(`No reference point given for path '${name}'`);
 
-    let baseState: StateObject = this.find(base);
+    const baseState: StateObject = this.find(base);
 
-    let splitName = name.split("."), i = 0, pathLength = splitName.length, current = baseState;
+    const splitName = name.split(".");
+    const pathLength = splitName.length;
+    let i = 0, current = baseState;
 
     for (; i < pathLength; i++) {
       if (splitName[i] === "" && i === 0) {
@@ -58,7 +60,7 @@ export class StateMatcher {
       }
       break;
     }
-    let relName = splitName.slice(i).join(".");
+    const relName = splitName.slice(i).join(".");
     return current.name + (current.name && relName ? "." : "") + relName;
   }
 }

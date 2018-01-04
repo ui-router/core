@@ -151,18 +151,18 @@ export class Transition implements IHookRegistry {
     // current() is assumed to come from targetState.options, but provide a naive implementation otherwise.
     this._options = extend({ current: val(this) }, targetState.options());
     this.$id = router.transitionService._transitionCount++;
-    let toPath = PathUtils.buildToPath(fromPath, targetState);
+    const toPath = PathUtils.buildToPath(fromPath, targetState);
     this._treeChanges = PathUtils.treeChanges(fromPath, toPath, this._options.reloadState);
     this.createTransitionHookRegFns();
 
-    let onCreateHooks = this._hookBuilder.buildHooksForPhase(TransitionHookPhase.CREATE);
+    const onCreateHooks = this._hookBuilder.buildHooksForPhase(TransitionHookPhase.CREATE);
     TransitionHook.invokeHooks(onCreateHooks, () => null);
 
     this.applyViewConfigs(router);
   }
 
   private applyViewConfigs(router: UIRouter) {
-    let enteringStates = this._treeChanges.entering.map(node => node.state);
+    const enteringStates = this._treeChanges.entering.map(node => node.state);
     PathUtils.applyViewConfigs(router.transitionService.$view, this._treeChanges.to, enteringStates);
   }
 
@@ -393,10 +393,10 @@ export class Transition implements IHookRegistry {
   addResolvable(resolvable: Resolvable|ResolvableLiteral, state: StateOrName = ""): void {
     resolvable = is(Resolvable)(resolvable) ? resolvable : new Resolvable(resolvable);
 
-    let stateName: string = (typeof state === "string") ? state : state.name;
-    let topath = this._treeChanges.to;
-    let targetNode = find(topath, node => node.state.name === stateName);
-    let resolveContext: ResolveContext = new ResolveContext(topath);
+    const stateName: string = (typeof state === "string") ? state : state.name;
+    const topath = this._treeChanges.to;
+    const targetNode = find(topath, node => node.state.name === stateName);
+    const resolveContext: ResolveContext = new ResolveContext(topath);
     resolveContext.addResolvables([resolvable as Resolvable], targetNode.state);
   }
 
@@ -448,7 +448,7 @@ export class Transition implements IHookRegistry {
    * @returns The original Transition that started a redirect chain
    */
   originalTransition(): Transition {
-    let rf = this.redirectedFrom();
+    const rf = this.redirectedFrom();
     return (rf && rf.originalTransition()) || this;
   }
 
@@ -541,7 +541,7 @@ export class Transition implements IHookRegistry {
       if (++redirects > 20) throw new Error(`Too many consecutive Transition redirects (20+)`);
     }
 
-    let redirectOpts: TransitionOptions = { redirectedFrom: this, source: "redirect" };
+    const redirectOpts: TransitionOptions = { redirectedFrom: this, source: "redirect" };
     // If the original transition was caused by URL sync, then use { location: 'replace' }
     // on the new transition (unless the target state explicitly specifies location: false).
     // This causes the original url to be replaced with the url for the redirect target
@@ -550,12 +550,12 @@ export class Transition implements IHookRegistry {
       redirectOpts.location = 'replace';
     }
 
-    let newOptions = extend({}, this.options(), targetState.options(), redirectOpts);
+    const newOptions = extend({}, this.options(), targetState.options(), redirectOpts);
     targetState = targetState.withOptions(newOptions, true);
 
-    let newTransition = this.router.transitionService.create(this._treeChanges.from, targetState);
-    let originalEnteringNodes = this._treeChanges.entering;
-    let redirectEnteringNodes = newTransition._treeChanges.entering;
+    const newTransition = this.router.transitionService.create(this._treeChanges.from, targetState);
+    const originalEnteringNodes = this._treeChanges.entering;
+    const redirectEnteringNodes = newTransition._treeChanges.entering;
 
     // --- Re-use resolve data from original transition ---
     // When redirecting from a parent state to a child state where the parent parameter values haven't changed
@@ -572,7 +572,7 @@ export class Transition implements IHookRegistry {
     };
 
     // Find any "entering" nodes in the redirect path that match the original path and aren't being reloaded
-    let matchingEnteringNodes: PathNode[] = PathUtils.matching(redirectEnteringNodes, originalEnteringNodes, PathUtils.nonDynamicParams)
+    const matchingEnteringNodes: PathNode[] = PathUtils.matching(redirectEnteringNodes, originalEnteringNodes, PathUtils.nonDynamicParams)
         .filter(not(nodeIsReloading(targetState.options().reloadState)));
 
     // Use the existing (possibly pre-resolved) resolvables for the matching entering nodes.
@@ -585,7 +585,7 @@ export class Transition implements IHookRegistry {
 
   /** @hidden If a transition doesn't exit/enter any states, returns any [[Param]] whose value changed */
   private _changedParams(): Param[] {
-    let tc = this._treeChanges;
+    const tc = this._treeChanges;
 
     /** Return undefined if it's not a "dynamic" transition, for the following reasons */
     // If user explicitly wants a reload
@@ -595,15 +595,15 @@ export class Transition implements IHookRegistry {
     // If to/from path lengths differ
     if (tc.to.length !== tc.from.length) return undefined;
     // If the to/from paths are different
-    let pathsDiffer: boolean = arrayTuples(tc.to, tc.from)
+    const pathsDiffer: boolean = arrayTuples(tc.to, tc.from)
         .map(tuple => tuple[0].state !== tuple[1].state)
         .reduce(anyTrueR, false);
     if (pathsDiffer) return undefined;
 
     // Find any parameter values that differ
-    let nodeSchemas: Param[][] = tc.to.map((node: PathNode) => node.paramSchema);
-    let [toValues, fromValues] = [tc.to, tc.from].map(path => path.map(x => x.paramValues));
-    let tuples = arrayTuples(nodeSchemas, toValues, fromValues);
+    const nodeSchemas: Param[][] = tc.to.map((node: PathNode) => node.paramSchema);
+    const [toValues, fromValues] = [tc.to, tc.from].map(path => path.map(x => x.paramValues));
+    const tuples = arrayTuples(nodeSchemas, toValues, fromValues);
 
     return tuples.map(([schema, toVals, fromVals]) => Param.changed(schema, toVals, fromVals)).reduce(unnestR, []);
   }
@@ -616,7 +616,7 @@ export class Transition implements IHookRegistry {
    * @returns true if the Transition is dynamic
    */
   dynamic(): boolean {
-    let changes = this._changedParams();
+    const changes = this._changedParams();
     return !changes ? false : changes.map(x => x.dynamic).reduce(anyTrueR, false);
   }
 
@@ -642,8 +642,8 @@ export class Transition implements IHookRegistry {
       return pathA.length === matching.filter(node => !reloadState || !node.state.includes[reloadState.name]).length;
     };
 
-    let newTC = this.treeChanges();
-    let pendTC = pending && pending.treeChanges();
+    const newTC = this.treeChanges();
+    const pendTC = pending && pending.treeChanges();
 
     if (pendTC && same(pendTC.to, newTC.to) && same(pendTC.exiting, newTC.exiting)) return "SameAsPending";
     if (newTC.exiting.length === 0 && newTC.entering.length === 0 && same(newTC.from, newTC.to)) return "SameAsCurrent";
@@ -659,7 +659,7 @@ export class Transition implements IHookRegistry {
    * @returns a promise for a successful transition.
    */
   run(): Promise<any> {
-    let runAllHooks = TransitionHook.runAllHooks;
+    const runAllHooks = TransitionHook.runAllHooks;
 
     // Gets transition hooks array for the given phase
     const getHooksFor = (phase: TransitionHookPhase) =>
@@ -684,13 +684,13 @@ export class Transition implements IHookRegistry {
     const runTransition = () => {
       // Wait to build the RUN hook chain until the BEFORE hooks are done
       // This allows a BEFORE hook to dynamically add additional RUN hooks via the Transition object.
-      let allRunHooks = getHooksFor(TransitionHookPhase.RUN);
-      let done = () => services.$q.when(undefined);
+      const allRunHooks = getHooksFor(TransitionHookPhase.RUN);
+      const done = () => services.$q.when(undefined);
       return TransitionHook.invokeHooks(allRunHooks, done);
     };
 
     const startTransition = () => {
-      let globals = this.router.globals;
+      const globals = this.router.globals;
 
       globals.lastStartedTransitionId = this.$id;
       globals.transition = this;
@@ -701,7 +701,7 @@ export class Transition implements IHookRegistry {
       return services.$q.when(undefined);
     };
 
-    let allBeforeHooks = getHooksFor(TransitionHookPhase.BEFORE);
+    const allBeforeHooks = getHooksFor(TransitionHookPhase.BEFORE);
     TransitionHook.invokeHooks(allBeforeHooks, startTransition)
         .then(runTransition)
         .then(transitionSuccess, transitionError);
@@ -744,7 +744,7 @@ export class Transition implements IHookRegistry {
    * @returns an error message explaining why the transition is invalid, or the reason the transition failed.
    */
   error() {
-    let state: StateObject = this.$to();
+    const state: StateObject = this.$to();
 
     if (state.self.abstract)
       return `Cannot transition to abstract state '${state.name}'`;
@@ -765,14 +765,14 @@ export class Transition implements IHookRegistry {
    * @returns A string representation of the Transition
    */
   toString () {
-    let fromStateOrName = this.from();
-    let toStateOrName = this.to();
+    const fromStateOrName = this.from();
+    const toStateOrName = this.to();
 
     const avoidEmptyHash = (params: RawParams) =>
       (params["#"] !== null && params["#"] !== undefined) ? params : omit(params, ["#"]);
 
     // (X) means the to state is invalid.
-    let id = this.$id,
+    const id = this.$id,
         from = isObject(fromStateOrName) ? fromStateOrName.name : fromStateOrName,
         fromParams = stringify(avoidEmptyHash(this._treeChanges.from.map(prop('paramValues')).reduce(mergeR, {}))),
         toValid = this.valid() ? "" : "(X) ",

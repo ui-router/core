@@ -70,8 +70,8 @@ export class StateService {
 
   /** @internalapi */
   constructor(private router: UIRouter) {
-    let getters = ['current', '$current', 'params', 'transition'];
-    let boundFns = Object.keys(StateService.prototype).filter(not(inArray(getters)));
+    const getters = ['current', '$current', 'params', 'transition'];
+    const boundFns = Object.keys(StateService.prototype).filter(not(inArray(getters)));
     createProxyFunctions(val(StateService.prototype), this, val(this), boundFns);
   }
 
@@ -93,12 +93,12 @@ export class StateService {
    * @internalapi
    */
   private _handleInvalidTargetState(fromPath: PathNode[], toState: TargetState) {
-    let fromState = PathUtils.makeTargetState(this.router.stateRegistry, fromPath);
-    let globals = this.router.globals;
+    const fromState = PathUtils.makeTargetState(this.router.stateRegistry, fromPath);
+    const globals = this.router.globals;
     const latestThing = () => globals.transitionHistory.peekTail();
-    let latest = latestThing();
-    let callbackQueue = new Queue<OnInvalidCallback>(this.invalidCallbacks.slice());
-    let injector = new ResolveContext(fromPath).injector();
+    const latest = latestThing();
+    const callbackQueue = new Queue<OnInvalidCallback>(this.invalidCallbacks.slice());
+    const injector = new ResolveContext(fromPath).injector();
 
     const checkForRedirect = (result: HookResult) => {
       if (!(result instanceof TargetState)) {
@@ -121,10 +121,10 @@ export class StateService {
     };
 
     function invokeNextCallback() {
-      let nextCallback = callbackQueue.dequeue();
+      const nextCallback = callbackQueue.dequeue();
       if (nextCallback === undefined) return Rejection.invalid(toState.error()).toPromise();
 
-      let callbackResult = services.$q.when(nextCallback(toState, fromState, injector));
+      const callbackResult = services.$q.when(nextCallback(toState, fromState, injector));
       return callbackResult.then(checkForRedirect).then(result => result || invokeNextCallback());
     }
 
@@ -256,8 +256,8 @@ export class StateService {
    * @returns {promise} A promise representing the state of the new transition.
    */
   go(to: StateOrName, params?: RawParams, options?: TransitionOptions): TransitionPromise {
-    let defautGoOpts = { relative: this.$current, inherit: true };
-    let transOpts = defaults(options, defautGoOpts, defaultTransOpts);
+    const defautGoOpts = { relative: this.$current, inherit: true };
+    const transOpts = defaults(options, defautGoOpts, defaultTransOpts);
     return this.transitionTo(to, params, transOpts);
   }
 
@@ -272,7 +272,7 @@ export class StateService {
     // If we're reloading, find the state object to reload from
     if (isObject(options.reload) && !(<any>options.reload).name)
       throw new Error('Invalid reload state object');
-    let reg = this.router.stateRegistry;
+    const reg = this.router.stateRegistry;
     options.reloadState = options.reload === true ? reg.root() : reg.matcher.find(<any> options.reload, options.relative);
 
     if (options.reload && !options.reloadState)
@@ -282,8 +282,8 @@ export class StateService {
   }
 
   private getCurrentPath(): PathNode[] {
-    let globals = this.router.globals;
-    let latestSuccess: Transition = globals.successfulTransitions.peekTail();
+    const globals = this.router.globals;
+    const latestSuccess: Transition = globals.successfulTransitions.peekTail();
     const rootPath = () => [ new PathNode(this.router.stateRegistry.root()) ];
     return latestSuccess ? latestSuccess.treeChanges().to : rootPath();
   }
@@ -312,15 +312,15 @@ export class StateService {
    * @returns A promise representing the state of the new transition. See [[go]]
    */
   transitionTo(to: StateOrName, toParams: RawParams = {}, options: TransitionOptions = {}): TransitionPromise {
-    let router = this.router;
-    let globals = router.globals;
+    const router = this.router;
+    const globals = router.globals;
     options = defaults(options, defaultTransOpts);
     const getCurrent = () =>
         globals.transition;
     options = extend(options, { current: getCurrent });
 
-    let ref: TargetState = this.target(to, toParams, options);
-    let currentPath = this.getCurrentPath();
+    const ref: TargetState = this.target(to, toParams, options);
+    const currentPath = this.getCurrentPath();
 
     if (!ref.exists())
       return this._handleInvalidTargetState(currentPath, ref);
@@ -351,7 +351,7 @@ export class StateService {
         if (error.type === RejectType.SUPERSEDED && error.redirected && detail instanceof TargetState) {
           // If `Transition.run()` was redirected, allow the `transitionTo()` promise to resolve successfully
           // by returning the promise for the new (redirect) `Transition.run()`.
-          let redirect: Transition = trans.redirect(detail);
+          const redirect: Transition = trans.redirect(detail);
           return redirect.run().catch(rejectedTransitionHandler(redirect));
         }
 
@@ -361,14 +361,14 @@ export class StateService {
         }
       }
 
-      let errorHandler = this.defaultErrorHandler();
+      const errorHandler = this.defaultErrorHandler();
       errorHandler(error);
 
       return services.$q.reject(error);
     };
 
-    let transition = this.router.transitionService.create(currentPath, ref);
-    let transitionToPromise = transition.run().catch(rejectedTransitionHandler(transition));
+    const transition = this.router.transitionService.create(currentPath, ref);
+    const transitionToPromise = transition.run().catch(rejectedTransitionHandler(transition));
     silenceUncaughtInPromise(transitionToPromise); // issue #2676
 
     // Return a promise for the transition, which also has the transition object on it.
@@ -408,12 +408,12 @@ export class StateService {
    */
   is(stateOrName: StateOrName, params?: RawParams, options?: { relative?: StateOrName }): boolean {
     options = defaults(options, { relative: this.$current });
-    let state = this.router.stateRegistry.matcher.find(stateOrName, options.relative);
+    const state = this.router.stateRegistry.matcher.find(stateOrName, options.relative);
     if (!isDefined(state)) return undefined;
     if (this.$current !== state) return false;
     if (!params) return true;
 
-    let schema: Param[] = state.parameters({ inherit: true, matchingKeys: params });
+    const schema: Param[] = state.parameters({ inherit: true, matchingKeys: params });
     return Param.equals(schema, Param.values(schema, params), this.params);
   }
 
@@ -457,19 +457,19 @@ export class StateService {
    */
   includes(stateOrName: StateOrName, params?: RawParams, options?: TransitionOptions): boolean {
     options = defaults(options, { relative: this.$current });
-    let glob = isString(stateOrName) && Glob.fromString(<string> stateOrName);
+    const glob = isString(stateOrName) && Glob.fromString(<string> stateOrName);
 
     if (glob) {
       if (!glob.matches(this.$current.name)) return false;
       stateOrName = this.$current.name;
     }
-    let state = this.router.stateRegistry.matcher.find(stateOrName, options.relative), include = this.$current.includes;
+    const state = this.router.stateRegistry.matcher.find(stateOrName, options.relative), include = this.$current.includes;
 
     if (!isDefined(state)) return undefined;
     if (!isDefined(include[state.name])) return false;
     if (!params) return true;
 
-    let schema: Param[] = state.parameters({ inherit: true, matchingKeys: params });
+    const schema: Param[] = state.parameters({ inherit: true, matchingKeys: params });
     return Param.equals(schema, Param.values(schema, params), this.params);
   }
 
@@ -491,7 +491,7 @@ export class StateService {
    * @returns {string} compiled state url
    */
   href(stateOrName: StateOrName, params: RawParams, options?: HrefOptions): string {
-    let defaultHrefOpts = {
+    const defaultHrefOpts = {
       lossy:    true,
       inherit:  true,
       absolute: false,
@@ -500,12 +500,12 @@ export class StateService {
     options = defaults(options, defaultHrefOpts);
     params = params || {};
 
-    let state = this.router.stateRegistry.matcher.find(stateOrName, options.relative);
+    const state = this.router.stateRegistry.matcher.find(stateOrName, options.relative);
 
     if (!isDefined(state)) return null;
     if (options.inherit) params = <any> this.params.$inherit(params, this.$current, state);
 
-    let nav = (state && options.lossy) ? state.navigable : state;
+    const nav = (state && options.lossy) ? state.navigable : state;
 
     if (!nav || nav.url === undefined || nav.url === null) {
       return null;
@@ -572,7 +572,7 @@ export class StateService {
   get(stateOrName: StateOrName): StateDeclaration;
   get(): StateDeclaration[];
   get(stateOrName?: StateOrName, base?: StateOrName): any {
-    let reg = this.router.stateRegistry;
+    const reg = this.router.stateRegistry;
     if (arguments.length === 0) return reg.get();
     return reg.get(stateOrName, base || this.$current);
   }
@@ -590,11 +590,11 @@ export class StateService {
    * @returns a promise to lazy load
    */
   lazyLoad(stateOrName: StateOrName, transition?: Transition): Promise<LazyLoadResult> {
-    let state: StateDeclaration = this.get(stateOrName);
+    const state: StateDeclaration = this.get(stateOrName);
     if (!state || !state.lazyLoad) throw new Error("Can not lazy load " + stateOrName);
 
-    let currentPath = this.getCurrentPath();
-    let target = PathUtils.makeTargetState(this.router.stateRegistry, currentPath);
+    const currentPath = this.getCurrentPath();
+    const target = PathUtils.makeTargetState(this.router.stateRegistry, currentPath);
     transition = transition || this.router.transitionService.create(currentPath, target);
 
     return lazyLoadState(transition, state);

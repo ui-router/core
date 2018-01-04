@@ -65,7 +65,7 @@ export class ParamType implements ParamTypeDefinition {
 
 
   $subPattern() {
-    let sub = this.pattern.toString();
+    const sub = this.pattern.toString();
     return sub.substr(1, sub.length - 2);
   }
 
@@ -118,8 +118,8 @@ function ArrayType(type: ParamType, mode: (boolean|"auto")) {
   function arrayHandler(callback: (x: any) => any, allTruthyMode?: boolean) {
     return function handleArray(val: any) {
       if (isArray(val) && val.length === 0) return val;
-      let arr = arrayWrap(val);
-      let result = map(arr, callback);
+      const arr = arrayWrap(val);
+      const result = map(arr, callback);
       return (allTruthyMode === true) ? filter(result, x => !x).length === 0 : arrayUnwrap(result);
     };
   }
@@ -127,7 +127,7 @@ function ArrayType(type: ParamType, mode: (boolean|"auto")) {
   // Wraps type (.equals) functions to operate on each value of an array
   function arrayEqualsHandler(callback: (l: any, r: any) => boolean) {
     return function handleArray(val1: any, val2: any) {
-      let left = arrayWrap(val1), right = arrayWrap(val2);
+      const left = arrayWrap(val1), right = arrayWrap(val2);
       if (left.length !== right.length) return false;
       for (let i = 0; i < left.length; i++) {
         if (!callback(left[i], right[i])) return false;
@@ -137,8 +137,8 @@ function ArrayType(type: ParamType, mode: (boolean|"auto")) {
   }
 
   ['encode', 'decode', 'equals', '$normalize'].forEach(name => {
-    let paramTypeFn = type[name].bind(type);
-    let wrapperFn: Function = name === 'equals' ? arrayEqualsHandler : arrayHandler;
+    const paramTypeFn = type[name].bind(type);
+    const wrapperFn: Function = name === 'equals' ? arrayEqualsHandler : arrayHandler;
     this[name] = wrapperFn(paramTypeFn);
   });
 

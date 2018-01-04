@@ -6,7 +6,7 @@ export class Queue<T> {
   constructor(private _items: T[] = [], private _limit: number = null) { }
 
   enqueue(item: T) {
-    let items = this._items;
+    const items = this._items;
     items.push(item);
     if (this._limit && items.length > this._limit) items.shift();
     return item;
@@ -18,7 +18,7 @@ export class Queue<T> {
   }
 
   clear(): Array<T> {
-    let current = this._items;
+    const current = this._items;
     this._items = [];
     return current;
   }
@@ -28,7 +28,7 @@ export class Queue<T> {
   }
 
   remove(item: T) {
-    let idx = this._items.indexOf(item);
+    const idx = this._items.indexOf(item);
     return idx > -1 && this._items.splice(idx, 1)[0];
   }
 

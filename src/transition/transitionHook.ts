@@ -17,7 +17,7 @@ import { TransitionEventType } from './transitionEventType';
 import { RegisteredHook } from './hookRegistry';
 import { StateDeclaration } from '../state/interface';
 
-let defaultOptions: TransitionHookOptions = {
+const defaultOptions: TransitionHookOptions = {
   current: noop,
   transition: null,
   traceData: {},
@@ -104,10 +104,10 @@ export class TransitionHook {
    */
   static invokeHooks<T>(hooks: TransitionHook[], doneCallback: (result?: HookResult) => T): Promise<any> | T {
     for (let idx = 0; idx < hooks.length; idx++) {
-      let hookResult = hooks[idx].invokeHook();
+      const hookResult = hooks[idx].invokeHook();
 
       if (isPromise(hookResult)) {
-        let remainingHooks = hooks.slice(idx + 1);
+        const remainingHooks = hooks.slice(idx + 1);
 
         return TransitionHook.chain(remainingHooks, hookResult)
           .then(doneCallback);
@@ -140,13 +140,13 @@ export class TransitionHook {
   }
 
   invokeHook(): Promise<HookResult> | void {
-    let hook = this.registeredHook;
+    const hook = this.registeredHook;
     if (hook._deregistered) return;
 
-    let notCurrent = this.getNotCurrentRejection();
+    const notCurrent = this.getNotCurrentRejection();
     if (notCurrent) return notCurrent;
 
-    let options = this.options;
+    const options = this.options;
     trace.traceHookInvocation(this, this.transition, options);
 
     const invokeCallback = () =>
@@ -162,7 +162,7 @@ export class TransitionHook {
         hook.eventType.getResultHandler(this)(result);
 
     try {
-      let result = invokeCallback();
+      const result = invokeCallback();
 
       if (!this.type.synchronous && isPromise(result)) {
         return result.catch(normalizeErr)
@@ -190,7 +190,7 @@ export class TransitionHook {
    * was started while the hook was still running
    */
   handleHookResult(result: HookResult): Promise<HookResult> {
-    let notCurrent = this.getNotCurrentRejection();
+    const notCurrent = this.getNotCurrentRejection();
     if (notCurrent) return notCurrent;
 
     // Hook returned a promise
@@ -221,7 +221,7 @@ export class TransitionHook {
    * to a stopped router (disposed), or a new transition has started and superseded this one.
    */
   private getNotCurrentRejection() {
-    let router = this.transition.router;
+    const router = this.transition.router;
 
     // The router is stopped
     if (router._disposed) {
@@ -241,8 +241,8 @@ export class TransitionHook {
   }
 
   toString() {
-    let { options, registeredHook } = this;
-    let event = parse("traceData.hookType")(options) || "internal",
+    const { options, registeredHook } = this;
+    const event = parse("traceData.hookType")(options) || "internal",
         context = parse("traceData.context.state.name")(options) || parse("traceData.context")(options) || "unknown",
         name = fnToString(registeredHook.callback);
     return `${event} context: ${context}, ${maxLength(200, name)}`;

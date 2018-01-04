@@ -51,8 +51,8 @@ import {Predicate} from "./common";
  * @returns {*|function(): (*|any)}
  */
 export function curry(fn: Function): Function {
-  let initial_args = [].slice.apply(arguments, [1]);
-  let func_args_length = fn.length;
+  const initial_args = [].slice.apply(arguments, [1]);
+  const func_args_length = fn.length;
 
   function curried(args: any[]) {
     if (args.length >= func_args_length)
@@ -73,8 +73,8 @@ export function curry(fn: Function): Function {
  * then, composed is: f(g(h(x)))
  */
 export function compose() {
-  let args = arguments;
-  let start = args.length - 1;
+  const args = arguments;
+  const start = args.length - 1;
   return function() {
     let i = start, result = args[start].apply(this, arguments);
     while (i--) result = args[i].call(this, result);

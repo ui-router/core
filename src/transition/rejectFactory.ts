@@ -27,8 +27,8 @@ export class Rejection {
 
   /** Returns a Rejection due to transition superseded */
   static superseded(detail?: any, options?: any): Rejection {
-    let message = "The transition has been superseded by a different transition";
-    let rejection = new Rejection(RejectType.SUPERSEDED, message, detail);
+    const message = "The transition has been superseded by a different transition";
+    const rejection = new Rejection(RejectType.SUPERSEDED, message, detail);
     if (options && options.redirected) {
       rejection.redirected = true;
     }
@@ -42,25 +42,25 @@ export class Rejection {
 
   /** Returns a Rejection due to invalid transition */
   static invalid(detail?: any): Rejection {
-    let message = "This transition is invalid";
+    const message = "This transition is invalid";
     return new Rejection(RejectType.INVALID, message, detail);
   }
 
   /** Returns a Rejection due to ignored transition */
   static ignored(detail?: any): Rejection {
-    let message = "The transition was ignored";
+    const message = "The transition was ignored";
     return new Rejection(RejectType.IGNORED, message, detail);
   }
 
   /** Returns a Rejection due to aborted transition */
   static aborted(detail?: any): Rejection {
-    let message = "The transition has been aborted";
+    const message = "The transition has been aborted";
     return new Rejection(RejectType.ABORTED, message, detail);
   }
 
   /** Returns a Rejection due to aborted transition */
   static errored(detail?: any): Rejection {
-    let message = "The transition errored";
+    const message = "The transition errored";
     return new Rejection(RejectType.ERROR, message, detail);
   }
 
@@ -86,8 +86,8 @@ export class Rejection {
   toString() {
     const detailString = (d: any) =>
         d && d.toString !== Object.prototype.toString ? d.toString() : stringify(d);
-    let detail = detailString(this.detail);
-    let { $id, type, message } = this;
+    const detail = detailString(this.detail);
+    const { $id, type, message } = this;
     return `Transition Rejection($id: ${$id} type: ${type}, message: ${message}, detail: ${detail})`;
   }
 

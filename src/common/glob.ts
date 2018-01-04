@@ -69,7 +69,7 @@ export class Glob {
     this.text = text;
     this.glob = text.split('.');
 
-    let regexpString = this.text.split('.')
+    const regexpString = this.text.split('.')
         .map(seg => {
           if (seg === '**') return '(?:|(?:\\.[^.]*)*)';
           if (seg === '*')  return '\\.[^.]*';

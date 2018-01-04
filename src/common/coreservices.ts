@@ -13,7 +13,7 @@ export let notImplemented = (fnname: string) => () => {
   throw new Error(`${fnname}(): No coreservices implementation for UI-Router is loaded.`);
 };
 
-let services: CoreServices = {
+const services: CoreServices = {
   $q: undefined,
   $injector: undefined,
 };

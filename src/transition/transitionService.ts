@@ -273,7 +273,7 @@ export class TransitionService implements IHookRegistry, Disposable {
                getResultHandler: GetResultHandler = TransitionHook.HANDLE_RESULT,
                getErrorHandler: GetErrorHandler = TransitionHook.REJECT_ERROR,
                synchronous = false) {
-    let eventType = new TransitionEventType(name, hookPhase, hookOrder, criteriaMatchPath, reverseSort, getResultHandler, getErrorHandler, synchronous);
+    const eventType = new TransitionEventType(name, hookPhase, hookOrder, criteriaMatchPath, reverseSort, getResultHandler, getErrorHandler, synchronous);
 
     this._eventTypes.push(eventType);
     makeEvent(this, this, eventType);
@@ -281,12 +281,12 @@ export class TransitionService implements IHookRegistry, Disposable {
 
   /** @hidden */ // tslint:disable-next-line
   private _getEvents(phase?: TransitionHookPhase): TransitionEventType[] {
-    let transitionHookTypes = isDefined(phase) ?
+    const transitionHookTypes = isDefined(phase) ?
         this._eventTypes.filter(type => type.hookPhase === phase) :
         this._eventTypes.slice();
 
     return transitionHookTypes.sort((l, r) => {
-      let cmpByPhase = l.hookPhase - r.hookPhase;
+      const cmpByPhase = l.hookPhase - r.hookPhase;
       return cmpByPhase === 0 ? l.hookOrder - r.hookOrder : cmpByPhase;
     });
   }
@@ -320,7 +320,7 @@ export class TransitionService implements IHookRegistry, Disposable {
 
   /** @hidden */
   private _registerCoreTransitionHooks() {
-    let fns = this._deregisterHookFns;
+    const fns = this._deregisterHookFns;
 
     fns.addCoreResolves = registerAddCoreResolvables(this);
     fns.ignored         = registerIgnoredTransitionHook(this);

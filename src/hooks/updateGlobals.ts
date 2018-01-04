@@ -17,7 +17,7 @@ import { TransitionService } from '../transition/transitionService';
  * [[StateService.transition]], [[StateService.current]], [[StateService.params]]
  */
 const updateGlobalState = (trans: Transition) => {
-  let globals = trans.router.globals;
+  const globals = trans.router.globals;
 
   const transitionSuccessful = () => {
     globals.successfulTransitions.enqueue(trans);

@@ -158,7 +158,7 @@ export const removeFrom: typeof _removeFrom = curry(_removeFrom) as any;
 export function _removeFrom<T>(array: T[], obj: T): T[];
 export function _removeFrom<T>(array: T[]): (obj: T) => T[];
 export function _removeFrom(array, obj?) {
-  let idx = array.indexOf(obj);
+  const idx = array.indexOf(obj);
   if (idx >= 0) array.splice(idx, 1);
   return array;
 }
@@ -183,8 +183,8 @@ export const deregAll = (functions: Function[]) =>
  * Earlier objects in the defaultsList take precedence when applying defaults.
  */
 export function defaults(opts, ...defaultsList: Obj[]) {
-  let _defaultsList = defaultsList.concat({}).reverse();
-  let defaultVals = extend.apply(null, _defaultsList);
+  const _defaultsList = defaultsList.concat({}).reverse();
+  const defaultVals = extend.apply(null, _defaultsList);
   return extend({}, defaultVals, pick(opts || {}, Object.keys(defaultVals)));
 }
 
@@ -199,9 +199,9 @@ export const mergeR = (memo: Obj, item: Obj) => extend(memo, item);
  * @return {Array} Returns an array of state names in descending order, not including the root.
  */
 export function ancestors(first: StateObject, second: StateObject) {
-  let path: StateObject[] = [];
+  const path: StateObject[] = [];
 
-  for (let n in first.path) { // tslint:disable-line:forin
+  for (const n in first.path) { // tslint:disable-line:forin
     if (first.path[n] !== second.path[n]) break;
     path.push(first.path[n]);
   }
@@ -220,10 +220,10 @@ export function ancestors(first: StateObject, second: StateObject) {
  * @param propNames an Array of strings, which are the whitelisted property names
  */
 export function pick(obj: Obj, propNames: string[]): Obj {
-  let objCopy = {};
-  for (let prop in obj) {
-    if (propNames.indexOf(prop) !== -1) {
-      objCopy[prop] = obj[prop];
+  const objCopy = {};
+  for (const _prop in obj) {
+    if (propNames.indexOf(_prop) !== -1) {
+      objCopy[_prop] = obj[_prop];
     }
   }
   return objCopy;
@@ -266,8 +266,8 @@ export function filter<T>(collection: T[], callback: (t: T, key?: number) => boo
 export function filter<T>(collection: TypedMap<T>, callback: (t: T, key?: string) => boolean): TypedMap<T>;
 /** Filters an Array or an Object's properties based on a predicate */
 export function filter<T>(collection: any, callback: Function): T {
-  let arr = isArray(collection), result: any = arr ? [] : {};
-  let accept = arr ? x => result.push(x) : (x, key) => result[key] = x;
+  const arr = isArray(collection), result: any = arr ? [] : {};
+  const accept = arr ? x => result.push(x) : (x, key) => result[key] = x;
   forEach(collection, function(item, i) {
     if (callback(item, i)) accept(item, i);
   });
@@ -298,7 +298,7 @@ export function map<T, U>(collection: T[], callback: Mapper<T, U>): U[];
 export function map<T, U>(collection: { [key: string]: T }, callback: Mapper<T, U>): { [key: string]: U };
 /** Maps an array or object properties using a callback function */
 export function map(collection: any, callback: any): any {
-  let result = isArray(collection) ? [] : {};
+  const result = isArray(collection) ? [] : {};
   forEach(collection, (item, i) => result[i] = callback(item, i));
   return result;
 }
@@ -439,7 +439,7 @@ export const assertPredicate: <T> (predicate: Predicate<T>, errMsg: (string|Func
 export const assertMap: <T, U> (mapFn: (t: T) => U, errMsg: (string|Function)) => (t: T) => U = assertFn;
 export function assertFn(predicateOrMap: Function, errMsg: (string|Function) = "assert failure"): any {
   return (obj) => {
-    let result = predicateOrMap(obj);
+    const result = predicateOrMap(obj);
     if (!result) {
       throw new Error(isFunction(errMsg) ? (<Function> errMsg)(obj) : errMsg);
     }
@@ -475,11 +475,10 @@ export const pairs = (obj: Obj) =>
  */
 export function arrayTuples(...args: any[]): any[] {
   if (args.length === 0) return [];
-  let maxArrayLen = args.reduce((min, arr) => Math.min(arr.length, min), 9007199254740991); // aka 2^53 − 1 aka Number.MAX_SAFE_INTEGER
+  const maxArrayLen = args.reduce((min, arr) => Math.min(arr.length, min), 9007199254740991); // aka 2^53 − 1 aka Number.MAX_SAFE_INTEGER
+  const result = [];
 
-  let i, result = [];
-
-  for (i = 0; i < maxArrayLen; i++) {
+  for (let i = 0; i < maxArrayLen; i++) {
     // This is a hot function
     // Unroll when there are 1-4 arguments
     switch (args.length) {
@@ -547,9 +546,9 @@ function _forEach(obj: (any[]|any), cb: (el, idx?) => void, _this: Obj) {
 export function _extend(toObj: Obj, ...fromObjs: Obj[]): any;
 export function _extend(toObj: Obj): any {
   for (let i = 1; i < arguments.length; i++) {
-    let obj = arguments[i];
+    const obj = arguments[i];
     if (!obj) continue;
-    let keys = Object.keys(obj);
+    const keys = Object.keys(obj);
 
     for (let j = 0; j < keys.length; j++) {
       toObj[keys[j]] = obj[keys[j]];
@@ -563,7 +562,7 @@ function _equals(o1: any, o2: any): boolean {
   if (o1 === o2) return true;
   if (o1 === null || o2 === null) return false;
   if (o1 !== o1 && o2 !== o2) return true; // NaN === NaN
-  let t1 = typeof o1, t2 = typeof o2;
+  const t1 = typeof o1, t2 = typeof o2;
   if (t1 !== t2 || t1 !== 'object') return false;
 
   const tup = [o1, o2];
@@ -572,15 +571,15 @@ function _equals(o1: any, o2: any): boolean {
   if (all(isRegExp)(tup)) return o1.toString() === o2.toString();
   if (all(isFunction)(tup)) return true; // meh
 
-  let predicates = [isFunction, isArray, isDate, isRegExp];
+  const predicates = [isFunction, isArray, isDate, isRegExp];
   if (predicates.map(any).reduce((b, fn) => b || !!fn(tup), false)) return false;
 
-  let key: string, keys: { [i: string]: boolean } = {};
-  for (key in o1) { // tslint:disable-line:forin
+  const keys: { [i: string]: boolean } = {};
+  for (const key in o1) { // tslint:disable-line:forin
     if (!_equals(o1[key], o2[key])) return false;
     keys[key] = true;
   }
-  for (key in o2) {
+  for (const key in o2) {
     if (!keys[key]) return false;
   }
 

@@ -33,7 +33,7 @@ export const isState: (x: any) => x is StateObject = StateObject.isState;
  */
 export function isInjectable(val: any) {
   if (isArray(val) && val.length) {
-    let head = val.slice(0, -1), tail = val.slice(-1);
+    const head = val.slice(0, -1), tail = val.slice(-1);
     return !(head.filter(not(isString)).length || tail.filter(not(isFunction)).length);
   }
   return isFunction(val);

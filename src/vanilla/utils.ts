@@ -24,20 +24,20 @@ export const getParams = (queryString: string): any =>
 
 export function parseUrl(url: string) {
   const orEmptyString = x => x || "";
-  let [beforehash, hash] = splitHash(url).map(orEmptyString);
-  let [path, search] = splitQuery(beforehash).map(orEmptyString);
+  const [beforehash, hash] = splitHash(url).map(orEmptyString);
+  const [path, search] = splitQuery(beforehash).map(orEmptyString);
 
   return { path, search, hash, url };
 }
 
 export const buildUrl = (loc: LocationServices) => {
-  let path = loc.path();
-  let searchObject = loc.search();
-  let hash = loc.hash();
+  const path = loc.path();
+  const searchObject = loc.search();
+  const hash = loc.hash();
 
-  let search = Object.keys(searchObject).map(key => {
-    let param = searchObject[key];
-    let vals = isArray(param) ? param : [param];
+  const search = Object.keys(searchObject).map(key => {
+    const param = searchObject[key];
+    const vals = isArray(param) ? param : [param];
     return vals.map(val => key + "=" + val);
   }).reduce(unnestR, []).join("&");
 
@@ -51,8 +51,8 @@ export function locationPluginFactory(
     configurationClass: { new(uiRouter?: UIRouter, isHtml5?: boolean): LocationConfig }
 ) {
   return function(uiRouter: UIRouter) {
-    let service       = uiRouter.locationService = new serviceClass(uiRouter);
-    let configuration = uiRouter.locationConfig  = new configurationClass(uiRouter, isHtml5);
+    const service       = uiRouter.locationService = new serviceClass(uiRouter);
+    const configuration = uiRouter.locationConfig  = new configurationClass(uiRouter, isHtml5);
 
     function dispose(router: UIRouter) {
       router.dispose(service);

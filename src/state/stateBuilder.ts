@@ -17,7 +17,7 @@ import { ParamFactory } from "../url/interface";
 
 const parseUrl = (url: string): any => {
   if (!isString(url)) return false;
-  let root = url.charAt(0) === '^';
+  const root = url.charAt(0) === '^';
   return { val: root ? url.substring(1) : url, root };
 };
 
@@ -57,7 +57,7 @@ function dataBuilder(state: StateObject) {
 
 const getUrlBuilder = ($urlMatcherFactoryProvider: UrlMatcherFactory, root: () => StateObject) =>
 function urlBuilder(state: StateObject) {
-  let stateDec: StateDeclaration = <any> state;
+  const stateDec: StateDeclaration = <any> state;
 
   // For future states, i.e., states whose name ends with `.**`,
   // match anything that starts with the url prefix
@@ -87,8 +87,8 @@ function navigableBuilder(state: StateObject) {
 const getParamsBuilder = (paramFactory: ParamFactory) =>
 function paramsBuilder(state: StateObject): { [key: string]: Param } {
   const makeConfigParam = (config: any, id: string) => paramFactory.fromConfig(id, null, config);
-  let urlParams: Param[] = (state.url && state.url.parameters({inherit: false})) || [];
-  let nonUrlParams: Param[] = values(mapObj(omit(state.params || {}, urlParams.map(prop('id'))), makeConfigParam));
+  const urlParams: Param[] = (state.url && state.url.parameters({inherit: false})) || [];
+  const nonUrlParams: Param[] = values(mapObj(omit(state.params || {}, urlParams.map(prop('id'))), makeConfigParam));
   return urlParams.concat(nonUrlParams).map(p => [p.id, p]).reduce(applyPairs, {});
 };
 
@@ -97,7 +97,7 @@ function pathBuilder(state: StateObject) {
 }
 
 function includesBuilder(state: StateObject) {
-  let includes = state.parent ? extend({}, state.parent.includes) : {};
+  const includes = state.parent ? extend({}, state.parent.includes) : {};
   includes[state.name] = true;
   return includes;
 }
@@ -152,7 +152,7 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
 
   /** fetch DI annotations from a function or ng1-style array */
   const annotate          = (fn: Function)  => {
-    let $injector = services.$injector;
+    const $injector = services.$injector;
     // ng1 doesn't have an $injector until runtime.
     // If the $injector doesn't exist, use "deferred" literal as a
     // marker indicating they should be annotated when runtime starts
@@ -196,8 +196,8 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
 
   // If resolveBlock is already an array, use it as-is.
   // Otherwise, assume it's an object and convert to an Array of tuples
-  let decl = state.resolve;
-  let items: any[] = isArray(decl) ? decl : objects2Tuples(decl, state.resolvePolicy || {});
+  const decl = state.resolve;
+  const items: any[] = isArray(decl) ? decl : objects2Tuples(decl, state.resolvePolicy || {});
   return items.map(item2Resolvable);
 }
 
@@ -218,7 +218,7 @@ export class StateBuilder {
   private builders: Builders;
 
   constructor(private matcher: StateMatcher, urlMatcherFactory: UrlMatcherFactory) {
-    let self = this;
+    const self = this;
 
     const root = () => matcher.find("");
     const isRoot = (state: StateObject) => state.name === "";
@@ -260,8 +260,8 @@ export class StateBuilder {
    * @returns a function which deregisters the BuilderFunction
    */
   builder(name: string, fn: BuilderFunction): (BuilderFunction|BuilderFunction[]|Function) {
-    let builders = this.builders;
-    let array = builders[name] || [];
+    const builders = this.builders;
+    const array = builders[name] || [];
     // Backwards compat: if only one builder exists, return it, else return whole arary.
     if (isString(name) && !isDefined(fn)) return array.length > 1 ? array : array[0];
     if (!isString(name) || !isFunction(fn)) return;
@@ -279,16 +279,16 @@ export class StateBuilder {
    * @returns the built State object
    */
   build(state: StateObject): StateObject {
-    let {matcher, builders} = this;
-    let parent = this.parentName(state);
+    const {matcher, builders} = this;
+    const parent = this.parentName(state);
 
     if (parent && !matcher.find(parent, undefined, false)) {
       return null;
     }
 
-    for (let key in builders) {
+    for (const key in builders) {
       if (!builders.hasOwnProperty(key)) continue;
-      let chain = builders[key].reduce((parentFn: BuilderFunction, step: BuilderFunction) => (_state) => step(_state, parentFn), noop);
+      const chain = builders[key].reduce((parentFn: BuilderFunction, step: BuilderFunction) => (_state) => step(_state, parentFn), noop);
       state[key] = chain(state);
     }
     return state;
@@ -296,11 +296,11 @@ export class StateBuilder {
 
   parentName(state: StateObject) {
     // name = 'foo.bar.baz.**'
-    let name = state.name || "";
+    const name = state.name || "";
     // segments = ['foo', 'bar', 'baz', '.**']
-    let segments = name.split('.');
+    const segments = name.split('.');
     // segments = ['foo', 'bar', 'baz']
-    let lastSegment = segments.pop();
+    const lastSegment = segments.pop();
     // segments = ['foo', 'bar'] (ignore .** segment for future states)
     if (lastSegment === '**') segments.pop();
 
@@ -318,10 +318,10 @@ export class StateBuilder {
   }
 
   name(state: StateObject) {
-    let name = state.name;
+    const name = state.name;
     if (name.indexOf('.') !== -1 || !state.parent) return name;
 
-    let parentName = isString(state.parent) ? state.parent : state.parent.name;
+    const parentName = isString(state.parent) ? state.parent : state.parent.name;
     return parentName ? parentName + "." + name : name;
   }
 }

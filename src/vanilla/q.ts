@@ -29,7 +29,7 @@ export const $q = {
 
   /** @returns a deferred object, which has `resolve` and `reject` functions */
   defer: () => {
-    let deferred: any = {};
+    const deferred: any = {};
     deferred.promise = new Promise((resolve, reject) => {
       deferred.resolve = resolve;
       deferred.reject = reject;
@@ -46,7 +46,7 @@ export const $q = {
     if (isObject(promises)) {
       // Convert promises map to promises array.
       // When each promise resolves, map it to a tuple { key: key, val: val }
-      let chain = Object.keys(promises)
+      const chain = Object.keys(promises)
           .map(key => promises[key].then(val => ({key, val})));
 
       // Then wait for all promises to resolve, and convert them back to an object

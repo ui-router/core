@@ -43,7 +43,7 @@ export class UrlRuleFactory {
       [isFunction,     (_what: UrlRuleMatchFn) => new BaseUrlRule(_what, handler as UrlRuleHandlerFn)],
     ]);
 
-    let rule = makeRule(what);
+    const rule = makeRule(what);
     if (!rule) throw new Error("invalid 'what' in when()");
     return rule;
   }
@@ -90,7 +90,7 @@ export class UrlRuleFactory {
     if (is(UrlMatcher)(handler)) _handler = (match: RawParams) => (handler as UrlMatcher).format(match);
 
     function match(url: UrlParts) {
-      let match = urlMatcher.exec(url.path, url.search, url.hash);
+      const match = urlMatcher.exec(url.path, url.search, url.hash);
       return urlMatcher.validates(match) && match;
     }
 
@@ -100,13 +100,13 @@ export class UrlRuleFactory {
     // - Some optional parameters, some matched
     // - Some optional parameters, all matched
     function matchPriority(params: RawParams): number {
-      let optional = urlMatcher.parameters().filter(param => param.isOptional);
+      const optional = urlMatcher.parameters().filter(param => param.isOptional);
       if (!optional.length) return 0.000001;
-      let matched = optional.filter(param => params[param.id]);
+      const matched = optional.filter(param => params[param.id]);
       return matched.length / optional.length;
     }
 
-    let details = { urlMatcher, matchPriority, type: "URLMATCHER" };
+    const details = { urlMatcher, matchPriority, type: "URLMATCHER" };
     return extend(new BaseUrlRule(match, _handler), details) as MatcherUrlRule;
   }
 
@@ -131,14 +131,14 @@ export class UrlRuleFactory {
      * and the new URL are already identical
      */
     const handler = (match: RawParams) => {
-      let $state = router.stateService;
-      let globals = router.globals;
+      const $state = router.stateService;
+      const globals = router.globals;
       if ($state.href(state, match) !== $state.href(globals.current, globals.params)) {
         $state.transitionTo(state, match, { inherit: true, source: "url" });
       }
     };
 
-    let details = { state, type: "STATE" };
+    const details = { state, type: "STATE" };
     return extend(this.fromUrlMatcher(state.url, handler), details) as StateRule;
   }
 
@@ -192,7 +192,7 @@ export class UrlRuleFactory {
     const match = (url: UrlParts): RegExpExecArray =>
         regexp.exec(url.path);
 
-    let details = { regexp, type: "REGEXP" };
+    const details = { regexp, type: "REGEXP" };
     return extend(new BaseUrlRule(match, _handler), details) as RegExpRule
   }
 }

@@ -11,8 +11,8 @@ import { ParamType } from "./paramType";
 import { ParamTypes } from "./paramTypes";
 import { UrlMatcherFactory } from "../url/urlMatcherFactory";
 
-/** @hidden */ let hasOwn = Object.prototype.hasOwnProperty;
-/** @hidden */ let isShorthand = (cfg: ParamDeclaration) =>
+/** @hidden */ const hasOwn = Object.prototype.hasOwnProperty;
+/** @hidden */ const isShorthand = (cfg: ParamDeclaration) =>
     ["value", "type", "squash", "array", "dynamic"].filter(hasOwn.bind(cfg || {})).length === 0;
 
 /** @internalapi */
@@ -42,7 +42,7 @@ function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, i
   if (cfg.type && urlType && urlType.name === 'string' && paramTypes.type(cfg.type as string)) return paramTypes.type(cfg.type as string);
   if (urlType) return urlType;
   if (!cfg.type) {
-    let type = location === DefType.CONFIG ? "any" :
+    const type = location === DefType.CONFIG ? "any" :
         location === DefType.PATH ? "path" :
         location === DefType.SEARCH ? "query" : "string";
     return paramTypes.type(type);
@@ -55,7 +55,7 @@ function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, i
  * returns false, true, or the squash value to indicate the "default parameter url squash policy".
  */
 function getSquashPolicy(config: ParamDeclaration, isOptional: boolean, defaultPolicy: (boolean|string)) {
-  let squash = config.squash;
+  const squash = config.squash;
   if (!isOptional || squash === false) return false;
   if (!isDefined(squash) || squash == null) return defaultPolicy;
   if (squash === true || isString(squash)) return squash;
@@ -64,13 +64,15 @@ function getSquashPolicy(config: ParamDeclaration, isOptional: boolean, defaultP
 
 /** @internalapi */
 function getReplace(config: ParamDeclaration, arrayMode: boolean, isOptional: boolean, squash: (string|boolean)) {
-  let replace: any, configuredKeys: string[], defaultPolicy = [
-    {from: "", to: (isOptional || arrayMode ? undefined : "")},
-    {from: null, to: (isOptional || arrayMode ? undefined : "")},
+  const defaultPolicy = [
+    { from: "", to: (isOptional || arrayMode ? undefined : "") },
+    { from: null, to: (isOptional || arrayMode ? undefined : "") },
   ];
-  replace = isArray(config.replace) ? config.replace : [];
+
+  const replace = isArray(config.replace) ? config.replace : [];
   if (isString(squash)) replace.push({ from: squash, to: undefined });
-  configuredKeys = map(replace, prop("from"));
+
+  const configuredKeys = map(replace, prop("from"));
   return filter(defaultPolicy, item => configuredKeys.indexOf(item.from) === -1).concat(replace);
 }
 
@@ -95,7 +97,7 @@ export class Param {
 
   static values(params: Param[], values: RawParams = {}): RawParams {
     const paramValues = {} as RawParams;
-    for (let param of params) {
+    for (const param of params) {
       paramValues[param.id] = param.value(values[param.id]);
     }
     return paramValues;
@@ -137,23 +139,23 @@ export class Param {
   constructor(id: string, type: ParamType, config: ParamDeclaration, location: DefType, urlMatcherFactory: UrlMatcherFactory) {
     config = unwrapShorthand(config);
     type = getType(config, type, location, id, urlMatcherFactory.paramTypes);
-    let arrayMode = getArrayMode();
+    const arrayMode = getArrayMode();
     type = arrayMode ? type.$asArray(arrayMode, location === DefType.SEARCH) : type;
-    let isOptional = config.value !== undefined || location === DefType.SEARCH;
-    let dynamic = isDefined(config.dynamic) ? !!config.dynamic : !!type.dynamic;
-    let raw = isDefined(config.raw) ? !!config.raw : !!type.raw;
-    let squash = getSquashPolicy(config, isOptional, urlMatcherFactory.defaultSquashPolicy());
-    let replace = getReplace(config, arrayMode, isOptional, squash);
-    let inherit = isDefined(config.inherit) ? !!config.inherit : !!type.inherit;
+    const isOptional = config.value !== undefined || location === DefType.SEARCH;
+    const dynamic = isDefined(config.dynamic) ? !!config.dynamic : !!type.dynamic;
+    const raw = isDefined(config.raw) ? !!config.raw : !!type.raw;
+    const squash = getSquashPolicy(config, isOptional, urlMatcherFactory.defaultSquashPolicy());
+    const replace = getReplace(config, arrayMode, isOptional, squash);
+    const inherit = isDefined(config.inherit) ? !!config.inherit : !!type.inherit;
 
     // array config: param name (param[]) overrides default settings.  explicit config overrides param name.
     function getArrayMode() {
-      let arrayDefaults = { array: (location === DefType.SEARCH ? "auto" : false) };
-      let arrayParamNomenclature = id.match(/\[\]$/) ? { array: true } : {};
+      const arrayDefaults = { array: (location === DefType.SEARCH ? "auto" : false) };
+      const arrayParamNomenclature = id.match(/\[\]$/) ? { array: true } : {};
       return extend(arrayDefaults, arrayParamNomenclature, config).array;
     }
 
-    extend(this, {id, type, location, isOptional, dynamic, raw, squash, replace, inherit, array: arrayMode, config });
+    extend(this, { id, type, location, isOptional, dynamic, raw, squash, replace, inherit, array: arrayMode, config });
   }
 
   isDefaultValue(value: any): boolean {
@@ -173,7 +175,7 @@ export class Param {
 
       if (!services.$injector) throw new Error("Injectable functions cannot be called at configuration time");
 
-      let defaultValue = services.$injector.invoke(this.config.$$fn);
+      const defaultValue = services.$injector.invoke(this.config.$$fn);
 
       if (defaultValue !== null && defaultValue !== undefined && !this.type.is(defaultValue))
         throw new Error(`Default value (${defaultValue}) for parameter '${this.id}' is not an instance of ParamType (${this.type.name})`);
@@ -186,7 +188,7 @@ export class Param {
     };
 
     const replaceSpecialValues = (val: any) => {
-      for (let tuple of this.replace) {
+      for (const tuple of this.replace) {
         if (tuple.from === val) return tuple.to;
       }
       return val;
