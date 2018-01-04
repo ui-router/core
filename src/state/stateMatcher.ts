@@ -6,7 +6,7 @@ import {values} from "../common/common";
 
 export class StateMatcher {
   constructor (private _states: { [key: string]: StateObject }) { }
-  
+
   isRelative(stateName: string) {
     stateName = stateName || "";
     return stateName.indexOf(".") === 0 || stateName.indexOf("^") === 0;
@@ -31,6 +31,7 @@ export class StateMatcher {
       );
 
       if (matches.length > 1) {
+        // tslint:disable-next-line:no-console
         console.log(`stateMatcher.find: Found multiple matches for ${name} using glob: `, matches.map(match => match.name));
       }
       return matches[0];
@@ -40,7 +41,7 @@ export class StateMatcher {
 
   resolvePath(name: string, base: StateOrName) {
     if (!base) throw new Error(`No reference point given for path '${name}'`);
-    
+
     let baseState: StateObject = this.find(base);
 
     let splitName = name.split("."), i = 0, pathLength = splitName.length, current = baseState;

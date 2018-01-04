@@ -32,7 +32,8 @@
  *
  * @coreapi
  * @module trace
- */ /** for typedoc */
+ */
+/* tslint:disable:no-console */
 import { parse } from "../common/hof";
 import { isFunction, isNumber } from "../common/predicates";
 import { Transition } from "../transition/transition";
