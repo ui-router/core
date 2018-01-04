@@ -135,19 +135,19 @@ export class StateRegistry {
   private _deregisterTree(state: StateObject) {
     let all = this.get().map(s => s.$$state());
     const getChildren = (states: StateObject[]) => {
-      let children = all.filter(s => states.indexOf(s.parent) !== -1);
-      return children.length === 0 ? children : children.concat(getChildren(children));
+      let _children = all.filter(s => states.indexOf(s.parent) !== -1);
+      return _children.length === 0 ? _children : _children.concat(getChildren(_children));
     };
 
     let children = getChildren([state]);
     let deregistered: StateObject[] = [state].concat(children).reverse();
 
-    deregistered.forEach(state => {
+    deregistered.forEach(_state => {
       let $ur = this._router.urlRouter;
       // Remove URL rule
-      $ur.rules().filter(propEq("state", state)).forEach($ur.removeRule.bind($ur));
+      $ur.rules().filter(propEq("state", _state)).forEach($ur.removeRule.bind($ur));
       // Remove state from registry
-      delete this.states[state.name];
+      delete this.states[_state.name];
     });
 
     return deregistered;

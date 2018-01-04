@@ -179,8 +179,9 @@ export class ViewService {
     // handle parent relative targeting "^.^.^"
     let relativeMatch = /^(\^(?:\.\^)*)$/;
     if (relativeMatch.exec(uiViewContextAnchor)) {
-      let anchor = uiViewContextAnchor.split(".").reduce(((anchor, x) => anchor.parent), context);
-      uiViewContextAnchor = anchor.name;
+      let anchorState = uiViewContextAnchor.split(".")
+        .reduce(((anchor, x) => anchor.parent), context);
+      uiViewContextAnchor = anchorState.name;
     } else if (uiViewContextAnchor === '.') {
       uiViewContextAnchor = context.name;
     }

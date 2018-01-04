@@ -47,12 +47,12 @@ export const buildUrl = (loc: LocationServices) => {
 export function locationPluginFactory(
     name: string,
     isHtml5: boolean,
-    serviceClass: { new(router?: UIRouter): LocationServices },
-    configurationClass: { new(router?: UIRouter, isHtml5?: boolean): LocationConfig }
+    serviceClass: { new(uiRouter?: UIRouter): LocationServices },
+    configurationClass: { new(uiRouter?: UIRouter, isHtml5?: boolean): LocationConfig }
 ) {
-  return function(router: UIRouter) {
-    let service       = router.locationService = new serviceClass(router);
-    let configuration = router.locationConfig  = new configurationClass(router, isHtml5);
+  return function(uiRouter: UIRouter) {
+    let service       = uiRouter.locationService = new serviceClass(uiRouter);
+    let configuration = uiRouter.locationConfig  = new configurationClass(uiRouter, isHtml5);
 
     function dispose(router: UIRouter) {
       router.dispose(service);

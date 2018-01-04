@@ -25,9 +25,9 @@ export class StateMatcher {
       return state;
     } else if (isStr && matchGlob) {
       let _states = values(this._states);
-      let matches = _states.filter(state =>
-          state.__stateObjectCache.nameGlob &&
-          state.__stateObjectCache.nameGlob.matches(name)
+      let matches = _states.filter(_state =>
+          _state.__stateObjectCache.nameGlob &&
+          _state.__stateObjectCache.nameGlob.matches(name)
       );
 
       if (matches.length > 1) {

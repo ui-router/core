@@ -33,8 +33,8 @@ function quoteRegExp(string: any, param?: any) {
 }
 
 /** @hidden */
-const memoizeTo = (obj: Obj, prop: string, fn: Function) =>
-    obj[prop] = obj[prop] || fn();
+const memoizeTo = (obj: Obj, _prop: string, fn: Function) =>
+    obj[_prop] = obj[_prop] || fn();
 
 /** @hidden */
 const splitOnSlash = splitOnDelim('/');
@@ -189,10 +189,10 @@ export class UrlMatcher {
 
     const weightsA = weights(a), weightsB = weights(b);
     padArrays(weightsA, weightsB, 0);
-    let cmp, i, pairs = arrayTuples(weightsA, weightsB);
+    let cmp, i, _pairs = arrayTuples(weightsA, weightsB);
 
-    for (i = 0; i < pairs.length; i++) {
-      cmp = pairs[i][0] - pairs[i][1];
+    for (i = 0; i < _pairs.length; i++) {
+      cmp = _pairs[i][0] - _pairs[i][1];
       if (cmp !== 0) return cmp;
     }
 
@@ -230,7 +230,7 @@ export class UrlMatcher {
     //    \{(?:[^{}\\]+|\\.)*\}          - a matched set of curly braces containing other atoms
     let placeholder = /([:*])([\w\[\]]+)|\{([\w\[\]]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g,
         searchPlaceholder = /([:]?)([\w\[\].-]+)|\{([\w\[\].-]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g,
-        last = 0, m: RegExpExecArray, patterns: any[][] = [];
+        last = 0, matchArray: RegExpExecArray, patterns: any[][] = [];
 
     const checkParamErrors = (id: string) => {
       if (!UrlMatcher.nameValidator.test(id)) throw new Error(`Invalid parameter name '${id}' in pattern '${pattern}'`);
@@ -241,11 +241,11 @@ export class UrlMatcher {
     // The number of segments is always 1 more than the number of parameters.
     const matchDetails = (m: RegExpExecArray, isSearch: boolean) => {
       // IE[78] returns '' for unmatched groups instead of null
-      let id = m[2] || m[3];
-      let regexp = isSearch ? m[4] : m[4] || (m[1] === '*' ? '[\\s\\S]*' : null);
+      let id: string = m[2] || m[3];
+      let regexp: string = isSearch ? m[4] : m[4] || (m[1] === '*' ? '[\\s\\S]*' : null);
 
-      const makeRegexpType = (regexp) => inherit(paramTypes.type(isSearch ? "query" : "path"), {
-        pattern: new RegExp(regexp, this.config.caseInsensitive ? 'i' : undefined)
+      const makeRegexpType = (str) => inherit(paramTypes.type(isSearch ? "query" : "path"), {
+        pattern: new RegExp(str, this.config.caseInsensitive ? 'i' : undefined)
       });
 
       return {
@@ -259,8 +259,8 @@ export class UrlMatcher {
 
     let p: any, segment: string;
 
-    while ((m = placeholder.exec(pattern))) {
-      p = matchDetails(m, false);
+    while ((matchArray = placeholder.exec(pattern))) {
+      p = matchDetails(matchArray, false);
       if (p.segment.indexOf('?') >= 0) break; // we're into the search part
 
       checkParamErrors(p.id);
@@ -281,8 +281,8 @@ export class UrlMatcher {
       if (search.length > 0) {
         last = 0;
 
-        while ((m = searchPlaceholder.exec(search))) {
-          p = matchDetails(m, true);
+        while ((matchArray = searchPlaceholder.exec(search))) {
+          p = matchDetails(matchArray, true);
           checkParamErrors(p.id);
           this._params.push(paramFactory.fromSearch(p.id, p.type, this.config.paramMap(p.cfg, true)));
           last = placeholder.lastIndex;
@@ -292,7 +292,7 @@ export class UrlMatcher {
     }
 
     this._segments.push(segment);
-    this._compiled = patterns.map(pattern => quoteRegExp.apply(null, pattern)).concat(quoteRegExp(segment));
+    this._compiled = patterns.map(_pattern => quoteRegExp.apply(null, _pattern)).concat(quoteRegExp(segment));
   }
 
   /**

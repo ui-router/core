@@ -104,7 +104,7 @@ export function lazyLoadState(transition: Transition, state: StateDeclaration): 
   /** Register any lazy loaded state definitions */
   function updateStateRegistry(result: LazyLoadResult) {
     if (result && Array.isArray(result.states)) {
-      result.states.forEach(state => transition.router.stateRegistry.register(state));
+      result.states.forEach(_state => transition.router.stateRegistry.register(_state));
     }
     return result;
   }
