@@ -97,7 +97,7 @@ let stringifyPattern = function(value: any) {
 };
 
 export function stringify(o: any) {
-  var seen: any[] = [];
+  let seen: any[] = [];
 
   function format(val: any) {
     if (isObject(val)) {

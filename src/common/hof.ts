@@ -218,7 +218,7 @@ export function invoke(fnName: string, args?: any[]): Function {
  */
 export function pattern(struct: Function[][]): Function {
   return function(x: any) {
-    for (var i = 0; i < struct.length; i++) {
+    for (let i = 0; i < struct.length; i++) {
       if (struct[i][0](x)) return struct[i][1](x);
     }
   };

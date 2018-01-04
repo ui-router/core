@@ -137,8 +137,8 @@ function ArrayType(type: ParamType, mode: (boolean|"auto")) {
   }
 
   ['encode', 'decode', 'equals', '$normalize'].forEach(name => {
-    var paramTypeFn = type[name].bind(type);
-    var wrapperFn: Function = name === 'equals' ? arrayEqualsHandler : arrayHandler;
+    let paramTypeFn = type[name].bind(type);
+    let wrapperFn: Function = name === 'equals' ? arrayEqualsHandler : arrayHandler;
     this[name] = wrapperFn(paramTypeFn);
   });
 
