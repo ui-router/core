@@ -10,7 +10,7 @@ import {TransitionHookFn} from "../transition/interface";
  * A [[TransitionHookFn]] that redirects to a different state or params
  *
  * Registered using `transitionService.onStart({ to: (state) => !!state.redirectTo }, redirectHook);`
- * 
+ *
  * See [[StateDeclaration.redirectTo]]
  */
 const redirectToHook: TransitionHookFn = (trans: Transition) => {

@@ -5,9 +5,9 @@ import {Transition} from "../transition/transition";
 import {TransitionHookFn} from "../transition/interface";
 import {TransitionService} from "../transition/transitionService";
 
-/** 
+/**
  * A [[TransitionHookFn]] which updates the URL after a successful transition
- * 
+ *
  * Registered using `transitionService.onSuccess({}, updateUrl);`
  */
 const updateUrl: TransitionHookFn = (transition: Transition) => {

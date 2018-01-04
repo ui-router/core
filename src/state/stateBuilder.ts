@@ -145,7 +145,7 @@ function includesBuilder(state: StateObject) {
  */
 export function resolvablesBuilder(state: StateObject): Resolvable[] {
   interface Tuple { token: any, val: any, deps: any[], policy: ResolvePolicy }
-  
+
   /** convert resolve: {} and resolvePolicy: {} objects to an array of tuples */
   const objects2Tuples    = (resolveObj: Obj, resolvePolicies: { [key: string]: ResolvePolicy }) =>
       Object.keys(resolveObj || {}).map(token => ({token, val: resolveObj[token], deps: undefined, policy: resolvePolicies[token]}));

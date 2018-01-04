@@ -2,7 +2,7 @@
  * @coreapi
  * @module core
  */
-/** 
+/**
  * Matches state names using glob-like pattern strings.
  *
  * Globs can be used in specific APIs including:
