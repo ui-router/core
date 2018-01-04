@@ -31,15 +31,15 @@ export class UrlService implements LocationServices, UrlSyncApi {
   url(): string;
   /** @inheritdoc */
   url(newurl: string, replace?: boolean, state?): void;
-  url(newurl?, replace?, state?): any { return };
+  url(newurl?, replace?, state?): any { return; }
   /** @inheritdoc */
-  path(): string { return };
+  path(): string { return; }
   /** @inheritdoc */
-  search(): { [key: string]: any } { return };
+  search(): { [key: string]: any } { return; }
   /** @inheritdoc */
-  hash(): string { return };
+  hash(): string { return; }
   /** @inheritdoc */
-  onChange(callback: Function): Function { return };
+  onChange(callback: Function): Function { return; }
 
 
   /**
@@ -50,19 +50,19 @@ export class UrlService implements LocationServices, UrlSyncApi {
    * @returns the current url parts
    */
   parts(): UrlParts {
-    return { path: this.path(), search: this.search(), hash: this.hash() }
+    return { path: this.path(), search: this.search(), hash: this.hash() };
   }
 
   dispose() { }
 
   /** @inheritdoc */
-  sync(evt?) { return }
+  sync(evt?) { return; }
   /** @inheritdoc */
-  listen(enabled?: boolean): Function { return };
+  listen(enabled?: boolean): Function { return; }
   /** @inheritdoc */
-  deferIntercept(defer?: boolean) { return }
+  deferIntercept(defer?: boolean) { return; }
   /** @inheritdoc */
-  match(urlParts: UrlParts): MatchResult { return }
+  match(urlParts: UrlParts): MatchResult { return; }
 
   /**
    * A nested API for managing URL rules and rewrites
