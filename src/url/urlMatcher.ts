@@ -278,7 +278,7 @@ export class UrlMatcher {
 
     if (!match) return null;
 
-    //options = defaults(options, { isolate: false });
+    // options = defaults(options, { isolate: false });
 
     let allParams:    Param[] = this.parameters(),
         pathParams:   Param[] = allParams.filter(param => !param.isSearch()),

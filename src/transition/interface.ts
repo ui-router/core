@@ -90,7 +90,7 @@ export interface TransitionOptions {
 
 /** @internalapi */
 export interface TransitionHookOptions {
-  current             ?: () => Transition;  //path?
+  current             ?: () => Transition;  // path?
   transition          ?: Transition;
   hookType            ?: string;
   target              ?: any;

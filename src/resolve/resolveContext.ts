@@ -167,7 +167,7 @@ export class ResolveContext {
     // subpath stopping at resolvable's node, or the whole path (if the resolvable isn't in the path)
     let subPath: PathNode[] = PathUtils.subPath(this._path, x => x === node) || this._path;
     let availableResolvables: Resolvable[] = subPath
-        .reduce((acc, _node) => acc.concat(_node.resolvables), []) //all of subpath's resolvables
+        .reduce((acc, _node) => acc.concat(_node.resolvables), []) // all of subpath's resolvables
         .filter(res => res !== resolvable); // filter out the `resolvable` argument
 
     const getDependency = (token: any) => {
