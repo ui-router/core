@@ -186,7 +186,7 @@ export type IHookRegistration = (matchCriteria: HookMatchCriteria, callback: Hoo
  *
  */
 export interface TransitionHookFn {
-  (transition: Transition) : HookResult;
+  (transition: Transition): HookResult;
 }
 
 /**
@@ -211,7 +211,7 @@ export interface TransitionHookFn {
  * @returns a [[HookResult]] which may alter the transition
  */
 export interface TransitionStateHookFn {
-  (transition: Transition, state: StateDeclaration) : HookResult;
+  (transition: Transition, state: StateDeclaration): HookResult;
 }
 
 /**
