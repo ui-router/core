@@ -11,8 +11,11 @@ import { ParamType } from './paramType';
 import { ParamTypes } from './paramTypes';
 import { UrlMatcherFactory } from '../url/urlMatcherFactory';
 
-/** @hidden */ const hasOwn = Object.prototype.hasOwnProperty;
-/** @hidden */ const isShorthand = (cfg: ParamDeclaration) =>
+/** @hidden */
+const hasOwn = Object.prototype.hasOwnProperty;
+
+/** @hidden */
+const isShorthand = (cfg: ParamDeclaration) =>
     ['value', 'type', 'squash', 'array', 'dynamic'].filter(hasOwn.bind(cfg || {})).length === 0;
 
 /** @internalapi */

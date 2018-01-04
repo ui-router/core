@@ -90,9 +90,14 @@ export enum Category {
   RESOLVE, TRANSITION, HOOK, UIVIEW, VIEWCONFIG,
 }
 
-/** @hidden */ const _tid = parse('$id');
-/** @hidden */ const _rid = parse('router.$id');
-/** @hidden */ const transLbl = (trans) => `Transition #${_tid(trans)}-${_rid(trans)}`;
+/** @hidden */
+const _tid = parse('$id');
+
+/** @hidden */
+const _rid = parse('router.$id');
+
+/** @hidden */
+const transLbl = (trans) => `Transition #${_tid(trans)}-${_rid(trans)}`;
 
 /**
  * Prints UI-Router Transition trace information to the console.

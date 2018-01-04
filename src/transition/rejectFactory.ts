@@ -11,7 +11,8 @@ export enum RejectType {
   SUPERSEDED = 2, ABORTED = 3, INVALID = 4, IGNORED = 5, ERROR = 6,
 }
 
-/** @hidden */ let id = 0;
+/** @hidden */
+let id = 0;
 
 export class Rejection {
   $id = id++;
