@@ -163,8 +163,8 @@ export const is = <T> (ctor: { new(...args): T }) =>
         (obj != null && obj.constructor === ctor || obj instanceof ctor);
 
 /** Given a value, returns a Predicate function that returns true if another value is === equal to the original value */
-export const eq: (comp: any) => Predicate<any> = (val: any) => (other: any) =>
-    val === other;
+export const eq: (comp: any) => Predicate<any> = (value: any) => (other: any) =>
+    value === other;
 
 /** Given a value, returns a function which returns the value */
 export const val = <T> (v: T) => () => v;

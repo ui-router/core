@@ -89,9 +89,9 @@ export class UrlRuleFactory {
     if (isString(handler)) handler = this.router.urlMatcherFactory.compile(handler);
     if (is(UrlMatcher)(handler)) _handler = (match: RawParams) => (handler as UrlMatcher).format(match);
 
-    function match(url: UrlParts) {
-      const match = urlMatcher.exec(url.path, url.search, url.hash);
-      return urlMatcher.validates(match) && match;
+    function matchUrlParamters(url: UrlParts): RawParams {
+      const params = urlMatcher.exec(url.path, url.search, url.hash);
+      return urlMatcher.validates(params) && params;
     }
 
     // Prioritize URLs, lowest to highest:
@@ -107,7 +107,7 @@ export class UrlRuleFactory {
     }
 
     const details = { urlMatcher, matchPriority, type: 'URLMATCHER' };
-    return extend(new BaseUrlRule(match, _handler), details) as MatcherUrlRule;
+    return extend(new BaseUrlRule(matchUrlParamters, _handler), details) as MatcherUrlRule;
   }
 
 
@@ -189,11 +189,11 @@ export class UrlRuleFactory {
 
     const _handler = isString(handler) ? redirectUrlTo : handler;
 
-    const match = (url: UrlParts): RegExpExecArray =>
+    const matchParamsFromRegexp = (url: UrlParts): RegExpExecArray =>
         regexp.exec(url.path);
 
     const details = { regexp, type: 'REGEXP' };
-    return extend(new BaseUrlRule(match, _handler), details) as RegExpRule
+    return extend(new BaseUrlRule(matchParamsFromRegexp, _handler), details) as RegExpRule
   }
 }
 

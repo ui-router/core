@@ -99,15 +99,15 @@ const stringifyPattern = function(value: any) {
 export function stringify(o: any) {
   const seen: any[] = [];
 
-  function format(val: any) {
-    if (isObject(val)) {
-      if (seen.indexOf(val) !== -1) return '[circular ref]';
-      seen.push(val);
+  function format(value: any) {
+    if (isObject(value)) {
+      if (seen.indexOf(value) !== -1) return '[circular ref]';
+      seen.push(value);
     }
-    return stringifyPattern(val);
+    return stringifyPattern(value);
   }
 
-  return JSON.stringify(o, (key, val) => format(val)).replace(/\\"/g, '"');
+  return JSON.stringify(o, (key, value) => format(value)).replace(/\\"/g, '"');
 }
 
 /** Returns a function that splits a string on a character or substring */

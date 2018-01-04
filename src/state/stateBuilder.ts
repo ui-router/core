@@ -169,15 +169,15 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
   const isTupleFromObj    = (obj: any) => !!(obj && obj.val && (isString(obj.val) || isArray(obj.val)  || isFunction(obj.val)));
 
   /** extracts the token from a Provider or provide literal */
-  const token             = (p: any) => p.provide || p.token;
+  const getToken          = (p: any) => p.provide || p.token;
 
   /** Given a literal resolve or provider object, returns a Resolvable */
   const literal2Resolvable = pattern([
-    [prop('resolveFn'),   p => new Resolvable(token(p), p.resolveFn, p.deps, p.policy)],
-    [prop('useFactory'),  p => new Resolvable(token(p), p.useFactory, (p.deps || p.dependencies), p.policy)],
-    [prop('useClass'),    p => new Resolvable(token(p), () => new (<any>p.useClass)(), [], p.policy)],
-    [prop('useValue'),    p => new Resolvable(token(p), () => p.useValue, [], p.policy, p.useValue)],
-    [prop('useExisting'), p => new Resolvable(token(p), identity, [p.useExisting], p.policy)],
+    [prop('resolveFn'),   p => new Resolvable(getToken(p), p.resolveFn, p.deps, p.policy)],
+    [prop('useFactory'),  p => new Resolvable(getToken(p), p.useFactory, (p.deps || p.dependencies), p.policy)],
+    [prop('useClass'),    p => new Resolvable(getToken(p), () => new (<any>p.useClass)(), [], p.policy)],
+    [prop('useValue'),    p => new Resolvable(getToken(p), () => p.useValue, [], p.policy, p.useValue)],
+    [prop('useExisting'), p => new Resolvable(getToken(p), identity, [p.useExisting], p.policy)],
   ]);
 
   const tuple2Resolvable = pattern([
