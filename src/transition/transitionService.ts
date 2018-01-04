@@ -269,10 +269,10 @@ export class TransitionService implements IHookRegistry, Disposable {
                hookPhase: TransitionHookPhase,
                hookOrder: number,
                criteriaMatchPath: PathType,
-               reverseSort: boolean = false,
+               reverseSort = false,
                getResultHandler: GetResultHandler = TransitionHook.HANDLE_RESULT,
                getErrorHandler: GetErrorHandler = TransitionHook.REJECT_ERROR,
-               synchronous: boolean = false) {
+               synchronous = false) {
     let eventType = new TransitionEventType(name, hookPhase, hookOrder, criteriaMatchPath, reverseSort, getResultHandler, getErrorHandler, synchronous);
 
     this._eventTypes.push(eventType);

@@ -53,7 +53,7 @@ export abstract class BaseLocationServices implements LocationServices, Disposab
   path   = () => parseUrl(this._get()).path;
   search = () => getParams(parseUrl(this._get()).search);
 
-  url(url?: string, replace: boolean = true): string {
+  url(url?: string, replace = true): string {
     if (isDefined(url) && url !== this._get()) {
       this._set(null, null, url, replace);
 

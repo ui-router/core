@@ -41,7 +41,7 @@ export class Resolvable implements ResolvableLiteral {
   deps: any[];
 
   data: any;
-  resolved: boolean = false;
+  resolved = false;
   promise: Promise<any> = undefined;
 
   static fromData = (token: any, data: any) =>

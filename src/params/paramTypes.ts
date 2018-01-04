@@ -193,7 +193,7 @@ export class ParamTypes {
   /** @hidden */
   types: any;
   /** @hidden */
-  enqueue: boolean = true;
+  enqueue = true;
   /** @hidden */
   typeQueue: any[] = [];
 

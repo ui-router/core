@@ -45,7 +45,7 @@ export class UIRouterGlobals implements Disposable {
   transition: Transition;
 
   /** @internalapi */
-  lastStartedTransitionId: number = -1;
+  lastStartedTransitionId = -1;
 
   /** @internalapi */
   transitionHistory = new Queue<Transition>([], 1);

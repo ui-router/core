@@ -20,8 +20,8 @@ import { ParamFactory, UrlMatcherConfig } from "./interface";
  */
 export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
   /** @hidden */ paramTypes = new ParamTypes();
-  /** @hidden */ _isCaseInsensitive: boolean = false;
-  /** @hidden */ _isStrictMode: boolean = true;
+  /** @hidden */ _isCaseInsensitive = false;
+  /** @hidden */ _isStrictMode = true;
   /** @hidden */ _defaultSquashPolicy: (boolean|string) = false;
 
   /** @internalapi Creates a new [[Param]] for a given location (DefType) */

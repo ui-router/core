@@ -259,7 +259,7 @@ export class Transition implements IHookRegistry {
    */
   params(pathname?: string): any;
   params<T>(pathname?: string): T;
-  params(pathname: string = "to") {
+  params(pathname = "to") {
     return Object.freeze(this._treeChanges[pathname].map(prop("paramValues")).reduce(mergeR, {}));
   }
 
@@ -357,7 +357,7 @@ export class Transition implements IHookRegistry {
    *
    * @returns an array of resolve tokens (keys)
    */
-  getResolveTokens(pathname: string = "to"): any[] {
+  getResolveTokens(pathname = "to"): any[] {
     return new ResolveContext(this._treeChanges[pathname]).getTokens();
   }
 
@@ -501,7 +501,7 @@ export class Transition implements IHookRegistry {
    *
    * @returns a list of ViewConfig objects for the given path.
    */
-  views(pathname: string = "entering", state?: StateObject): ViewConfig[] {
+  views(pathname = "entering", state?: StateObject): ViewConfig[] {
     let path = this._treeChanges[pathname];
     path = !state ? path : path.filter(propEq('state', state));
     return path.map(prop("views")).filter(identity).reduce(unnestR, []);

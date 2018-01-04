@@ -8,7 +8,7 @@ import { GetErrorHandler, GetResultHandler, TransitionHook } from "./transitionH
  * @interalapi
  */
 export class TransitionEventType {
-
+  /* tslint:disable:no-inferrable-types */
   constructor(public name:               string,
               public hookPhase:          TransitionHookPhase,
               public hookOrder:          number,
