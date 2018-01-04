@@ -213,7 +213,7 @@ export class StateService {
       inherit: false,
       notify: false,
     });
-  };
+  }
 
   /**
    * Transition to a different state and/or parameters
@@ -259,7 +259,7 @@ export class StateService {
     let defautGoOpts = { relative: this.$current, inherit: true };
     let transOpts = defaults(options, defautGoOpts, defaultTransOpts);
     return this.transitionTo(to, params, transOpts);
-  };
+  }
 
   /**
    * Creates a [[TargetState]]
@@ -279,7 +279,7 @@ export class StateService {
       throw new Error(`No such reload state '${(isString(options.reload) ? options.reload : (<any>options.reload).name)}'`);
 
     return new TargetState(this.router.stateRegistry, identifier, params, options);
-  };
+  }
 
   private getCurrentPath(): PathNode[] {
     let globals = this.router.globals;
@@ -337,9 +337,9 @@ export class StateService {
      * no error occurred.  Likewise, the transition.run() promise may be rejected because of
      * a Redirect, but the transitionTo() promise is chained to the new Transition's promise.
      */
-    const rejectedTransitionHandler = (transition: Transition) => (error: any): Promise<any> => {
+    const rejectedTransitionHandler = (trans: Transition) => (error: any): Promise<any> => {
       if (error instanceof Rejection) {
-        const isLatest = router.globals.lastStartedTransitionId === transition.$id;
+        const isLatest = router.globals.lastStartedTransitionId === trans.$id;
 
         if (error.type === RejectType.IGNORED) {
           isLatest && router.urlRouter.update();
@@ -351,7 +351,7 @@ export class StateService {
         if (error.type === RejectType.SUPERSEDED && error.redirected && detail instanceof TargetState) {
           // If `Transition.run()` was redirected, allow the `transitionTo()` promise to resolve successfully
           // by returning the promise for the new (redirect) `Transition.run()`.
-          let redirect: Transition = transition.redirect(detail);
+          let redirect: Transition = trans.redirect(detail);
           return redirect.run().catch(rejectedTransitionHandler(redirect));
         }
 
@@ -373,7 +373,7 @@ export class StateService {
 
     // Return a promise for the transition, which also has the transition object on it.
     return extend(transitionToPromise, { transition });
-  };
+  }
 
   /**
    * Checks if the current state *is* the provided state
@@ -415,7 +415,7 @@ export class StateService {
 
     let schema: Param[] = state.parameters({ inherit: true, matchingKeys: params });
     return Param.equals(schema, Param.values(schema, params), this.params);
-  };
+  }
 
   /**
    * Checks if the current state *includes* the provided state
@@ -471,7 +471,7 @@ export class StateService {
 
     let schema: Param[] = state.parameters({ inherit: true, matchingKeys: params });
     return Param.equals(schema, Param.values(schema, params), this.params);
-  };
+  }
 
 
   /**
@@ -513,7 +513,7 @@ export class StateService {
     return this.router.urlRouter.href(nav.url, params, {
       absolute: options.absolute,
     });
-  };
+  }
 
   /** @hidden */
   private _defaultErrorHandler: ((_error: any) => void) = function $defaultErrorHandler($error$) {
