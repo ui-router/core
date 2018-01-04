@@ -207,11 +207,11 @@ export type PolicyAsync = 'WAIT' | 'NOWAIT' | 'RXWAIT' ;
 export let resolvePolicies = {
   when: {
     LAZY: 'LAZY',
-    EAGER: 'EAGER'
+    EAGER: 'EAGER',
   },
   async: {
     WAIT: 'WAIT',
     NOWAIT: 'NOWAIT',
-    RXWAIT: 'RXWAIT'
-  }
+    RXWAIT: 'RXWAIT',
+  },
 };

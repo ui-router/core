@@ -8,7 +8,7 @@ import { isArray } from '../common/predicates';
 
 import {
     TransitionOptions, TransitionHookOptions, IHookRegistry, TreeChanges, IMatchingNodes,
-    TransitionHookPhase, TransitionHookScope
+    TransitionHookPhase, TransitionHookScope,
 } from './interface';
 
 import { Transition } from './transition';
@@ -63,7 +63,7 @@ export class HookBuilder {
 
     const baseHookOptions = <TransitionHookOptions> {
       transition: transition,
-      current: transition.options().current
+      current: transition.options().current,
     };
 
     const makeTransitionHooks = (hook: RegisteredHook) => {
@@ -76,7 +76,7 @@ export class HookBuilder {
        return matchingNodes.map(node => {
          const _options = extend({
            bind: hook.bind,
-           traceData: { hookType: hookType.name, context: node }
+           traceData: { hookType: hookType.name, context: node },
          }, baseHookOptions);
 
          const state = hookType.criteriaMatchPath.scope === TransitionHookScope.STATE ? node.state.self : null;

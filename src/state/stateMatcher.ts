@@ -27,7 +27,7 @@ export class StateMatcher {
       const _states = values(this._states);
       const matches = _states.filter(_state =>
           _state.__stateObjectCache.nameGlob &&
-          _state.__stateObjectCache.nameGlob.matches(name)
+          _state.__stateObjectCache.nameGlob.matches(name),
       );
 
       if (matches.length > 1) {

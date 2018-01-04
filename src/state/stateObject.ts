@@ -103,7 +103,7 @@ export class StateObject {
   /** @hidden */
   __stateObjectCache: {
     /** Might be null */
-    nameGlob?: Glob
+    nameGlob?: Glob,
   };
 
   /**
@@ -121,7 +121,7 @@ export class StateObject {
     stateDecl.$$state = () => state;
     state.self = stateDecl;
     state.__stateObjectCache = {
-      nameGlob: Glob.fromString(state.name) // might return null
+      nameGlob: Glob.fromString(state.name), // might return null
     };
     return state;
   }

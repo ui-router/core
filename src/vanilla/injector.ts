@@ -4,7 +4,7 @@
  */
 /** */
 import {
-  extend, assertPredicate, isFunction, isArray, isInjectable, $InjectorLike, IInjectable
+  extend, assertPredicate, isFunction, isArray, isInjectable, $InjectorLike, IInjectable,
 } from '../common/index';
 
 // globally available injectables
@@ -95,5 +95,5 @@ export const $injector = {
     const fnStr = fn.toString().replace(STRIP_COMMENTS, '');
     const result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
     return result || [];
-  }
+  },
 } as $InjectorLike;

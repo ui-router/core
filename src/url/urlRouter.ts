@@ -12,7 +12,7 @@ import { UIRouter } from '../router';
 import { is, pattern, val } from '../common/hof';
 import { UrlRuleFactory } from './urlRule';
 import { TargetState } from '../state/targetState';
-import { MatcherUrlRule, MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi, UrlSyncApi, } from './interface';
+import { MatcherUrlRule, MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi, UrlSyncApi } from './interface';
 import { TargetStateDef } from '../state/interface';
 import { stripLastPathElement } from '../common';
 

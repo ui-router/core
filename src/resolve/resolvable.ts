@@ -19,7 +19,7 @@ import { isNullOrUndefined } from '../common';
 // TODO: explicitly make this user configurable
 export let defaultResolvePolicy: ResolvePolicy = {
   when: 'LAZY',
-  async: 'WAIT'
+  async: 'WAIT',
 };
 
 /**

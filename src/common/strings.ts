@@ -90,7 +90,7 @@ const stringifyPattern = function(value: any) {
     [is(Transition),  invoke('toString')],
     [is(Resolvable),  invoke('toString')],
     [isInjectable,    functionToString],
-    [val(true),       identity]
+    [val(true),       identity],
   ]);
 
   return stringifyPatternFn(value);

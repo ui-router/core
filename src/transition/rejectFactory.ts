@@ -8,7 +8,7 @@ import { stringify } from '../common/strings';
 import { is } from '../common/hof';
 
 export enum RejectType {
-  SUPERSEDED = 2, ABORTED = 3, INVALID = 4, IGNORED = 5, ERROR = 6
+  SUPERSEDED = 2, ABORTED = 3, INVALID = 4, IGNORED = 5, ERROR = 6,
 }
 
 /** @hidden */ let id = 0;

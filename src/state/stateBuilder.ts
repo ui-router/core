@@ -71,7 +71,7 @@ function urlBuilder(state: StateObject) {
     paramMap: function (paramConfig: any, isSearch: boolean) {
       if (stateDec.reloadOnSearch === false && isSearch) paramConfig = extend(paramConfig || {}, { dynamic: true });
       return paramConfig;
-    }
+    },
   });
 
   if (!url) return null;
@@ -191,7 +191,7 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
     [isResolveLiteral,              literal2Resolvable],
     [isLikeNg2Provider,             literal2Resolvable],
     [isTupleFromObj,                tuple2Resolvable],
-    [val(true),                     (obj: any) => { throw new Error('Invalid resolve value: ' + stringify(obj)) }]
+    [val(true),                     (obj: any) => { throw new Error('Invalid resolve value: ' + stringify(obj)) }],
   ]);
 
   // If resolveBlock is already an array, use it as-is.
@@ -245,7 +245,7 @@ export class StateBuilder {
       path: [ pathBuilder ],
       // Speed up $state.includes() as it's used a lot
       includes: [ includesBuilder ],
-      resolvables: [ resolvablesBuilder ]
+      resolvables: [ resolvablesBuilder ],
     };
   }
 

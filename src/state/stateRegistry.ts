@@ -49,9 +49,9 @@ export class StateRegistry {
       url: '^',
       views: null,
       params: {
-        '#': { value: null, type: 'hash', dynamic: true }
+        '#': { value: null, type: 'hash', dynamic: true },
       },
-      abstract: true
+      abstract: true,
     };
 
     const _root = this._root = this.stateQueue.register(rootStateDef);

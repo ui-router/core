@@ -10,7 +10,7 @@ import { is, pattern } from '../common/hof';
 import { StateObject } from '../state/stateObject';
 import { RawParams } from '../params/interface';
 import {
-    UrlRule, UrlRuleMatchFn, UrlRuleHandlerFn, UrlRuleType, UrlParts, MatcherUrlRule, StateRule, RegExpRule
+    UrlRule, UrlRuleMatchFn, UrlRuleHandlerFn, UrlRuleType, UrlParts, MatcherUrlRule, StateRule, RegExpRule,
 } from './interface';
 
 /**

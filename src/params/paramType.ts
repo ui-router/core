@@ -148,6 +148,6 @@ function ArrayType(type: ParamType, mode: (boolean|'auto')) {
     pattern: type.pattern,
     inherit: type.inherit,
     is: arrayHandler(type.is.bind(type), true),
-    $arrayMode: mode
+    $arrayMode: mode,
   });
 }

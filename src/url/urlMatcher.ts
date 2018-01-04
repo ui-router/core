@@ -4,7 +4,7 @@
  */
 /** for typedoc */
 import {
-  map, defaults, inherit, identity, unnest, tail, find, Obj, pairs, allTrueR, unnestR, arrayTuples
+  map, defaults, inherit, identity, unnest, tail, find, Obj, pairs, allTrueR, unnestR, arrayTuples,
 } from '../common/common';
 import { prop, propEq } from '../common/hof';
 import { isArray, isString, isDefined } from '../common/predicates';
@@ -214,7 +214,7 @@ export class UrlMatcher {
       params: {},
       strict: true,
       caseInsensitive: false,
-      paramMap: identity
+      paramMap: identity,
     });
 
     // Find all placeholders and create a compiled pattern, using either classic or curly syntax:
@@ -248,7 +248,7 @@ export class UrlMatcher {
       const regexp: string = isSearch ? m[4] : m[4] || (m[1] === '*' ? '[\\s\\S]*' : null);
 
       const makeRegexpType = (str) => inherit(paramTypes.type(isSearch ? 'query' : 'path'), {
-        pattern: new RegExp(str, this.config.caseInsensitive ? 'i' : undefined)
+        pattern: new RegExp(str, this.config.caseInsensitive ? 'i' : undefined),
       });
 
       return {
@@ -256,7 +256,7 @@ export class UrlMatcher {
         regexp,
         cfg:     this.config.params[id],
         segment: pattern.substring(last, m.index),
-        type:    !regexp ? null : paramTypes.type(regexp) || makeRegexpType(regexp)
+        type:    !regexp ? null : paramTypes.type(regexp) || makeRegexpType(regexp),
       };
     };
 
@@ -357,7 +357,7 @@ export class UrlMatcher {
         '^',
         unnest(this._cache.path.map(prop('_compiled'))).join(''),
         this.config.strict === false ? '\/?' : '',
-        '$'
+        '$',
       ].join(''), this.config.caseInsensitive ? 'i' : undefined);
     }).exec(path);
 

@@ -53,5 +53,5 @@ export const $q = {
       return $q.all(chain).then(values =>
         values.reduce((acc, tuple) => { acc[tuple.key] = tuple.val; return acc; }, {}));
     }
-  }
+  },
 } as $QLike;
