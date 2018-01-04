@@ -15,8 +15,8 @@ import { ParamFactory } from './interface';
 import { joinNeighborsR, splitOnDelim } from '../common/strings';
 
 /** @hidden */
-function quoteRegExp(string: any, param?: any) {
-  let surroundPattern = ['', ''], result = string.replace(/[\\\[\]\^$*+?.()|{}]/g, '\\$&');
+function quoteRegExp(str: any, param?: any) {
+  let surroundPattern = ['', ''], result = str.replace(/[\\\[\]\^$*+?.()|{}]/g, '\\$&');
   if (!param) return result;
 
   switch (param.squash) {
@@ -374,11 +374,11 @@ export class UrlMatcher {
     if (nPathSegments !== match.length - 1)
       throw new Error(`Unbalanced capture group in route '${this.pattern}'`);
 
-    function decodePathArray(string: string) {
+    function decodePathArray(paramVal: string) {
       const reverseString = (str: string) => str.split('').reverse().join('');
       const unquoteDashes = (str: string) => str.replace(/\\-/g, '-');
 
-      const split = reverseString(string).split(/-(?!\\)/);
+      const split = reverseString(paramVal).split(/-(?!\\)/);
       const allReversed = map(split, reverseString);
       return map(allReversed, unquoteDashes).reverse();
     }

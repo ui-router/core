@@ -6,7 +6,7 @@
  * @module common_hof
  */ /** */
 
-import {Predicate} from './common';
+import { Predicate } from './common';
 /**
  * Returns a new function for [Partial Application](https://en.wikipedia.org/wiki/Partial_application) of the original function.
  *
@@ -108,7 +108,7 @@ export const prop = (name: string) =>
  * let getName = propEq("name", "blarg");
  * getName(obj) === true
  */
-export const propEq = curry((name: string, val: any, obj: any) => obj && obj[name] === val);
+export const propEq = curry((name: string, _val: any, obj: any) => obj && obj[name] === _val);
 
 /**
  * Given a dotted property name, returns a function that returns a nested property from an object, or undefined
@@ -152,6 +152,8 @@ export function or(fn1: Predicate<any>, fn2: Predicate<any>): Predicate<any> {
  */
 export const all = (fn1: Predicate<any>) =>
     (arr: any[]) => arr.reduce((b, x) => b && !!fn1(x), true) as boolean;
+
+// tslint:disable-next-line:variable-name
 export const any = (fn1: Predicate<any>) =>
     (arr: any[]) => arr.reduce((b, x) => b || !!fn1(x), false) as boolean;
 
