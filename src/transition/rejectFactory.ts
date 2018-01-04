@@ -20,24 +20,6 @@ export class Rejection {
   detail: any;
   redirected: boolean;
 
-  constructor(type: number, message?: string, detail?: any) {
-    this.type = type;
-    this.message = message;
-    this.detail = detail;
-  }
-
-  toString() {
-    const detailString = (d: any) => 
-        d && d.toString !== Object.prototype.toString ? d.toString() : stringify(d);
-    let detail = detailString(this.detail);
-    let { $id, type, message } = this;
-    return `Transition Rejection($id: ${$id} type: ${type}, message: ${message}, detail: ${detail})`;
-  }
-
-  toPromise(): Promise<any> {
-    return extend(silentRejection(this), { _transitionRejection: this });
-  }
-
   /** Returns true if the obj is a rejected promise created from the `asPromise` factory */
   static isRejectionPromise(obj: any): boolean {
     return obj && (typeof obj.then === 'function') && is(Rejection)(obj._transitionRejection);
@@ -81,7 +63,7 @@ export class Rejection {
     let message = "The transition errored";
     return new Rejection(RejectType.ERROR, message, detail);
   }
-  
+
   /**
    * Returns a Rejection
    *
@@ -93,5 +75,23 @@ export class Rejection {
    */
   static normalize(detail?: Rejection | Error | any): Rejection {
     return is(Rejection)(detail) ? detail : Rejection.errored(detail);
+  }
+
+  constructor(type: number, message?: string, detail?: any) {
+    this.type = type;
+    this.message = message;
+    this.detail = detail;
+  }
+
+  toString() {
+    const detailString = (d: any) =>
+        d && d.toString !== Object.prototype.toString ? d.toString() : stringify(d);
+    let detail = detailString(this.detail);
+    let { $id, type, message } = this;
+    return `Transition Rejection($id: ${$id} type: ${type}, message: ${message}, detail: ${detail})`;
+  }
+
+  toPromise(): Promise<any> {
+    return extend(silentRejection(this), { _transitionRejection: this });
   }
 }

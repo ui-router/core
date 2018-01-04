@@ -21,9 +21,6 @@ import { StateRegistry } from '../state';
  * This class contains functions which convert TargetStates, Nodes and paths from one type to another.
  */
 export class PathUtils {
-
-  constructor() { }
-
   /** Given a PathNode[], create an TargetState */
   static makeTargetState(registry: StateRegistry, path: PathNode[]): TargetState {
     let state = tail(path).state;

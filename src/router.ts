@@ -72,6 +72,9 @@ export class UIRouter {
   /** Provides services related to the URL */
   urlService: UrlService = new UrlService(this);
 
+  /** @hidden plugin instances are registered here */
+  private _plugins: { [key: string]: UIRouterPlugin } = {};
+
 
   /** Registers an object to be notified when the router is disposed */
   disposable(disposable: Disposable) {
@@ -127,9 +130,6 @@ export class UIRouter {
     this.disposable(locationService);
     this.disposable(locationConfig);
   }
-
-  /** @hidden */
-  private _plugins: { [key: string]: UIRouterPlugin } = {};
 
   /** Add plugin (as ES6 class) */
   plugin<T extends UIRouterPlugin>(plugin: { new(router: UIRouter, options?: any): T }, options?: any): T;

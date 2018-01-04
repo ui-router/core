@@ -33,12 +33,12 @@ export interface $QLike {
 }
 
 export interface $InjectorLike {
+  strictDi?: boolean;
   get(token: any): any;
   get<T>(token: any): T;
   has(token: any): boolean;
   invoke(fn: IInjectable, context?: any, locals?: Obj): any;
   annotate(fn: IInjectable, strictDi?: boolean): any[];
-  strictDi?: boolean;
 }
 
 export interface CoreServices {

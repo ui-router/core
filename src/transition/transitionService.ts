@@ -108,47 +108,6 @@ export class TransitionService implements IHookRegistry, Disposable {
   /** @hidden */
   _transitionCount = 0;
 
-  /**
-   * Registers a [[TransitionHookFn]], called *while a transition is being constructed*.
-   *
-   * Registers a transition lifecycle hook, which is invoked during transition construction.
-   *
-   * This low level hook should only be used by plugins.
-   * This can be a useful time for plugins to add resolves or mutate the transition as needed.
-   * The Sticky States plugin uses this hook to modify the treechanges.
-   *
-   * ### Lifecycle
-   *
-   * `onCreate` hooks are invoked *while a transition is being constructed*.
-   *
-   * ### Return value
-   *
-   * The hook's return value is ignored
-   *
-   * @internalapi
-   * @param criteria defines which Transitions the Hook should be invoked for.
-   * @param callback the hook function which will be invoked.
-   * @param options the registration options
-   * @returns a function which deregisters the hook.
-   */
-  onCreate(criteria: HookMatchCriteria, callback: TransitionCreateHookFn, options?: HookRegOptions): Function { return; }
-  /** @inheritdoc */
-  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
-  /** @inheritdoc */
-  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
-  /** @inheritdoc */
-  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
-  /** @inheritdoc */
-  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
-  /** @inheritdoc */
-  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
-  /** @inheritdoc */
-  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
-  /** @inheritdoc */
-  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
-  /** @inheritdoc */
-  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
-
   /** @hidden */
   public $view: ViewService;
 
@@ -205,6 +164,47 @@ export class TransitionService implements IHookRegistry, Disposable {
     this._defineCoreEvents();
     this._registerCoreTransitionHooks();
   }
+
+  /**
+   * Registers a [[TransitionHookFn]], called *while a transition is being constructed*.
+   *
+   * Registers a transition lifecycle hook, which is invoked during transition construction.
+   *
+   * This low level hook should only be used by plugins.
+   * This can be a useful time for plugins to add resolves or mutate the transition as needed.
+   * The Sticky States plugin uses this hook to modify the treechanges.
+   *
+   * ### Lifecycle
+   *
+   * `onCreate` hooks are invoked *while a transition is being constructed*.
+   *
+   * ### Return value
+   *
+   * The hook's return value is ignored
+   *
+   * @internalapi
+   * @param criteria defines which Transitions the Hook should be invoked for.
+   * @param callback the hook function which will be invoked.
+   * @param options the registration options
+   * @returns a function which deregisters the hook.
+   */
+  onCreate(criteria: HookMatchCriteria, callback: TransitionCreateHookFn, options?: HookRegOptions): Function { return; }
+  /** @inheritdoc */
+  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  /** @inheritdoc */
+  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  /** @inheritdoc */
+  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
+  /** @inheritdoc */
+  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
+  /** @inheritdoc */
+  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
+  /** @inheritdoc */
+  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  /** @inheritdoc */
+  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  /** @inheritdoc */
+  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
 
   /**
    * dispose

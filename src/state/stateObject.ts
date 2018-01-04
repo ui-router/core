@@ -77,8 +77,8 @@ export class StateObject {
    */
   public data: any;
 
-  /** 
-   * An object containing the parent States' names as keys and 
+  /**
+   * An object containing the parent States' names as keys and
    * true as their values.
    */
   public includes: { [name: string]: boolean };
@@ -106,12 +106,6 @@ export class StateObject {
     nameGlob?: Glob
   };
 
-
-  /** @deprecated use State.create() */
-  constructor(config?: StateDeclaration) {
-    return StateObject.create(config || {});
-  }
-
   /**
    * Create a state object to put the private/internal implementation details onto.
    * The object's prototype chain looks like:
@@ -134,11 +128,17 @@ export class StateObject {
 
   /** Predicate which returns true if the object is an class with @State() decorator */
   static isStateClass = (stateDecl: _StateDeclaration): stateDecl is ({ new (): StateDeclaration }) =>
-      isFunction(stateDecl) && stateDecl['__uiRouterState'] === true;
+    isFunction(stateDecl) && stateDecl['__uiRouterState'] === true;
 
   /** Predicate which returns true if the object is an internal [[StateObject]] object */
   static isState = (obj: any): obj is StateObject =>
-      isObject(obj['__stateObjectCache']);
+    isObject(obj['__stateObjectCache']);
+
+
+  /** @deprecated use State.create() */
+  constructor(config?: StateDeclaration) {
+    return StateObject.create(config || {});
+  }
 
   /**
    * Returns true if the provided parameter is the same state.

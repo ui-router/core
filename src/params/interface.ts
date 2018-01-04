@@ -468,6 +468,75 @@ export interface Replace {
  */
 export interface ParamTypeDefinition {
   /**
+   * A regular expression that matches the encoded parameter type
+   *
+   * This regular expression is used to match an encoded parameter value **in the URL**.
+   *
+   * For example, if your type encodes as a dash-separated numbers, match that here:
+   * `new RegExp("[0-9]+(?:-[0-9]+)*")`.
+   *
+   * There are some limitations to these regexps:
+   *
+   * - No capturing groups are allowed (use non-capturing groups: `(?: )`)
+   * - No pattern modifiers like case insensitive
+   * - No start-of-string or end-of-string: `/^foo$/`
+   */
+  pattern?: RegExp;
+
+
+  /**
+   * Disables url-encoding of parameter values
+   *
+   * If a parameter type is declared `raw`, it will not be url-encoded.
+   * Custom encoding can still be applied in the [[encode]] function.
+   *
+   * ### Decoding warning
+   *
+   * The decoding behavior of raw parameters is not defined.
+   * See: [[ParamDeclaration.raw]] for details
+   */
+  raw?: boolean;
+
+  /**
+   * Enables/disables inheriting of parameter values (of this type)
+   *
+   * When a transition is run with [[TransitionOptions.inherit]] set to
+   * `true`, the current param values are inherited in the new transition.
+   * However, parameters whose type has `inherit: false` set  will *not be inherited*.
+   *
+   * The internal parameter type of `hash` has `inherit: false`.
+   * This is used to disable inheriting of the hash value (`#`) on subsequent transitions.
+   *
+   * #### Example:
+   * ```js
+   * $state.go('home', { '#': 'inboxAnchor' });
+   * ...
+   * // "#" is not inherited.
+   * // The value of the "#" parameter will be `null`
+   * // The url's hash will be cleared.
+   * $state.go('home.nest');
+   * ```
+   *
+   * ---
+   *
+   * See also [[TransitionOptions.inherit]] and [[ParamDeclaration.inherit]]
+   *
+   */
+  inherit?: boolean;
+
+  /**
+   * Dynamic flag
+   *
+   * When `dynamic` is `true`, changes to the parameter value will not cause the state to be entered/exited.
+   *
+   * Normally, if a parameter value changes, the state which declared that the parameter will be reloaded (entered/exited).
+   * When a parameter is `dynamic`, a transition still occurs, but it does not cause the state to exit/enter.
+   *
+   * Default: `false`
+   */
+  dynamic?: boolean;
+
+  /**
    * Tests if some object type is compatible with this parameter type
    *
    * Detects whether some value is of this particular type.
@@ -545,74 +614,5 @@ export interface ParamTypeDefinition {
    * @returns `true` if the values are equivalent/equal, otherwise `false`.
    */
   equals(a: any, b: any): boolean;
-
-  /**
-   * A regular expression that matches the encoded parameter type
-   *
-   * This regular expression is used to match an encoded parameter value **in the URL**.
-   *
-   * For example, if your type encodes as a dash-separated numbers, match that here:
-   * `new RegExp("[0-9]+(?:-[0-9]+)*")`.
-   *
-   * There are some limitations to these regexps:
-   *
-   * - No capturing groups are allowed (use non-capturing groups: `(?: )`)
-   * - No pattern modifiers like case insensitive
-   * - No start-of-string or end-of-string: `/^foo$/`
-   */
-  pattern?: RegExp;
-
-
-  /**
-   * Disables url-encoding of parameter values
-   *
-   * If a parameter type is declared `raw`, it will not be url-encoded.
-   * Custom encoding can still be applied in the [[encode]] function.
-   *
-   * ### Decoding warning
-   *
-   * The decoding behavior of raw parameters is not defined.
-   * See: [[ParamDeclaration.raw]] for details
-   */
-  raw?: boolean;
-
-  /**
-   * Enables/disables inheriting of parameter values (of this type)
-   *
-   * When a transition is run with [[TransitionOptions.inherit]] set to
-   * `true`, the current param values are inherited in the new transition.
-   * However, parameters whose type has `inherit: false` set  will *not be inherited*.
-   *
-   * The internal parameter type of `hash` has `inherit: false`.
-   * This is used to disable inheriting of the hash value (`#`) on subsequent transitions.
-   *
-   * #### Example:
-   * ```js
-   * $state.go('home', { '#': 'inboxAnchor' });
-   * ...
-   * // "#" is not inherited.
-   * // The value of the "#" parameter will be `null`
-   * // The url's hash will be cleared.
-   * $state.go('home.nest');
-   * ```
-   *
-   * ---
-   *
-   * See also [[TransitionOptions.inherit]] and [[ParamDeclaration.inherit]]
-   *
-   */
-  inherit?: boolean;
-
-  /**
-   * Dynamic flag
-   *
-   * When `dynamic` is `true`, changes to the parameter value will not cause the state to be entered/exited.
-   *
-   * Normally, if a parameter value changes, the state which declared that the parameter will be reloaded (entered/exited).
-   * When a parameter is `dynamic`, a transition still occurs, but it does not cause the state to exit/enter.
-   *
-   * Default: `false`
-   */
-  dynamic?: boolean;
 }
 

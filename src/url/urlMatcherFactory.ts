@@ -24,6 +24,21 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
   /** @hidden */ _isStrictMode: boolean = true;
   /** @hidden */ _defaultSquashPolicy: (boolean|string) = false;
 
+  /** @internalapi Creates a new [[Param]] for a given location (DefType) */
+  paramFactory: ParamFactory = {
+    /** Creates a new [[Param]] from a CONFIG block */
+    fromConfig: (id: string, type: ParamType, config: any) =>
+      new Param(id, type, config, DefType.CONFIG, this),
+
+    /** Creates a new [[Param]] from a url PATH */
+    fromPath: (id: string, type: ParamType, config: any) =>
+      new Param(id, type, config, DefType.PATH, this),
+
+    /** Creates a new [[Param]] from a url SEARCH */
+    fromSearch: (id: string, type: ParamType, config: any) =>
+      new Param(id, type, config, DefType.SEARCH, this),
+  };
+
   constructor() {
     extend(this, { UrlMatcher, Param });
   }
@@ -107,21 +122,6 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
     this.paramTypes.enqueue = false;
     this.paramTypes._flushTypeQueue();
     return this;
-  };
-
-  /** @internalapi Creates a new [[Param]] for a given location (DefType) */
-  paramFactory: ParamFactory = {
-    /** Creates a new [[Param]] from a CONFIG block */
-    fromConfig: (id: string, type: ParamType, config: any) =>
-        new Param(id, type, config, DefType.CONFIG, this),
-
-    /** Creates a new [[Param]] from a url PATH */
-    fromPath: (id: string, type: ParamType, config: any) =>
-        new Param(id, type, config, DefType.PATH, this),
-
-    /** Creates a new [[Param]] from a url SEARCH */
-    fromSearch: (id: string, type: ParamType, config: any) =>
-        new Param(id, type, config, DefType.SEARCH, this),
   };
 
   /** @internalapi */

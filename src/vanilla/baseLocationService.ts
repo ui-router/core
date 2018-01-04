@@ -11,16 +11,16 @@ import { buildUrl, getParams, parseUrl } from './utils';
 
 /** A base `LocationServices` */
 export abstract class BaseLocationServices implements LocationServices, Disposable {
+  private _listeners: Function[] = [];
+  _location: LocationLike;
+  _history: HistoryLike;
+
+  _listener = evt => this._listeners.forEach(cb => cb(evt));
+
   constructor(router: UIRouter, public fireAfterUpdate: boolean) {
     this._location = root.location;
     this._history = root.history;
   }
-
-  _listener = evt => this._listeners.forEach(cb => cb(evt));
-
-  private _listeners: Function[] = [];
-  _location: LocationLike;
-  _history: HistoryLike;
 
   /**
    * This should return the current internal URL representation.

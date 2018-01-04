@@ -27,43 +27,6 @@ export class UrlService implements LocationServices, UrlSyncApi {
   /** @hidden */
   static locationConfigStub: LocationConfig = makeStub(locationConfigFns);
 
-  /** @inheritdoc */
-  url(): string;
-  /** @inheritdoc */
-  url(newurl: string, replace?: boolean, state?): void;
-  url(newurl?, replace?, state?): any { return; }
-  /** @inheritdoc */
-  path(): string { return; }
-  /** @inheritdoc */
-  search(): { [key: string]: any } { return; }
-  /** @inheritdoc */
-  hash(): string { return; }
-  /** @inheritdoc */
-  onChange(callback: Function): Function { return; }
-
-
-  /**
-   * Returns the current URL parts
-   *
-   * This method returns the current URL components as a [[UrlParts]] object.
-   *
-   * @returns the current url parts
-   */
-  parts(): UrlParts {
-    return { path: this.path(), search: this.search(), hash: this.hash() };
-  }
-
-  dispose() { }
-
-  /** @inheritdoc */
-  sync(evt?) { return; }
-  /** @inheritdoc */
-  listen(enabled?: boolean): Function { return; }
-  /** @inheritdoc */
-  deferIntercept(defer?: boolean) { return; }
-  /** @inheritdoc */
-  match(urlParts: UrlParts): MatchResult { return; }
-
   /**
    * A nested API for managing URL rules and rewrites
    *
@@ -101,4 +64,42 @@ export class UrlService implements LocationServices, UrlSyncApi {
     createProxyFunctions(urlRouter, this.rules, urlRouter, rulesFns);
     createProxyFunctions(urlRouter, this, urlRouter, syncFns);
   }
+
+  /** @inheritdoc */
+  url(): string;
+  /** @inheritdoc */
+  url(newurl: string, replace?: boolean, state?): void;
+  url(newurl?, replace?, state?): any { return; }
+  /** @inheritdoc */
+  path(): string { return; }
+  /** @inheritdoc */
+  search(): { [key: string]: any } { return; }
+  /** @inheritdoc */
+  hash(): string { return; }
+  /** @inheritdoc */
+  onChange(callback: Function): Function { return; }
+
+
+  /**
+   * Returns the current URL parts
+   *
+   * This method returns the current URL components as a [[UrlParts]] object.
+   *
+   * @returns the current url parts
+   */
+  parts(): UrlParts {
+    return { path: this.path(), search: this.search(), hash: this.hash() };
+  }
+
+  dispose() { }
+
+  /** @inheritdoc */
+  sync(evt?) { return; }
+  /** @inheritdoc */
+  listen(enabled?: boolean): Function { return; }
+  /** @inheritdoc */
+  deferIntercept(defer?: boolean) { return; }
+  /** @inheritdoc */
+  match(urlParts: UrlParts): MatchResult { return; }
+
 }

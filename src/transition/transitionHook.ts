@@ -33,13 +33,6 @@ export type ErrorHandler  = (error: any)              => Promise<any>;
 /** @hidden */
 export class TransitionHook {
   type: TransitionEventType;
-  constructor(private transition: Transition,
-              private stateContext: StateDeclaration,
-              private registeredHook: RegisteredHook,
-              private options: TransitionHookOptions) {
-    this.options = defaults(options, defaultOptions);
-    this.type = registeredHook.eventType;
-  }
 
   /**
    * These GetResultHandler(s) are used by [[invokeHook]] below
@@ -70,6 +63,73 @@ export class TransitionHook {
 
   static THROW_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) => {
     throw error;
+  }
+
+  /**
+   * Chains together an array of TransitionHooks.
+   *
+   * Given a list of [[TransitionHook]] objects, chains them together.
+   * Each hook is invoked after the previous one completes.
+   *
+   * #### Example:
+   * ```js
+   * var hooks: TransitionHook[] = getHooks();
+   * let promise: Promise<any> = TransitionHook.chain(hooks);
+   *
+   * promise.then(handleSuccess, handleError);
+   * ```
+   *
+   * @param hooks the list of hooks to chain together
+   * @param waitFor if provided, the chain is `.then()`'ed off this promise
+   * @returns a `Promise` for sequentially invoking the hooks (in order)
+   */
+  static chain(hooks: TransitionHook[], waitFor?: Promise<any>): Promise<any> {
+    // Chain the next hook off the previous
+    const createHookChainR = (prev: Promise<any>, nextHook: TransitionHook) =>
+      prev.then(() => nextHook.invokeHook());
+    return hooks.reduce(createHookChainR, waitFor || services.$q.when());
+  }
+
+
+  /**
+   * Invokes all the provided TransitionHooks, in order.
+   * Each hook's return value is checked.
+   * If any hook returns a promise, then the rest of the hooks are chained off that promise, and the promise is returned.
+   * If no hook returns a promise, then all hooks are processed synchronously.
+   *
+   * @param hooks the list of TransitionHooks to invoke
+   * @param doneCallback a callback that is invoked after all the hooks have successfully completed
+   *
+   * @returns a promise for the async result, or the result of the callback
+   */
+  static invokeHooks<T>(hooks: TransitionHook[], doneCallback: (result?: HookResult) => T): Promise<any> | T {
+    for (let idx = 0; idx < hooks.length; idx++) {
+      let hookResult = hooks[idx].invokeHook();
+
+      if (isPromise(hookResult)) {
+        let remainingHooks = hooks.slice(idx + 1);
+
+        return TransitionHook.chain(remainingHooks, hookResult)
+          .then(doneCallback);
+      }
+    }
+
+    return doneCallback();
+  }
+
+  /**
+   * Run all TransitionHooks, ignoring their return value.
+   */
+  static runAllHooks(hooks: TransitionHook[]): void {
+    hooks.forEach(hook => hook.invokeHook());
+  }
+
+  constructor(private transition: Transition,
+              private stateContext: StateDeclaration,
+              private registeredHook: RegisteredHook,
+              private options: TransitionHookOptions) {
+    this.options = defaults(options, defaultOptions);
+    this.type = registeredHook.eventType;
   }
 
   private isSuperseded = () =>
@@ -186,65 +246,6 @@ export class TransitionHook {
         context = parse("traceData.context.state.name")(options) || parse("traceData.context")(options) || "unknown",
         name = fnToString(registeredHook.callback);
     return `${event} context: ${context}, ${maxLength(200, name)}`;
-  }
-
-  /**
-   * Chains together an array of TransitionHooks.
-   *
-   * Given a list of [[TransitionHook]] objects, chains them together.
-   * Each hook is invoked after the previous one completes.
-   *
-   * #### Example:
-   * ```js
-   * var hooks: TransitionHook[] = getHooks();
-   * let promise: Promise<any> = TransitionHook.chain(hooks);
-   *
-   * promise.then(handleSuccess, handleError);
-   * ```
-   *
-   * @param hooks the list of hooks to chain together
-   * @param waitFor if provided, the chain is `.then()`'ed off this promise
-   * @returns a `Promise` for sequentially invoking the hooks (in order)
-   */
-  static chain(hooks: TransitionHook[], waitFor?: Promise<any>): Promise<any> {
-    // Chain the next hook off the previous
-    const createHookChainR = (prev: Promise<any>, nextHook: TransitionHook) =>
-        prev.then(() => nextHook.invokeHook());
-    return hooks.reduce(createHookChainR, waitFor || services.$q.when());
-  }
-
-
-  /**
-   * Invokes all the provided TransitionHooks, in order.
-   * Each hook's return value is checked.
-   * If any hook returns a promise, then the rest of the hooks are chained off that promise, and the promise is returned.
-   * If no hook returns a promise, then all hooks are processed synchronously.
-   *
-   * @param hooks the list of TransitionHooks to invoke
-   * @param doneCallback a callback that is invoked after all the hooks have successfully completed
-   *
-   * @returns a promise for the async result, or the result of the callback
-   */
-  static invokeHooks<T>(hooks: TransitionHook[], doneCallback: (result?: HookResult) => T): Promise<any> | T {
-    for (let idx = 0; idx < hooks.length; idx++) {
-      let hookResult = hooks[idx].invokeHook();
-
-      if (isPromise(hookResult)) {
-        let remainingHooks = hooks.slice(idx + 1);
-
-        return TransitionHook.chain(remainingHooks, hookResult)
-            .then(doneCallback);
-      }
-    }
-
-    return doneCallback();
-  }
-
-  /**
-   * Run all TransitionHooks, ignoring their return value.
-   */
-  static runAllHooks(hooks: TransitionHook[]): void {
-    hooks.forEach(hook => hook.invokeHook());
   }
 
 }

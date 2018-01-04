@@ -9,6 +9,8 @@ import { noop } from "../common/common";
 
 /** A `LocationConfig` mock that gets/sets all config from an in-memory object */
 export class MemoryLocationConfig implements LocationConfig {
+  dispose = noop;
+
   _baseHref = '';
   _port = 80;
   _protocol = "http";
@@ -21,5 +23,4 @@ export class MemoryLocationConfig implements LocationConfig {
   baseHref = () => this._baseHref;
   html5Mode = () => false;
   hashPrefix = (newval?) => isDefined(newval) ? this._hashPrefix = newval : this._hashPrefix;
-  dispose = noop;
 }

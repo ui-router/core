@@ -55,6 +55,16 @@ export class Glob {
   glob: Array<string>;
   regexp: RegExp;
 
+  /** Returns true if the string has glob-like characters in it */
+  static is(text: string) {
+    return !!/[!,*]+/.exec(text);
+  }
+
+  /** Returns a glob from the string, or null if the string isn't Glob-like */
+  static fromString(text: string) {
+    return Glob.is(text) ? new Glob(text) : null;
+  }
+
   constructor(text: string) {
     this.text = text;
     this.glob = text.split('.');
@@ -71,15 +81,5 @@ export class Glob {
 
   matches(name: string) {
     return this.regexp.test('.' + name);
-  }
-
-  /** Returns true if the string has glob-like characters in it */
-  static is(text: string) {
-    return !!/[!,*]+/.exec(text);
-  }
-
-  /** Returns a glob from the string, or null if the string isn't Glob-like */
-  static fromString(text: string) {
-    return Glob.is(text) ? new Glob(text) : null;
   }
 }

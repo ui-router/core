@@ -28,13 +28,6 @@ import { ParamTypeDefinition } from "./interface";
  * - [[any]]
  */
 export class ParamTypes {
-  /** @hidden */
-  types: any;
-  /** @hidden */
-  enqueue: boolean = true;
-  /** @hidden */
-  typeQueue: any[] = [];
-
   /**
    * Built-in parameter type: `string`
    *
@@ -196,6 +189,13 @@ export class ParamTypes {
    */
   static any: ParamTypeDefinition;
 
+
+  /** @hidden */
+  types: any;
+  /** @hidden */
+  enqueue: boolean = true;
+  /** @hidden */
+  typeQueue: any[] = [];
 
   /** @internalapi */
   private defaultTypes: any = pick(ParamTypes.prototype, ["hash", "string", "query", "path", "int", "bool", "date", "json", "any"]);

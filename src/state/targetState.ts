@@ -46,6 +46,10 @@ export class TargetState {
   private _params: RawParams;
   private _options: TransitionOptions;
 
+  /** Returns true if the object has a state property that might be a state or state name */
+  static isDef = (obj): obj is TargetStateDef =>
+    obj && obj.state && (isString(obj.state) || isString(obj.state.name));
+
   /**
    * The TargetState constructor
    *
@@ -128,10 +132,6 @@ export class TargetState {
   toString() {
     return `'${this.name()}'${stringify(this.params())}`;
   }
-
-  /** Returns true if the object has a state property that might be a state or state name */
-  static isDef = (obj): obj is TargetStateDef =>
-      obj && obj.state && (isString(obj.state) || isString(obj.state.name));
 
   /**
    * Returns a copy of this TargetState which targets a different state.

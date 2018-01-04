@@ -101,12 +101,12 @@ export class Trace {
   approximateDigests: number;
 
   /** @hidden */
+  private _enabled: { [key: string]: boolean } = {};
+
+  /** @hidden */
   constructor() {
     this.approximateDigests = 0;
   }
-
-  /** @hidden */
-  private _enabled: { [key: string]: boolean } = {};
 
    /** @hidden */
   private _set(enabled: boolean, categories: Category[]) {

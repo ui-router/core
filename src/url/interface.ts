@@ -486,17 +486,6 @@ export interface UrlRule {
    */
   priority: number;
 
-  /**
-   * The priority of a given match.
-   *
-   * Sometimes more than one UrlRule might have matched.
-   * This method is used to choose the best match.
-   *
-   * If multiple rules matched, each rule's `matchPriority` is called with the value from [[match]].
-   * The rule with the highest `matchPriority` has its [[handler]] called.
-   */
-  matchPriority(match: any): number;
-
   /** The type of the rule */
   type: UrlRuleType;
 
@@ -514,6 +503,17 @@ export interface UrlRule {
    * See [[UrlRuleHandlerFn]] for details
    */
   handler: UrlRuleHandlerFn;
+
+  /**
+   * The priority of a given match.
+   *
+   * Sometimes more than one UrlRule might have matched.
+   * This method is used to choose the best match.
+   *
+   * If multiple rules matched, each rule's `matchPriority` is called with the value from [[match]].
+   * The rule with the highest `matchPriority` has its [[handler]] called.
+   */
+  matchPriority(match: any): number;
 }
 
 /** @internalapi */

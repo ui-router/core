@@ -117,6 +117,88 @@ export class UrlMatcher {
   /** The pattern that was passed into the constructor */
   public pattern: string;
 
+  /** @hidden */
+  static encodeDashes(str: string) { // Replace dashes with encoded "\-"
+    return encodeURIComponent(str).replace(/-/g, c => `%5C%${c.charCodeAt(0).toString(16).toUpperCase()}`);
+  }
+
+  /** @hidden Given a matcher, return an array with the matcher's path segments and path params, in order */
+  static pathSegmentsAndParams(matcher: UrlMatcher) {
+    let staticSegments = matcher._segments;
+    let pathParams = matcher._params.filter(p => p.location === DefType.PATH);
+    return arrayTuples(staticSegments, pathParams.concat(undefined))
+      .reduce(unnestR, [])
+      .filter(x => x !== "" && isDefined(x));
+  }
+
+  /** @hidden Given a matcher, return an array with the matcher's query params */
+  static queryParams(matcher: UrlMatcher): Param[] {
+    return matcher._params.filter(p => p.location === DefType.SEARCH);
+  }
+
+  /**
+   * Compare two UrlMatchers
+   *
+   * This comparison function converts a UrlMatcher into static and dynamic path segments.
+   * Each static path segment is a static string between a path separator (slash character).
+   * Each dynamic segment is a path parameter.
+   *
+   * The comparison function sorts static segments before dynamic ones.
+   */
+  static compare(a: UrlMatcher, b: UrlMatcher): number {
+    /**
+     * Turn a UrlMatcher and all its parent matchers into an array
+     * of slash literals '/', string literals, and Param objects
+     *
+     * This example matcher matches strings like "/foo/:param/tail":
+     * var matcher = $umf.compile("/foo").append($umf.compile("/:param")).append($umf.compile("/")).append($umf.compile("tail"));
+     * var result = segments(matcher); // [ '/', 'foo', '/', Param, '/', 'tail' ]
+     *
+     * Caches the result as `matcher._cache.segments`
+     */
+    const segments = (matcher: UrlMatcher) =>
+      matcher._cache.segments = matcher._cache.segments ||
+        matcher._cache.path.map(UrlMatcher.pathSegmentsAndParams)
+          .reduce(unnestR, [])
+          .reduce(joinNeighborsR, [])
+          .map(x => isString(x) ? splitOnSlash(x) : x)
+          .reduce(unnestR, []);
+
+    /**
+     * Gets the sort weight for each segment of a UrlMatcher
+     *
+     * Caches the result as `matcher._cache.weights`
+     */
+    const weights = (matcher: UrlMatcher) =>
+      matcher._cache.weights = matcher._cache.weights ||
+        segments(matcher).map(segment => {
+          // Sort slashes first, then static strings, the Params
+          if (segment === '/') return 1;
+          if (isString(segment)) return 2;
+          if (segment instanceof Param) return 3;
+        });
+
+    /**
+     * Pads shorter array in-place (mutates)
+     */
+    const padArrays = (l: any[], r: any[], padVal: any) => {
+      const len = Math.max(l.length, r.length);
+      while (l.length < len) l.push(padVal);
+      while (r.length < len) r.push(padVal);
+    };
+
+    const weightsA = weights(a), weightsB = weights(b);
+    padArrays(weightsA, weightsB, 0);
+    let cmp, i, pairs = arrayTuples(weightsA, weightsB);
+
+    for (i = 0; i < pairs.length; i++) {
+      cmp = pairs[i][0] - pairs[i][1];
+      if (cmp !== 0) return cmp;
+    }
+
+    return 0;
+  }
+
   /**
    * @param pattern The pattern to compile into a matcher.
    * @param paramTypes The [[ParamTypes]] registry
@@ -462,88 +544,6 @@ export class UrlMatcher {
 
     // Concat the pathstring with the queryString (if exists) and the hashString (if exists)
     return pathString + (queryString ? `?${queryString}` : "") + (values["#"] ? "#" + values["#"] : "");
-  }
-
-  /** @hidden */
-  static encodeDashes(str: string) { // Replace dashes with encoded "\-"
-    return encodeURIComponent(str).replace(/-/g, c => `%5C%${c.charCodeAt(0).toString(16).toUpperCase()}`);
-  }
-
-  /** @hidden Given a matcher, return an array with the matcher's path segments and path params, in order */
-  static pathSegmentsAndParams(matcher: UrlMatcher) {
-    let staticSegments = matcher._segments;
-    let pathParams = matcher._params.filter(p => p.location === DefType.PATH);
-    return arrayTuples(staticSegments, pathParams.concat(undefined))
-        .reduce(unnestR, [])
-        .filter(x => x !== "" && isDefined(x));
-  }
-
-  /** @hidden Given a matcher, return an array with the matcher's query params */
-  static queryParams(matcher: UrlMatcher): Param[] {
-    return matcher._params.filter(p => p.location === DefType.SEARCH);
-  }
-
-  /**
-   * Compare two UrlMatchers
-   *
-   * This comparison function converts a UrlMatcher into static and dynamic path segments.
-   * Each static path segment is a static string between a path separator (slash character).
-   * Each dynamic segment is a path parameter.
-   *
-   * The comparison function sorts static segments before dynamic ones.
-   */
-  static compare(a: UrlMatcher, b: UrlMatcher): number {
-    /**
-     * Turn a UrlMatcher and all its parent matchers into an array
-     * of slash literals '/', string literals, and Param objects
-     *
-     * This example matcher matches strings like "/foo/:param/tail":
-     * var matcher = $umf.compile("/foo").append($umf.compile("/:param")).append($umf.compile("/")).append($umf.compile("tail"));
-     * var result = segments(matcher); // [ '/', 'foo', '/', Param, '/', 'tail' ]
-     *
-     * Caches the result as `matcher._cache.segments`
-     */
-    const segments = (matcher: UrlMatcher) =>
-        matcher._cache.segments = matcher._cache.segments ||
-            matcher._cache.path.map(UrlMatcher.pathSegmentsAndParams)
-                .reduce(unnestR, [])
-                .reduce(joinNeighborsR, [])
-                .map(x => isString(x) ? splitOnSlash(x) : x)
-                .reduce(unnestR, []);
-
-    /**
-     * Gets the sort weight for each segment of a UrlMatcher
-     *
-     * Caches the result as `matcher._cache.weights`
-     */
-    const weights = (matcher: UrlMatcher) =>
-        matcher._cache.weights = matcher._cache.weights ||
-            segments(matcher).map(segment => {
-              // Sort slashes first, then static strings, the Params
-              if (segment === '/') return 1;
-              if (isString(segment)) return 2;
-              if (segment instanceof Param) return 3;
-            });
-
-    /**
-     * Pads shorter array in-place (mutates)
-     */
-    const padArrays = (l: any[], r: any[], padVal: any) => {
-      const len = Math.max(l.length, r.length);
-      while (l.length < len) l.push(padVal);
-      while (r.length < len) r.push(padVal);
-    };
-
-    const weightsA = weights(a), weightsB = weights(b);
-    padArrays(weightsA, weightsB, 0);
-    let cmp, i, pairs = arrayTuples(weightsA, weightsB);
-
-    for (i = 0; i < pairs.length; i++) {
-      cmp = pairs[i][0] - pairs[i][1];
-      if (cmp !== 0) return cmp;
-    }
-
-    return 0;
   }
 }
 

@@ -276,6 +276,9 @@ export interface HookRegOptions {
  * Note: the Transition object only allows hooks to be registered before the Transition is started.
  */
 export interface IHookRegistry {
+  /** @hidden place to store the hooks */
+  _registeredHooks: { [key: string]: RegisteredHook[] };
+
   /**
    * Registers a [[TransitionHookFn]], called *before a transition starts*.
    *
@@ -700,9 +703,6 @@ export interface IHookRegistry {
    * ```
    */
   getHooks(hookName: string): RegisteredHook[];
-
-  /** @hidden place to store the hooks */
-  _registeredHooks: { [key: string]: RegisteredHook[] };
 }
 
 /** A predicate type which tests if a [[StateObject]] passes some test. Returns a boolean. */

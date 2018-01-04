@@ -93,6 +93,47 @@ export class Param {
     defaultValue: any,
   };
 
+  static values(params: Param[], values: RawParams = {}): RawParams {
+    const paramValues = {} as RawParams;
+    for (let param of params) {
+      paramValues[param.id] = param.value(values[param.id]);
+    }
+    return paramValues;
+  }
+
+  /**
+   * Finds [[Param]] objects which have different param values
+   *
+   * Filters a list of [[Param]] objects to only those whose parameter values differ in two param value objects
+   *
+   * @param params: The list of Param objects to filter
+   * @param values1: The first set of parameter values
+   * @param values2: the second set of parameter values
+   *
+   * @returns any Param objects whose values were different between values1 and values2
+   */
+  static changed(params: Param[], values1: RawParams = {}, values2: RawParams = {}): Param[] {
+    return params.filter(param => !param.type.equals(values1[param.id], values2[param.id]));
+  }
+
+  /**
+   * Checks if two param value objects are equal (for a set of [[Param]] objects)
+   *
+   * @param params The list of [[Param]] objects to check
+   * @param values1 The first set of param values
+   * @param values2 The second set of param values
+   *
+   * @returns true if the param values in values1 and values2 are equal
+   */
+  static equals(params: Param[], values1 = {}, values2 = {}): boolean {
+    return Param.changed(params, values1, values2).length === 0;
+  }
+
+  /** Returns true if a the parameter values are valid, according to the Param definitions */
+  static validates(params: Param[], values: RawParams = {}): boolean {
+    return params.map(param => param.validates(values[param.id])).reduce(allTrueR, true);
+  }
+
   constructor(id: string, type: ParamType, config: ParamDeclaration, location: DefType, urlMatcherFactory: UrlMatcherFactory) {
     config = unwrapShorthand(config);
     type = getType(config, type, location, id, urlMatcherFactory.paramTypes);
@@ -175,46 +216,5 @@ export class Param {
 
   toString() {
     return `{Param:${this.id} ${this.type} squash: '${this.squash}' optional: ${this.isOptional}}`;
-  }
-
-  static values(params: Param[], values: RawParams = {}): RawParams {
-    const paramValues = {} as RawParams;
-    for (let param of params) {
-      paramValues[param.id] = param.value(values[param.id]);
-    }
-    return paramValues;
-  }
-
-  /**
-   * Finds [[Param]] objects which have different param values
-   *
-   * Filters a list of [[Param]] objects to only those whose parameter values differ in two param value objects
-   *
-   * @param params: The list of Param objects to filter
-   * @param values1: The first set of parameter values
-   * @param values2: the second set of parameter values
-   *
-   * @returns any Param objects whose values were different between values1 and values2
-   */
-  static changed(params: Param[], values1: RawParams = {}, values2: RawParams = {}): Param[] {
-    return params.filter(param => !param.type.equals(values1[param.id], values2[param.id]));
-  }
-
-  /**
-   * Checks if two param value objects are equal (for a set of [[Param]] objects)
-   *
-   * @param params The list of [[Param]] objects to check
-   * @param values1 The first set of param values
-   * @param values2 The second set of param values
-   *
-   * @returns true if the param values in values1 and values2 are equal
-   */
-  static equals(params: Param[], values1 = {}, values2 = {}): boolean {
-    return Param.changed(params, values1, values2).length === 0;
-  }
-
-  /** Returns true if a the parameter values are valid, according to the Param definitions */
-  static validates(params: Param[], values: RawParams = {}): boolean {
-    return params.map(param => param.validates(values[param.id])).reduce(allTrueR, true);
   }
 }

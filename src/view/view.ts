@@ -53,8 +53,6 @@ export class ViewService {
   private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
   private _listeners: ViewSyncListener[] = [];
 
-  constructor() { }
-
   public _pluginapi: ViewServicePluginAPI = {
     _rootViewContext: this._rootViewContext.bind(this),
     _viewConfigFactory: this._viewConfigFactory.bind(this),
@@ -65,39 +63,6 @@ export class ViewService {
       return () => removeFrom(this._listeners, listener);
     },
   };
-
-  private _rootViewContext(context?: ViewContext): ViewContext {
-    return this._rootContext = context || this._rootContext;
-  };
-
-  private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
-    this._viewConfigFactories[viewType] = factory;
-  }
-
-  createViewConfig(path: PathNode[], decl: _ViewDeclaration): ViewConfig[] {
-    let cfgFactory = this._viewConfigFactories[decl.$type];
-    if (!cfgFactory) throw new Error("ViewService: No view config factory registered for type " + decl.$type);
-    let cfgs = cfgFactory(path, decl);
-    return isArray(cfgs) ? cfgs : [cfgs];
-  }
-
-  /**
-   * Deactivates a ViewConfig.
-   *
-   * This function deactivates a `ViewConfig`.
-   * After calling [[sync]], it will un-pair from any `ui-view` with which it is currently paired.
-   *
-   * @param viewConfig The ViewConfig view to deregister.
-   */
-  deactivateViewConfig(viewConfig: ViewConfig) {
-    trace.traceViewServiceEvent("<- Removing", viewConfig);
-    removeFrom(this._viewConfigs, viewConfig);
-  }
-
-  activateViewConfig(viewConfig: ViewConfig) {
-    trace.traceViewServiceEvent("-> Registering", <any> viewConfig);
-    this._viewConfigs.push(viewConfig);
-  }
 
   /**
    * Given a ui-view and a ViewConfig, determines if they "match".
@@ -177,6 +142,87 @@ export class ViewService {
     let uiViewContext = uiViewsByFqn[fqnToFirstSegment].creationContext;
     return vc.$uiViewContextAnchor === (uiViewContext && uiViewContext.name);
   }
+
+  /**
+   * Normalizes a view's name from a state.views configuration block.
+   *
+   * This should be used by a framework implementation to calculate the values for
+   * [[_ViewDeclaration.$uiViewName]] and [[_ViewDeclaration.$uiViewContextAnchor]].
+   *
+   * @param context the context object (state declaration) that the view belongs to
+   * @param rawViewName the name of the view, as declared in the [[StateDeclaration.views]]
+   *
+   * @returns the normalized uiViewName and uiViewContextAnchor that the view targets
+   */
+  static normalizeUIViewTarget(context: ViewContext, rawViewName = "") {
+    // TODO: Validate incoming view name with a regexp to allow:
+    // ex: "view.name@foo.bar" , "^.^.view.name" , "view.name@^.^" , "" ,
+    // "@" , "$default@^" , "!$default.$default" , "!foo.bar"
+    let viewAtContext: string[] = rawViewName.split("@");
+    let uiViewName = viewAtContext[0] || "$default";  // default to unnamed view
+    let uiViewContextAnchor = isString(viewAtContext[1]) ? viewAtContext[1] : "^";    // default to parent context
+
+    // Handle relative view-name sugar syntax.
+    // Matches rawViewName "^.^.^.foo.bar" into array: ["^.^.^.foo.bar", "^.^.^", "foo.bar"],
+    let relativeViewNameSugar = /^(\^(?:\.\^)*)\.(.*$)/.exec(uiViewName);
+    if (relativeViewNameSugar) {
+      // Clobbers existing contextAnchor (rawViewName validation will fix this)
+      uiViewContextAnchor = relativeViewNameSugar[1]; // set anchor to "^.^.^"
+      uiViewName = relativeViewNameSugar[2]; // set view-name to "foo.bar"
+    }
+
+    if (uiViewName.charAt(0) === '!') {
+      uiViewName = uiViewName.substr(1);
+      uiViewContextAnchor = ""; // target absolutely from root
+    }
+
+    // handle parent relative targeting "^.^.^"
+    let relativeMatch = /^(\^(?:\.\^)*)$/;
+    if (relativeMatch.exec(uiViewContextAnchor)) {
+      let anchor = uiViewContextAnchor.split(".").reduce(((anchor, x) => anchor.parent), context);
+      uiViewContextAnchor = anchor.name;
+    } else if (uiViewContextAnchor === '.') {
+      uiViewContextAnchor = context.name;
+    }
+
+    return {uiViewName, uiViewContextAnchor};
+  }
+
+  constructor() { }
+
+  private _rootViewContext(context?: ViewContext): ViewContext {
+    return this._rootContext = context || this._rootContext;
+  };
+
+  private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
+    this._viewConfigFactories[viewType] = factory;
+  }
+
+  createViewConfig(path: PathNode[], decl: _ViewDeclaration): ViewConfig[] {
+    let cfgFactory = this._viewConfigFactories[decl.$type];
+    if (!cfgFactory) throw new Error("ViewService: No view config factory registered for type " + decl.$type);
+    let cfgs = cfgFactory(path, decl);
+    return isArray(cfgs) ? cfgs : [cfgs];
+  }
+
+  /**
+   * Deactivates a ViewConfig.
+   *
+   * This function deactivates a `ViewConfig`.
+   * After calling [[sync]], it will un-pair from any `ui-view` with which it is currently paired.
+   *
+   * @param viewConfig The ViewConfig view to deregister.
+   */
+  deactivateViewConfig(viewConfig: ViewConfig) {
+    trace.traceViewServiceEvent("<- Removing", viewConfig);
+    removeFrom(this._viewConfigs, viewConfig);
+  }
+
+  activateViewConfig(viewConfig: ViewConfig) {
+    trace.traceViewServiceEvent("-> Registering", <any> viewConfig);
+    this._viewConfigs.push(viewConfig);
+  }
+
 
   sync() {
     let uiViewsByFqn: TypedMap<ActiveUIView> =
@@ -287,48 +333,4 @@ export class ViewService {
     return this._uiViews.filter(prop("$config")).map(prop("name"));
   }
 
-  /**
-   * Normalizes a view's name from a state.views configuration block.
-   *
-   * This should be used by a framework implementation to calculate the values for
-   * [[_ViewDeclaration.$uiViewName]] and [[_ViewDeclaration.$uiViewContextAnchor]].
-   *
-   * @param context the context object (state declaration) that the view belongs to
-   * @param rawViewName the name of the view, as declared in the [[StateDeclaration.views]]
-   *
-   * @returns the normalized uiViewName and uiViewContextAnchor that the view targets
-   */
-  static normalizeUIViewTarget(context: ViewContext, rawViewName = "") {
-    // TODO: Validate incoming view name with a regexp to allow:
-    // ex: "view.name@foo.bar" , "^.^.view.name" , "view.name@^.^" , "" ,
-    // "@" , "$default@^" , "!$default.$default" , "!foo.bar"
-    let viewAtContext: string[] = rawViewName.split("@");
-    let uiViewName = viewAtContext[0] || "$default";  // default to unnamed view
-    let uiViewContextAnchor = isString(viewAtContext[1]) ? viewAtContext[1] : "^";    // default to parent context
-
-    // Handle relative view-name sugar syntax.
-    // Matches rawViewName "^.^.^.foo.bar" into array: ["^.^.^.foo.bar", "^.^.^", "foo.bar"],
-    let relativeViewNameSugar = /^(\^(?:\.\^)*)\.(.*$)/.exec(uiViewName);
-    if (relativeViewNameSugar) {
-      // Clobbers existing contextAnchor (rawViewName validation will fix this)
-      uiViewContextAnchor = relativeViewNameSugar[1]; // set anchor to "^.^.^"
-      uiViewName = relativeViewNameSugar[2]; // set view-name to "foo.bar"
-    }
-
-    if (uiViewName.charAt(0) === '!') {
-      uiViewName = uiViewName.substr(1);
-      uiViewContextAnchor = ""; // target absolutely from root
-    }
-
-    // handle parent relative targeting "^.^.^"
-    let relativeMatch = /^(\^(?:\.\^)*)$/;
-    if (relativeMatch.exec(uiViewContextAnchor)) {
-      let anchor = uiViewContextAnchor.split(".").reduce(((anchor, x) => anchor.parent), context);
-      uiViewContextAnchor = anchor.name;
-    } else if (uiViewContextAnchor === '.') {
-      uiViewContextAnchor = context.name;
-    }
-
-    return {uiViewName, uiViewContextAnchor};
-  }
 }

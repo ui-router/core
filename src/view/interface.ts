@@ -50,8 +50,8 @@ export interface ViewConfig {
   /** The node the ViewConfig is bound to */
   path: PathNode[];
 
+  loaded: boolean;
+
   /** Fetches templates, runs dynamic (controller|template)Provider code, lazy loads Components, etc */
   load(): Promise<ViewConfig>;
-  
-  loaded: boolean;
 }

@@ -25,14 +25,14 @@ import {
  * @internalapi
  */
 export class UrlRuleFactory {
+  static isUrlRule = obj =>
+    obj && ['type', 'match', 'handler'].every(key => isDefined(obj[key]));
+
   constructor(public router: UIRouter) { }
 
   compile(str: string) {
     return this.router.urlMatcherFactory.compile(str);
   }
-
-  static isUrlRule = obj =>
-      obj && ['type', 'match', 'handler'].every(key => isDefined(obj[key]));
 
   create(what: string|UrlMatcher|StateObject|RegExp|UrlRuleMatchFn, handler?: string|UrlRuleHandlerFn): UrlRule {
     const makeRule = pattern([
