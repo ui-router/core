@@ -156,7 +156,7 @@ export function splitOnDelim(delim: string) {
  */
 export function joinNeighborsR(acc: any[], x: any) {
   if (isString(tail(acc)) && isString(x))
-    return acc.slice(0, -1).concat(tail(acc)+ x);
+    return acc.slice(0, -1).concat(tail(acc) + x);
   return pushR(acc, x);
 };
 
