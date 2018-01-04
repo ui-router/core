@@ -3,9 +3,9 @@
  * @module params
  */
 /** */
-import {extend, filter, map} from '../common/common';
-import {isArray, isDefined} from '../common/predicates';
-import {ParamTypeDefinition} from './interface';
+import { extend, filter, map } from '../common/common';
+import { isArray, isDefined } from '../common/predicates';
+import { ParamTypeDefinition } from './interface';
 
 /**
  * An internal class which implements [[ParamTypeDefinition]].
@@ -61,7 +61,7 @@ export class ParamType implements ParamTypeDefinition {
   /** @inheritdoc */
   decode(val: string, key?: string): any { return val; }
   /** @inheritdoc */
-  equals(a: any, b: any): boolean { return a == b; }
+  equals(a: any, b: any): boolean { return a == b; } // tslint:disable-line:triple-equals
 
 
   $subPattern() {
