@@ -46,7 +46,7 @@ export class StateQueueManager implements Disposable {
   }
 
   flush() {
-    const {queue, states, builder} = this;
+    const { queue, states, builder } = this;
     const registered: StateObject[] = [], // states that got registered
         orphans: StateObject[] = [], // states that don't yet have a parent registered
         previousQueueLength = {}; // keep track of how long the queue when an orphan was first encountered

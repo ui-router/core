@@ -2,14 +2,14 @@
  * @coreapi
  * @module transition
  */ /** for typedoc */
-import {StateDeclaration} from '../state/interface';
-import {Predicate} from '../common/common';
+import { StateDeclaration } from '../state/interface';
+import { Predicate } from '../common/common';
 
-import {Transition} from './transition';
-import {StateObject} from '../state/stateObject';
-import {PathNode} from '../path/pathNode';
-import {TargetState} from '../state/targetState';
-import {RegisteredHook} from './hookRegistry';
+import { Transition } from './transition';
+import { StateObject } from '../state/stateObject';
+import { PathNode } from '../path/pathNode';
+import { TargetState } from '../state/targetState';
+import { RegisteredHook } from './hookRegistry';
 
 /**
  * The TransitionOptions object can be used to change the behavior of a transition.

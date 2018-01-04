@@ -25,7 +25,7 @@ const eagerResolvePath: TransitionHookFn = (trans: Transition) =>
         .then(noop);
 
 export const registerEagerResolvePath = (transitionService: TransitionService) =>
-    transitionService.onStart({}, eagerResolvePath, {priority: RESOLVE_HOOK_PRIORITY});
+    transitionService.onStart({}, eagerResolvePath, { priority: RESOLVE_HOOK_PRIORITY });
 
 /**
  * A [[TransitionHookFn]] which resolves all LAZY Resolvables for the state (and all its ancestors) in the To Path
@@ -43,7 +43,7 @@ const lazyResolveState: TransitionStateHookFn = (trans: Transition, state: State
         .then(noop);
 
 export const registerLazyResolveState = (transitionService: TransitionService) =>
-    transitionService.onEnter({ entering: val(true) }, lazyResolveState, {priority: RESOLVE_HOOK_PRIORITY});
+    transitionService.onEnter({ entering: val(true) }, lazyResolveState, { priority: RESOLVE_HOOK_PRIORITY });
 
 
 /**
@@ -62,4 +62,4 @@ const resolveRemaining: TransitionHookFn = (trans: Transition) =>
     .then(noop);
 
 export const registerResolveRemaining = (transitionService: TransitionService) =>
-  transitionService.onFinish({}, resolveRemaining, {priority: RESOLVE_HOOK_PRIORITY});
+  transitionService.onFinish({}, resolveRemaining, { priority: RESOLVE_HOOK_PRIORITY });

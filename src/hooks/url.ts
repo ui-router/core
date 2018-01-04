@@ -1,9 +1,9 @@
 /** @module hooks */ /** */
-import {UrlRouter} from '../url/urlRouter';
-import {StateService} from '../state/stateService';
-import {Transition} from '../transition/transition';
-import {TransitionHookFn} from '../transition/interface';
-import {TransitionService} from '../transition/transitionService';
+import { UrlRouter } from '../url/urlRouter';
+import { StateService } from '../state/stateService';
+import { Transition } from '../transition/transition';
+import { TransitionHookFn } from '../transition/interface';
+import { TransitionService } from '../transition/transitionService';
 
 /**
  * A [[TransitionHookFn]] which updates the URL after a successful transition
@@ -20,7 +20,7 @@ const updateUrl: TransitionHookFn = (transition: Transition) => {
   // The user doesn't want the url to update (options.location === false)
   // The destination state, and all parents have no navigable url
   if (options.source !== 'url' && options.location && $state.$current.navigable) {
-    const urlOptions = {replace: options.location === 'replace'};
+    const urlOptions = { replace: options.location === 'replace' };
     $urlRouter.push($state.$current.navigable.url, $state.params, urlOptions);
   }
 
@@ -28,4 +28,4 @@ const updateUrl: TransitionHookFn = (transition: Transition) => {
 };
 
 export const registerUpdateUrl = (transitionService: TransitionService) =>
-    transitionService.onSuccess({}, updateUrl, {priority: 9999});
+    transitionService.onSuccess({}, updateUrl, { priority: 9999 });

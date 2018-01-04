@@ -1,11 +1,11 @@
 /** @module path */ /** for typedoc */
-import {extend, applyPairs, find, allTrueR, pairs, arrayTuples} from '../common/common';
-import {propEq} from '../common/hof';
-import {StateObject} from '../state/stateObject';
-import {RawParams} from '../params/interface';
-import {Param} from '../params/param';
-import {Resolvable} from '../resolve/resolvable';
-import {ViewConfig} from '../view/interface';
+import { extend, applyPairs, find, allTrueR, pairs, arrayTuples } from '../common/common';
+import { propEq } from '../common/hof';
+import { StateObject } from '../state/stateObject';
+import { RawParams } from '../params/interface';
+import { Param } from '../params/param';
+import { Resolvable } from '../resolve/resolvable';
+import { ViewConfig } from '../view/interface';
 
 /**
  * @internalapi

@@ -47,7 +47,7 @@ export const $q = {
       // Convert promises map to promises array.
       // When each promise resolves, map it to a tuple { key: key, val: val }
       const chain = Object.keys(promises)
-          .map(key => promises[key].then(val => ({key, val})));
+          .map(key => promises[key].then(val => ({ key, val })));
 
       // Then wait for all promises to resolve, and convert them back to an object
       return $q.all(chain).then(values =>

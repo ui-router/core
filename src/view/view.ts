@@ -186,7 +186,7 @@ export class ViewService {
       uiViewContextAnchor = context.name;
     }
 
-    return {uiViewName, uiViewContextAnchor};
+    return { uiViewName, uiViewContextAnchor };
   }
 
   constructor() { }

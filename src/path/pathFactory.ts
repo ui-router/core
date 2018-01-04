@@ -3,17 +3,17 @@
 import {
   extend, find, pick, omit, tail, mergeR, values, unnestR, Predicate, inArray, arrayTuples,
 } from '../common/common';
-import {prop, propEq, not} from '../common/hof';
+import { prop, propEq, not } from '../common/hof';
 
-import {RawParams} from '../params/interface';
-import {TreeChanges} from '../transition/interface';
-import {ViewConfig} from '../view/interface';
-import {_ViewDeclaration} from '../state/interface';
+import { RawParams } from '../params/interface';
+import { TreeChanges } from '../transition/interface';
+import { ViewConfig } from '../view/interface';
+import { _ViewDeclaration } from '../state/interface';
 
-import {StateObject} from '../state/stateObject';
-import {TargetState} from '../state/targetState';
-import {GetParamsFn, PathNode} from './pathNode';
-import {ViewService} from '../view/view';
+import { StateObject } from '../state/stateObject';
+import { TargetState } from '../state/targetState';
+import { GetParamsFn, PathNode } from './pathNode';
+import { ViewService } from '../view/view';
 import { Param } from '../params/param';
 import { StateRegistry } from '../state';
 

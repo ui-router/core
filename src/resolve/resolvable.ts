@@ -2,17 +2,17 @@
  * @coreapi
  * @module resolve
  */ /** for typedoc */
-import {extend, equals, inArray, identity} from '../common/common';
-import {services} from '../common/coreservices';
-import {trace} from '../common/trace';
-import {ResolvePolicy, ResolvableLiteral, resolvePolicies} from './interface';
+import { extend, equals, inArray, identity } from '../common/common';
+import { services } from '../common/coreservices';
+import { trace } from '../common/trace';
+import { ResolvePolicy, ResolvableLiteral, resolvePolicies } from './interface';
 
-import {ResolveContext} from './resolveContext';
-import {stringify} from '../common/strings';
-import {isFunction, isObject} from '../common/predicates';
-import {Transition} from '../transition/transition';
-import {StateObject} from '../state/stateObject';
-import {PathNode} from '../path/pathNode';
+import { ResolveContext } from './resolveContext';
+import { stringify } from '../common/strings';
+import { isFunction, isObject } from '../common/predicates';
+import { Transition } from '../transition/transition';
+import { StateObject } from '../state/stateObject';
+import { PathNode } from '../path/pathNode';
 import { isNullOrUndefined } from '../common';
 
 

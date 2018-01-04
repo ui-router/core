@@ -1,18 +1,18 @@
 /** @module state */ /** for typedoc */
-import {Obj, omit, noop, extend, inherit, values, applyPairs, tail, mapObj, identity} from '../common/common';
-import {isDefined, isFunction, isString, isArray} from '../common/predicates';
-import {stringify} from '../common/strings';
-import {prop, pattern, is, pipe, val} from '../common/hof';
-import {StateDeclaration} from './interface';
+import { Obj, omit, noop, extend, inherit, values, applyPairs, tail, mapObj, identity } from '../common/common';
+import { isDefined, isFunction, isString, isArray } from '../common/predicates';
+import { stringify } from '../common/strings';
+import { prop, pattern, is, pipe, val } from '../common/hof';
+import { StateDeclaration } from './interface';
 
-import {StateObject} from './stateObject';
-import {StateMatcher} from './stateMatcher';
-import {Param} from '../params/param';
-import {UrlMatcherFactory} from '../url/urlMatcherFactory';
-import {UrlMatcher} from '../url/urlMatcher';
-import {Resolvable} from '../resolve/resolvable';
-import {services} from '../common/coreservices';
-import {ResolvePolicy} from '../resolve/interface';
+import { StateObject } from './stateObject';
+import { StateMatcher } from './stateMatcher';
+import { Param } from '../params/param';
+import { UrlMatcherFactory } from '../url/urlMatcherFactory';
+import { UrlMatcher } from '../url/urlMatcher';
+import { Resolvable } from '../resolve/resolvable';
+import { services } from '../common/coreservices';
+import { ResolvePolicy } from '../resolve/interface';
 import { ParamFactory } from '../url/interface';
 
 const parseUrl = (url: string): any => {
@@ -69,7 +69,7 @@ function urlBuilder(state: StateObject) {
   const url = !parsed ? stateDec.url : $urlMatcherFactoryProvider.compile(parsed.val, {
     params: state.params || {},
     paramMap: function (paramConfig: any, isSearch: boolean) {
-      if (stateDec.reloadOnSearch === false && isSearch) paramConfig = extend(paramConfig || {}, {dynamic: true});
+      if (stateDec.reloadOnSearch === false && isSearch) paramConfig = extend(paramConfig || {}, { dynamic: true });
       return paramConfig;
     }
   });
@@ -87,7 +87,7 @@ function navigableBuilder(state: StateObject) {
 const getParamsBuilder = (paramFactory: ParamFactory) =>
 function paramsBuilder(state: StateObject): { [key: string]: Param } {
   const makeConfigParam = (config: any, id: string) => paramFactory.fromConfig(id, null, config);
-  const urlParams: Param[] = (state.url && state.url.parameters({inherit: false})) || [];
+  const urlParams: Param[] = (state.url && state.url.parameters({ inherit: false })) || [];
   const nonUrlParams: Param[] = values(mapObj(omit(state.params || {}, urlParams.map(prop('id'))), makeConfigParam));
   return urlParams.concat(nonUrlParams).map(p => [p.id, p]).reduce(applyPairs, {});
 };
@@ -148,7 +148,7 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
 
   /** convert resolve: {} and resolvePolicy: {} objects to an array of tuples */
   const objects2Tuples    = (resolveObj: Obj, resolvePolicies: { [key: string]: ResolvePolicy }) =>
-      Object.keys(resolveObj || {}).map(token => ({token, val: resolveObj[token], deps: undefined, policy: resolvePolicies[token]}));
+      Object.keys(resolveObj || {}).map(token => ({ token, val: resolveObj[token], deps: undefined, policy: resolvePolicies[token] }));
 
   /** fetch DI annotations from a function or ng1-style array */
   const annotate          = (fn: Function)  => {
@@ -279,7 +279,7 @@ export class StateBuilder {
    * @returns the built State object
    */
   build(state: StateObject): StateObject {
-    const {matcher, builders} = this;
+    const { matcher, builders } = this;
     const parent = this.parentName(state);
 
     if (parent && !matcher.find(parent, undefined, false)) {

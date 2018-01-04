@@ -3,21 +3,21 @@
  * @module transition
  */ /** for typedoc */
 
-import {extend, tail, assertPredicate, unnestR, identity} from '../common/common';
-import {isArray} from '../common/predicates';
+import { extend, tail, assertPredicate, unnestR, identity } from '../common/common';
+import { isArray } from '../common/predicates';
 
 import {
     TransitionOptions, TransitionHookOptions, IHookRegistry, TreeChanges, IMatchingNodes,
     TransitionHookPhase, TransitionHookScope
 } from './interface';
 
-import {Transition} from './transition';
-import {TransitionHook} from './transitionHook';
-import {StateObject} from '../state/stateObject';
-import {PathNode} from '../path/pathNode';
-import {TransitionService} from './transitionService';
-import {TransitionEventType} from './transitionEventType';
-import {RegisteredHook} from './hookRegistry';
+import { Transition } from './transition';
+import { TransitionHook } from './transitionHook';
+import { StateObject } from '../state/stateObject';
+import { PathNode } from '../path/pathNode';
+import { TransitionService } from './transitionService';
+import { TransitionEventType } from './transitionEventType';
+import { RegisteredHook } from './hookRegistry';
 
 /**
  * This class returns applicable TransitionHooks for a specific Transition instance.

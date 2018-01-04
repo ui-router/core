@@ -264,4 +264,4 @@ export class Trace {
  * ```
  */
 const trace = new Trace();
-export {trace};
+export { trace };

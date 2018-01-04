@@ -1,9 +1,9 @@
 /** @module hooks */ /** */
-import {Transition} from '../transition/transition';
-import {TransitionService} from '../transition/transitionService';
-import {TransitionHookFn} from '../transition/interface';
-import {StateDeclaration, LazyLoadResult} from '../state/interface';
-import {services} from '../common/coreservices';
+import { Transition } from '../transition/transition';
+import { TransitionService } from '../transition/transitionService';
+import { TransitionHookFn } from '../transition/interface';
+import { StateDeclaration, LazyLoadResult } from '../state/interface';
+import { services } from '../common/coreservices';
 import { StateRule } from '../url/interface';
 
 /**

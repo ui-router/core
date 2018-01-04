@@ -1,11 +1,11 @@
 /** @module hooks */ /** for typedoc */
-import {noop} from '../common/common';
-import {services} from '../common/coreservices';
-import {Transition} from '../transition/transition';
-import {ViewService} from '../view/view';
-import {ViewConfig} from '../view/interface';
-import {TransitionHookFn} from '../transition/interface';
-import {TransitionService} from '../transition/transitionService';
+import { noop } from '../common/common';
+import { services } from '../common/coreservices';
+import { Transition } from '../transition/transition';
+import { ViewService } from '../view/view';
+import { ViewConfig } from '../view/interface';
+import { TransitionHookFn } from '../transition/interface';
+import { TransitionService } from '../transition/transitionService';
 
 
 /**

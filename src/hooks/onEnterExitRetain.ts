@@ -33,7 +33,7 @@ function makeEnterExitRetainHook(hookName: string): TransitionStateHookFn {
  */
 const onExitHook: TransitionStateHookFn = makeEnterExitRetainHook('onExit');
 export const registerOnExitHook = (transitionService: TransitionService) =>
-    transitionService.onExit({exiting: state => !!state.onExit}, onExitHook);
+    transitionService.onExit({ exiting: state => !!state.onExit }, onExitHook);
 
 /**
  * The [[TransitionStateHookFn]] for onRetain
@@ -46,7 +46,7 @@ export const registerOnExitHook = (transitionService: TransitionService) =>
  */
 const onRetainHook: TransitionStateHookFn = makeEnterExitRetainHook('onRetain');
 export const registerOnRetainHook = (transitionService: TransitionService) =>
-    transitionService.onRetain({retained: state => !!state.onRetain}, onRetainHook);
+    transitionService.onRetain({ retained: state => !!state.onRetain }, onRetainHook);
 
 /**
  * The [[TransitionStateHookFn]] for onEnter
@@ -59,5 +59,5 @@ export const registerOnRetainHook = (transitionService: TransitionService) =>
  */
 const onEnterHook: TransitionStateHookFn = makeEnterExitRetainHook('onEnter');
 export const registerOnEnterHook = (transitionService: TransitionService) =>
-    transitionService.onEnter({entering: state => !!state.onEnter}, onEnterHook);
+    transitionService.onEnter({ entering: state => !!state.onEnter }, onEnterHook);
 

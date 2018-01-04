@@ -8,7 +8,7 @@
  * @coreapi
  * @module resolve
  */ /** for typedoc */
-import {Resolvable} from './resolvable';
+import { Resolvable } from './resolvable';
 
 /**
  * An interface which is similar to an Angular 2 `Provider`

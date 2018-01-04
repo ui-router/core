@@ -7,7 +7,7 @@ import { trace } from '../common/trace';
 import { services } from '../common/coreservices';
 import { stringify } from '../common/strings';
 import { map, find, extend, mergeR, tail, omit, arrayTuples, unnestR, identity, anyTrueR } from '../common/common';
-import {isObject, isUndefined} from '../common/predicates';
+import { isObject, isUndefined } from '../common/predicates';
 import { prop, propEq, val, not, is } from '../common/hof';
 import { StateDeclaration, StateOrName } from '../state/interface';
 import {

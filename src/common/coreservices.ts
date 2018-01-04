@@ -5,7 +5,7 @@
  * @module common
  */
 /** for typedoc */
-import {IInjectable, Obj} from './common';
+import { IInjectable, Obj } from './common';
 import { Disposable } from '../interface';
 import { UrlParts } from '../url/interface';
 
@@ -196,4 +196,4 @@ export interface LocationConfig extends Disposable {
   hashPrefix(newprefix: string): string;
 }
 
-export {services};
+export { services };

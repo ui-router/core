@@ -3,8 +3,8 @@
  * @module transition
  */ /** for typedoc */
 'use strict';
-import {extend, silentRejection} from '../common/common';
-import {stringify} from '../common/strings';
+import { extend, silentRejection } from '../common/common';
+import { stringify } from '../common/strings';
 import { is } from '../common/hof';
 
 export enum RejectType {
