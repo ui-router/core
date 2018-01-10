@@ -13,7 +13,7 @@ import { isFunction, isObject } from '../common/predicates';
 import { Transition } from '../transition/transition';
 import { StateObject } from '../state/stateObject';
 import { PathNode } from '../path/pathNode';
-import { isNullOrUndefined } from '../common';
+import { isNullOrUndefined } from '../common/predicates';
 
 
 // TODO: explicitly make this user configurable
