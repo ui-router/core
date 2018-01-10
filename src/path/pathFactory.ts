@@ -125,16 +125,13 @@ export class PathUtils {
 
     let from: PathNode[], retained: PathNode[], exiting: PathNode[], entering: PathNode[], to: PathNode[];
 
-    from                  = fromPath;
-    retained              = from.slice(0, keep);
-    exiting               = from.slice(keep);
+    from     = fromPath;
+    retained = from.slice(0, keep).map(applyToParams); // applyToParams to update dynamic params
+    exiting  = from.slice(keep);
+    entering = toPath.slice(keep);
+    to       = (retained).concat(entering);
 
-    // Create a new retained path (with shallow copies of nodes) which have the params of the toPath mapped
-    const retainedWithToParams  = retained.map(applyToParams);
-    entering              = toPath.slice(keep);
-    to                    = (retainedWithToParams).concat(entering);
-
-    return { from, to, retained: retainedWithToParams, exiting, entering };
+    return { from, to, retained, exiting, entering };
   }
 
   /**
