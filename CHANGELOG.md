@@ -1,3 +1,14 @@
+## 5.0.14 (2018-01-10)
+[Compare `@uirouter/core` versions 5.0.13 and 5.0.14](https://github.com/ui-router/core/compare/5.0.13...5.0.14)
+
+### Bug Fixes
+
+* **trace:** Fix null reference in uiview name sort function ([59cb067](https://github.com/ui-router/core/commit/59cb067))
+* **treeChanges:** apply toParams to 'retained' path ([#72](https://github.com/ui-router/core/issues/72)) ([cf63d11](https://github.com/ui-router/core/commit/cf63d11))
+
+
+
+
 ## 5.0.13 (2017-12-22)
 [Compare `@uirouter/core` versions 5.0.12 and 5.0.13](https://github.com/ui-router/core/compare/5.0.12...5.0.13)
 
