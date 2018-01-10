@@ -18,7 +18,7 @@ import { TransitionHook } from './transitionHook';
 import { matchState, makeEvent, RegisteredHook } from './hookRegistry';
 import { HookBuilder } from './hookBuilder';
 import { PathNode } from '../path/pathNode';
-import { PathUtils } from '../path/pathFactory';
+import { PathUtils } from '../path/pathUtils';
 import { StateObject } from '../state/stateObject';
 import { TargetState } from '../state/targetState';
 import { Param } from '../params/param';

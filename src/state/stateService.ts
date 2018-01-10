@@ -8,7 +8,7 @@ import { isDefined, isObject, isString } from '../common/predicates';
 import { Queue } from '../common/queue';
 import { services } from '../common/coreservices';
 
-import { PathUtils } from '../path/pathFactory';
+import { PathUtils } from '../path/pathUtils';
 import { PathNode } from '../path/pathNode';
 
 import { HookResult, TransitionOptions } from '../transition/interface';

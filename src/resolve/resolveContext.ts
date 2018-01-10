@@ -8,7 +8,7 @@ import { resolvePolicies, PolicyWhen, ResolvePolicy } from './interface';
 import { PathNode } from '../path/pathNode';
 import { Resolvable } from './resolvable';
 import { StateObject } from '../state/stateObject';
-import { PathUtils } from '../path/pathFactory';
+import { PathUtils } from '../path/pathUtils';
 import { stringify } from '../common/strings';
 import { Transition } from '../transition/transition';
 import { UIInjector } from '../interface';
