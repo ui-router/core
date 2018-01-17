@@ -1,7 +1,7 @@
 import {
     defaults, filter, is, eq, not, pattern, val, isInjectable
 } from "../src/index";
-import { pick } from '../src/common/common';
+import { map, mapObj, pick } from '../src/common/common';
 
 describe('common', function() {
   describe('filter', function() {
@@ -124,6 +124,42 @@ describe('common', function() {
     it('should not pick missing properties', () => {
       let obj = { foo: 'foo', bar: 'bar' };
       expect(pick(obj, ['baz'])).toEqual({ });
+    });
+  });
+
+  describe('map', () => {
+    it('should map arrays', () => {
+      const src = [1, 2, 3, 4];
+      const dest = map(src, x => x * 2);
+
+      expect(src).toEqual([1, 2, 3, 4]);
+      expect(dest).toEqual([2, 4, 6, 8]);
+    });
+
+    it('should map arrays in place when target === src', () => {
+      const src = [1, 2, 3, 4];
+      const dest = map(src, x => x * 2, src);
+
+      expect(src).toEqual([2, 4, 6, 8]);
+      expect(dest).toEqual([2, 4, 6, 8]);
+    });
+  });
+
+  describe('mapObj', () => {
+    it('should map objects', () => {
+      const src = { foo: 1, bar: 2, baz: 3 };
+      const dest = mapObj(src, x => x * 2);
+
+      expect(src).toEqual({ foo: 1, bar: 2, baz: 3 });
+      expect(dest).toEqual({ foo: 2, bar: 4, baz: 6 });
+    });
+
+    it('should map objects in place when target === src', () => {
+      const src = { foo: 1, bar: 2, baz: 3 };
+      const dest = mapObj(src, x => x * 2, src);
+
+      expect(src).toEqual({ foo: 2, bar: 4, baz: 6 });
+      expect(dest).toEqual({ foo: 2, bar: 4, baz: 6 });
     });
   });
 });
