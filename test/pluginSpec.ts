@@ -1,9 +1,9 @@
-import { UIRouter, TransitionService, StateService } from "../src/index";
-import * as vanilla from "../src/vanilla";
-import { StateRegistry } from "../src/state/stateRegistry";
-import { UrlRouter } from "../src/url/urlRouter";
-import {UIRouterPlugin} from "../src/interface";
-import { isArray } from "../src/common/predicates";
+import { UIRouter, TransitionService, StateService } from '../src/index';
+import * as vanilla from '../src/vanilla';
+import { StateRegistry } from '../src/state/stateRegistry';
+import { UrlRouter } from '../src/url/urlRouter';
+import { UIRouterPlugin } from '../src/interface';
+import { isArray } from '../src/common/predicates';
 
 describe('plugin api', function () {
   let router: UIRouter;
@@ -23,24 +23,24 @@ describe('plugin api', function () {
   });
 
   class FancyPluginClass implements UIRouterPlugin {
-    name = "fancypluginclass";
+    name = 'fancypluginclass';
     constructor(public router: UIRouter) { }
     dispose() {}
   }
 
   function FancyPluginConstructor(router: UIRouter, options: any) {
-    this.name = "fancypluginconstructor";
+    this.name = 'fancypluginconstructor';
   }
 
   describe('initialization', () => {
     it('should accept a plugin class', () => {
-      let plugin = router.plugin(FancyPluginClass);
+      const plugin = router.plugin(FancyPluginClass);
       expect(plugin instanceof FancyPluginClass).toBeTruthy();
       expect(plugin.name).toBe('fancypluginclass');
     });
 
     it('should accept a constructor function', () => {
-      let plugin = router.plugin(FancyPluginConstructor);
+      const plugin = router.plugin(FancyPluginConstructor);
       expect(plugin instanceof FancyPluginConstructor).toBeTruthy();
       expect(plugin.name).toBe('fancypluginconstructor');
     });
@@ -49,13 +49,13 @@ describe('plugin api', function () {
       function factoryFn(router: UIRouter, options: any) {
         return new FancyPluginClass(router);
       }
-      let plugin = router.plugin(factoryFn);
+      const plugin = router.plugin(factoryFn);
       expect(plugin instanceof FancyPluginClass).toBeTruthy();
       expect(plugin.name).toBe('fancypluginclass');
     });
 
     it('should return an instance of the plugin', () => {
-      let plugin = router.plugin(() => new FancyPluginClass(router));
+      const plugin = router.plugin(() => new FancyPluginClass(router));
       expect(plugin instanceof FancyPluginClass).toBeTruthy();
     });
 
@@ -63,7 +63,7 @@ describe('plugin api', function () {
       let pluginRouterInstance = undefined;
       function PluginFactory(router) {
         pluginRouterInstance = router;
-        return { name: 'plugin' }
+        return { name: 'plugin' };
       }
 
       router.plugin(PluginFactory);
@@ -72,33 +72,33 @@ describe('plugin api', function () {
 
     it('should throw if the plugin constructor returns an object without name() getter', () => {
       function PluginFactory(router) {
-        return { }
+        return { };
       }
 
-      expect(() => router.plugin(<any> PluginFactory)).toThrow()
+      expect(() => router.plugin(<any> PluginFactory)).toThrow();
     });
   });
 
   describe('getPlugin', () => {
     it('should return the plugin instance', () => {
       router.plugin(FancyPluginClass);
-      let plugin = router.getPlugin('fancypluginclass');
+      const plugin = router.getPlugin('fancypluginclass');
       expect(plugin instanceof FancyPluginClass).toBeTruthy();
     });
 
     it('should return undefined if no pluginName is registered', () => {
       router.plugin(FancyPluginClass);
-      let plugin = router.getPlugin('notexists');
+      const plugin = router.getPlugin('notexists');
       expect(plugin).toBeUndefined();
     });
 
     it('should return all registered plugins when no pluginName is specified', () => {
       router.plugin(FancyPluginClass);
       router.plugin(FancyPluginConstructor);
-      let plugins = router.getPlugin();
+      const plugins = router.getPlugin();
       expect(isArray(plugins)).toBeTruthy();
       expect(plugins.pop() instanceof FancyPluginConstructor).toBeTruthy();
       expect(plugins.pop() instanceof FancyPluginClass).toBeTruthy();
     });
-  })
+  });
 });

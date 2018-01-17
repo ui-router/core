@@ -1,9 +1,9 @@
-import { StateMatcher, StateBuilder, UrlMatcher, extend } from "../src/index";
-import { ParamTypes } from "../src/params/paramTypes";
-import { UIRouter } from "../src/router";
-import { StateObject } from "../src/state/stateObject";
+import { StateMatcher, StateBuilder, UrlMatcher, extend } from '../src/index';
+import { ParamTypes } from '../src/params/paramTypes';
+import { UIRouter } from '../src/router';
+import { StateObject } from '../src/state/stateObject';
 
-let paramTypes = new ParamTypes();
+const paramTypes = new ParamTypes();
 describe('StateBuilder', function() {
   let states, router, registry, matcher, urlMatcherFactory, builder;
 
@@ -25,8 +25,8 @@ describe('StateBuilder', function() {
     registry.register({ name: 'other.foo' });
     registry.register({ name: 'other.foo.bar' });
 
-    registry.register({ name: 'home.withData', data: { val1: "foo", val2: "bar" } });
-    registry.register({ name: 'home.withData.child', data: { val2: "baz" } });
+    registry.register({ name: 'home.withData', data: { val1: 'foo', val2: 'bar' } });
+    registry.register({ name: 'home.withData.child', data: { val2: 'baz' } });
 
     states = registry.get().reduce((acc, state) => (acc[state.name] = state, acc), {});
   });
@@ -44,8 +44,8 @@ describe('StateBuilder', function() {
       });
 
       it('should concatenate parent names', function() {
-        expect(builder.name({ name: "bar", parent: "foo" })).toBe("foo.bar");
-        expect(builder.name({ name: "bar", parent: { name: "foo" } })).toBe("foo.bar");
+        expect(builder.name({ name: 'bar', parent: 'foo' })).toBe('foo.bar');
+        expect(builder.name({ name: 'bar', parent: { name: 'foo' } })).toBe('foo.bar');
       });
     });
 
@@ -57,14 +57,14 @@ describe('StateBuilder', function() {
         expect(builder.parentName(states['other.foo'])).toBe('other');
       });
       it('should return empty string if state has no parent', function() {
-        expect(builder.parentName(states[''])).toBe("");
+        expect(builder.parentName(states[''])).toBe('');
       });
       it('should error if parent: is specified *AND* the state name has a dot (.) in it', function() {
-        let errorState = { name: 'home.error', parent: 'home' };
+        const errorState = { name: 'home.error', parent: 'home' };
         expect(() => builder.parentName(errorState)).toThrowError();
       });
       it('should not error if parent: is specified and the (future state) name ends in .**', function() {
-        let futureState = { name: 'child.**', parent: 'home' };
+        const futureState = { name: 'child.**', parent: 'home' };
         expect(builder.parentName(futureState)).toBe('home');
       });
     });
@@ -72,41 +72,41 @@ describe('StateBuilder', function() {
 
   describe('state building', function() {
     it('should build parent property', function() {
-      let about = StateObject.create({ name: 'home.about' });
+      const about = StateObject.create({ name: 'home.about' });
       expect(builder.builder('parent')(about)).toBe(states['home'].$$state());
     });
 
     it('should inherit parent data', function() {
       let state = StateObject.create(states['home.withData.child']);
-      expect(builder.builder('data')(state)).toEqualData({ val1: "foo", val2: "baz" });
+      expect(builder.builder('data')(state)).toEqualData({ val1: 'foo', val2: 'baz' });
 
       state = StateObject.create(states['home.withData']);
-      expect(builder.builder('data')(state)).toEqualData({ val1: "foo", val2: "bar" });
+      expect(builder.builder('data')(state)).toEqualData({ val1: 'foo', val2: 'bar' });
     });
 
     it('should compile a UrlMatcher for ^ URLs', function() {
-      let url = new UrlMatcher('/', paramTypes, null);
+      const url = new UrlMatcher('/', paramTypes, null);
       spyOn(urlMatcherFactory, 'compile').and.returnValue(url);
       spyOn(urlMatcherFactory, 'isMatcher').and.returnValue(true);
 
-      expect(builder.builder('url')({ url: "^/foo" })).toBe(url);
-      expect(urlMatcherFactory.compile).toHaveBeenCalledWith("/foo", {
+      expect(builder.builder('url')({ url: '^/foo' })).toBe(url);
+      expect(urlMatcherFactory.compile).toHaveBeenCalledWith('/foo', {
         params: {},
-        paramMap: jasmine.any(Function)
+        paramMap: jasmine.any(Function),
       });
       expect(urlMatcherFactory.isMatcher).toHaveBeenCalledWith(url);
     });
 
     it('should concatenate URLs from root', function() {
-      let root = states[''].$$state();
+      const root = states[''].$$state();
       spyOn(root.url, 'append').and.callThrough();
 
-      let childstate = StateObject.create({ name: 'asdf', url: "/foo" });
+      const childstate = StateObject.create({ name: 'asdf', url: '/foo' });
       builder.builder('url')(childstate);
-      
+
       expect(root.url.append).toHaveBeenCalled();
-      let args = root.url.append.calls.argsFor(0);
-      expect(args[0].pattern).toBe('/foo')
+      const args = root.url.append.calls.argsFor(0);
+      expect(args[0].pattern).toBe('/foo');
     });
 
     it('should pass through empty URLs', function() {
@@ -114,8 +114,8 @@ describe('StateBuilder', function() {
     });
 
     it('should pass through custom UrlMatchers', function() {
-      let root = states[''].$$state();
-      let url = new UrlMatcher("/", paramTypes, null);
+      const root = states[''].$$state();
+      const url = new UrlMatcher('/', paramTypes, null);
       spyOn(urlMatcherFactory, 'isMatcher').and.returnValue(true);
       spyOn(root.url, 'append').and.returnValue(url);
       expect(builder.builder('url')({ url: url })).toBe(url);
@@ -127,19 +127,19 @@ describe('StateBuilder', function() {
       spyOn(urlMatcherFactory, 'isMatcher').and.returnValue(false);
 
       expect(function() {
-        builder.builder('url')({ toString: function() { return "foo"; }, url: { foo: "bar" } });
+        builder.builder('url')({ toString: function() { return 'foo'; }, url: { foo: 'bar' } });
       }).toThrowError(Error, "Invalid url '[object Object]' in state 'foo'");
 
-      expect(urlMatcherFactory.isMatcher).toHaveBeenCalledWith({ foo: "bar" });
+      expect(urlMatcherFactory.isMatcher).toHaveBeenCalledWith({ foo: 'bar' });
     });
   });
 
   describe('state definitions with prototypes', () => {
     function fooResolve() {}
-    let proto = {
+    const proto = {
       name: 'name_',
       abstract: true,
-      resolve: { foo: fooResolve},
+      resolve: { foo: fooResolve },
       resolvePolicy: {},
       url: 'name/',
       params: { foo: 'foo' },
@@ -155,8 +155,8 @@ describe('StateBuilder', function() {
     MyStateClass.prototype = proto;
     function MyStateClass () { }
 
-    let nestedProto = {
-      parent: "name_",
+    const nestedProto = {
+      parent: 'name_',
       name: 'nested',
     };
 
@@ -226,9 +226,9 @@ describe('StateBuilder', function() {
     it('should use `lazyLoad` from the prototype', () => {
       expect(myBuiltState.lazyLoad).toBe(proto.lazyLoad);
     });
-    
+
     it('should use `redirectTo` from the prototype', () => {
       expect(myBuiltState.redirectTo).toBe(proto.redirectTo);
     });
-  })
+  });
 });

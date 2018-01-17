@@ -1,7 +1,7 @@
 import { stripLastPathElement } from '../src/common';
 import { UIRouter } from '../src/router';
 import { UrlService } from '../src/url/urlService';
-import * as vanilla from "../src/vanilla";
+import * as vanilla from '../src/vanilla';
 import { UrlMatcherFactory } from '../src/url/urlMatcherFactory';
 import { BrowserLocationConfig } from '../src/vanilla';
 import { resetBrowserUrl } from './_testUtils';
@@ -17,7 +17,7 @@ describe('BrowserLocationConfig implementation', () => {
 
   // Replace the history and location
   function mockPushState(_router) {
-    let plugin: any = _router.getPlugin('vanilla.pushStateLocation');
+    const plugin: any = _router.getPlugin('vanilla.pushStateLocation');
 
     mockHistory = {
       replaceState: (a, b, url) => mockLocation.href = url,
@@ -25,17 +25,17 @@ describe('BrowserLocationConfig implementation', () => {
     };
 
     mockLocation = {
-      _href: "/",
-      pathname: "/",
-      search: "",
+      _href: '/',
+      pathname: '/',
+      search: '',
       get href() {
         return this._href;
       },
       set href(val) {
         this._href = val;
-        let [pathname, search] = val.split("?");
+        const [pathname, search] = val.split('?');
         this.pathname = pathname;
-        this.search = search ? "?" + search : "";
+        this.search = search ? '?' + search : '';
       },
     };
 
@@ -59,16 +59,16 @@ describe('BrowserLocationConfig implementation', () => {
   });
 
   it('uses history.pushState when setting a url', () => {
-    let service = mockPushState(router);
+    const service = mockPushState(router);
     expect(router.urlService.config.html5Mode()).toBe(true);
-    let stub = spyOn(service._history, 'pushState');
+    const stub = spyOn(service._history, 'pushState');
     router.urlRouter.push($umf.compile('/hello/:name'), { name: 'world' }, {});
     expect(stub.calls.first().args[2]).toBe(stripLastPathElement($url.config.baseHref()) + '/hello/world');
   });
 
   it('uses history.replaceState when setting a url with replace', () => {
-    let service = mockPushState(router);
-    let stub = spyOn(service._history, 'replaceState');
+    const service = mockPushState(router);
+    const stub = spyOn(service._history, 'replaceState');
     router.urlRouter.push($umf.compile('/hello/:name'), { name: 'world' }, { replace: true });
     expect(stub.calls.first().args[2]).toBe(stripLastPathElement($url.config.baseHref()) + '/hello/world');
   });
@@ -103,7 +103,7 @@ describe('BrowserLocationConfig implementation', () => {
 
     expect(blc.host()).toBe(location.hostname);
     expect(blc.port()).toBe(parseInt(location.port, 10));
-    expect(blc.protocol() + ":").toBe(location.protocol);
+    expect(blc.protocol() + ':').toBe(location.protocol);
   });
 
   describe('base href', () => {

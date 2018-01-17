@@ -1,12 +1,12 @@
-import { UIRouter } from "../src/router";
-import { UIRouterPluginBase } from "../src/interface";
-import * as vanilla from "../src/vanilla";
-import { UrlService } from "../src/url/urlService";
+import { UIRouter } from '../src/router';
+import { UIRouterPluginBase } from '../src/interface';
+import * as vanilla from '../src/vanilla';
+import { UrlService } from '../src/url/urlService';
 
 export class TestingPlugin extends UIRouterPluginBase {
-  name: string = 'testing';
-  errorsCount: number = 0;
-  errorsThreshold: number = 1000;
+  name = 'testing';
+  errorsCount = 0;
+  errorsThreshold = 1000;
 
   constructor(public router: UIRouter) {
     super();
@@ -28,7 +28,7 @@ export class TestingPlugin extends UIRouterPluginBase {
   }
 
   addErrorLoopHandler() {
-    let $transitions = this.router.transitionService;
+    const $transitions = this.router.transitionService;
     $transitions.onCreate({}, trans => {
       trans.promise.catch(() => this.errorsCount++);
       if (this.errorsCount > this.errorsThreshold) {

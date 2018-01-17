@@ -1,7 +1,7 @@
-import { pick, forEach, omit } from "../src/index";
-import { map } from "../src/common/common";
+import { pick, forEach, omit } from '../src/index';
+import { map } from '../src/common/common';
 
-let stateProps = ["resolve", "resolvePolicy", "data", "template", "templateUrl", "url", "name", "params"];
+const stateProps = ['resolve', 'resolvePolicy', 'data', 'template', 'templateUrl', 'url', 'name', 'params'];
 
 const initialUrl = document.location.href;
 export const resetBrowserUrl = () =>
@@ -14,8 +14,8 @@ export const _delay = (ms) => () => delay(ms);
 export function tree2Array(tree, inheritName) {
 
   function processState(parent, state, name) {
-    let substates: any = omit(state, stateProps);
-    let thisState: any = pick(state, stateProps);
+    const substates: any = omit(state, stateProps);
+    const thisState: any = pick(state, stateProps);
     thisState.name = name;
     if (!inheritName) thisState.parent = parent;
 
@@ -31,7 +31,7 @@ export function tree2Array(tree, inheritName) {
     return states;
   }
 
-  return processChildren("", tree);
+  return processChildren('', tree);
 }
 
 export function PromiseResult(promise?) {
@@ -43,11 +43,11 @@ export function PromiseResult(promise?) {
       throw new Error("Already have with'd a promise.");
     }
 
-    let onfulfilled = (data) =>
+    const onfulfilled = (data) =>
         resolve = data || true;
-    let onrejected = (err) =>
+    const onrejected = (err) =>
         reject = err || true;
-    let done = () =>
+    const done = () =>
         complete = true;
 
     _promise = promise;
@@ -68,7 +68,7 @@ export function PromiseResult(promise?) {
 }
 
 export const awaitTransition = (router) => new Promise(resolve => {
-  let dereg = router.transitionService.onSuccess({}, (trans) => {
+  const dereg = router.transitionService.onSuccess({}, (trans) => {
     dereg();
     resolve(trans);
   });

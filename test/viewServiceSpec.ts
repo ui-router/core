@@ -1,14 +1,14 @@
-import { UIRouter } from "../src/router";
+import { UIRouter } from '../src/router';
 import { ViewSyncListener, ViewTuple } from '../src/view';
-import { tree2Array } from "./_testUtils";
-import { StateRegistry } from "../src/state/stateRegistry";
-import { ViewService } from "../src/view/view";
-import { ActiveUIView } from "../src/view/interface";
+import { tree2Array } from './_testUtils';
+import { StateRegistry } from '../src/state/stateRegistry';
+import { ViewService } from '../src/view/view';
+import { ActiveUIView } from '../src/view/interface';
 
 let router: UIRouter = null;
 let registry: StateRegistry = null;
 let $view: ViewService = null;
-let statetree = {
+const statetree = {
   A: {
     B: {
       C: {
@@ -31,7 +31,7 @@ const makeUIView = (state?): ActiveUIView => ({
   configUpdated: function() {},
 });
 
-describe("View Service", () => {
+describe('View Service', () => {
   beforeEach(() => {
     router = new UIRouter();
     registry = router.stateRegistry;
@@ -40,15 +40,15 @@ describe("View Service", () => {
   });
 
   describe('registerUIView', () => {
-    it("should track a ui-view", () => {
+    it('should track a ui-view', () => {
       expect($view.available().length).toBe(0);
       $view.registerUIView(makeUIView());
       expect($view.available().length).toBe(1);
     });
 
-    it("should return a deregistration function", () => {
+    it('should return a deregistration function', () => {
       expect($view.available().length).toBe(0);
-      let deregistrationFn = $view.registerUIView(makeUIView());
+      const deregistrationFn = $view.registerUIView(makeUIView());
       expect(typeof deregistrationFn).toBe('function');
       expect($view.available().length).toBe(1);
       deregistrationFn();

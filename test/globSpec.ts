@@ -1,8 +1,8 @@
-import {Glob} from "../src/common/glob";
+import { Glob } from '../src/common/glob';
 
 describe('Glob', function() {
   it('should match exact strings', function() {
-    var state = 'about.person.item';
+    let state = 'about.person.item';
 
     expect(new Glob('about.person.item').matches(state)).toBe(true);
     expect(new Glob('about.person.item.foo').matches(state)).toBe(false);
@@ -10,7 +10,7 @@ describe('Glob', function() {
   });
 
   it('with a single wildcard (*) should match a top level state', function() {
-    var glob = new Glob('*');
+    let glob = new Glob('*');
 
     expect(glob.matches('foo')).toBe(true);
     expect(glob.matches('bar')).toBe(true);
@@ -20,7 +20,7 @@ describe('Glob', function() {
   });
 
   it('with a single wildcard (*) should match any single non-empty segment', function() {
-    var state = 'about.person.item';
+    let state = 'about.person.item';
 
     expect(new Glob('*.person.item').matches(state)).toBe(true);
     expect(new Glob('*.*.item').matches(state)).toBe(true);
@@ -34,7 +34,7 @@ describe('Glob', function() {
   });
 
   it('with a double wildcard (**) should match any valid state name', function() {
-    var glob = new Glob('**');
+    let glob = new Glob('**');
 
     expect(glob.matches('foo')).toBe(true);
     expect(glob.matches('bar')).toBe(true);
@@ -42,7 +42,7 @@ describe('Glob', function() {
   });
 
   it('with a double wildcard (**) should match zero or more segments', function() {
-    var state = 'about.person.item';
+    let state = 'about.person.item';
 
     expect(new Glob('**').matches(state)).toBe(true);
     expect(new Glob('**.**').matches(state)).toBe(true);

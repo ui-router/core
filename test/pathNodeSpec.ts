@@ -1,8 +1,8 @@
-import {UIRouter} from '../src/router';
-import {StateRegistry} from '../src/state/stateRegistry';
-import {StateService} from '../src/state/stateService';
-import {PathNode} from '../src/path/pathNode';
-import {TestingPlugin} from './_testingPlugin';
+import { UIRouter } from '../src/router';
+import { StateRegistry } from '../src/state/stateRegistry';
+import { StateService } from '../src/state/stateService';
+import { PathNode } from '../src/path/pathNode';
+import { TestingPlugin } from './_testingPlugin';
 
 let router: UIRouter;
 let registry: StateRegistry;
@@ -17,7 +17,7 @@ describe('PathNode', () => {
 
     registry = router.stateRegistry;
     $state = router.stateService;
-    let A = {
+    const A = {
       name: 'A',
       url: '/:foo/:bar/:baz',
       params: {
@@ -26,7 +26,7 @@ describe('PathNode', () => {
       },
     };
 
-    let B = {
+    const B = {
       name: 'B',
       url: '/B/:qux',
     };
@@ -55,7 +55,7 @@ describe('PathNode', () => {
       a1.applyRawParams({ foo: '1', bar: '2', baz: '5' });
       a2.applyRawParams({ foo: '1', bar: '2', baz: '3' });
 
-      let baz = a1.parameter('baz');
+      const baz = a1.parameter('baz');
       expect(a1.diff(a2)).toEqual([baz]);
     });
 
@@ -70,7 +70,7 @@ describe('PathNode', () => {
       a1.applyRawParams({ foo: '1', bar: '2', baz: '3', nonurl: '4' });
       a2.applyRawParams({ foo: '1', bar: '2', baz: '3' });
 
-      let nonurl = a1.parameter('nonurl');
+      const nonurl = a1.parameter('nonurl');
       expect(a1.diff(a2)).toEqual([nonurl]);
     });
   });

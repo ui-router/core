@@ -1,8 +1,8 @@
-import { UIRouter } from "../src/index";
-import * as vanilla from "../src/vanilla";
-import { UrlMatcherFactory } from "../src/url/urlMatcherFactory";
-import { StateService } from "../src/state/stateService";
-import { UrlService } from "../src/url/urlService";
+import { UIRouter } from '../src/index';
+import * as vanilla from '../src/vanilla';
+import { UrlMatcherFactory } from '../src/url/urlMatcherFactory';
+import { StateService } from '../src/state/stateService';
+import { UrlService } from '../src/url/urlService';
 import { resetBrowserUrl } from './_testUtils';
 
 const origin = window.location.origin;
@@ -122,7 +122,7 @@ describe('pushStateLocationService', () => {
     });
 
     describe('/debug.html', () => {
-      const base = "/debug.html";
+      const base = '/debug.html';
       beforeEach(() => applyBaseTag(base));
 
       it('handles bar correctly', () => {

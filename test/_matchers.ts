@@ -1,6 +1,6 @@
 /// <reference path="./_matchers.d.ts" />
 
-import {equals} from "../src/common/common";
+import { equals } from '../src/common/common';
 declare var testablePromise;
 
 beforeEach(function() {
@@ -9,37 +9,37 @@ beforeEach(function() {
       return {
         compare: function(actual, expected) {
           return { pass: equals(actual, expected) };
-        }
-      }
+        },
+      };
     },
 
     toEqualValues: function() {
       return {
         compare: function(actual, expected) {
-          let pass = Object.keys(expected)
+          const pass = Object.keys(expected)
               .reduce((acc, key) => acc && equals(actual[key], expected[key]), true);
           return { pass };
-        }
-      }
+        },
+      };
     },
 
     toBeResolved: () => ({
       compare: actual => ({
-        pass: !!testablePromise(actual).$$resolved
-      })
+        pass: !!testablePromise(actual).$$resolved,
+      }),
     }),
 
     toHaveClass: function() {
       return {
         compare: function(actual, clazz) {
-          var classes = Array.prototype.slice.call(actual[0].classList);
-          var pass = classes.indexOf(clazz) !== -1;
-          var message = pass ? undefined :  "Expected '" + (actual) + "' to have class '" + clazz + "'.";
+          const classes = Array.prototype.slice.call(actual[0].classList);
+          const pass = classes.indexOf(clazz) !== -1;
+          const message = pass ? undefined :  "Expected '" + (actual) + "' to have class '" + clazz + "'.";
 
-          return { pass: pass, message: message};
-        }
+          return { pass: pass, message: message };
+        },
       };
-    }
+    },
 
   });
 });
