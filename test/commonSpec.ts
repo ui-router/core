@@ -19,7 +19,7 @@ describe('common', function() {
 
     it('should filter objects', function() {
       const input = { foo: 1, bar: 2, baz: 3, qux: 4 };
-      const filtered = filter(input, function(val, key) { return val > 2; });
+      const filtered = filter(input, function(value, _key) { return value > 2; });
       expect(Object.keys(filtered).length).toBe(2);
       expect(filtered).toEqual({ baz: 3, qux: 4 });
     });
@@ -99,18 +99,18 @@ describe('common', function() {
     });
 
     it('should accept functions with parameters', function() {
-      function fn(foo, bar) {}
+      function fn(_foo, _bar) {}
       expect(isInjectable(fn)).toBeTruthy();
     });
 
     it('should accept ng1 annotated functions', function() {
       fn['$inject'] = ['foo', 'bar'];
-      function fn (foo, bar) {}
+      function fn (_foo, _bar) {}
       expect(isInjectable(fn)).toBeTruthy();
     });
 
     it('should accept ng1 array notation', function() {
-      const fn = ['foo', 'bar', function(foo, bar) {}];
+      const fn = ['foo', 'bar', function(_foo, _bar) {}];
       expect(isInjectable(fn)).toBeTruthy();
     });
   });
