@@ -88,7 +88,7 @@ export class Resolvable implements ResolvableLiteral {
       this.data = data;
       this.resolved = data !== undefined;
       this.promise = this.resolved ? services.$q.when(this.data) : undefined;
-    } else if (isObject(arg1) && arg1.token && isFunction(arg1.resolveFn)) {
+    } else if (isObject(arg1) && arg1.token && (arg1.hasOwnProperty('resolveFn') || arg1.hasOwnProperty('data'))) {
       const literal = <ResolvableLiteral> arg1;
       return new Resolvable(literal.token, literal.resolveFn, literal.deps, literal.policy, literal.data);
     }
@@ -144,6 +144,7 @@ export class Resolvable implements ResolvableLiteral {
     const applyResolvedValue = (resolvedValue: any) => {
       this.data = resolvedValue;
       this.resolved = true;
+      this.resolveFn = null;
       trace.traceResolvableResolved(this, trans);
       return this.data;
     };

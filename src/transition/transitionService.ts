@@ -13,7 +13,7 @@ import { TargetState } from '../state/targetState';
 import { PathNode } from '../path/pathNode';
 import { ViewService } from '../view/view';
 import { UIRouter } from '../router';
-import { registerAddCoreResolvables } from '../hooks/coreResolvables';
+import { registerAddCoreResolvables, treeChangesCleanup } from '../hooks/coreResolvables';
 import { registerRedirectToHook } from '../hooks/redirectTo';
 import { registerOnExitHook, registerOnRetainHook, registerOnEnterHook } from '../hooks/onEnterExitRetain';
 import { registerEagerResolvePath, registerLazyResolveState, registerResolveRemaining } from '../hooks/resolve';
@@ -163,6 +163,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     this._defineCorePaths();
     this._defineCoreEvents();
     this._registerCoreTransitionHooks();
+    _router.globals.successfulTransitions.onEvict(treeChangesCleanup);
   }
 
   /**

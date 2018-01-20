@@ -45,11 +45,11 @@ export class UIRouter {
   /** Provides services related to ui-view synchronization */
   viewService = new ViewService();
 
-  /** Provides services related to Transitions */
-  transitionService: TransitionService = new TransitionService(this);
-
   /** Global router state */
   globals: UIRouterGlobals = new UIRouterGlobals();
+
+  /** Provides services related to Transitions */
+  transitionService: TransitionService = new TransitionService(this);
 
   /**
    * Deprecated for public use. Use [[urlService]] instead.

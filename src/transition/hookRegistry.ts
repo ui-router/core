@@ -2,18 +2,14 @@
  * @coreapi
  * @module transition
  */ /** for typedoc */
-import { extend, removeFrom, tail, values, identity, map } from '../common/common';
-import { isString, isFunction } from '../common/predicates';
+import { isString, isFunction, Glob, extend, removeFrom, tail, values, identity, mapObj } from '../common';
 import { PathNode } from '../path/pathNode';
 import {
-    TransitionStateHookFn, TransitionHookFn, TransitionHookPhase, TransitionHookScope, IHookRegistry, PathType,
-} from './interface'; // has or is using
-
-import {
-    HookRegOptions, HookMatchCriteria, TreeChanges,
-    HookMatchCriterion, IMatchingNodes, HookFn,
+  TransitionStateHookFn, TransitionHookFn, TransitionHookPhase, // has or is using
+  TransitionHookScope, IHookRegistry, PathType,
 } from './interface';
-import { Glob } from '../common/glob';
+
+import { HookRegOptions, HookMatchCriteria, TreeChanges, HookMatchCriterion, IMatchingNodes, HookFn } from './interface';
 import { StateObject } from '../state/stateObject';
 import { TransitionEventType } from './transitionEventType';
 import { TransitionService } from './transitionService';
@@ -108,7 +104,7 @@ export class RegisteredHook {
    * }
    */
   private _getDefaultMatchCriteria(): HookMatchCriteria {
-    return map(this.tranSvc._pluginapi._getPathTypes(), () => true);
+    return mapObj(this.tranSvc._pluginapi._getPathTypes(), () => true);
   }
 
   /**

@@ -1002,4 +1002,22 @@ describe('transition', function () {
       done();
     });
   });
+
+  describe('from previous transitions', () => {
+    it('should get their Transition resolves cleaned up', async(done) => {
+      router.stateRegistry.register({ name: 'resolve', resolve: { foo: () => 'Some data' } });
+      const trans = router.stateService.go('resolve').transition;
+      await trans.promise;
+
+      expect(trans.injector().get(Transition)).toBe(trans);
+      expect(trans.injector().get('foo')).toBe('Some data');
+
+      await router.stateService.go('A');
+
+      expect(trans.injector().get(Transition)).toBe(null);
+      expect(trans.injector().get('foo')).toBe('Some data');
+
+      done();
+    });
+  });
 });
