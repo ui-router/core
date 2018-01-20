@@ -1,14 +1,26 @@
+import { pushTo } from './common';
+
 /**
  * @module common
- */ /** for typedoc */
+ */
+/** for typedoc */
 
 export class Queue<T> {
+  private _evictListeners: ((item: T) => void)[] = [];
+  public onEvict = pushTo(this._evictListeners);
+
   constructor(private _items: T[] = [], private _limit: number = null) { }
 
   enqueue(item: T) {
     const items = this._items;
     items.push(item);
-    if (this._limit && items.length > this._limit) items.shift();
+    if (this._limit && items.length > this._limit) this.evict();
+    return item;
+  }
+
+  evict(): T {
+    const item: T = this._items.shift();
+    this._evictListeners.forEach(fn => fn(item));
     return item;
   }
 

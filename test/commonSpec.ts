@@ -2,6 +2,7 @@ import {
     defaults, filter, is, eq, not, pattern, val, isInjectable,
 } from '../src/index';
 import { map, mapObj, pick } from '../src/common/common';
+import { Queue } from '../src/common';
 
 describe('common', function() {
   describe('filter', function() {
@@ -160,6 +161,109 @@ describe('common', function() {
 
       expect(src).toEqual({ foo: 2, bar: 4, baz: 6 });
       expect(dest).toEqual({ foo: 2, bar: 4, baz: 6 });
+    });
+  });
+
+  describe('Queue', () => {
+    it('peekTail() should show the last enqueued item', () => {
+      const q = new Queue();
+      q.enqueue(1);
+      q.enqueue(2);
+      q.enqueue(3);
+      expect(q.size()).toBe(3);
+      expect(q.peekTail()).toBe(3);
+    });
+
+    it('peekHead() should show the first enqueued item', () => {
+      const q = new Queue();
+      q.enqueue(1);
+      q.enqueue(2);
+      q.enqueue(3);
+      expect(q.size()).toBe(3);
+      expect(q.peekHead()).toBe(1);
+    });
+
+    it('should support a limit (max number of items)', () => {
+      const q = new Queue([], 2);
+      q.enqueue(1);
+      q.enqueue(2);
+      q.enqueue(3);
+      expect(q.size()).toBe(2);
+      expect(q.peekHead()).toBe(2);
+      expect(q.peekTail()).toBe(3);
+    });
+
+    it('clear() should remove all items', () => {
+      const q = new Queue([], 2);
+      q.enqueue(1);
+      q.enqueue(2);
+      q.enqueue(3);
+      expect(q.size()).toBe(2);
+
+      q.clear();
+      expect(q.size()).toBe(0);
+    });
+
+    it('enqueue() should evict from the head when max length is reached', () => {
+      const q = new Queue([], 3);
+      q.enqueue(1);
+      q.enqueue(2);
+      q.enqueue(3);
+      expect(q.size()).toBe(3);
+
+      q.enqueue(4);
+      expect(q.size()).toBe(3);
+
+      const a = q.dequeue();
+      const b = q.dequeue();
+      const c = q.dequeue();
+
+      expect(q.size()).toBe(0);
+      expect([a, b, c]).toEqual([2, 3, 4]);
+    });
+
+    it('onEvict() handlers should be called when an item is evicted', () => {
+      const log = [];
+      const q = new Queue([], 2);
+
+      q.onEvict(item => log.push(item));
+
+      q.enqueue(1);
+      expect(q.size()).toBe(1);
+      expect(log).toEqual([]);
+
+      q.enqueue(2);
+      expect(q.size()).toBe(2);
+      expect(log).toEqual([]);
+
+      q.enqueue(3);
+      expect(q.size()).toBe(2);
+      expect(log).toEqual([1]);
+
+      q.enqueue(4);
+      expect(q.size()).toBe(2);
+      expect(log).toEqual([1, 2]);
+    });
+
+    it('onEvict() should support multiple handlers', () => {
+      const log = [];
+      const log2 = [];
+      const q = new Queue([], 2);
+
+      q.onEvict(item => log.push(item));
+      q.onEvict(item => log2.push(item));
+
+      q.enqueue(1);
+      q.enqueue(2);
+      q.enqueue(3);
+      expect(q.size()).toBe(2);
+      expect(log).toEqual([1]);
+      expect(log2).toEqual([1]);
+
+      q.enqueue(4);
+      expect(q.size()).toBe(2);
+      expect(log).toEqual([1, 2]);
+      expect(log2).toEqual([1, 2]);
     });
   });
 });
