@@ -28,11 +28,6 @@ export class PathNode {
   /** The state's declared view configuration objects */
   public views: ViewConfig[];
 
-  /** Returns a clone of the PathNode */
-  static clone(node: PathNode) {
-    return new PathNode(node);
-  }
-
   /** Creates a copy of a PathNode */
   constructor(node: PathNode);
   /** Creates a new (empty) PathNode for a State */
@@ -52,6 +47,10 @@ export class PathNode {
       this.paramValues = {};
       this.resolvables = state.resolvables.map(res => res.clone());
     }
+  }
+
+  clone() {
+    return new PathNode(this);
   }
 
   /** Sets [[paramValues]] for the node, from the values of an object hash */

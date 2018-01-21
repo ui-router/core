@@ -118,7 +118,7 @@ export class PathUtils {
 
     /** Given a retained node, return a new node which uses the to node's param values */
     function applyToParams(retainedNode: PathNode, idx: number): PathNode {
-      const cloned = PathNode.clone(retainedNode);
+      const cloned = retainedNode.clone();
       cloned.paramValues = toPath[idx].paramValues;
       return cloned;
     }
