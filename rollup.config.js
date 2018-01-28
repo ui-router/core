@@ -42,11 +42,11 @@ const CONFIG = {
     file: '_bundles/ui-router-core' + extension,
     sourcemap: true,
     format: 'umd',
+    exports: 'named',
+    banner: banner,
   },
 
-  exports: 'named',
   plugins: plugins,
-  banner: banner,
   onwarn: onwarn,
 };
 
