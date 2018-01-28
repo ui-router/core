@@ -6,5 +6,6 @@
   "typescript2.6": "./test/typescript2.6",
   "angular": "https://github.com/ui-router/angular.git",
   "angularjs": "https://github.com/angular-ui/ui-router.git",
-  "react": "https://github.com/ui-router/react.git"
+  "react": "https://github.com/ui-router/react.git",
+  "sticky-states": "https://github.com/ui-router/sticky-states.git"
 }
