@@ -138,6 +138,16 @@ export interface TreeChanges {
   retained: PathNode[];
 
   /**
+   * The path of active nodes that the transition is retaining with updated "to params" applied.
+   *
+   * These nodes are neither exited, nor entered.
+   * Before and after the transition is successful, these nodes are active.
+   *
+   * This is a shallow copy of [[retained]], but with new (dynamic) parameter values from [[to]] applied.
+   */
+  retainedWithToParams: PathNode[];
+
+  /**
    * The path of previously active nodes that the transition is exiting.
    *
    * After the Transition is successful, these nodes are no longer active.

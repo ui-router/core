@@ -28,6 +28,12 @@ export class PathNode {
   /** The state's declared view configuration objects */
   public views: ViewConfig[];
 
+  /**
+   * Returns a clone of the PathNode
+   * @deprecated use instance method `node.clone()`
+   */
+  static clone = (node: PathNode) => node.clone();
+
   /** Creates a copy of a PathNode */
   constructor(node: PathNode);
   /** Creates a new (empty) PathNode for a State */
