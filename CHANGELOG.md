@@ -1,3 +1,20 @@
+## 5.0.15 (2018-01-28)
+[Compare `@uirouter/core` versions 5.0.14 and 5.0.15](https://github.com/ui-router/core/compare/5.0.14...5.0.15)
+
+### Bug Fixes
+
+* **core:** Fix memory leak of resolve data from ALL transitions ever ([7f2aed1](https://github.com/ui-router/core/commit/7f2aed1))
+* **pathNode:** add backwards compat for PathNode.clone(). Add retainedWithToParams to treeChanges interface. ([4833a32](https://github.com/ui-router/core/commit/4833a32))
+
+
+### Features
+
+* **common:** Add map-in-place support to map() ([12bc7d8](https://github.com/ui-router/core/commit/12bc7d8))
+* **common:** Add onEvict() callback registry for queues with max length ([c19d007](https://github.com/ui-router/core/commit/c19d007))
+
+
+
+
 ## 5.0.14 (2018-01-10)
 [Compare `@uirouter/core` versions 5.0.13 and 5.0.14](https://github.com/ui-router/core/compare/5.0.13...5.0.14)
 
