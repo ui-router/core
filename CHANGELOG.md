@@ -1,3 +1,13 @@
+## 5.0.16 (2018-01-30)
+[Compare `@uirouter/core` versions 5.0.15 and 5.0.16](https://github.com/ui-router/core/compare/5.0.15...5.0.16)
+
+### Bug Fixes
+
+* **common:** Fix signature of  for objects (make target optional) ([61d0afc](https://github.com/ui-router/core/commit/61d0afc))
+
+
+
+
 ## 5.0.15 (2018-01-28)
 [Compare `@uirouter/core` versions 5.0.14 and 5.0.15](https://github.com/ui-router/core/compare/5.0.14...5.0.15)
 
