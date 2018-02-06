@@ -71,7 +71,7 @@
     "dts-downlevel": "0.3.0",
     "fork-ts-checker-webpack-plugin": "0.3.0",
     "glob": "7.1.2",
-    "jasmine-core": "2.99.0",
+    "jasmine-core": "3.0.0",
     "karma": "2.0.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-firefox-launcher": "1.1.0",
