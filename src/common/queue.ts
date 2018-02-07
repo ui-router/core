@@ -1,9 +1,5 @@
+/** @module common */
 import { pushTo } from './common';
-
-/**
- * @module common
- */
-/** for typedoc */
 
 export class Queue<T> {
   private _evictListeners: ((item: T) => void)[] = [];
