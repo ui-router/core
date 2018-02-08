@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [ "es6", "dom" ],
+    "allowSyntheticDefaultImports": true,
+    "rootDir": "src",
+    "outDir": "lib",
+    "declaration": true,
+    "sourceMap": true,
+    "inlineSources": true
+  },
+  "typedoc": {
+    "publishDir": "_core_docs",
+    "include": [ ],
+    "generateOptions": {
+      "tsconfig": "typedoc.json",
+      "readme": "README.md",
+      "name": "@uirouter/core",
+      "theme": "node_modules/ui-router-typedoc-themes/bin/default",
+      "out": "_doc",
+      "internal-aliases": "internal,coreapi",
+      "external-aliases": "internalapi,external",
+      "navigation-label-globals": "@uirouter/core"
+    }
+  },
+  "files": [
+    "src/index.ts",
+    "src/vanilla.ts",
+    "node_modules/typedoc/node_modules/typescript/lib/lib.es6.d.ts"
+  ]
+}
