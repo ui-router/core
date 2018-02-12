@@ -3,7 +3,7 @@ import { Transition } from '../transition/transition';
 import { UIRouter } from '../router';
 import { TransitionService } from '../transition/transitionService';
 import { Resolvable } from '../resolve';
-import { extend, inArray, map, mapObj, unnestR, values } from '../common';
+import { extend, inArray, map, mapObj, uniqR, unnestR, values } from '../common';
 import { PathNode } from '../path';
 import { TreeChanges } from "../transition";
 
@@ -29,15 +29,14 @@ const isTransition = inArray(TRANSITION_TOKENS);
 // This function removes resolves for '$transition$' and `Transition` from the treeChanges.
 // Do not use this on current transitions, only on old ones.
 export const treeChangesCleanup = (trans: Transition) => {
+  const nodes = values(trans.treeChanges()).reduce(unnestR, []).reduce(uniqR, []);
+
   // If the resolvable is a Transition, return a new resolvable with null data
-  const replaceTransitionWithNull = (r: Resolvable): Resolvable =>
-    isTransition(r.token) ? Resolvable.fromData(r.token, null) : r;
+  const replaceTransitionWithNull = (r: Resolvable): Resolvable => {
+    return isTransition(r.token) ? Resolvable.fromData(r.token, null) : r;
+  };
 
-  const cleanPath = (path: PathNode[]) => path.map((node: PathNode) => {
-    const resolvables = node.resolvables.map(replaceTransitionWithNull);
-    return extend(node.clone(), { resolvables });
+  nodes.forEach((node: PathNode) => {
+    node.resolvables = node.resolvables.map(replaceTransitionWithNull);
   });
-
-  const treeChanges: TreeChanges = trans.treeChanges();
-  mapObj(treeChanges, cleanPath, treeChanges);
 };
