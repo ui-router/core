@@ -9,19 +9,19 @@
  *
  * ### ES6
  * ```js
- * import {trace} from "@uirouter/angularjs";
+ * import {trace} from "@uirouter/core";
  * trace.enable(1, 5); // TRANSITION and VIEWCONFIG
  * ```
  *
  * ### CJS
  * ```js
- * let trace = require("@uirouter/angularjs").trace;
+ * let trace = require("@uirouter/core").trace;
  * trace.enable("TRANSITION", "VIEWCONFIG");
  * ```
  *
  * ### Globals
  * ```js
- * let trace = window["@uirouter/angularjs"].trace;
+ * let trace = window["@uirouter/core"].trace;
  * trace.enable(); // Trace everything (very verbose)
  * ```
  *
@@ -264,7 +264,7 @@ export class Trace {
  *
  * #### Example:
  * ```js
- * import {trace} from "@uirouter/angularjs";
+ * import {trace} from "@uirouter/core";
  * trace.enable(1, 5);
  * ```
  */
