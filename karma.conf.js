@@ -22,7 +22,7 @@ module.exports = function (karma) {
 
     // Start these browsers, currently available:
     // Chrome, ChromeCanary, Firefox, Opera, Safari, PhantomJS
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
 
     frameworks: ['jasmine'],
 
@@ -30,13 +30,12 @@ module.exports = function (karma) {
       require('karma-chrome-launcher'),
       require('karma-firefox-launcher'),
       require('karma-jasmine'),
-      require('karma-phantomjs-launcher'),
       require('karma-sourcemap-loader'),
       require('karma-webpack'),
     ],
 
     webpack: {
-      devtool: 'inline-source-map',
+      mode: 'development',
 
       resolve: {
         extensions: ['.js', '.ts']
