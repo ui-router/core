@@ -27,7 +27,7 @@ matrix:
   # - env: DOWNSTREAM_PKGS=react,sample-app-react
 notifications:
   slack:
-    on_success: change
+    on_success: never
     rooms:
       secure: YXAdbpNslKfzMVgby/amCLSJqsQ1ZUYnWzG6MJTIt7/UyMjbyasqknefSV2yFGdbWXCIkyh1ClTArFRxGfzJA9YKadWuueWJ64cOusz6fsY4G1iAFeDWGa4kOffVntk9f4ZXgkeP4Hk1Bce3iPXMIFXy3R10LLvBb3BcBge5ynPJm+arIDtKoMR6yXqz7Jj0ZOn1oBNV8SgyQHEvs6eBggGnPJubmUd1HVfQ/PXvJXk6szlD4mlcNgUnBhxy0zA0AG1TPKidk+fyLC0YjqR/2GfUQIcnhfOTQhJfKy6UOTIYQQPYSrTSHX8rS7H8T+7ZSTu5nCCiVjVP3CNjEIUF57exdT4wjWQv+gpTYesUEgkaf0200YCzwZez0l2pSpAZhKi2cyzmanO36xUHeqR3bdaDyFPDTkd2z4ZiyO/MXkIWpU5ktepHvx5UtD/rRaFQ4u6wchVxfJBB2Wr8FbW1rOZtdn5y7mQCU90JzSZvF9d19zjF2bOTHqsqh8YtPAlGcQb1c9O1mQkSYWklSRTO/68Os59fUbrat9lQvqMnT8/pV275lCDu7xCSEKY1ORfgzgmD2CditdeC15haP4n8eOoToE8dj3rzCcMRtHBGe9wqIKb97aSO4wJzY6NDN5U/2p1/PtPKwcSk75N/aPFrCbwe5jUezHMe7hJfqevYX1A=
 sudo: false
