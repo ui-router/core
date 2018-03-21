@@ -67,7 +67,7 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
 };
 
 export const registerLazyLoadHook = (transitionService: TransitionService) =>
-    transitionService.onBefore({ entering: (state) => !!state.lazyLoad }, lazyLoadHook);
+    transitionService.onEnter({ entering: (state) => !!state.lazyLoad }, lazyLoadHook);
 
 
 /**
