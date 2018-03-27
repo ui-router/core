@@ -4,7 +4,7 @@
   "version": "5.0.17",
   "scripts": {
     "clean": "shx rm -rf lib lib-esm _bundles",
-    "compile": "npm run clean && tsc && tsc -m es6 --outDir lib-esm",
+    "compile": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && shx cp src/*.json lib",
     "build": "run-s compile fixdts bundle fixmaps:*",
     "bundle": "rollup -c && rollup -c --environment MINIFY",
     "fixdts": "dts-downlevel 'lib/**/*.d.ts' 'lib-esm/**/*.d.ts'",
