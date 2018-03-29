@@ -3,7 +3,7 @@
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
   "version": "5.0.17",
   "scripts": {
-    "clean": "shx rm -rf lib lib-esm _bundles",
+    "clean": "shx rm -rf lib lib-esm _bundles .cache _doc",
     "compile": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && shx cp src/*.json lib",
     "build": "run-s compile fixdts bundle fixmaps:*",
     "bundle": "rollup -c && rollup -c --environment MINIFY",
