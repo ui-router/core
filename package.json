@@ -10,7 +10,6 @@
     "fixdts": "dts-downlevel 'lib/**/*.d.ts' 'lib-esm/**/*.d.ts'",
     "fixmaps:lib": "tweak_sourcemap_paths -a --include 'lib/**/*.js.map' 'lib-esm/**/*.js.map'",
     "fixmaps:bundle": "tweak_sourcemap_paths -a --include '_bundles/**/*.js.map'",
-    "install": "node migrate/migratewarn.js",
     "prepublishOnly": "npm run build",
     "test": "karma start",
     "test:downstream": "npm run build && test_downstream_projects",
