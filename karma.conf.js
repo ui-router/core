@@ -20,8 +20,6 @@ module.exports = function (karma) {
     // base path, that will be used to resolve files and exclude
     basePath: '.',
 
-    // Start these browsers, currently available:
-    // Chrome, ChromeCanary, Firefox, Opera, Safari, PhantomJS
     browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
       ChromeHeadlessNoSandbox: { base: 'ChromeHeadless', flags: ['--no-sandbox'] }
@@ -46,7 +44,7 @@ module.exports = function (karma) {
 
       module: {
         rules: [
-          { 
+          {
             test: /\.ts$/,
             loader: 'ts-loader',
             options: {
