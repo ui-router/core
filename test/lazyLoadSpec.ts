@@ -292,6 +292,20 @@ describe('future state', function () {
         done();
       });
     });
+
+    it('should use onEnter for registering lazy load hook', (done) => {
+      router.urlService.url('/a/');
+      $urlRouter.sync();
+      let onBeforeCallCount = 0, onEnterCallCount = 0;
+      $transitions.onBefore({}, () => { onBeforeCallCount++; });
+      $transitions.onEnter({}, () => { onEnterCallCount++; });
+
+      $transitions.onSuccess({}, () => {
+        expect(onBeforeCallCount).toEqual(1);
+        expect(onEnterCallCount).toEqual(1);
+        done();
+      });
+    });
   });
 
   describe('that resolves to multiple states', () => {
