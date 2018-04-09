@@ -114,7 +114,7 @@ export interface UIRouterPlugin extends Disposable {
 /** @internalapi */
 export abstract class UIRouterPluginBase implements UIRouterPlugin, Disposable {
   abstract name: string;
-  dispose(router: UIRouter) { }
+  dispose(router: UIRouter) {}
 }
 
 /** @internalapi */

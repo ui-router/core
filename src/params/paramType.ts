@@ -52,17 +52,23 @@ export class ParamType implements ParamTypeDefinition {
     extend(this, def);
   }
 
-
   // consider these four methods to be "abstract methods" that should be overridden
   /** @inheritdoc */
-  is(val: any, key?: string): boolean { return true; }
+  is(val: any, key?: string): boolean {
+    return true;
+  }
   /** @inheritdoc */
-  encode(val: any, key?: string): (string|string[]) { return val; }
+  encode(val: any, key?: string): string | string[] {
+    return val;
+  }
   /** @inheritdoc */
-  decode(val: string, key?: string): any { return val; }
+  decode(val: string, key?: string): any {
+    return val;
+  }
   /** @inheritdoc */
-  equals(a: any, b: any): boolean { return a == b; } // tslint:disable-line:triple-equals
-
+  equals(a: any, b: any): boolean {
+    return a == b;
+  } // tslint:disable-line:triple-equals
 
   $subPattern() {
     const sub = this.pattern.toString();
@@ -88,10 +94,10 @@ export class ParamType implements ParamTypeDefinition {
    * - url: "/path?queryParam=1 will create $stateParams.queryParam: 1
    * - url: "/path?queryParam=1&queryParam=2 will create $stateParams.queryParam: [1, 2]
    */
-  $asArray(mode: (boolean|'auto'), isSearch: boolean) {
+  $asArray(mode: boolean | 'auto', isSearch: boolean) {
     if (!mode) return this;
     if (mode === 'auto' && !isSearch) throw new Error("'auto' array mode is for query parameters only");
-    return new (<any> ArrayType)(this, mode);
+    return new (<any>ArrayType)(this, mode);
   }
 }
 
@@ -99,18 +105,21 @@ export class ParamType implements ParamTypeDefinition {
  * Wraps up a `ParamType` object to handle array values.
  * @internalapi
  */
-function ArrayType(type: ParamType, mode: (boolean|'auto')) {
+function ArrayType(type: ParamType, mode: boolean | 'auto') {
   // Wrap non-array value as array
   function arrayWrap(val: any): any[] {
-    return isArray(val) ? val : (isDefined(val) ? [ val ] : []);
+    return isArray(val) ? val : isDefined(val) ? [val] : [];
   }
 
   // Unwrap array value for "auto" mode. Return undefined for empty array.
   function arrayUnwrap(val: any) {
     switch (val.length) {
-      case 0: return undefined;
-      case 1: return mode === 'auto' ? val[0] : val;
-      default: return val;
+      case 0:
+        return undefined;
+      case 1:
+        return mode === 'auto' ? val[0] : val;
+      default:
+        return val;
     }
   }
 
@@ -120,14 +129,15 @@ function ArrayType(type: ParamType, mode: (boolean|'auto')) {
       if (isArray(val) && val.length === 0) return val;
       const arr = arrayWrap(val);
       const result = map(arr, callback);
-      return (allTruthyMode === true) ? filter(result, x => !x).length === 0 : arrayUnwrap(result);
+      return allTruthyMode === true ? filter(result, x => !x).length === 0 : arrayUnwrap(result);
     };
   }
 
   // Wraps type (.equals) functions to operate on each value of an array
   function arrayEqualsHandler(callback: (l: any, r: any) => boolean) {
     return function handleArray(val1: any, val2: any) {
-      const left = arrayWrap(val1), right = arrayWrap(val2);
+      const left = arrayWrap(val1),
+        right = arrayWrap(val2);
       if (left.length !== right.length) return false;
       for (let i = 0; i < left.length; i++) {
         if (!callback(left[i], right[i])) return false;

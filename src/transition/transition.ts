@@ -11,8 +11,15 @@ import { isObject, isUndefined } from '../common/predicates';
 import { prop, propEq, val, not, is } from '../common/hof';
 import { StateDeclaration, StateOrName } from '../state/interface';
 import {
-  TransitionOptions, TreeChanges, IHookRegistry, TransitionHookPhase, RegisteredHooks, HookRegOptions,
-  HookMatchCriteria, TransitionStateHookFn, TransitionHookFn,
+  TransitionOptions,
+  TreeChanges,
+  IHookRegistry,
+  TransitionHookPhase,
+  RegisteredHooks,
+  HookRegOptions,
+  HookMatchCriteria,
+  TransitionStateHookFn,
+  TransitionHookFn,
 } from './interface'; // has or is using
 import { TransitionHook } from './transitionHook';
 import { matchState, makeEvent, RegisteredHook } from './hookRegistry';
@@ -42,7 +49,6 @@ const stateSelf: (_state: StateObject) => StateDeclaration = prop('self');
  * It has information about all states being entered and exited as a result of the transition.
  */
 export class Transition implements IHookRegistry {
-
   /** @hidden */
   static diToken = Transition;
 
@@ -84,7 +90,7 @@ export class Transition implements IHookRegistry {
   private _error: any;
 
   /** @hidden Holds the hook registration functions such as those passed to Transition.onStart() */
-  _registeredHooks: RegisteredHooks = { };
+  _registeredHooks: RegisteredHooks = {};
 
   /** @hidden */
   private _options: TransitionOptions;
@@ -95,32 +101,48 @@ export class Transition implements IHookRegistry {
   /** @hidden */
   private _hookBuilder = new HookBuilder(this);
 
-
   /** @hidden */
-  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
+  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
+  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
+  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
 
   /** @hidden
    * Creates the transition-level hook registration functions
    * (which can then be used to register hooks)
    */
   private createTransitionHookRegFns() {
-    this.router.transitionService._pluginapi._getEvents()
-        .filter(type => type.hookPhase !== TransitionHookPhase.CREATE)
-        .forEach(type => makeEvent(this, this.router.transitionService, type));
+    this.router.transitionService._pluginapi
+      ._getEvents()
+      .filter(type => type.hookPhase !== TransitionHookPhase.CREATE)
+      .forEach(type => makeEvent(this, this.router.transitionService, type));
   }
 
   /** @internalapi */
@@ -221,7 +243,7 @@ export class Transition implements IHookRegistry {
    * Determines whether two transitions are equivalent.
    * @deprecated
    */
-  is(compare: (Transition|{to?: any, from?: any})): boolean {
+  is(compare: Transition | { to?: any; from?: any }): boolean {
     if (compare instanceof Transition) {
       // TODO: Also compare parameters
       return this.is({ to: compare.$to().name, from: compare.$from().name });
@@ -262,7 +284,6 @@ export class Transition implements IHookRegistry {
   params(pathname = 'to') {
     return Object.freeze(this._treeChanges[pathname].map(prop('paramValues')).reduce(mergeR, {}));
   }
-
 
   /**
    * Creates a [[UIInjector]] Dependency Injector
@@ -390,10 +411,10 @@ export class Transition implements IHookRegistry {
    * @param resolvable a [[ResolvableLiteral]] object (or a [[Resolvable]])
    * @param state the state in the "to path" which should receive the new resolve (otherwise, the root state)
    */
-  addResolvable(resolvable: Resolvable|ResolvableLiteral, state: StateOrName = ''): void {
+  addResolvable(resolvable: Resolvable | ResolvableLiteral, state: StateOrName = ''): void {
     resolvable = is(Resolvable)(resolvable) ? resolvable : new Resolvable(resolvable);
 
-    const stateName: string = (typeof state === 'string') ? state : state.name;
+    const stateName: string = typeof state === 'string' ? state : state.name;
     const topath = this._treeChanges.to;
     const targetNode = find(topath, node => node.state.name === stateName);
     const resolveContext: ResolveContext = new ResolveContext(topath);
@@ -476,7 +497,9 @@ export class Transition implements IHookRegistry {
    * @returns an array of states that will be exited during this transition.
    */
   exiting(): StateDeclaration[] {
-    return map(this._treeChanges.exiting, prop('state')).map(stateSelf).reverse();
+    return map(this._treeChanges.exiting, prop('state'))
+      .map(stateSelf)
+      .reverse();
   }
 
   /**
@@ -504,7 +527,10 @@ export class Transition implements IHookRegistry {
   views(pathname = 'entering', state?: StateObject): ViewConfig[] {
     let path = this._treeChanges[pathname];
     path = !state ? path : path.filter(propEq('state', state));
-    return path.map(prop('views')).filter(identity).reduce(unnestR, []);
+    return path
+      .map(prop('views'))
+      .filter(identity)
+      .reduce(unnestR, []);
   }
 
   /**
@@ -536,7 +562,8 @@ export class Transition implements IHookRegistry {
    * @returns Returns a new [[Transition]] instance.
    */
   redirect(targetState: TargetState): Transition {
-    let redirects = 1, trans: Transition = this;
+    let redirects = 1,
+      trans: Transition = this;
     // tslint:disable-next-line:no-conditional-assignment
     while ((trans = trans.redirectedFrom()) != null) {
       if (++redirects > 20) throw new Error(`Too many consecutive Transition redirects (20+)`);
@@ -573,8 +600,11 @@ export class Transition implements IHookRegistry {
     };
 
     // Find any "entering" nodes in the redirect path that match the original path and aren't being reloaded
-    const matchingEnteringNodes: PathNode[] = PathUtils.matching(redirectEnteringNodes, originalEnteringNodes, PathUtils.nonDynamicParams)
-        .filter(not(nodeIsReloading(targetState.options().reloadState)));
+    const matchingEnteringNodes: PathNode[] = PathUtils.matching(
+      redirectEnteringNodes,
+      originalEnteringNodes,
+      PathUtils.nonDynamicParams,
+    ).filter(not(nodeIsReloading(targetState.options().reloadState)));
 
     // Use the existing (possibly pre-resolved) resolvables for the matching entering nodes.
     matchingEnteringNodes.forEach((node, idx) => {
@@ -597,8 +627,8 @@ export class Transition implements IHookRegistry {
     if (tc.to.length !== tc.from.length) return undefined;
     // If the to/from paths are different
     const pathsDiffer: boolean = arrayTuples(tc.to, tc.from)
-        .map(tuple => tuple[0].state !== tuple[1].state)
-        .reduce(anyTrueR, false);
+      .map(tuple => tuple[0].state !== tuple[1].state)
+      .reduce(anyTrueR, false);
     if (pathsDiffer) return undefined;
 
     // Find any parameter values that differ
@@ -633,7 +663,7 @@ export class Transition implements IHookRegistry {
   }
 
   /** @hidden */
-  _ignoredReason(): 'SameAsCurrent'|'SameAsPending'|undefined {
+  _ignoredReason(): 'SameAsCurrent' | 'SameAsPending' | undefined {
     const pending = this.router.globals.transition;
     const reloadState = this._options.reloadState;
 
@@ -663,8 +693,7 @@ export class Transition implements IHookRegistry {
     const runAllHooks = TransitionHook.runAllHooks;
 
     // Gets transition hooks array for the given phase
-    const getHooksFor = (phase: TransitionHookPhase) =>
-        this._hookBuilder.buildHooksForPhase(phase);
+    const getHooksFor = (phase: TransitionHookPhase) => this._hookBuilder.buildHooksForPhase(phase);
 
     // When the chain is complete, then resolve or reject the deferred
     const transitionSuccess = () => {
@@ -704,15 +733,14 @@ export class Transition implements IHookRegistry {
 
     const allBeforeHooks = getHooksFor(TransitionHookPhase.BEFORE);
     TransitionHook.invokeHooks(allBeforeHooks, startTransition)
-        .then(runTransition)
-        .then(transitionSuccess, transitionError);
+      .then(runTransition)
+      .then(transitionSuccess, transitionError);
 
     return this.promise;
   }
 
   /** Checks if this transition is currently active/running. */
-  isActive = () =>
-      this.router.globals.transition === this;
+  isActive = () => this.router.globals.transition === this;
 
   /**
    * Checks if the Transition is valid
@@ -731,7 +759,7 @@ export class Transition implements IHookRegistry {
    */
   abort() {
     // Do not set flag if the transition is already complete
-    if (isUndefined(this.success))  {
+    if (isUndefined(this.success)) {
       this._aborted = true;
     }
   }
@@ -747,17 +775,18 @@ export class Transition implements IHookRegistry {
   error() {
     const state: StateObject = this.$to();
 
-    if (state.self.abstract)
-      return `Cannot transition to abstract state '${state.name}'`;
+    if (state.self.abstract) return `Cannot transition to abstract state '${state.name}'`;
 
-    const paramDefs = state.parameters(), values = this.params();
+    const paramDefs = state.parameters(),
+      values = this.params();
     const invalidParams = paramDefs.filter(param => !param.validates(values[param.id]));
     if (invalidParams.length) {
-      return `Param values not valid for state '${state.name}'. Invalid params: [ ${invalidParams.map(param => param.id).join(', ')} ]`;
+      return `Param values not valid for state '${state.name}'. Invalid params: [ ${invalidParams
+        .map(param => param.id)
+        .join(', ')} ]`;
     }
 
-    if (this.success === false)
-      return this._error;
+    if (this.success === false) return this._error;
   }
 
   /**
@@ -765,20 +794,20 @@ export class Transition implements IHookRegistry {
    *
    * @returns A string representation of the Transition
    */
-  toString () {
+  toString() {
     const fromStateOrName = this.from();
     const toStateOrName = this.to();
 
     const avoidEmptyHash = (params: RawParams) =>
-      (params['#'] !== null && params['#'] !== undefined) ? params : omit(params, ['#']);
+      params['#'] !== null && params['#'] !== undefined ? params : omit(params, ['#']);
 
     // (X) means the to state is invalid.
     const id = this.$id,
-        from = isObject(fromStateOrName) ? fromStateOrName.name : fromStateOrName,
-        fromParams = stringify(avoidEmptyHash(this._treeChanges.from.map(prop('paramValues')).reduce(mergeR, {}))),
-        toValid = this.valid() ? '' : '(X) ',
-        to = isObject(toStateOrName) ? toStateOrName.name : toStateOrName,
-        toParams = stringify(avoidEmptyHash(this.params()));
+      from = isObject(fromStateOrName) ? fromStateOrName.name : fromStateOrName,
+      fromParams = stringify(avoidEmptyHash(this._treeChanges.from.map(prop('paramValues')).reduce(mergeR, {}))),
+      toValid = this.valid() ? '' : '(X) ',
+      to = isObject(toStateOrName) ? toStateOrName.name : toStateOrName,
+      toParams = stringify(avoidEmptyHash(this.params()));
 
     return `Transition#${id}( '${from}'${fromParams} -> ${toValid}'${to}'${toParams} )`;
   }

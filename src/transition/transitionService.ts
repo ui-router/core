@@ -4,8 +4,18 @@
  */
 /** for typedoc */
 import {
-  IHookRegistry, TransitionOptions, TransitionHookScope, TransitionHookPhase, TransitionCreateHookFn, HookMatchCriteria,
-  HookRegOptions, PathTypes, PathType, RegisteredHooks, TransitionHookFn, TransitionStateHookFn,
+  IHookRegistry,
+  TransitionOptions,
+  TransitionHookScope,
+  TransitionHookPhase,
+  TransitionCreateHookFn,
+  HookMatchCriteria,
+  HookRegOptions,
+  PathTypes,
+  PathType,
+  RegisteredHooks,
+  TransitionHookFn,
+  TransitionStateHookFn,
 } from './interface';
 import { Transition } from './transition';
 import { makeEvent, RegisteredHook } from './hookRegistry';
@@ -38,16 +48,15 @@ import { registerInvalidTransitionHook } from '../hooks/invalidTransition';
  * let options = defaults(theirOpts, customDefaults, defaultOptions);
  */
 export let defaultTransOpts: TransitionOptions = {
-  location    : true,
-  relative    : null,
-  inherit     : false,
-  notify      : true,
-  reload      : false,
-  custom      : {},
-  current     : () => null,
-  source      : 'unknown',
+  location: true,
+  relative: null,
+  inherit: false,
+  notify: true,
+  reload: false,
+  custom: {},
+  current: () => null,
+  source: 'unknown',
 };
-
 
 /**
  * Plugin API for Transition Service
@@ -76,14 +85,16 @@ export interface TransitionServicePluginAPI {
    * Defines a transition hook type and returns a transition hook registration
    * function (which can then be used to register hooks of this type).
    */
-  _defineEvent(name: string,
-               hookPhase: TransitionHookPhase,
-               hookOrder: number,
-               criteriaMatchPath: PathType,
-               reverseSort?: boolean,
-               getResultHandler?: GetResultHandler,
-               getErrorHandler?: GetErrorHandler,
-               rejectIfSuperseded?: boolean);
+  _defineEvent(
+    name: string,
+    hookPhase: TransitionHookPhase,
+    hookOrder: number,
+    criteriaMatchPath: PathType,
+    reverseSort?: boolean,
+    getResultHandler?: GetResultHandler,
+    getErrorHandler?: GetErrorHandler,
+    rejectIfSuperseded?: boolean,
+  );
 
   /**
    * Returns the known event types, such as `onBefore`
@@ -114,9 +125,9 @@ export class TransitionService implements IHookRegistry, Disposable {
   /** @hidden The transition hook types, such as `onEnter`, `onStart`, etc */
   private _eventTypes: TransitionEventType[] = [];
   /** @hidden The registered transition hooks */
-  _registeredHooks = { } as RegisteredHooks;
+  _registeredHooks = {} as RegisteredHooks;
   /** @hidden The  paths on a criteria object */
-  private _criteriaPaths = { } as PathTypes;
+  private _criteriaPaths = {} as PathTypes;
   /** @hidden */
   private _router: UIRouter;
 
@@ -151,8 +162,8 @@ export class TransitionService implements IHookRegistry, Disposable {
   constructor(_router: UIRouter) {
     this._router = _router;
     this.$view = _router.viewService;
-    this._deregisterHookFns = <any> {};
-    this._pluginapi = <TransitionServicePluginAPI> createProxyFunctions(val(this), {}, val(this), [
+    this._deregisterHookFns = <any>{};
+    this._pluginapi = <TransitionServicePluginAPI>createProxyFunctions(val(this), {}, val(this), [
       '_definePathType',
       '_defineEvent',
       '_getPathTypes',
@@ -189,33 +200,53 @@ export class TransitionService implements IHookRegistry, Disposable {
    * @param options the registration options
    * @returns a function which deregisters the hook.
    */
-  onCreate(criteria: HookMatchCriteria, callback: TransitionCreateHookFn, options?: HookRegOptions): Function { return; }
+  onCreate(criteria: HookMatchCriteria, callback: TransitionCreateHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onStart(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
+  onExit(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
+  onRetain(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function { return; }
+  onEnter(criteria: HookMatchCriteria, callback: TransitionStateHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onFinish(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onSuccess(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
   /** @inheritdoc */
-  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function { return; }
+  onError(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
+    return;
+  }
 
   /**
    * dispose
    * @internalapi
    */
   dispose(router: UIRouter) {
-    values(this._registeredHooks).forEach((hooksArray: RegisteredHook[]) => hooksArray.forEach(hook => {
-      hook._deregistered = true;
-      removeFrom(hooksArray, hook);
-    }));
+    values(this._registeredHooks).forEach((hooksArray: RegisteredHook[]) =>
+      hooksArray.forEach(hook => {
+        hook._deregistered = true;
+        removeFrom(hooksArray, hook);
+      }),
+    );
   }
 
   /**
@@ -237,21 +268,49 @@ export class TransitionService implements IHookRegistry, Disposable {
     const Phase = TransitionHookPhase;
     const TH = TransitionHook;
     const paths = this._criteriaPaths;
-    const NORMAL_SORT = false, REVERSE_SORT = true;
+    const NORMAL_SORT = false,
+      REVERSE_SORT = true;
     const SYNCHRONOUS = true;
 
-    this._defineEvent('onCreate',  Phase.CREATE,  0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.THROW_ERROR, SYNCHRONOUS);
+    this._defineEvent(
+      'onCreate',
+      Phase.CREATE,
+      0,
+      paths.to,
+      NORMAL_SORT,
+      TH.LOG_REJECTED_RESULT,
+      TH.THROW_ERROR,
+      SYNCHRONOUS,
+    );
 
-    this._defineEvent('onBefore',  Phase.BEFORE,  0,   paths.to);
+    this._defineEvent('onBefore', Phase.BEFORE, 0, paths.to);
 
-    this._defineEvent('onStart',   Phase.RUN,     0,   paths.to);
-    this._defineEvent('onExit',    Phase.RUN,     100, paths.exiting, REVERSE_SORT);
-    this._defineEvent('onRetain',  Phase.RUN,     200, paths.retained);
-    this._defineEvent('onEnter',   Phase.RUN,     300, paths.entering);
-    this._defineEvent('onFinish',  Phase.RUN,     400, paths.to);
+    this._defineEvent('onStart', Phase.RUN, 0, paths.to);
+    this._defineEvent('onExit', Phase.RUN, 100, paths.exiting, REVERSE_SORT);
+    this._defineEvent('onRetain', Phase.RUN, 200, paths.retained);
+    this._defineEvent('onEnter', Phase.RUN, 300, paths.entering);
+    this._defineEvent('onFinish', Phase.RUN, 400, paths.to);
 
-    this._defineEvent('onSuccess', Phase.SUCCESS, 0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.LOG_ERROR, SYNCHRONOUS);
-    this._defineEvent('onError',   Phase.ERROR,   0,   paths.to, NORMAL_SORT, TH.LOG_REJECTED_RESULT, TH.LOG_ERROR, SYNCHRONOUS);
+    this._defineEvent(
+      'onSuccess',
+      Phase.SUCCESS,
+      0,
+      paths.to,
+      NORMAL_SORT,
+      TH.LOG_REJECTED_RESULT,
+      TH.LOG_ERROR,
+      SYNCHRONOUS,
+    );
+    this._defineEvent(
+      'onError',
+      Phase.ERROR,
+      0,
+      paths.to,
+      NORMAL_SORT,
+      TH.LOG_REJECTED_RESULT,
+      TH.LOG_ERROR,
+      SYNCHRONOUS,
+    );
   }
 
   /** @hidden */
@@ -266,25 +325,35 @@ export class TransitionService implements IHookRegistry, Disposable {
   }
 
   /** @hidden */
-  _defineEvent(name: string,
-               hookPhase: TransitionHookPhase,
-               hookOrder: number,
-               criteriaMatchPath: PathType,
-               reverseSort = false,
-               getResultHandler: GetResultHandler = TransitionHook.HANDLE_RESULT,
-               getErrorHandler: GetErrorHandler = TransitionHook.REJECT_ERROR,
-               synchronous = false) {
-    const eventType = new TransitionEventType(name, hookPhase, hookOrder, criteriaMatchPath, reverseSort, getResultHandler, getErrorHandler, synchronous);
+  _defineEvent(
+    name: string,
+    hookPhase: TransitionHookPhase,
+    hookOrder: number,
+    criteriaMatchPath: PathType,
+    reverseSort = false,
+    getResultHandler: GetResultHandler = TransitionHook.HANDLE_RESULT,
+    getErrorHandler: GetErrorHandler = TransitionHook.REJECT_ERROR,
+    synchronous = false,
+  ) {
+    const eventType = new TransitionEventType(
+      name,
+      hookPhase,
+      hookOrder,
+      criteriaMatchPath,
+      reverseSort,
+      getResultHandler,
+      getErrorHandler,
+      synchronous,
+    );
 
     this._eventTypes.push(eventType);
     makeEvent(this, this, eventType);
-  }
+  } // tslint:disable-next-line
 
-  /** @hidden */ // tslint:disable-next-line
-  private _getEvents(phase?: TransitionHookPhase): TransitionEventType[] {
-    const transitionHookTypes = isDefined(phase) ?
-        this._eventTypes.filter(type => type.hookPhase === phase) :
-        this._eventTypes.slice();
+  /** @hidden */ private _getEvents(phase?: TransitionHookPhase): TransitionEventType[] {
+    const transitionHookTypes = isDefined(phase)
+      ? this._eventTypes.filter(type => type.hookPhase === phase)
+      : this._eventTypes.slice();
 
     return transitionHookTypes.sort((l, r) => {
       const cmpByPhase = l.hookPhase - r.hookPhase;
@@ -307,10 +376,9 @@ export class TransitionService implements IHookRegistry, Disposable {
    */
   private _definePathType(name: string, hookScope: TransitionHookScope) {
     this._criteriaPaths[name] = { name, scope: hookScope };
-  }
+  } // tslint:disable-next-line
 
-  /** * @hidden */ // tslint:disable-next-line
-  private _getPathTypes(): PathTypes {
+  /** * @hidden */ private _getPathTypes(): PathTypes {
     return this._criteriaPaths;
   }
 
@@ -324,33 +392,33 @@ export class TransitionService implements IHookRegistry, Disposable {
     const fns = this._deregisterHookFns;
 
     fns.addCoreResolves = registerAddCoreResolvables(this);
-    fns.ignored         = registerIgnoredTransitionHook(this);
-    fns.invalid         = registerInvalidTransitionHook(this);
+    fns.ignored = registerIgnoredTransitionHook(this);
+    fns.invalid = registerInvalidTransitionHook(this);
 
     // Wire up redirectTo hook
-    fns.redirectTo      = registerRedirectToHook(this);
+    fns.redirectTo = registerRedirectToHook(this);
 
     // Wire up onExit/Retain/Enter state hooks
-    fns.onExit          = registerOnExitHook(this);
-    fns.onRetain        = registerOnRetainHook(this);
-    fns.onEnter         = registerOnEnterHook(this);
+    fns.onExit = registerOnExitHook(this);
+    fns.onRetain = registerOnRetainHook(this);
+    fns.onEnter = registerOnEnterHook(this);
 
     // Wire up Resolve hooks
-    fns.eagerResolve    = registerEagerResolvePath(this);
-    fns.lazyResolve     = registerLazyResolveState(this);
-    fns.resolveAll      = registerResolveRemaining(this);
+    fns.eagerResolve = registerEagerResolvePath(this);
+    fns.lazyResolve = registerLazyResolveState(this);
+    fns.resolveAll = registerResolveRemaining(this);
 
     // Wire up the View management hooks
-    fns.loadViews       = registerLoadEnteringViews(this);
-    fns.activateViews   = registerActivateViews(this);
+    fns.loadViews = registerLoadEnteringViews(this);
+    fns.activateViews = registerActivateViews(this);
 
     // Updates global state after a transition
-    fns.updateGlobals   = registerUpdateGlobalState(this);
+    fns.updateGlobals = registerUpdateGlobalState(this);
 
     // After globals.current is updated at priority: 10000
-    fns.updateUrl       = registerUpdateUrl(this);
+    fns.updateUrl = registerUpdateUrl(this);
 
     // Lazy load state trees
-    fns.lazyLoad        = registerLazyLoadHook(this);
+    fns.lazyLoad = registerLazyLoadHook(this);
   }
 }

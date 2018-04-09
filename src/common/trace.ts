@@ -48,21 +48,23 @@ import { HookResult } from '../transition/interface';
 import { StateObject } from '../state/stateObject';
 
 /** @hidden */
-function uiViewString (uiview: ActiveUIView) {
-    if (!uiview) return 'ui-view (defunct)';
-    const state = uiview.creationContext ? uiview.creationContext.name || '(root)' : '(none)';
-    return `[ui-view#${uiview.id} ${uiview.$type}:${uiview.fqn} (${uiview.name}@${state})]`;
+function uiViewString(uiview: ActiveUIView) {
+  if (!uiview) return 'ui-view (defunct)';
+  const state = uiview.creationContext ? uiview.creationContext.name || '(root)' : '(none)';
+  return `[ui-view#${uiview.id} ${uiview.$type}:${uiview.fqn} (${uiview.name}@${state})]`;
 }
 
 /** @hidden */
 const viewConfigString = (viewConfig: ViewConfig) => {
   const view = viewConfig.viewDecl;
   const state = view.$context.name || '(root)';
-  return `[View#${viewConfig.$id} from '${state}' state]: target ui-view: '${view.$uiViewName}@${view.$uiViewContextAnchor}'`;
+  return `[View#${viewConfig.$id} from '${state}' state]: target ui-view: '${view.$uiViewName}@${
+    view.$uiViewContextAnchor
+  }'`;
 };
 
 /** @hidden */
-function normalizedCat(input: Category|string): string {
+function normalizedCat(input: Category | string): string {
   return isNumber(input) ? Category[input] : Category[Category[input]];
 }
 
@@ -71,7 +73,6 @@ const consoleLog = Function.prototype.bind.call(console.log, console);
 
 /** @hidden */
 const consoletable = isFunction(console.table) ? console.table.bind(console) : consoleLog.bind(console);
-
 
 /**
  * Trace categories Enum
@@ -87,7 +88,11 @@ const consoletable = isFunction(console.table) ? console.table.bind(console) : c
  * `trace.enable(1)`
  */
 export enum Category {
-  RESOLVE, TRANSITION, HOOK, UIVIEW, VIEWCONFIG,
+  RESOLVE,
+  TRANSITION,
+  HOOK,
+  UIVIEW,
+  VIEWCONFIG,
 }
 
 /** @hidden */
@@ -97,7 +102,7 @@ const _tid = parse('$id');
 const _rid = parse('router.$id');
 
 /** @hidden */
-const transLbl = (trans) => `Transition #${_tid(trans)}-${_rid(trans)}`;
+const transLbl = trans => `Transition #${_tid(trans)}-${_rid(trans)}`;
 
 /**
  * Prints UI-Router Transition trace information to the console.
@@ -114,15 +119,15 @@ export class Trace {
     this.approximateDigests = 0;
   }
 
-   /** @hidden */
+  /** @hidden */
   private _set(enabled: boolean, categories: Category[]) {
     if (!categories.length) {
-      categories = <any> Object.keys(Category)
-          .map(k => parseInt(k, 10))
-          .filter(k => !isNaN(k))
-          .map(key => Category[key]);
+      categories = <any>Object.keys(Category)
+        .map(k => parseInt(k, 10))
+        .filter(k => !isNaN(k))
+        .map(key => Category[key]);
     }
-    categories.map(normalizedCat).forEach(category => this._enabled[category] = enabled);
+    categories.map(normalizedCat).forEach(category => (this._enabled[category] = enabled));
   }
 
   /**
@@ -135,8 +140,10 @@ export class Trace {
    * @param categories categories to enable. If `categories` is omitted, all categories are enabled.
    *        Also takes strings (category name) or ordinal (category position)
    */
-  enable(...categories: (Category|string|number)[]);
-  enable(...categories: any[]) { this._set(true, categories); }
+  enable(...categories: (Category | string | number)[]);
+  enable(...categories: any[]) {
+    this._set(true, categories);
+  }
   /**
    * Disables a trace [[Category]]
    *
@@ -147,8 +154,10 @@ export class Trace {
    * @param categories categories to disable. If `categories` is omitted, all categories are disabled.
    *        Also takes strings (category name) or ordinal (category position)
    */
-  disable(...categories: (Category|string|number)[]);
-  disable(...categories: any[]) { this._set(false, categories); }
+  disable(...categories: (Category | string | number)[]);
+  disable(...categories: any[]) {
+    this._set(false, categories);
+  }
 
   /**
    * Retrieves the enabled stateus of a [[Category]]
@@ -159,7 +168,7 @@ export class Trace {
    *
    * @returns boolean true if the category is enabled
    */
-  enabled(category: (Category|string|number)): boolean {
+  enabled(category: Category | string | number): boolean {
     return !!this._enabled[normalizedCat(category)];
   }
 
@@ -179,8 +188,8 @@ export class Trace {
   traceHookInvocation(step: TransitionHook, trans: Transition, options: any) {
     if (!this.enabled(Category.HOOK)) return;
     const event = parse('traceData.hookType')(options) || 'internal',
-        context = parse('traceData.context.state.name')(options) || parse('traceData.context')(options) || 'unknown',
-        name = functionToString((step as any).registeredHook.callback);
+      context = parse('traceData.context.state.name')(options) || parse('traceData.context')(options) || 'unknown',
+      name = functionToString((step as any).registeredHook.callback);
     console.log(`${transLbl(trans)}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
   }
 
@@ -199,7 +208,9 @@ export class Trace {
   /** @internalapi called by ui-router code */
   traceResolvableResolved(resolvable: Resolvable, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
-    console.log(`${transLbl(trans)}:               <- Resolved  ${resolvable} to: ${maxLength(200, stringify(resolvable.data))}`);
+    console.log(
+      `${transLbl(trans)}:               <- Resolved  ${resolvable} to: ${maxLength(200, stringify(resolvable.data))}`,
+    );
   }
 
   /** @internalapi called by ui-router code */
@@ -237,11 +248,13 @@ export class Trace {
     if (!this.enabled(Category.VIEWCONFIG)) return;
     const uivheader = 'uiview component fqn';
     const cfgheader = 'view config state (view name)';
-    const mapping = pairs.map(({ uiView, viewConfig }) => {
-      const uiv = uiView && uiView.fqn;
-      const cfg = viewConfig && `${viewConfig.viewDecl.$context.name}: (${viewConfig.viewDecl.$name})`;
-      return { [uivheader]: uiv, [cfgheader]: cfg };
-    }).sort((a, b) => (a[uivheader] || '').localeCompare(b[uivheader] || ''));
+    const mapping = pairs
+      .map(({ uiView, viewConfig }) => {
+        const uiv = uiView && uiView.fqn;
+        const cfg = viewConfig && `${viewConfig.viewDecl.$context.name}: (${viewConfig.viewDecl.$name})`;
+        return { [uivheader]: uiv, [cfgheader]: cfg };
+      })
+      .sort((a, b) => (a[uivheader] || '').localeCompare(b[uivheader] || ''));
 
     consoletable(mapping);
   }

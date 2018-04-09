@@ -12,7 +12,7 @@ import { ResolvePolicy, ResolvableLiteral, ProviderLike } from '../resolve/inter
 import { Resolvable } from '../resolve/resolvable';
 import { TargetState } from './targetState';
 
-export type StateOrName = (string|StateDeclaration|StateObject);
+export type StateOrName = string | StateDeclaration | StateObject;
 
 /** @internalapi */
 export interface TransitionPromise extends Promise<StateObject> {
@@ -35,7 +35,8 @@ export type ResolveTypes = Resolvable | ResolvableLiteral | ProviderLike;
  *
  * @internalapi
  */
-export interface _ViewDeclaration { // tslint:disable-line
+export interface _ViewDeclaration {
+  // tslint:disable-line
   /**
    * The raw name for the view declaration, i.e., the [[StateDeclaration.views]] property name.
    * @internalapi
@@ -86,7 +87,7 @@ export interface _ViewDeclaration { // tslint:disable-line
  * - TargetState: a target state, parameters, and options
  * - object: an object with a state name and parameters
  */
-export type RedirectToResult = string | TargetState | { state?: string, params?: RawParams } | void;
+export type RedirectToResult = string | TargetState | { state?: string; params?: RawParams } | void;
 
 /**
  * The StateDeclaration object is used to define a state or nested state.
@@ -178,7 +179,7 @@ export interface StateDeclaration {
    * }
    * ```
    */
-  parent?: (string|StateDeclaration);
+  parent?: string | StateDeclaration;
 
   /**
    * Gets the internal State object API
@@ -309,7 +310,7 @@ export interface StateDeclaration {
    * }
    * ```
    */
-  resolve?: (ResolveTypes[] | { [key: string]: IInjectable; });
+  resolve?: ResolveTypes[] | { [key: string]: IInjectable };
 
   /**
    * Sets the resolve policy defaults for all resolves on this state
@@ -323,7 +324,7 @@ export interface StateDeclaration {
    *
    * See [[ResolvePolicy]] for more details.
    */
-  resolvePolicy?: ResolvePolicy
+  resolvePolicy?: ResolvePolicy;
 
   /**
    * The url fragment for the state
@@ -375,7 +376,7 @@ export interface StateDeclaration {
    * }
    * ```
    */
-  params?: { [key: string]: (ParamDeclaration|any); };
+  params?: { [key: string]: ParamDeclaration | any };
 
   /**
    * Named views
@@ -422,7 +423,7 @@ export interface StateDeclaration {
    * }
    * ```
    */
-  views?: { [key: string]: _ViewDeclaration; };
+  views?: { [key: string]: _ViewDeclaration };
 
   /**
    * An inherited property to store state data
@@ -503,9 +504,10 @@ export interface StateDeclaration {
    * })
    * ```
    */
-  redirectTo?: RedirectToResult |
-      ((transition: Transition) => RedirectToResult) |
-      ((transition: Transition) => Promise<RedirectToResult>);
+  redirectTo?:
+    | RedirectToResult
+    | ((transition: Transition) => RedirectToResult)
+    | ((transition: Transition) => Promise<RedirectToResult>);
 
   /**
    * A Transition Hook called with the state is being entered.  See: [[IHookRegistry.onEnter]]
@@ -724,24 +726,24 @@ export interface HrefOptions {
    *
    * When a relative path is found (e.g `^` or `.bar`), defines which state to be relative from.
    */
-  relative?:  StateOrName;
+  relative?: StateOrName;
 
   /**
    * If true, and if there is no url associated with the state provided in the
    *    first parameter, then the constructed href url will be built from the first
    *    ancestor which has a url.
    */
-  lossy?:     boolean;
+  lossy?: boolean;
 
   /**
    * If `true` will inherit parameters from the current parameter values.
    */
-  inherit?:   boolean;
+  inherit?: boolean;
 
   /**
    * If true will generate an absolute url, e.g. `http://www.example.com/fullurl`.
    */
-  absolute?:  boolean;
+  absolute?: boolean;
 }
 
 /**

@@ -4,7 +4,14 @@
  */
 /** */
 import {
-  LocationConfig, LocationServices, identity, unnestR, isArray, splitEqual, splitHash, splitQuery,
+  LocationConfig,
+  LocationServices,
+  identity,
+  unnestR,
+  isArray,
+  splitEqual,
+  splitHash,
+  splitQuery,
 } from '../common';
 import { UIRouter } from '../router';
 
@@ -20,7 +27,11 @@ export const keyValsToObjectR = (accum, [key, val]) => {
 };
 
 export const getParams = (queryString: string): any =>
-    queryString.split('&').filter(identity).map(splitEqual).reduce(keyValsToObjectR, {});
+  queryString
+    .split('&')
+    .filter(identity)
+    .map(splitEqual)
+    .reduce(keyValsToObjectR, {});
 
 export function parseUrl(url: string) {
   const orEmptyString = x => x || '';
@@ -35,24 +46,27 @@ export const buildUrl = (loc: LocationServices) => {
   const searchObject = loc.search();
   const hash = loc.hash();
 
-  const search = Object.keys(searchObject).map(key => {
-    const param = searchObject[key];
-    const vals = isArray(param) ? param : [param];
-    return vals.map(val => key + '=' + val);
-  }).reduce(unnestR, []).join('&');
+  const search = Object.keys(searchObject)
+    .map(key => {
+      const param = searchObject[key];
+      const vals = isArray(param) ? param : [param];
+      return vals.map(val => key + '=' + val);
+    })
+    .reduce(unnestR, [])
+    .join('&');
 
   return path + (search ? '?' + search : '') + (hash ? '#' + hash : '');
 };
 
 export function locationPluginFactory(
-    name: string,
-    isHtml5: boolean,
-    serviceClass: { new(uiRouter?: UIRouter): LocationServices },
-    configurationClass: { new(uiRouter?: UIRouter, isHtml5?: boolean): LocationConfig },
+  name: string,
+  isHtml5: boolean,
+  serviceClass: { new (uiRouter?: UIRouter): LocationServices },
+  configurationClass: { new (uiRouter?: UIRouter, isHtml5?: boolean): LocationConfig },
 ) {
   return function(uiRouter: UIRouter) {
-    const service       = uiRouter.locationService = new serviceClass(uiRouter);
-    const configuration = uiRouter.locationConfig  = new configurationClass(uiRouter, isHtml5);
+    const service = (uiRouter.locationService = new serviceClass(uiRouter));
+    const configuration = (uiRouter.locationConfig = new configurationClass(uiRouter, isHtml5));
 
     function dispose(router: UIRouter) {
       router.dispose(service);

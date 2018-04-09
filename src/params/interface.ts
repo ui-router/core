@@ -133,7 +133,7 @@ export interface ParamDeclaration {
    * - Non-url parameters (`param: { foo: null }`): `any`
    *
    */
-  type: (string|ParamType);
+  type: string | ParamType;
 
   /**
    * The parameter's `array` mode
@@ -223,7 +223,7 @@ export interface ParamDeclaration {
    *
    * Default: If squash is not set, it uses the configured default squash policy. (See [[defaultSquashPolicy]]())
    */
-  squash: (boolean|string);
+  squash: boolean | string;
 
   /**
    * @internalapi
@@ -483,7 +483,6 @@ export interface ParamTypeDefinition {
    */
   pattern?: RegExp;
 
-
   /**
    * Disables url-encoding of parameter values
    *
@@ -583,7 +582,7 @@ export interface ParamTypeDefinition {
    * @param key The name of the parameter in which `val` is stored. Can be used for meta-programming of `ParamType` objects.
    * @returns a string representation of `val` that can be encoded in a URL.
    */
-  encode(val: any, key?: string): (string|string[]);
+  encode(val: any, key?: string): string | string[];
 
   /**
    * Decodes a parameter value string (from URL string or transition param) to a custom/native value.
@@ -615,4 +614,3 @@ export interface ParamTypeDefinition {
    */
   equals(a: any, b: any): boolean;
 }
-

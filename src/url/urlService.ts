@@ -10,7 +10,7 @@ import { UrlConfigApi, UrlSyncApi, UrlRulesApi, UrlParts, MatchResult } from './
 
 /** @hidden */
 const makeStub = (keys: string[]): any =>
-    keys.reduce((acc, key) => (acc[key] = notImplemented(key), acc), { dispose: noop });
+  keys.reduce((acc, key) => ((acc[key] = notImplemented(key)), acc), { dispose: noop });
 
 /* tslint:disable:align */
 /** @hidden */ const locationServicesFns = ['url', 'path', 'search', 'hash', 'onChange'];
@@ -71,16 +71,25 @@ export class UrlService implements LocationServices, UrlSyncApi {
   url(): string;
   /** @inheritdoc */
   url(newurl: string, replace?: boolean, state?): void;
-  url(newurl?, replace?, state?): any { return; }
+  url(newurl?, replace?, state?): any {
+    return;
+  }
   /** @inheritdoc */
-  path(): string { return; }
+  path(): string {
+    return;
+  }
   /** @inheritdoc */
-  search(): { [key: string]: any } { return; }
+  search(): { [key: string]: any } {
+    return;
+  }
   /** @inheritdoc */
-  hash(): string { return; }
+  hash(): string {
+    return;
+  }
   /** @inheritdoc */
-  onChange(callback: Function): Function { return; }
-
+  onChange(callback: Function): Function {
+    return;
+  }
 
   /**
    * Returns the current URL parts
@@ -93,15 +102,22 @@ export class UrlService implements LocationServices, UrlSyncApi {
     return { path: this.path(), search: this.search(), hash: this.hash() };
   }
 
-  dispose() { }
+  dispose() {}
 
   /** @inheritdoc */
-  sync(evt?) { return; }
+  sync(evt?) {
+    return;
+  }
   /** @inheritdoc */
-  listen(enabled?: boolean): Function { return; }
+  listen(enabled?: boolean): Function {
+    return;
+  }
   /** @inheritdoc */
-  deferIntercept(defer?: boolean) { return; }
+  deferIntercept(defer?: boolean) {
+    return;
+  }
   /** @inheritdoc */
-  match(urlParts: UrlParts): MatchResult { return; }
-
+  match(urlParts: UrlParts): MatchResult {
+    return;
+  }
 }

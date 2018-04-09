@@ -3,7 +3,16 @@
  * @module state
  */
 /** */
-import { createProxyFunctions, defaults, extend, inArray, noop, removeFrom, silenceUncaughtInPromise, silentRejection } from '../common/common';
+import {
+  createProxyFunctions,
+  defaults,
+  extend,
+  inArray,
+  noop,
+  removeFrom,
+  silenceUncaughtInPromise,
+  silentRejection,
+} from '../common/common';
 import { isDefined, isObject, isString } from '../common/predicates';
 import { Queue } from '../common/queue';
 import { services } from '../common/coreservices';
@@ -30,8 +39,7 @@ import { lazyLoadState } from '../hooks/lazyLoad';
 import { not, val } from '../common/hof';
 import { StateParams } from '../params/stateParams';
 
-export type OnInvalidCallback =
-    (toState?: TargetState, fromState?: TargetState, injector?: UIInjector) => HookResult;
+export type OnInvalidCallback = (toState?: TargetState, fromState?: TargetState, injector?: UIInjector) => HookResult;
 
 /**
  * Provides state related service functions
@@ -48,25 +56,33 @@ export class StateService {
    *
    * This is a passthrough through to [[UIRouterGlobals.transition]]
    */
-  get transition() { return this.router.globals.transition; }
+  get transition() {
+    return this.router.globals.transition;
+  }
   /**
    * The latest successful state parameters
    *
    * This is a passthrough through to [[UIRouterGlobals.params]]
    */
-  get params(): StateParams { return this.router.globals.params; }
+  get params(): StateParams {
+    return this.router.globals.params;
+  }
   /**
    * The current [[StateDeclaration]]
    *
    * This is a passthrough through to [[UIRouterGlobals.current]]
    */
-  get current() { return this.router.globals.current; }
+  get current() {
+    return this.router.globals.current;
+  }
   /**
    * The current [[StateObject]]
    *
    * This is a passthrough through to [[UIRouterGlobals.$current]]
    */
-  get $current() { return this.router.globals.$current; }
+  get $current() {
+    return this.router.globals.$current;
+  }
 
   /** @internalapi */
   constructor(private router: UIRouter) {
@@ -105,7 +121,7 @@ export class StateService {
         return;
       }
 
-      let target = <TargetState> result;
+      let target = <TargetState>result;
       // Recreate the TargetState, in case the state is now defined.
       target = this.target(target.identifier(), target.params(), target.options());
 
@@ -161,7 +177,6 @@ export class StateService {
       removeFrom(this.invalidCallbacks)(callback);
     }.bind(this);
   }
-
 
   /**
    * Reloads the current state
@@ -270,13 +285,15 @@ export class StateService {
    */
   target(identifier: StateOrName, params?: RawParams, options: TransitionOptions = {}): TargetState {
     // If we're reloading, find the state object to reload from
-    if (isObject(options.reload) && !(<any>options.reload).name)
-      throw new Error('Invalid reload state object');
+    if (isObject(options.reload) && !(<any>options.reload).name) throw new Error('Invalid reload state object');
     const reg = this.router.stateRegistry;
-    options.reloadState = options.reload === true ? reg.root() : reg.matcher.find(<any> options.reload, options.relative);
+    options.reloadState =
+      options.reload === true ? reg.root() : reg.matcher.find(<any>options.reload, options.relative);
 
     if (options.reload && !options.reloadState)
-      throw new Error(`No such reload state '${(isString(options.reload) ? options.reload : (<any>options.reload).name)}'`);
+      throw new Error(
+        `No such reload state '${isString(options.reload) ? options.reload : (<any>options.reload).name}'`,
+      );
 
     return new TargetState(this.router.stateRegistry, identifier, params, options);
   }
@@ -284,7 +301,7 @@ export class StateService {
   private getCurrentPath(): PathNode[] {
     const globals = this.router.globals;
     const latestSuccess: Transition = globals.successfulTransitions.peekTail();
-    const rootPath = () => [ new PathNode(this.router.stateRegistry.root()) ];
+    const rootPath = () => [new PathNode(this.router.stateRegistry.root())];
     return latestSuccess ? latestSuccess.treeChanges().to : rootPath();
   }
 
@@ -315,18 +332,15 @@ export class StateService {
     const router = this.router;
     const globals = router.globals;
     options = defaults(options, defaultTransOpts);
-    const getCurrent = () =>
-        globals.transition;
+    const getCurrent = () => globals.transition;
     options = extend(options, { current: getCurrent });
 
     const ref: TargetState = this.target(to, toParams, options);
     const currentPath = this.getCurrentPath();
 
-    if (!ref.exists())
-      return this._handleInvalidTargetState(currentPath, ref);
+    if (!ref.exists()) return this._handleInvalidTargetState(currentPath, ref);
 
-    if (!ref.valid())
-      return <TransitionPromise> silentRejection(ref.error());
+    if (!ref.valid()) return <TransitionPromise>silentRejection(ref.error());
 
     /**
      * Special handling for Ignored, Aborted, and Redirected transitions
@@ -457,13 +471,14 @@ export class StateService {
    */
   includes(stateOrName: StateOrName, params?: RawParams, options?: TransitionOptions): boolean {
     options = defaults(options, { relative: this.$current });
-    const glob = isString(stateOrName) && Glob.fromString(<string> stateOrName);
+    const glob = isString(stateOrName) && Glob.fromString(<string>stateOrName);
 
     if (glob) {
       if (!glob.matches(this.$current.name)) return false;
       stateOrName = this.$current.name;
     }
-    const state = this.router.stateRegistry.matcher.find(stateOrName, options.relative), include = this.$current.includes;
+    const state = this.router.stateRegistry.matcher.find(stateOrName, options.relative),
+      include = this.$current.includes;
 
     if (!isDefined(state)) return undefined;
     if (!isDefined(include[state.name])) return false;
@@ -472,7 +487,6 @@ export class StateService {
     const schema: Param[] = state.parameters({ inherit: true, matchingKeys: params });
     return Param.equals(schema, Param.values(schema, params), this.params);
   }
-
 
   /**
    * Generates a URL for a state and parameters
@@ -492,8 +506,8 @@ export class StateService {
    */
   href(stateOrName: StateOrName, params: RawParams, options?: HrefOptions): string {
     const defaultHrefOpts = {
-      lossy:    true,
-      inherit:  true,
+      lossy: true,
+      inherit: true,
       absolute: false,
       relative: this.$current,
     };
@@ -503,9 +517,9 @@ export class StateService {
     const state = this.router.stateRegistry.matcher.find(stateOrName, options.relative);
 
     if (!isDefined(state)) return null;
-    if (options.inherit) params = <any> this.params.$inherit(params, this.$current, state);
+    if (options.inherit) params = <any>this.params.$inherit(params, this.$current, state);
 
-    const nav = (state && options.lossy) ? state.navigable : state;
+    const nav = state && options.lossy ? state.navigable : state;
 
     if (!nav || nav.url === undefined || nav.url === null) {
       return null;
@@ -522,8 +536,7 @@ export class StateService {
       console.error($error$.stack);
     } else if ($error$ instanceof Rejection) {
       console.error($error$.toString());
-      if ($error$.detail && $error$.detail.stack)
-        console.error($error$.detail.stack);
+      if ($error$.detail && $error$.detail.stack) console.error($error$.detail.stack);
     } else {
       console.error($error$);
     }
@@ -554,7 +567,7 @@ export class StateService {
    * @returns the current global error handler
    */
   defaultErrorHandler(handler?: (error: any) => void): (error: any) => void {
-    return this._defaultErrorHandler = handler || this._defaultErrorHandler;
+    return (this._defaultErrorHandler = handler || this._defaultErrorHandler);
   }
 
   /**

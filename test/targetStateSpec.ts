@@ -61,13 +61,13 @@ describe('TargetState object', function() {
 
   describe('.withParams', function() {
     it('should merge params with current params when replace is false or unspecified', () => {
-      const ref = new TargetState(registry, 'foo', { param1: 1 }, { });
+      const ref = new TargetState(registry, 'foo', { param1: 1 }, {});
       const newRef = ref.withParams({ param2: 2 });
       expect(newRef.params()).toEqual({ param1: 1, param2: 2 });
     });
 
     it('should replace all params when replace is true', () => {
-      const ref = new TargetState(registry, 'foo', { param1: 1 }, { });
+      const ref = new TargetState(registry, 'foo', { param1: 1 }, {});
       const newRef = ref.withParams({ param2: 2 }, true);
       expect(newRef.params()).toEqual({ param2: 2 });
     });

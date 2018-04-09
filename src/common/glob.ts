@@ -69,12 +69,14 @@ export class Glob {
     this.text = text;
     this.glob = text.split('.');
 
-    const regexpString = this.text.split('.')
-        .map(seg => {
-          if (seg === '**') return '(?:|(?:\\.[^.]*)*)';
-          if (seg === '*')  return '\\.[^.]*';
-          return                   '\\.' + seg;
-        }).join('');
+    const regexpString = this.text
+      .split('.')
+      .map(seg => {
+        if (seg === '**') return '(?:|(?:\\.[^.]*)*)';
+        if (seg === '*') return '\\.[^.]*';
+        return '\\.' + seg;
+      })
+      .join('');
 
     this.regexp = new RegExp('^' + regexpString + '$');
   }

@@ -3,11 +3,11 @@ import { ParamTypes } from '../src/index';
 describe('parameters', () => {
   let types;
 
-  beforeEach(() => types = new ParamTypes());
+  beforeEach(() => (types = new ParamTypes()));
 
   describe('date type', () => {
     let dateType;
-    beforeEach(() => dateType = types.type('date'));
+    beforeEach(() => (dateType = types.type('date')));
 
     it('should compare dates', () => {
       const date1 = new Date('2010-01-01');

@@ -75,7 +75,6 @@ export class UIRouter {
   /** @hidden plugin instances are registered here */
   private _plugins: { [key: string]: UIRouterPlugin } = {};
 
-
   /** Registers an object to be notified when the router is disposed */
   disposable(disposable: Disposable) {
     this._disposables.push(disposable);
@@ -114,10 +113,9 @@ export class UIRouter {
    * @internalapi
    */
   constructor(
-      public locationService: LocationServices = UrlService.locationServiceStub,
-      public locationConfig: LocationConfig = UrlService.locationConfigStub,
+    public locationService: LocationServices = UrlService.locationServiceStub,
+    public locationConfig: LocationConfig = UrlService.locationConfigStub,
   ) {
-
     this.viewService._pluginapi._rootViewContext(this.stateRegistry.root());
     this.globals.$current = this.stateRegistry.root();
     this.globals.current = this.globals.$current.self;
@@ -132,7 +130,7 @@ export class UIRouter {
   }
 
   /** Add plugin (as ES6 class) */
-  plugin<T extends UIRouterPlugin>(plugin: { new(router: UIRouter, options?: any): T }, options?: any): T;
+  plugin<T extends UIRouterPlugin>(plugin: { new (router: UIRouter, options?: any): T }, options?: any): T;
   /** Add plugin (as javascript constructor function) */
   plugin<T extends UIRouterPlugin>(plugin: { (router: UIRouter, options?: any): void }, options?: any): T;
   /** Add plugin (as javascript factory function) */
@@ -194,7 +192,7 @@ export class UIRouter {
     const pluginInstance = new plugin(this, options);
     if (!pluginInstance.name) throw new Error('Required property `name` missing on plugin: ' + pluginInstance);
     this._disposables.push(pluginInstance);
-    return this._plugins[pluginInstance.name] = pluginInstance;
+    return (this._plugins[pluginInstance.name] = pluginInstance);
   }
 
   /**
@@ -208,7 +206,7 @@ export class UIRouter {
    */
   getPlugin(pluginName: string): UIRouterPlugin;
   getPlugin(): UIRouterPlugin[];
-  getPlugin(pluginName?: string): UIRouterPlugin|UIRouterPlugin[] {
+  getPlugin(pluginName?: string): UIRouterPlugin | UIRouterPlugin[] {
     return pluginName ? this._plugins[pluginName] : values(this._plugins);
   }
 }

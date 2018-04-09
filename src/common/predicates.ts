@@ -11,18 +11,18 @@ import { Predicate } from './common'; // has or is using
 import { StateObject } from '../state/stateObject';
 
 const toStr = Object.prototype.toString;
-const tis = (t: string) => (x: any) => typeof(x) === t;
+const tis = (t: string) => (x: any) => typeof x === t;
 export const isUndefined = tis('undefined');
 export const isDefined = not(isUndefined);
 export const isNull = (o: any) => o === null;
 export const isNullOrUndefined = or(isNull, isUndefined);
-export const isFunction: (x: any) => x is Function = <any> tis('function');
-export const isNumber: (x: any) => x is number = <any> tis('number');
-export const isString = <(x: any) => x is string> tis('string');
+export const isFunction: (x: any) => x is Function = <any>tis('function');
+export const isNumber: (x: any) => x is number = <any>tis('number');
+export const isString = <(x: any) => x is string>tis('string');
 export const isObject = (x: any) => x !== null && typeof x === 'object';
 export const isArray = Array.isArray;
-export const isDate: (x: any) => x is Date = <any> ((x: any) => toStr.call(x) === '[object Date]');
-export const isRegExp: (x: any) => x is RegExp = <any> ((x: any) => toStr.call(x) === '[object RegExp]');
+export const isDate: (x: any) => x is Date = <any>((x: any) => toStr.call(x) === '[object Date]');
+export const isRegExp: (x: any) => x is RegExp = <any>((x: any) => toStr.call(x) === '[object RegExp]');
 export const isState: (x: any) => x is StateObject = StateObject.isState;
 
 /**
@@ -33,7 +33,8 @@ export const isState: (x: any) => x is StateObject = StateObject.isState;
  */
 export function isInjectable(val: any) {
   if (isArray(val) && val.length) {
-    const head = val.slice(0, -1), tail = val.slice(-1);
+    const head = val.slice(0, -1),
+      tail = val.slice(-1);
     return !(head.filter(not(isString)).length || tail.filter(not(isFunction)).length);
   }
   return isFunction(val);
@@ -44,5 +45,4 @@ export function isInjectable(val: any) {
  *
  * It is probably a Promise if it's an object, and it has a `then` property which is a Function
  */
-export const isPromise = <(x: any) => x is Promise<any>> and(isObject, pipe(prop('then'), isFunction));
-
+export const isPromise = <(x: any) => x is Promise<any>>and(isObject, pipe(prop('then'), isFunction));

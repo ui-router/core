@@ -20,8 +20,8 @@ describe('BrowserLocationConfig implementation', () => {
     const plugin: any = _router.getPlugin('vanilla.pushStateLocation');
 
     mockHistory = {
-      replaceState: (a, b, url) => mockLocation.href = url,
-      pushState: (a, b, url) => mockLocation.href = url,
+      replaceState: (a, b, url) => (mockLocation.href = url),
+      pushState: (a, b, url) => (mockLocation.href = url),
     };
 
     mockLocation = {
@@ -73,7 +73,7 @@ describe('BrowserLocationConfig implementation', () => {
     expect(stub.calls.first().args[2]).toBe(stripLastPathElement($url.config.baseHref()) + '/hello/world');
   });
 
-  it('returns the correct url query', async(done) => {
+  it('returns the correct url query', async done => {
     mockPushState(router);
 
     expect(router.urlService.config.html5Mode()).toBe(true);
@@ -133,6 +133,4 @@ describe('BrowserLocationConfig implementation', () => {
       expect(blc.baseHref()).toBe(location.pathname);
     });
   });
-
-
 });

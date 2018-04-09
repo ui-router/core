@@ -22,7 +22,7 @@ import { propEq } from '../common/hof';
  * @param event a string; either "registered" or "deregistered"
  * @param states the list of [[StateDeclaration]]s that were registered (or deregistered).
  */
-export type StateRegistryListener = (event: 'registered'|'deregistered', states: StateDeclaration[]) => void;
+export type StateRegistryListener = (event: 'registered' | 'deregistered', states: StateDeclaration[]) => void;
 
 export class StateRegistry {
   private _root: StateObject;
@@ -54,7 +54,7 @@ export class StateRegistry {
       abstract: true,
     };
 
-    const _root = this._root = this.stateQueue.register(rootStateDef);
+    const _root = (this._root = this.stateQueue.register(rootStateDef));
     _root.navigable = null;
   }
 
@@ -145,7 +145,10 @@ export class StateRegistry {
     deregistered.forEach(_state => {
       const $ur = this._router.urlRouter;
       // Remove URL rule
-      $ur.rules().filter(propEq('state', _state)).forEach($ur.removeRule.bind($ur));
+      $ur
+        .rules()
+        .filter(propEq('state', _state))
+        .forEach($ur.removeRule.bind($ur));
       // Remove state from registry
       delete this.states[_state.name];
     });
@@ -193,10 +196,9 @@ export class StateRegistry {
    */
   get(stateOrName: StateOrName, base?: StateOrName): StateDeclaration;
   get(stateOrName?: StateOrName, base?: StateOrName): any {
-    if (arguments.length === 0)
-      return <StateDeclaration[]> Object.keys(this.states).map(name => this.states[name].self);
+    if (arguments.length === 0) return <StateDeclaration[]>Object.keys(this.states).map(name => this.states[name].self);
     const found = this.matcher.find(stateOrName, base);
-    return found && found.self || null;
+    return (found && found.self) || null;
   }
 
   decorator(name: string, func: BuilderFunction) {

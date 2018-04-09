@@ -28,4 +28,4 @@ const updateUrl: TransitionHookFn = (transition: Transition) => {
 };
 
 export const registerUpdateUrl = (transitionService: TransitionService) =>
-    transitionService.onSuccess({}, updateUrl, { priority: 9999 });
+  transitionService.onSuccess({}, updateUrl, { priority: 9999 });

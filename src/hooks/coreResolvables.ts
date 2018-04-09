@@ -5,7 +5,7 @@ import { TransitionService } from '../transition/transitionService';
 import { Resolvable } from '../resolve';
 import { extend, inArray, map, mapObj, uniqR, unnestR, values } from '../common';
 import { PathNode } from '../path';
-import { TreeChanges } from "../transition";
+import { TreeChanges } from '../transition';
 
 function addCoreResolvables(trans: Transition) {
   trans.addResolvable(Resolvable.fromData(UIRouter, trans.router), '');
@@ -19,7 +19,7 @@ function addCoreResolvables(trans: Transition) {
 }
 
 export const registerAddCoreResolvables = (transitionService: TransitionService) =>
-    transitionService.onCreate({}, addCoreResolvables);
+  transitionService.onCreate({}, addCoreResolvables);
 
 const TRANSITION_TOKENS = ['$transition$', Transition];
 const isTransition = inArray(TRANSITION_TOKENS);
@@ -29,7 +29,9 @@ const isTransition = inArray(TRANSITION_TOKENS);
 // This function removes resolves for '$transition$' and `Transition` from the treeChanges.
 // Do not use this on current transitions, only on old ones.
 export const treeChangesCleanup = (trans: Transition) => {
-  const nodes = values(trans.treeChanges()).reduce(unnestR, []).reduce(uniqR, []);
+  const nodes = values(trans.treeChanges())
+    .reduce(unnestR, [])
+    .reduce(uniqR, []);
 
   // If the resolvable is a Transition, return a new resolvable with null data
   const replaceTransitionWithNull = (r: Resolvable): Resolvable => {

@@ -6,12 +6,12 @@ import { StateDeclaration } from '../src/state/interface';
 import { TestingPlugin } from './_testingPlugin';
 import { TransitionService } from '../src/transition/transitionService';
 
-
 const statetree = {
   A: {
     AA: {
-      AAA:  {
-        url: '/:fooId', params: { fooId: '' },
+      AAA: {
+        url: '/:fooId',
+        params: { fooId: '' },
       },
     },
   },
@@ -36,7 +36,7 @@ describe('hooks', () => {
   });
 
   describe('redirectTo:', () => {
-    it('should redirect to a state by name from the redirectTo: string', (done) => {
+    it('should redirect to a state by name from the redirectTo: string', done => {
       find(states, s => s.name === 'A').redirectTo = 'AAA';
       init();
 
@@ -46,7 +46,7 @@ describe('hooks', () => {
       });
     });
 
-    it('should redirect to a state by name from the redirectTo: object', (done) => {
+    it('should redirect to a state by name from the redirectTo: object', done => {
       find(states, s => s.name === 'A').redirectTo = { state: 'AAA' };
       init();
 
@@ -56,7 +56,7 @@ describe('hooks', () => {
       });
     });
 
-    it('should redirect to a state and params by name from the redirectTo: object', (done) => {
+    it('should redirect to a state and params by name from the redirectTo: object', done => {
       find(states, s => s.name === 'A').redirectTo = { state: 'AAA', params: { fooId: 'abc' } };
       init();
 
@@ -67,9 +67,8 @@ describe('hooks', () => {
       });
     });
 
-    it('should redirect to a TargetState returned from the redirectTo: function', (done) => {
-      find(states, s => s.name === 'A').redirectTo =
-          () => $state.target('AAA');
+    it('should redirect to a TargetState returned from the redirectTo: function', done => {
+      find(states, s => s.name === 'A').redirectTo = () => $state.target('AAA');
       init();
 
       $state.go('A').then(() => {
@@ -78,10 +77,11 @@ describe('hooks', () => {
       });
     });
 
-    it('should redirect after waiting for a promise for a state name returned from the redirectTo: function', (done) => {
-      find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
-        setTimeout(() => resolve('AAA'), 50);
-      });
+    it('should redirect after waiting for a promise for a state name returned from the redirectTo: function', done => {
+      find(states, s => s.name === 'A').redirectTo = () =>
+        new Promise(resolve => {
+          setTimeout(() => resolve('AAA'), 50);
+        });
       init();
 
       $state.go('A').then(() => {
@@ -90,10 +90,11 @@ describe('hooks', () => {
       });
     });
 
-    it('should redirect after waiting for a promise for a {state, params} returned from the redirectTo: function', (done) => {
-      find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
-        setTimeout(() => resolve({ state: 'AAA', params: { fooId: 'FOO' } }), 50);
-      });
+    it('should redirect after waiting for a promise for a {state, params} returned from the redirectTo: function', done => {
+      find(states, s => s.name === 'A').redirectTo = () =>
+        new Promise(resolve => {
+          setTimeout(() => resolve({ state: 'AAA', params: { fooId: 'FOO' } }), 50);
+        });
       init();
 
       $state.go('A').then(() => {
@@ -103,10 +104,11 @@ describe('hooks', () => {
       });
     });
 
-    it('should redirect after waiting for a promise for a TargetState returned from the redirectTo: function', (done) => {
-      find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
-        setTimeout(() => resolve($state.target('AAA')), 50);
-      });
+    it('should redirect after waiting for a promise for a TargetState returned from the redirectTo: function', done => {
+      find(states, s => s.name === 'A').redirectTo = () =>
+        new Promise(resolve => {
+          setTimeout(() => resolve($state.target('AAA')), 50);
+        });
       init();
 
       $state.go('A').then(() => {
@@ -116,7 +118,7 @@ describe('hooks', () => {
     });
 
     // Test for #3117
-    it('should not redirect if the redirectTo: function returns undefined', (done) => {
+    it('should not redirect if the redirectTo: function returns undefined', done => {
       find(states, s => s.name === 'A').redirectTo = function() {} as any;
       init();
 
@@ -126,10 +128,11 @@ describe('hooks', () => {
       });
     });
 
-    it('should not redirect if the redirectTo: function returns something other than a string, { state, params}, TargetState (or promise for)', (done) => {
-      find(states, s => s.name === 'A').redirectTo = () => new Promise((resolve) => {
-        setTimeout(() => resolve(12345 as any), 50);
-      });
+    it('should not redirect if the redirectTo: function returns something other than a string, { state, params}, TargetState (or promise for)', done => {
+      find(states, s => s.name === 'A').redirectTo = () =>
+        new Promise(resolve => {
+          setTimeout(() => resolve(12345 as any), 50);
+        });
       init();
 
       $state.go('A').then(() => {
@@ -140,49 +143,55 @@ describe('hooks', () => {
   });
 
   describe('onEnter:', () => {
-    it('should enter states from shallow to deep states', (done) => {
+    it('should enter states from shallow to deep states', done => {
       init();
       let log = [];
-      $transitions.onEnter({}, (trans, state) => { log.push(state); });
+      $transitions.onEnter({}, (trans, state) => {
+        log.push(state);
+      });
 
-      $state.go('B')
-          .then(() => expect(router.globals.current.name).toBe('B'))
-          .then(() => {
-            log = [];
-            return $state.go('AAA');
-          })
-          .then(() => {
-            expect(router.globals.current.name).toBe('AAA');
-            expect(log.map(x => x.name)).toEqual(['A', 'AA', 'AAA']);
-          })
-          .then(done);
+      $state
+        .go('B')
+        .then(() => expect(router.globals.current.name).toBe('B'))
+        .then(() => {
+          log = [];
+          return $state.go('AAA');
+        })
+        .then(() => {
+          expect(router.globals.current.name).toBe('AAA');
+          expect(log.map(x => x.name)).toEqual(['A', 'AA', 'AAA']);
+        })
+        .then(done);
     });
   });
 
   describe('onExit:', () => {
-    it('should exit states from deep to shallow states', (done) => {
+    it('should exit states from deep to shallow states', done => {
       init();
       let log = [];
-      $transitions.onExit({}, (trans, state) => { log.push(state); });
+      $transitions.onExit({}, (trans, state) => {
+        log.push(state);
+      });
 
-      $state.go('AAA')
-          .then(() => expect(router.globals.current.name).toBe('AAA'))
-          .then(() => {
-            log = [];
-            return $state.go('B');
-          })
-          .then(() => {
-            expect(router.globals.current.name).toBe('B');
-            expect(log.map(x => x.name)).toEqual(['AAA', 'AA', 'A']);
-          })
-          .then(done);
+      $state
+        .go('AAA')
+        .then(() => expect(router.globals.current.name).toBe('AAA'))
+        .then(() => {
+          log = [];
+          return $state.go('B');
+        })
+        .then(() => {
+          expect(router.globals.current.name).toBe('B');
+          expect(log.map(x => x.name)).toEqual(['AAA', 'AA', 'A']);
+        })
+        .then(done);
     });
   });
 
-  it('should not run a hook after the router is stopped', (done) => {
+  it('should not run a hook after the router is stopped', done => {
     init();
     let called = false;
-    router.transitionService.onSuccess({}, () => called = true);
+    router.transitionService.onSuccess({}, () => (called = true));
 
     $state.go('A').catch(err => {
       expect(called).toBe(false);
@@ -194,10 +203,11 @@ describe('hooks', () => {
     router.dispose();
   });
 
-  it('should not process a hook result after the router is stopped', (done) => {
+  it('should not process a hook result after the router is stopped', done => {
     init();
     let called = false;
-    let disposed, isdisposed = new Promise<any>(resolve => disposed = resolve);
+    let disposed,
+      isdisposed = new Promise<any>(resolve => (disposed = resolve));
 
     router.transitionService.onEnter({}, () => {
       called = true;
@@ -211,6 +221,9 @@ describe('hooks', () => {
       done();
     });
 
-    setTimeout(() => { router.dispose(); disposed(); }, 50);
+    setTimeout(() => {
+      router.dispose();
+      disposed();
+    }, 50);
   });
 });

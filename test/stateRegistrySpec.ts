@@ -9,9 +9,7 @@ const statetree = {
   A: {
     B: {
       C: {
-        D: {
-
-        },
+        D: {},
       },
     },
   },
@@ -32,8 +30,16 @@ describe('StateRegistry', () => {
       expect(registry.get().map(x => x.name)).toEqual(['', 'A', 'A.B', 'A.B.C', 'A.B.C.D']);
 
       registry.register({ name: 'A.B.C.D.E' });
-      expect(registry.get().map(x => x.name)).toEqual(['', 'A', 'A.B', 'A.B.C', 'A.B.C.D',
-        'A.B.C.D.E', 'A.B.C.D.E.F', 'A.B.C.D.E.F.G']);
+      expect(registry.get().map(x => x.name)).toEqual([
+        '',
+        'A',
+        'A.B',
+        'A.B.C',
+        'A.B.C.D',
+        'A.B.C.D.E',
+        'A.B.C.D.E.F',
+        'A.B.C.D.E.F.G',
+      ]);
     });
   });
 
@@ -80,8 +86,7 @@ describe('StateRegistry', () => {
     let changes;
     beforeEach(() => {
       changes = { registered: [], deregistered: [] };
-      registry.onStatesChanged((event, states) =>
-          changes[event] = changes[event].concat(states));
+      registry.onStatesChanged((event, states) => (changes[event] = changes[event].concat(states)));
     });
 
     it('should be invoked with `registered` when a state is registered', () => {
@@ -123,8 +128,8 @@ describe('StateRegistry', () => {
 
     it('should support multiple registered callbacks', () => {
       let log = '';
-      registry.onStatesChanged((event, states) => log += `1: [${event}:${states.map(s => s.name).join(',')}]`);
-      registry.onStatesChanged((event, states) => log += `2: [${event}:${states.map(s => s.name).join(',')}]`);
+      registry.onStatesChanged((event, states) => (log += `1: [${event}:${states.map(s => s.name).join(',')}]`));
+      registry.onStatesChanged((event, states) => (log += `2: [${event}:${states.map(s => s.name).join(',')}]`));
       registry.register({ name: 'A2' });
 
       expect(log).toEqual('1: [registered:A2]2: [registered:A2]');
@@ -137,8 +142,10 @@ describe('StateRegistry', () => {
 
     it('should remove the callback when the deregister function is invoked', () => {
       let log = '';
-      const deregister1fn = registry.onStatesChanged((event, states) => log += `1: [${event}:${states.map(s => s.name).join(',')}]`);
-      registry.onStatesChanged((event, states) => log += `2: [${event}:${states.map(s => s.name).join(',')}]`);
+      const deregister1fn = registry.onStatesChanged(
+        (event, states) => (log += `1: [${event}:${states.map(s => s.name).join(',')}]`),
+      );
+      registry.onStatesChanged((event, states) => (log += `2: [${event}:${states.map(s => s.name).join(',')}]`));
       registry.register({ name: 'A2' });
 
       expect(log).toEqual('1: [registered:A2]2: [registered:A2]');

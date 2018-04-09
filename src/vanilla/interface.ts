@@ -13,8 +13,8 @@ export interface LocationPlugin extends UIRouterPlugin {
 }
 
 export interface ServicesPlugin extends UIRouterPlugin {
-  $q: $QLike,
-  $injector: $InjectorLike
+  $q: $QLike;
+  $injector: $InjectorLike;
 }
 
 export interface LocationLike {

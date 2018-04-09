@@ -1,7 +1,17 @@
 /** @module path */ /** for typedoc */
 
 import {
-  extend, find, pick, omit, tail, mergeR, values, unnestR, Predicate, inArray, arrayTuples,
+  extend,
+  find,
+  pick,
+  omit,
+  tail,
+  mergeR,
+  values,
+  unnestR,
+  Predicate,
+  inArray,
+  arrayTuples,
 } from '../common/common';
 import { prop, propEq, not } from '../common/hof';
 
@@ -73,10 +83,11 @@ export class PathUtils {
       return extend({}, node && node.paramValues);
     }
 
-    const noInherit = fromPath.map(node => node.paramSchema)
-        .reduce(unnestR, [])
-        .filter(param => !param.inherit)
-        .map(prop('id'));
+    const noInherit = fromPath
+      .map(node => node.paramSchema)
+      .reduce(unnestR, [])
+      .filter(param => !param.inherit)
+      .map(prop('id'));
 
     /**
      * Given an [[PathNode]] "toNode", return a new [[PathNode]] with param values inherited from the
@@ -95,12 +106,11 @@ export class PathUtils {
     }
 
     // The param keys specified by the incoming toParams
-    return <PathNode[]> toPath.map(makeInheritedParamsNode);
+    return <PathNode[]>toPath.map(makeInheritedParamsNode);
   }
 
   static nonDynamicParams = (node: PathNode): Param[] =>
-      node.state.parameters({ inherit: false })
-          .filter(param => !param.dynamic);
+    node.state.parameters({ inherit: false }).filter(param => !param.dynamic);
 
   /**
    * Computes the tree changes (entering, exiting) between a fromPath and toPath.
@@ -109,8 +119,7 @@ export class PathUtils {
     const max = Math.min(fromPath.length, toPath.length);
     let keep = 0;
 
-    const nodesMatch = (node1: PathNode, node2: PathNode) =>
-        node1.equals(node2, PathUtils.nonDynamicParams);
+    const nodesMatch = (node1: PathNode, node2: PathNode) => node1.equals(node2, PathUtils.nonDynamicParams);
 
     while (keep < max && fromPath[keep].state !== reloadState && nodesMatch(fromPath[keep], toPath[keep])) {
       keep++;
@@ -125,14 +134,14 @@ export class PathUtils {
 
     let from: PathNode[], retained: PathNode[], exiting: PathNode[], entering: PathNode[], to: PathNode[];
 
-    from                  = fromPath;
-    retained              = from.slice(0, keep);
-    exiting               = from.slice(keep);
+    from = fromPath;
+    retained = from.slice(0, keep);
+    exiting = from.slice(keep);
 
     // Create a new retained path (with shallow copies of nodes) which have the params of the toPath mapped
-    const retainedWithToParams  = retained.map(applyToParams);
-    entering              = toPath.slice(keep);
-    to                    = (retainedWithToParams).concat(entering);
+    const retainedWithToParams = retained.map(applyToParams);
+    entering = toPath.slice(keep);
+    to = retainedWithToParams.concat(entering);
 
     return { from, to, retained, retainedWithToParams, exiting, entering };
   }
@@ -170,8 +179,7 @@ export class PathUtils {
    * @returns true if the the states and parameter values for both paths are identical
    */
   static equals(pathA: PathNode[], pathB: PathNode[], paramsFn?: GetParamsFn): boolean {
-    return pathA.length === pathB.length &&
-        PathUtils.matching(pathA, pathB, paramsFn).length === pathA.length;
+    return pathA.length === pathB.length && PathUtils.matching(pathA, pathB, paramsFn).length === pathA.length;
   }
 
   /**
@@ -191,6 +199,5 @@ export class PathUtils {
   }
 
   /** Gets the raw parameter values from a path */
-  static paramValues = (path: PathNode[]) =>
-      path.reduce((acc, node) => extend(acc, node.paramValues), {});
+  static paramValues = (path: PathNode[]) => path.reduce((acc, node) => extend(acc, node.paramValues), {});
 }

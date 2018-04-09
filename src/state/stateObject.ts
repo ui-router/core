@@ -36,7 +36,7 @@ export class StateObject {
   public abstract: boolean;
 
   /** Prototypally inherits from [[StateDeclaration.resolve]] */
-  public resolve: ({ [key: string]: (string|any[]|Function) }|any[]);
+  public resolve: { [key: string]: string | any[] | Function } | any[];
 
   /** A list of [[Resolvable]] objects.  The internal representation of [[resolve]]. */
   public resolvables: Resolvable[];
@@ -55,7 +55,7 @@ export class StateObject {
    * Note: `@uirouter/core` does not register a builder for views.
    * The framework specific code should register a `views` builder.
    */
-  public views: { [key: string]: _ViewDeclaration; };
+  public views: { [key: string]: _ViewDeclaration };
 
   /**
    * The original [[StateDeclaration]] used to build this [[StateObject]].
@@ -94,16 +94,15 @@ export class StateObject {
   public lazyLoad: (transition: Transition, state: StateDeclaration) => Promise<LazyLoadResult>;
 
   /** Prototypally inherits from [[StateDeclaration.redirectTo]] */
-  redirectTo: (
-      string |
-      (($transition$: Transition) => TargetState) |
-      { state: (string|StateDeclaration), params: { [key: string]: any }}
-  );
+  redirectTo:
+    | string
+    | (($transition$: Transition) => TargetState)
+    | { state: string | StateDeclaration; params: { [key: string]: any } };
 
   /** @hidden */
   __stateObjectCache: {
     /** Might be null */
-    nameGlob?: Glob,
+    nameGlob?: Glob;
   };
 
   /**
@@ -127,13 +126,11 @@ export class StateObject {
   }
 
   /** Predicate which returns true if the object is an class with @State() decorator */
-  static isStateClass = (stateDecl: _StateDeclaration): stateDecl is ({ new (): StateDeclaration }) =>
+  static isStateClass = (stateDecl: _StateDeclaration): stateDecl is { new (): StateDeclaration } =>
     isFunction(stateDecl) && stateDecl['__uiRouterState'] === true;
 
   /** Predicate which returns true if the object is an internal [[StateObject]] object */
-  static isState = (obj: any): obj is StateObject =>
-    isObject(obj['__stateObjectCache']);
-
+  static isState = (obj: any): obj is StateObject => isObject(obj['__stateObjectCache']);
 
   /** @deprecated use State.create() */
   constructor(config?: StateDeclaration) {
@@ -151,7 +148,7 @@ export class StateObject {
    *        into `$stateProvider.state()`, (c) the fully-qualified name of a state as a string.
    * @returns Returns `true` if `ref` matches the current `State` instance.
    */
-  is(ref: StateObject|StateDeclaration|string): boolean {
+  is(ref: StateObject | StateDeclaration | string): boolean {
     return this === ref || this.self === ref || this.fqn() === ref;
   }
 
@@ -171,7 +168,7 @@ export class StateObject {
    * @returns The root of this state's tree.
    */
   root(): StateObject {
-    return this.parent && this.parent.root() || this;
+    return (this.parent && this.parent.root()) || this;
   }
 
   /**
@@ -183,11 +180,12 @@ export class StateObject {
    *
    * @param opts options
    */
-  parameters(opts?: { inherit?: boolean, matchingKeys?: any }): Param[] {
+  parameters(opts?: { inherit?: boolean; matchingKeys?: any }): Param[] {
     opts = defaults(opts, { inherit: true, matchingKeys: null });
-    const inherited = opts.inherit && this.parent && this.parent.parameters() || [];
-    return inherited.concat(values(this.params))
-        .filter(param => !opts.matchingKeys || opts.matchingKeys.hasOwnProperty(param.id));
+    const inherited = (opts.inherit && this.parent && this.parent.parameters()) || [];
+    return inherited
+      .concat(values(this.params))
+      .filter(param => !opts.matchingKeys || opts.matchingKeys.hasOwnProperty(param.id));
   }
 
   /**
@@ -199,9 +197,9 @@ export class StateObject {
    */
   parameter(id: string, opts: { inherit?: boolean } = {}): Param {
     return (
-        this.url && this.url.parameter(id, opts) ||
-        find(values(this.params), propEq('id', id)) ||
-        opts.inherit && this.parent && this.parent.parameter(id)
+      (this.url && this.url.parameter(id, opts)) ||
+      find(values(this.params), propEq('id', id)) ||
+      (opts.inherit && this.parent && this.parent.parameter(id))
     );
   }
 

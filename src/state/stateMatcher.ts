@@ -5,13 +5,12 @@ import { StateObject } from './stateObject';
 import { values } from '../common/common';
 
 export class StateMatcher {
-  constructor (private _states: { [key: string]: StateObject }) { }
+  constructor(private _states: { [key: string]: StateObject }) {}
 
   isRelative(stateName: string) {
     stateName = stateName || '';
     return stateName.indexOf('.') === 0 || stateName.indexOf('^') === 0;
   }
-
 
   find(stateOrName: StateOrName, base?: StateOrName, matchGlob = true): StateObject {
     if (!stateOrName && stateOrName !== '') return undefined;
@@ -25,14 +24,16 @@ export class StateMatcher {
       return state;
     } else if (isStr && matchGlob) {
       const _states = values(this._states);
-      const matches = _states.filter(_state =>
-          _state.__stateObjectCache.nameGlob &&
-          _state.__stateObjectCache.nameGlob.matches(name),
+      const matches = _states.filter(
+        _state => _state.__stateObjectCache.nameGlob && _state.__stateObjectCache.nameGlob.matches(name),
       );
 
       if (matches.length > 1) {
         // tslint:disable-next-line:no-console
-        console.log(`stateMatcher.find: Found multiple matches for ${name} using glob: `, matches.map(match => match.name));
+        console.log(
+          `stateMatcher.find: Found multiple matches for ${name} using glob: `,
+          matches.map(match => match.name),
+        );
       }
       return matches[0];
     }
@@ -46,7 +47,8 @@ export class StateMatcher {
 
     const splitName = name.split('.');
     const pathLength = splitName.length;
-    let i = 0, current = baseState;
+    let i = 0,
+      current = baseState;
 
     for (; i < pathLength; i++) {
       if (splitName[i] === '' && i === 0) {

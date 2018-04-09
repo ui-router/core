@@ -34,7 +34,7 @@ export const NATIVE_INJECTOR_TOKEN: string = 'Native Injector';
 export class ResolveContext {
   _injector: UIInjector;
 
-  constructor(private _path: PathNode[]) { }
+  constructor(private _path: PathNode[]) {}
 
   /** Gets all the tokens found in the resolve context, de-duplicated */
   getTokens(): any[] {
@@ -48,9 +48,10 @@ export class ResolveContext {
    * Throws an error if it doesn't exist in the ResolveContext
    */
   getResolvable(token: any): Resolvable {
-    const matching = this._path.map(node => node.resolvables)
-        .reduce(unnestR, [])
-        .filter((r: Resolvable) => r.token === token);
+    const matching = this._path
+      .map(node => node.resolvables)
+      .reduce(unnestR, [])
+      .filter((r: Resolvable) => r.token === token);
     return tail(matching);
   }
 
@@ -103,7 +104,7 @@ export class ResolveContext {
    * @param state Used to find the node to put the resolvable on
    */
   addResolvables(newResolvables: Resolvable[], state: StateObject) {
-    const node = <PathNode> find(this._path, propEq('state', state));
+    const node = <PathNode>find(this._path, propEq('state', state));
     const keys = newResolvables.map(r => r.token);
     node.resolvables = node.resolvables.filter(r => keys.indexOf(r.token) === -1).concat(newResolvables);
   }
@@ -115,7 +116,7 @@ export class ResolveContext {
    * @param trans
    * @returns {Promise<any>|any}
    */
-  resolvePath(when: PolicyWhen = 'LAZY', trans?: Transition): Promise<{ token: any, value: any }[]> {
+  resolvePath(when: PolicyWhen = 'LAZY', trans?: Transition): Promise<{ token: any; value: any }[]> {
     // This option determines which 'when' policy Resolvables we are about to fetch.
     const whenOption: string = inArray(ALL_WHENS, when) ? when : 'LAZY';
     // If the caller specified EAGER, only the EAGER Resolvables are fetched.
@@ -125,9 +126,8 @@ export class ResolveContext {
     // get the subpath to the state argument, if provided
     trace.traceResolvePath(this._path, when, trans);
 
-    const matchesPolicy = (acceptedVals: string[], whenOrAsync: 'when'|'async') =>
-        (resolvable: Resolvable) =>
-            inArray(acceptedVals, this.getPolicy(resolvable)[whenOrAsync]);
+    const matchesPolicy = (acceptedVals: string[], whenOrAsync: 'when' | 'async') => (resolvable: Resolvable) =>
+      inArray(acceptedVals, this.getPolicy(resolvable)[whenOrAsync]);
 
     // Trigger all the (matching) Resolvables in the path
     // Reduce all the "WAIT" Resolvables into an array
@@ -138,7 +138,9 @@ export class ResolveContext {
 
       // For the matching Resolvables, start their async fetch process.
       const subContext = this.subContext(node.state);
-      const getResult = (r: Resolvable) => r.get(subContext, trans)
+      const getResult = (r: Resolvable) =>
+        r
+          .get(subContext, trans)
           // Return a tuple that includes the Resolvable's token
           .then(value => ({ token: r.token, value: value }));
       nowait.forEach(getResult);
@@ -168,8 +170,8 @@ export class ResolveContext {
     // subpath stopping at resolvable's node, or the whole path (if the resolvable isn't in the path)
     const subPath: PathNode[] = PathUtils.subPath(this._path, x => x === node) || this._path;
     const availableResolvables: Resolvable[] = subPath
-        .reduce((acc, _node) => acc.concat(_node.resolvables), []) // all of subpath's resolvables
-        .filter(res => res !== resolvable); // filter out the `resolvable` argument
+      .reduce((acc, _node) => acc.concat(_node.resolvables), []) // all of subpath's resolvables
+      .filter(res => res !== resolvable); // filter out the `resolvable` argument
 
     const getDependency = (token: any) => {
       const matching = availableResolvables.filter(r => r.token === token);

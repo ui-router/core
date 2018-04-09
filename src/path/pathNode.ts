@@ -61,7 +61,7 @@ export class PathNode {
 
   /** Sets [[paramValues]] for the node, from the values of an object hash */
   applyRawParams(params: RawParams): PathNode {
-    const getParamVal = (paramDef: Param) => [ paramDef.id, paramDef.value(params[paramDef.id]) ];
+    const getParamVal = (paramDef: Param) => [paramDef.id, paramDef.value(params[paramDef.id])];
     this.paramValues = this.paramSchema.reduce((memo, pDef) => applyPairs(memo, getParamVal(pDef)), {});
     return this;
   }

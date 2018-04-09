@@ -22,7 +22,7 @@ const redirectToHook: TransitionHookFn = (trans: Transition) => {
   function handleResult(result: any) {
     if (!result) return;
     if (result instanceof TargetState) return result;
-    if (isString(result)) return $state.target(<any> result, trans.params(), trans.options());
+    if (isString(result)) return $state.target(<any>result, trans.params(), trans.options());
     if (result['state'] || result['params'])
       return $state.target(result['state'] || trans.to(), result['params'] || trans.params(), trans.options());
   }
@@ -34,4 +34,4 @@ const redirectToHook: TransitionHookFn = (trans: Transition) => {
 };
 
 export const registerRedirectToHook = (transitionService: TransitionService) =>
-    transitionService.onStart({ to: (state) => !!state.redirectTo }, redirectToHook);
+  transitionService.onStart({ to: state => !!state.redirectTo }, redirectToHook);

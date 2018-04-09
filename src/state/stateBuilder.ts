@@ -38,7 +38,6 @@ interface Builders {
   resolvables: BuilderFunction[];
 }
 
-
 function nameBuilder(state: StateObject) {
   return state.name;
 }
@@ -56,41 +55,48 @@ function dataBuilder(state: StateObject) {
 }
 
 const getUrlBuilder = ($urlMatcherFactoryProvider: UrlMatcherFactory, root: () => StateObject) =>
-function urlBuilder(state: StateObject) {
-  const stateDec: StateDeclaration = <any> state;
+  function urlBuilder(state: StateObject) {
+    const stateDec: StateDeclaration = <any>state;
 
-  // For future states, i.e., states whose name ends with `.**`,
-  // match anything that starts with the url prefix
-  if (stateDec && stateDec.url && stateDec.name && stateDec.name.match(/\.\*\*$/)) {
-    stateDec.url += '{remainder:any}'; // match any path (.*)
-  }
+    // For future states, i.e., states whose name ends with `.**`,
+    // match anything that starts with the url prefix
+    if (stateDec && stateDec.url && stateDec.name && stateDec.name.match(/\.\*\*$/)) {
+      stateDec.url += '{remainder:any}'; // match any path (.*)
+    }
 
-  const parsed = parseUrl(stateDec.url), parent = state.parent;
-  const url = !parsed ? stateDec.url : $urlMatcherFactoryProvider.compile(parsed.val, {
-    params: state.params || {},
-    paramMap: function (paramConfig: any, isSearch: boolean) {
-      if (stateDec.reloadOnSearch === false && isSearch) paramConfig = extend(paramConfig || {}, { dynamic: true });
-      return paramConfig;
-    },
-  });
+    const parsed = parseUrl(stateDec.url),
+      parent = state.parent;
+    const url = !parsed
+      ? stateDec.url
+      : $urlMatcherFactoryProvider.compile(parsed.val, {
+          params: state.params || {},
+          paramMap: function(paramConfig: any, isSearch: boolean) {
+            if (stateDec.reloadOnSearch === false && isSearch)
+              paramConfig = extend(paramConfig || {}, { dynamic: true });
+            return paramConfig;
+          },
+        });
 
-  if (!url) return null;
-  if (!$urlMatcherFactoryProvider.isMatcher(url)) throw new Error(`Invalid url '${url}' in state '${state}'`);
-  return (parsed && parsed.root) ? url : ((parent && parent.navigable) || root()).url.append(<UrlMatcher> url);
-};
+    if (!url) return null;
+    if (!$urlMatcherFactoryProvider.isMatcher(url)) throw new Error(`Invalid url '${url}' in state '${state}'`);
+    return parsed && parsed.root ? url : ((parent && parent.navigable) || root()).url.append(<UrlMatcher>url);
+  };
 
 const getNavigableBuilder = (isRoot: (state: StateObject) => boolean) =>
-function navigableBuilder(state: StateObject) {
-  return !isRoot(state) && state.url ? state : (state.parent ? state.parent.navigable : null);
-};
+  function navigableBuilder(state: StateObject) {
+    return !isRoot(state) && state.url ? state : state.parent ? state.parent.navigable : null;
+  };
 
 const getParamsBuilder = (paramFactory: ParamFactory) =>
-function paramsBuilder(state: StateObject): { [key: string]: Param } {
-  const makeConfigParam = (config: any, id: string) => paramFactory.fromConfig(id, null, config);
-  const urlParams: Param[] = (state.url && state.url.parameters({ inherit: false })) || [];
-  const nonUrlParams: Param[] = values(mapObj(omit(state.params || {}, urlParams.map(prop('id'))), makeConfigParam));
-  return urlParams.concat(nonUrlParams).map(p => [p.id, p]).reduce(applyPairs, {});
-};
+  function paramsBuilder(state: StateObject): { [key: string]: Param } {
+    const makeConfigParam = (config: any, id: string) => paramFactory.fromConfig(id, null, config);
+    const urlParams: Param[] = (state.url && state.url.parameters({ inherit: false })) || [];
+    const nonUrlParams: Param[] = values(mapObj(omit(state.params || {}, urlParams.map(prop('id'))), makeConfigParam));
+    return urlParams
+      .concat(nonUrlParams)
+      .map(p => [p.id, p])
+      .reduce(applyPairs, {});
+  };
 
 function pathBuilder(state: StateObject) {
   return state.parent ? state.parent.path.concat(state) : /*root*/ [state];
@@ -144,54 +150,77 @@ function includesBuilder(state: StateObject) {
  * ]
  */
 export function resolvablesBuilder(state: StateObject): Resolvable[] {
-  interface Tuple { token: any, val: any, deps: any[], policy: ResolvePolicy }
+  interface Tuple {
+    token: any;
+    val: any;
+    deps: any[];
+    policy: ResolvePolicy;
+  }
 
   /** convert resolve: {} and resolvePolicy: {} objects to an array of tuples */
-  const objects2Tuples    = (resolveObj: Obj, resolvePolicies: { [key: string]: ResolvePolicy }) =>
-      Object.keys(resolveObj || {}).map(token => ({ token, val: resolveObj[token], deps: undefined, policy: resolvePolicies[token] }));
+  const objects2Tuples = (resolveObj: Obj, resolvePolicies: { [key: string]: ResolvePolicy }) =>
+    Object.keys(resolveObj || {}).map(token => ({
+      token,
+      val: resolveObj[token],
+      deps: undefined,
+      policy: resolvePolicies[token],
+    }));
 
   /** fetch DI annotations from a function or ng1-style array */
-  const annotate          = (fn: Function)  => {
+  const annotate = (fn: Function) => {
     const $injector = services.$injector;
     // ng1 doesn't have an $injector until runtime.
     // If the $injector doesn't exist, use "deferred" literal as a
     // marker indicating they should be annotated when runtime starts
-    return fn['$inject'] || ($injector && $injector.annotate(fn, $injector.strictDi)) || <any> 'deferred';
+    return fn['$inject'] || ($injector && $injector.annotate(fn, $injector.strictDi)) || <any>'deferred';
   };
 
   /** true if the object has both `token` and `resolveFn`, and is probably a [[ResolveLiteral]] */
-  const isResolveLiteral  = (obj: any) => !!(obj.token && obj.resolveFn);
+  const isResolveLiteral = (obj: any) => !!(obj.token && obj.resolveFn);
 
   /** true if the object looks like a provide literal, or a ng2 Provider */
-  const isLikeNg2Provider = (obj: any) => !!((obj.provide || obj.token) && (obj.useValue || obj.useFactory || obj.useExisting || obj.useClass));
+  const isLikeNg2Provider = (obj: any) =>
+    !!((obj.provide || obj.token) && (obj.useValue || obj.useFactory || obj.useExisting || obj.useClass));
 
   /** true if the object looks like a tuple from obj2Tuples */
-  const isTupleFromObj    = (obj: any) => !!(obj && obj.val && (isString(obj.val) || isArray(obj.val)  || isFunction(obj.val)));
+  const isTupleFromObj = (obj: any) =>
+    !!(obj && obj.val && (isString(obj.val) || isArray(obj.val) || isFunction(obj.val)));
 
   /** extracts the token from a Provider or provide literal */
-  const getToken          = (p: any) => p.provide || p.token;
+  const getToken = (p: any) => p.provide || p.token;
 
   /** Given a literal resolve or provider object, returns a Resolvable */
   const literal2Resolvable = pattern([
-    [prop('resolveFn'),   p => new Resolvable(getToken(p), p.resolveFn, p.deps, p.policy)],
-    [prop('useFactory'),  p => new Resolvable(getToken(p), p.useFactory, (p.deps || p.dependencies), p.policy)],
-    [prop('useClass'),    p => new Resolvable(getToken(p), () => new (<any>p.useClass)(), [], p.policy)],
-    [prop('useValue'),    p => new Resolvable(getToken(p), () => p.useValue, [], p.policy, p.useValue)],
+    [prop('resolveFn'), p => new Resolvable(getToken(p), p.resolveFn, p.deps, p.policy)],
+    [prop('useFactory'), p => new Resolvable(getToken(p), p.useFactory, p.deps || p.dependencies, p.policy)],
+    [prop('useClass'), p => new Resolvable(getToken(p), () => new (<any>p.useClass)(), [], p.policy)],
+    [prop('useValue'), p => new Resolvable(getToken(p), () => p.useValue, [], p.policy, p.useValue)],
     [prop('useExisting'), p => new Resolvable(getToken(p), identity, [p.useExisting], p.policy)],
   ]);
 
   const tuple2Resolvable = pattern([
-    [pipe(prop('val'), isString),   (tuple: Tuple) => new Resolvable(tuple.token, identity, [ tuple.val ], tuple.policy)],
-    [pipe(prop('val'), isArray),    (tuple: Tuple) => new Resolvable(tuple.token, tail(<any[]> tuple.val), tuple.val.slice(0, -1), tuple.policy)],
-    [pipe(prop('val'), isFunction), (tuple: Tuple) => new Resolvable(tuple.token, tuple.val, annotate(tuple.val), tuple.policy)],
+    [pipe(prop('val'), isString), (tuple: Tuple) => new Resolvable(tuple.token, identity, [tuple.val], tuple.policy)],
+    [
+      pipe(prop('val'), isArray),
+      (tuple: Tuple) => new Resolvable(tuple.token, tail(<any[]>tuple.val), tuple.val.slice(0, -1), tuple.policy),
+    ],
+    [
+      pipe(prop('val'), isFunction),
+      (tuple: Tuple) => new Resolvable(tuple.token, tuple.val, annotate(tuple.val), tuple.policy),
+    ],
   ]);
 
-  const item2Resolvable = <(obj: any) => Resolvable> pattern([
-    [is(Resolvable),                (r: Resolvable) => r],
-    [isResolveLiteral,              literal2Resolvable],
-    [isLikeNg2Provider,             literal2Resolvable],
-    [isTupleFromObj,                tuple2Resolvable],
-    [val(true),                     (obj: any) => { throw new Error('Invalid resolve value: ' + stringify(obj)); }],
+  const item2Resolvable = <(obj: any) => Resolvable>pattern([
+    [is(Resolvable), (r: Resolvable) => r],
+    [isResolveLiteral, literal2Resolvable],
+    [isLikeNg2Provider, literal2Resolvable],
+    [isTupleFromObj, tuple2Resolvable],
+    [
+      val(true),
+      (obj: any) => {
+        throw new Error('Invalid resolve value: ' + stringify(obj));
+      },
+    ],
   ]);
 
   // If resolveBlock is already an array, use it as-is.
@@ -229,23 +258,23 @@ export class StateBuilder {
     }
 
     this.builders = {
-      name: [ nameBuilder ],
-      self: [ selfBuilder ],
-      parent: [ parentBuilder ],
-      data: [ dataBuilder ],
+      name: [nameBuilder],
+      self: [selfBuilder],
+      parent: [parentBuilder],
+      data: [dataBuilder],
       // Build a URLMatcher if necessary, either via a relative or absolute URL
-      url: [ getUrlBuilder(urlMatcherFactory, root) ],
+      url: [getUrlBuilder(urlMatcherFactory, root)],
       // Keep track of the closest ancestor state that has a URL (i.e. is navigable)
-      navigable: [ getNavigableBuilder(isRoot) ],
-      params: [ getParamsBuilder(urlMatcherFactory.paramFactory) ],
+      navigable: [getNavigableBuilder(isRoot)],
+      params: [getParamsBuilder(urlMatcherFactory.paramFactory)],
       // Each framework-specific ui-router implementation should define its own `views` builder
       // e.g., src/ng1/statebuilders/views.ts
       views: [],
       // Keep a full path from the root down to this state as this is needed for state activation.
-      path: [ pathBuilder ],
+      path: [pathBuilder],
       // Speed up $state.includes() as it's used a lot
-      includes: [ includesBuilder ],
-      resolvables: [ resolvablesBuilder ],
+      includes: [includesBuilder],
+      resolvables: [resolvablesBuilder],
     };
   }
 
@@ -259,7 +288,7 @@ export class StateBuilder {
    * @param fn The BuilderFunction which will be used to build the State property
    * @returns a function which deregisters the BuilderFunction
    */
-  builder(name: string, fn: BuilderFunction): (BuilderFunction|BuilderFunction[]|Function) {
+  builder(name: string, fn: BuilderFunction): BuilderFunction | BuilderFunction[] | Function {
     const builders = this.builders;
     const array = builders[name] || [];
     // Backwards compat: if only one builder exists, return it, else return whole arary.
@@ -288,7 +317,10 @@ export class StateBuilder {
 
     for (const key in builders) {
       if (!builders.hasOwnProperty(key)) continue;
-      const chain = builders[key].reduce((parentFn: BuilderFunction, step: BuilderFunction) => (_state) => step(_state, parentFn), noop);
+      const chain = builders[key].reduce(
+        (parentFn: BuilderFunction, step: BuilderFunction) => _state => step(_state, parentFn),
+        noop,
+      );
       state[key] = chain(state);
     }
     return state;

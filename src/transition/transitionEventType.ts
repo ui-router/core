@@ -9,13 +9,14 @@ import { GetErrorHandler, GetResultHandler, TransitionHook } from './transitionH
  */
 export class TransitionEventType {
   /* tslint:disable:no-inferrable-types */
-  constructor(public name:               string,
-              public hookPhase:          TransitionHookPhase,
-              public hookOrder:          number,
-              public criteriaMatchPath:  PathType,
-              public reverseSort:        boolean = false,
-              public getResultHandler:   GetResultHandler = TransitionHook.HANDLE_RESULT,
-              public getErrorHandler:    GetErrorHandler = TransitionHook.REJECT_ERROR,
-              public synchronous:        boolean = false,
-  ) { }
+  constructor(
+    public name: string,
+    public hookPhase: TransitionHookPhase,
+    public hookOrder: number,
+    public criteriaMatchPath: PathType,
+    public reverseSort: boolean = false,
+    public getResultHandler: GetResultHandler = TransitionHook.HANDLE_RESULT,
+    public getErrorHandler: GetErrorHandler = TransitionHook.REJECT_ERROR,
+    public synchronous: boolean = false,
+  ) {}
 }

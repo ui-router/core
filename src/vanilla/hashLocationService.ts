@@ -21,9 +21,8 @@ export class HashLocationService extends BaseLocationServices {
     this._location.hash = url;
   }
 
-  dispose (router: UIRouter) {
+  dispose(router: UIRouter) {
     super.dispose(router);
     root.removeEventListener('hashchange', this._listener);
   }
 }
-

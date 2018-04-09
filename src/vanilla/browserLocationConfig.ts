@@ -11,7 +11,7 @@ export class BrowserLocationConfig implements LocationConfig {
   private _baseHref = undefined;
   private _hashPrefix = '';
 
-  constructor(router?, private _isHtml5 = false) { }
+  constructor(router?, private _isHtml5 = false) {}
 
   port(): number {
     if (location.port) {
@@ -35,17 +35,18 @@ export class BrowserLocationConfig implements LocationConfig {
 
   hashPrefix(): string;
   hashPrefix(newprefix?: string): string {
-    return isDefined(newprefix) ? this._hashPrefix = newprefix : this._hashPrefix;
+    return isDefined(newprefix) ? (this._hashPrefix = newprefix) : this._hashPrefix;
   }
 
   baseHref(href?: string): string {
-    return isDefined(href) ? this._baseHref = href :
-      isDefined(this._baseHref) ? this._baseHref : this.applyDocumentBaseHref();
+    return isDefined(href)
+      ? (this._baseHref = href)
+      : isDefined(this._baseHref) ? this._baseHref : this.applyDocumentBaseHref();
   }
 
   applyDocumentBaseHref() {
     const baseTag: HTMLBaseElement = document.getElementsByTagName('base')[0];
-    return this._baseHref = baseTag ? baseTag.href.substr(location.origin.length) : location.pathname || '/';
+    return (this._baseHref = baseTag ? baseTag.href.substr(location.origin.length) : location.pathname || '/');
   }
 
   dispose() {}

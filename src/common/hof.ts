@@ -55,16 +55,13 @@ export function curry(fn: Function): Function {
   const func_args_length = fn.length;
 
   function curried(args: any[]) {
-    if (args.length >= func_args_length)
-      return fn.apply(null, args);
-    return function () {
+    if (args.length >= func_args_length) return fn.apply(null, args);
+    return function() {
       return curried(args.concat([].slice.apply(arguments)));
     };
   }
   return curried(initial_args);
 }
-
-
 
 /**
  * Given a varargs list of functions, returns a function that composes the argument functions, right-to-left
@@ -76,7 +73,8 @@ export function compose() {
   const args = arguments;
   const start = args.length - 1;
   return function() {
-    let i = start, result = args[start].apply(this, arguments);
+    let i = start,
+      result = args[start].apply(this, arguments);
     while (i--) result = args[i].call(this, result);
     return result;
   };
@@ -98,8 +96,7 @@ export function pipe(...funcs: Function[]): (obj: any) => any {
  * let getName = prop("name");
  * getName(obj) === "blarg"
  */
-export const prop = (name: string) =>
-    (obj: any) => obj && obj[name];
+export const prop = (name: string) => (obj: any) => obj && obj[name];
 
 /**
  * Given a property name and a value, returns a function that returns a boolean based on whether
@@ -118,15 +115,14 @@ export const propEq = curry((name: string, _val: any, obj: any) => obj && obj[na
  * let propNotFound = prop("this.property.doesnt.exist");
  * propNotFound(obj) === undefined
  */
-export const parse = (name: string) =>
-    pipe.apply(null, name.split('.').map(prop));
+export const parse = (name: string) => pipe.apply(null, name.split('.').map(prop));
 
 /**
  * Given a function that returns a truthy or falsey value, returns a
  * function that returns the opposite (falsey or truthy) value given the same inputs
  */
-export const not: (fn: Predicate<any>) => Predicate<any> = (fn: Predicate<any>) =>
-    (...args: any[]) => !fn.apply(null, args);
+export const not: (fn: Predicate<any>) => Predicate<any> = (fn: Predicate<any>) => (...args: any[]) =>
+  !fn.apply(null, args);
 
 /**
  * Given two functions that return truthy or falsey values, returns a function that returns truthy
@@ -150,32 +146,25 @@ export function or(fn1: Predicate<any>, fn2: Predicate<any>): Predicate<any> {
  * @param fn1 a predicate function `fn1`
  * @returns a function which takes an array and returns true if `fn1` is true for all elements of the array
  */
-export const all = (fn1: Predicate<any>) =>
-    (arr: any[]) => arr.reduce((b, x) => b && !!fn1(x), true) as boolean;
+export const all = (fn1: Predicate<any>) => (arr: any[]) => arr.reduce((b, x) => b && !!fn1(x), true) as boolean;
 
 // tslint:disable-next-line:variable-name
-export const any = (fn1: Predicate<any>) =>
-    (arr: any[]) => arr.reduce((b, x) => b || !!fn1(x), false) as boolean;
+export const any = (fn1: Predicate<any>) => (arr: any[]) => arr.reduce((b, x) => b || !!fn1(x), false) as boolean;
 
 /** Given a class, returns a Predicate function that returns true if the object is of that class */
-export const is = <T> (ctor: { new(...args): T }) =>
-    (obj: any): obj is T =>
-        (obj != null && obj.constructor === ctor || obj instanceof ctor);
+export const is = <T>(ctor: { new (...args): T }) => (obj: any): obj is T =>
+  (obj != null && obj.constructor === ctor) || obj instanceof ctor;
 
 /** Given a value, returns a Predicate function that returns true if another value is === equal to the original value */
-export const eq: (comp: any) => Predicate<any> = (value: any) => (other: any) =>
-    value === other;
+export const eq: (comp: any) => Predicate<any> = (value: any) => (other: any) => value === other;
 
 /** Given a value, returns a function which returns the value */
-export const val = <T> (v: T) => () => v;
-
-
+export const val = <T>(v: T) => () => v;
 
 export function invoke(fnName: string): Function;
 export function invoke(fnName: string, args: any[]): Function;
 export function invoke(fnName: string, args?: any[]): Function {
-  return (obj: any) =>
-      obj[fnName].apply(obj, args);
+  return (obj: any) => obj[fnName].apply(obj, args);
 }
 
 /**
@@ -225,4 +214,3 @@ export function pattern(struct: Function[][]): Function {
     }
   };
 }
-

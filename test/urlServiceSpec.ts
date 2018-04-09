@@ -1,4 +1,3 @@
-
 import { UIRouter } from '../src/router';
 import { TestingPlugin } from './_testingPlugin';
 import { UrlService } from '../src/url/urlService';

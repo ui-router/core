@@ -5,7 +5,7 @@ import { UrlRouter } from '../src/url/urlRouter';
 import { UIRouterPlugin } from '../src/interface';
 import { isArray } from '../src/common/predicates';
 
-describe('plugin api', function () {
+describe('plugin api', function() {
   let router: UIRouter;
   let $registry: StateRegistry;
   let $transitions: TransitionService;
@@ -24,7 +24,7 @@ describe('plugin api', function () {
 
   class FancyPluginClass implements UIRouterPlugin {
     name = 'fancypluginclass';
-    constructor(public router: UIRouter) { }
+    constructor(public router: UIRouter) {}
     dispose() {}
   }
 
@@ -72,10 +72,10 @@ describe('plugin api', function () {
 
     it('should throw if the plugin constructor returns an object without name() getter', () => {
       function PluginFactory(router) {
-        return { };
+        return {};
       }
 
-      expect(() => router.plugin(<any> PluginFactory)).toThrow();
+      expect(() => router.plugin(<any>PluginFactory)).toThrow();
     });
   });
 

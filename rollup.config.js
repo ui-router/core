@@ -5,8 +5,7 @@ import sourcemaps from 'rollup-plugin-sourcemaps';
 const MINIFY = process.env.MINIFY;
 
 const pkg = require('./package.json');
-const banner =
-`/**
+const banner = `/**
  * ${pkg.description}
  * @version v${pkg.version}
  * @link ${pkg.homepage}
@@ -15,10 +14,9 @@ const banner =
 
 const uglifyOpts = { output: {} };
 // retain multiline comment with @license
-uglifyOpts.output.comments = (node, comment) =>
-comment.type === 'comment2' && /@license/i.test(comment.value);
+uglifyOpts.output.comments = (node, comment) => comment.type === 'comment2' && /@license/i.test(comment.value);
 
-const onwarn = (warning) => {
+const onwarn = warning => {
   // Suppress this error message... https://github.com/rollup/rollup/wiki/Troubleshooting#this-is-undefined
   const ignores = ['THIS_IS_UNDEFINED'];
   if (!ignores.some(code => code === warning.code)) {
@@ -26,14 +24,11 @@ const onwarn = (warning) => {
   }
 };
 
-const plugins = [
-  nodeResolve({jsnext: true}),
-  sourcemaps(),
-];
+const plugins = [nodeResolve({ jsnext: true }), sourcemaps()];
 
 if (MINIFY) plugins.push(uglify(uglifyOpts));
 
-const extension = MINIFY ? ".min.js" : ".js";
+const extension = MINIFY ? '.min.js' : '.js';
 
 const CONFIG = {
   input: 'lib-esm/index.js',

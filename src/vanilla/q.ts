@@ -22,10 +22,13 @@ import { isArray, isObject, $QLike } from '../common/index';
  */
 export const $q = {
   /** Normalizes a value as a promise */
-  when: (val) => new Promise((resolve, reject) => resolve(val)),
+  when: val => new Promise((resolve, reject) => resolve(val)),
 
   /** Normalizes a value as a promise rejection */
-  reject: (val) => new Promise((resolve, reject) => { reject(val); }),
+  reject: val =>
+    new Promise((resolve, reject) => {
+      reject(val);
+    }),
 
   /** @returns a deferred object, which has `resolve` and `reject` functions */
   defer: () => {
@@ -46,12 +49,15 @@ export const $q = {
     if (isObject(promises)) {
       // Convert promises map to promises array.
       // When each promise resolves, map it to a tuple { key: key, val: val }
-      const chain = Object.keys(promises)
-          .map(key => promises[key].then(val => ({ key, val })));
+      const chain = Object.keys(promises).map(key => promises[key].then(val => ({ key, val })));
 
       // Then wait for all promises to resolve, and convert them back to an object
       return $q.all(chain).then(values =>
-        values.reduce((acc, tuple) => { acc[tuple.key] = tuple.val; return acc; }, {}));
+        values.reduce((acc, tuple) => {
+          acc[tuple.key] = tuple.val;
+          return acc;
+        }, {}),
+      );
     }
   },
 } as $QLike;

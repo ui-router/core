@@ -20,12 +20,10 @@ export const RESOLVE_HOOK_PRIORITY = 1000;
  * See [[StateDeclaration.resolve]]
  */
 const eagerResolvePath: TransitionHookFn = (trans: Transition) =>
-    new ResolveContext(trans.treeChanges().to)
-        .resolvePath('EAGER', trans)
-        .then(noop);
+  new ResolveContext(trans.treeChanges().to).resolvePath('EAGER', trans).then(noop);
 
 export const registerEagerResolvePath = (transitionService: TransitionService) =>
-    transitionService.onStart({}, eagerResolvePath, { priority: RESOLVE_HOOK_PRIORITY });
+  transitionService.onStart({}, eagerResolvePath, { priority: RESOLVE_HOOK_PRIORITY });
 
 /**
  * A [[TransitionHookFn]] which resolves all LAZY Resolvables for the state (and all its ancestors) in the To Path
@@ -37,14 +35,13 @@ export const registerEagerResolvePath = (transitionService: TransitionService) =
  * See [[StateDeclaration.resolve]]
  */
 const lazyResolveState: TransitionStateHookFn = (trans: Transition, state: StateDeclaration) =>
-    new ResolveContext(trans.treeChanges().to)
-        .subContext(state.$$state())
-        .resolvePath('LAZY', trans)
-        .then(noop);
+  new ResolveContext(trans.treeChanges().to)
+    .subContext(state.$$state())
+    .resolvePath('LAZY', trans)
+    .then(noop);
 
 export const registerLazyResolveState = (transitionService: TransitionService) =>
-    transitionService.onEnter({ entering: val(true) }, lazyResolveState, { priority: RESOLVE_HOOK_PRIORITY });
-
+  transitionService.onEnter({ entering: val(true) }, lazyResolveState, { priority: RESOLVE_HOOK_PRIORITY });
 
 /**
  * A [[TransitionHookFn]] which resolves any dynamically added (LAZY or EAGER) Resolvables.
@@ -57,9 +54,7 @@ export const registerLazyResolveState = (transitionService: TransitionService) =
  * See [[StateDeclaration.resolve]]
  */
 const resolveRemaining: TransitionHookFn = (trans: Transition) =>
-  new ResolveContext(trans.treeChanges().to)
-    .resolvePath('LAZY', trans)
-    .then(noop);
+  new ResolveContext(trans.treeChanges().to).resolvePath('LAZY', trans).then(noop);
 
 export const registerResolveRemaining = (transitionService: TransitionService) =>
   transitionService.onFinish({}, resolveRemaining, { priority: RESOLVE_HOOK_PRIORITY });

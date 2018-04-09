@@ -1,25 +1,31 @@
-import {
-    defaults, filter, is, eq, not, pattern, val, isInjectable,
-} from '../src/index';
+import { defaults, filter, is, eq, not, pattern, val, isInjectable } from '../src/index';
 import { map, mapObj, pick } from '../src/common/common';
 import { Queue } from '../src/common';
 
 describe('common', function() {
   describe('filter', function() {
     it('should filter arrays', function() {
-      const input = [ 1, 2, 3, 4, 5 ];
-      const filtered = filter(input, function(int) { return int > 2; });
+      const input = [1, 2, 3, 4, 5];
+      const filtered = filter(input, function(int) {
+        return int > 2;
+      });
       expect(filtered.length).toBe(3);
-      expect(filtered).toEqual([ 3, 4, 5 ]);
+      expect(filtered).toEqual([3, 4, 5]);
     });
 
     it('should properly compact arrays', function() {
-      expect(filter([0, 1, 0, 2, 0, 3, 4], function(v) { return !!v; })).toEqual([1, 2, 3, 4]);
+      expect(
+        filter([0, 1, 0, 2, 0, 3, 4], function(v) {
+          return !!v;
+        }),
+      ).toEqual([1, 2, 3, 4]);
     });
 
     it('should filter objects', function() {
       const input = { foo: 1, bar: 2, baz: 3, qux: 4 };
-      const filtered = filter(input, function(value, _key) { return value > 2; });
+      const filtered = filter(input, function(value, _key) {
+        return value > 2;
+      });
       expect(Object.keys(filtered).length).toBe(2);
       expect(filtered).toEqual({ baz: 3, qux: 4 });
     });
@@ -53,9 +59,15 @@ describe('common', function() {
 
   describe('not', function() {
     it('should allow double-negatives', function() {
-      function T() { return true; }
-      function F() { return false; }
-      function empty(): boolean { return <any> ''; }
+      function T() {
+        return true;
+      }
+      function F() {
+        return false;
+      }
+      function empty(): boolean {
+        return <any>'';
+      }
 
       expect(not(not(T))()).toBe(true);
       expect(not(not(F))()).toBe(false);
@@ -65,7 +77,8 @@ describe('common', function() {
 
   describe('val', function() {
     it('should return identity', function() {
-      const f = function() {}, foo = {};
+      const f = function() {},
+        foo = {};
       expect(val(f)()).toBe(f);
       expect(val(foo)()).toBe(foo);
       expect(val(true)()).toBe(true);
@@ -77,10 +90,10 @@ describe('common', function() {
   describe('pattern', function() {
     it('should return the result of a paired function when a condition function returns true', function() {
       const typeChecker = pattern([
-        [is(Number),  val('number!')],
-        [is(String),  val('string!')],
+        [is(Number), val('number!')],
+        [is(String), val('string!')],
         [is(Boolean), val('boolean!')],
-        [eq(null),    val('null!')],
+        [eq(null), val('null!')],
       ]);
 
       expect(typeChecker(1)).toBe('number!');
@@ -105,7 +118,7 @@ describe('common', function() {
 
     it('should accept ng1 annotated functions', function() {
       fn['$inject'] = ['foo', 'bar'];
-      function fn (_foo, _bar) {}
+      function fn(_foo, _bar) {}
       expect(isInjectable(fn)).toBeTruthy();
     });
 
@@ -124,7 +137,7 @@ describe('common', function() {
 
     it('should not pick missing properties', () => {
       const obj = { foo: 'foo', bar: 'bar' };
-      expect(pick(obj, ['baz'])).toEqual({ });
+      expect(pick(obj, ['baz'])).toEqual({});
     });
   });
 

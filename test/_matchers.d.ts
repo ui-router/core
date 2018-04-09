@@ -1,4 +1,3 @@
-
 declare namespace jasmine {
   interface Matchers<T> {
     toEqualData(x: any): boolean;

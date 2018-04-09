@@ -10,7 +10,7 @@ import { PathNode } from '../path/pathNode';
 import { ActiveUIView, ViewContext, ViewConfig } from './interface';
 import { _ViewDeclaration } from '../state/interface';
 
-export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig|ViewConfig[];
+export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig | ViewConfig[];
 
 export interface ViewServicePluginAPI {
   _rootViewContext(context?: ViewContext): ViewContext;
@@ -132,16 +132,15 @@ export class ViewService {
 
     // Check if the tails of the segment arrays match. ex, these arrays' tails match:
     // vc: ["foo", "bar"], uiv fqn: ["$default", "foo", "bar"]
-    if (!equals(vcSegments, uivSegments.slice(0 - vcSegments.length)))
-      return false;
+    if (!equals(vcSegments, uivSegments.slice(0 - vcSegments.length))) return false;
 
     // Now check if the fqn ending at the first segment of the viewConfig matches the context:
     // ["$default", "foo"].join(".") == "$default.foo", does the ui-view $default.foo context match?
-    const negOffset = (1 - vcSegments.length) || undefined;
+    const negOffset = 1 - vcSegments.length || undefined;
     const fqnToFirstSegment = uivSegments.slice(0, negOffset).join('.');
     const uiViewContext = uiViewsByFqn[fqnToFirstSegment].creationContext;
     return vc.$uiViewContextAnchor === (uiViewContext && uiViewContext.name);
-  }
+  };
 
   /**
    * Normalizes a view's name from a state.views configuration block.
@@ -159,8 +158,8 @@ export class ViewService {
     // ex: "view.name@foo.bar" , "^.^.view.name" , "view.name@^.^" , "" ,
     // "@" , "$default@^" , "!$default.$default" , "!foo.bar"
     const viewAtContext: string[] = rawViewName.split('@');
-    let uiViewName = viewAtContext[0] || '$default';  // default to unnamed view
-    let uiViewContextAnchor = isString(viewAtContext[1]) ? viewAtContext[1] : '^';    // default to parent context
+    let uiViewName = viewAtContext[0] || '$default'; // default to unnamed view
+    let uiViewContextAnchor = isString(viewAtContext[1]) ? viewAtContext[1] : '^'; // default to parent context
 
     // Handle relative view-name sugar syntax.
     // Matches rawViewName "^.^.^.foo.bar" into array: ["^.^.^.foo.bar", "^.^.^", "foo.bar"],
@@ -179,8 +178,7 @@ export class ViewService {
     // handle parent relative targeting "^.^.^"
     const relativeMatch = /^(\^(?:\.\^)*)$/;
     if (relativeMatch.exec(uiViewContextAnchor)) {
-      const anchorState = uiViewContextAnchor.split('.')
-        .reduce(((anchor, x) => anchor.parent), context);
+      const anchorState = uiViewContextAnchor.split('.').reduce((anchor, x) => anchor.parent, context);
       uiViewContextAnchor = anchorState.name;
     } else if (uiViewContextAnchor === '.') {
       uiViewContextAnchor = context.name;
@@ -189,10 +187,10 @@ export class ViewService {
     return { uiViewName, uiViewContextAnchor };
   }
 
-  constructor() { }
+  constructor() {}
 
   private _rootViewContext(context?: ViewContext): ViewContext {
-    return this._rootContext = context || this._rootContext;
+    return (this._rootContext = context || this._rootContext);
   }
 
   private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
@@ -220,27 +218,25 @@ export class ViewService {
   }
 
   activateViewConfig(viewConfig: ViewConfig) {
-    trace.traceViewServiceEvent('-> Registering', <any> viewConfig);
+    trace.traceViewServiceEvent('-> Registering', <any>viewConfig);
     this._viewConfigs.push(viewConfig);
   }
 
-
   sync() {
-    const uiViewsByFqn: TypedMap<ActiveUIView> =
-        this._uiViews.map(uiv => [uiv.fqn, uiv]).reduce(applyPairs, <any> {});
+    const uiViewsByFqn: TypedMap<ActiveUIView> = this._uiViews.map(uiv => [uiv.fqn, uiv]).reduce(applyPairs, <any>{});
 
     // Return a weighted depth value for a uiView.
     // The depth is the nesting depth of ui-views (based on FQN; times 10,000)
     // plus the depth of the state that is populating the uiView
     function uiViewDepth(uiView: ActiveUIView) {
-      const stateDepth = (context: ViewContext) =>
-          context && context.parent ? stateDepth(context.parent) + 1 : 1;
-      return (uiView.fqn.split('.').length * 10000) + stateDepth(uiView.creationContext);
+      const stateDepth = (context: ViewContext) => (context && context.parent ? stateDepth(context.parent) + 1 : 1);
+      return uiView.fqn.split('.').length * 10000 + stateDepth(uiView.creationContext);
     }
 
     // Return the ViewConfig's context's depth in the context tree.
     function viewConfigDepth(config: ViewConfig) {
-      let context: ViewContext = config.viewDecl.$context, count = 0;
+      let context: ViewContext = config.viewDecl.$context,
+        count = 0;
       while (++count && context.parent) context = context.parent;
       return count;
     }
@@ -262,8 +258,7 @@ export class ViewService {
     const configureUIView = (tuple: ViewTuple) => {
       // If a parent ui-view is reconfigured, it could destroy child ui-views.
       // Before configuring a child ui-view, make sure it's still in the active uiViews array.
-      if (this._uiViews.indexOf(tuple.uiView) !== -1)
-        tuple.uiView.configUpdated(tuple.viewConfig);
+      if (this._uiViews.indexOf(tuple.uiView) !== -1) tuple.uiView.configUpdated(tuple.viewConfig);
     };
 
     // Sort views by FQN and state depth. Process uiviews nearest the root first.
@@ -333,5 +328,4 @@ export class ViewService {
   active() {
     return this._uiViews.filter(prop('$config')).map(prop('name'));
   }
-
 }

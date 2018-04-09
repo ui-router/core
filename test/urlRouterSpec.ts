@@ -10,7 +10,7 @@ import { pushStateLocationPlugin } from '../src/vanilla';
 declare let jasmine;
 const _anything = jasmine.anything();
 
-describe('UrlRouter', function () {
+describe('UrlRouter', function() {
   let router: UIRouter;
   let urlRouter: UrlRouter,
     urlService: UrlService,
@@ -20,11 +20,12 @@ describe('UrlRouter', function () {
     locationService: LocationServices;
 
   const matcher = (...strings: string[]) =>
-    strings.reduce((prev: UrlMatcher, str) =>
-      prev ? prev.append(urlMatcherFactory.compile(str)) : urlMatcherFactory.compile(str), undefined);
+    strings.reduce(
+      (prev: UrlMatcher, str) => (prev ? prev.append(urlMatcherFactory.compile(str)) : urlMatcherFactory.compile(str)),
+      undefined,
+    );
 
-  const matcherRule = (...strings: string[]) =>
-    urlRouter.urlRuleFactory.create(matcher(...strings));
+  const matcherRule = (...strings: string[]) => urlRouter.urlRuleFactory.create(matcher(...strings));
 
   beforeEach(function() {
     router = new UIRouter();
@@ -38,12 +39,16 @@ describe('UrlRouter', function () {
     locationService = router.locationService;
   });
 
-  it('should throw on non-function rules', function () {
-    expect(function() { urlRouter.rule(null); }).toThrowError(/invalid rule/);
-    expect(function() { urlRouter.otherwise(null); }).toThrowError(/must be a/);
+  it('should throw on non-function rules', function() {
+    expect(function() {
+      urlRouter.rule(null);
+    }).toThrowError(/invalid rule/);
+    expect(function() {
+      urlRouter.otherwise(null);
+    }).toThrowError(/must be a/);
   });
 
-  it('should execute rewrite rules', function () {
+  it('should execute rewrite rules', function() {
     urlRouter.rule(urlRouter.urlRuleFactory.create(/\/baz/, '/b4z'));
 
     locationService.url('/foo');
@@ -53,7 +58,7 @@ describe('UrlRouter', function () {
     expect(locationService.path()).toBe('/b4z');
   });
 
-  it('should keep otherwise last', function () {
+  it('should keep otherwise last', function() {
     urlRouter.otherwise('/otherwise');
 
     locationService.url('/lastrule');
@@ -75,17 +80,17 @@ describe('UrlRouter', function () {
       urlRouter.otherwise('/otherwise');
     });
 
-    it("should activate the initial path when initial path matches ''" , function () {
+    it("should activate the initial path when initial path matches ''", function() {
       locationService.url('');
       expect(locationService.path()).toBe('/foo');
     });
 
-    it("should activate the initial path when initial path matches '/'" , function () {
+    it("should activate the initial path when initial path matches '/'", function() {
       locationService.url('/');
       expect(locationService.path()).toBe('/foo');
     });
 
-    it('should not activate the initial path after the initial transition' , function (done) {
+    it('should not activate the initial path after the initial transition', function(done) {
       stateService.go('bar').then(() => {
         locationService.url('/');
         expect(locationService.path()).toBe('/otherwise');
@@ -107,17 +112,17 @@ describe('UrlRouter', function () {
       goSpy = spyOn(stateService, 'transitionTo').and.callThrough();
     });
 
-    it("should activate the initial path when initial path matches ''" , function () {
+    it("should activate the initial path when initial path matches ''", function() {
       locationService.url('');
       expect(goSpy).toHaveBeenCalledWith('foo', undefined, jasmine.anything());
     });
 
-    it("should activate the initial path when initial path matches '/'" , function () {
+    it("should activate the initial path when initial path matches '/'", function() {
       locationService.url('/');
       expect(goSpy).toHaveBeenCalledWith('foo', undefined, jasmine.anything());
     });
 
-    it('should not activate the initial path after the initial transition' , function (done) {
+    it('should not activate the initial path after the initial transition', function(done) {
       stateService.go('bar').then(() => {
         locationService.url('/');
         expect(goSpy).toHaveBeenCalledWith('otherwise', undefined, jasmine.anything());
@@ -125,7 +130,6 @@ describe('UrlRouter', function () {
       });
     });
   });
-
 
   it('`rule` should return a deregistration function', function() {
     let count = 0;
@@ -175,7 +179,9 @@ describe('UrlRouter', function () {
   it('`when` should return the new rule', function() {
     let calls = 0;
     locationService.url('/foo');
-    const rule = urlRouter.when('/foo', function() { calls++; });
+    const rule = urlRouter.when('/foo', function() {
+      calls++;
+    });
 
     urlRouter.sync();
     expect(calls).toBe(1);
@@ -185,32 +191,32 @@ describe('UrlRouter', function () {
   });
 
   describe('location updates', function() {
-    it('can push location changes', function () {
+    it('can push location changes', function() {
       spyOn(router.urlService, 'url');
       urlRouter.push(matcher('/hello/:name'), { name: 'world' });
       expect(router.urlService.url).toHaveBeenCalledWith('/hello/world', undefined);
     });
 
-    it('can push a replacement location', function () {
+    it('can push a replacement location', function() {
       spyOn(router.urlService, 'url');
       urlRouter.push(matcher('/hello/:name'), { name: 'world' }, { replace: true });
       expect(router.urlService.url).toHaveBeenCalledWith('/hello/world', true);
     });
 
-    it('can push location changes with no parameters', function () {
+    it('can push location changes with no parameters', function() {
       spyOn(router.urlService, 'url');
       urlRouter.push(urlMatcherFactory.compile('/hello/:name', { params: { name: '' } }));
       expect(router.urlService.url).toHaveBeenCalledWith('/hello/', undefined);
     });
 
-    it('can push location changes that include a #fragment', function () {
+    it('can push location changes that include a #fragment', function() {
       // html5mode disabled
       urlRouter.push(matcher('/hello/:name'), { name: 'world', '#': 'frag' });
       expect(urlService.path()).toBe('/hello/world');
       expect(urlService.hash()).toBe('frag');
     });
 
-    it('can read and sync a copy of location URL', function () {
+    it('can read and sync a copy of location URL', function() {
       urlService.url('/old');
 
       spyOn(router.locationService, 'path').and.callThrough();
@@ -224,7 +230,7 @@ describe('UrlRouter', function () {
     });
 
     // Test for https://github.com/ui-router/core/issues/94
-    it('can read and reset URL including query parameters', function () {
+    it('can read and reset URL including query parameters', function() {
       urlService.url('/old?param1=hey');
 
       expect(urlService.url()).toBe('/old?param1=hey');
@@ -235,23 +241,22 @@ describe('UrlRouter', function () {
 
       expect(urlService.url()).toBe('/old?param1=hey');
     });
-
   });
 
   describe('URL generation', function() {
-    it('should return null when UrlMatcher rejects parameters', function () {
-      urlMatcherFactory.type('custom', <any> { is: val => val === 1138 });
+    it('should return null when UrlMatcher rejects parameters', function() {
+      urlMatcherFactory.type('custom', <any>{ is: val => val === 1138 });
       const urlmatcher = matcher('/foo/{param:custom}');
 
       expect(urlRouter.href(urlmatcher, { param: 1138 })).toBe('#/foo/1138');
       expect(urlRouter.href(urlmatcher, { param: 5 })).toBeNull();
     });
 
-    it('should return URLs with #fragments', function () {
+    it('should return URLs with #fragments', function() {
       expect(urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' })).toBe('#/hello/world#frag');
     });
 
-    it('should return absolute URLs', function () {
+    it('should return absolute URLs', function() {
       const actual = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
       expect(actual).toBe('http://localhost/#/hello/world#frag');
     });
@@ -275,22 +280,22 @@ describe('UrlRouter', function () {
       describe('with base="/base/"', () => {
         beforeEach(() => applyBaseTag('/base/'));
 
-        it('should prefix the href with /base/', function () {
+        it('should prefix the href with /base/', function() {
           expect(urlRouter.href(matcher('/foo'))).toBe('/base/foo');
         });
 
-        it('should include #fragments', function () {
+        it('should include #fragments', function() {
           expect(urlRouter.href(matcher('/foo'), { '#': 'hello' })).toBe('/base/foo#hello');
         });
 
-        it('should return absolute URLs', function () {
+        it('should return absolute URLs', function() {
           // don't use urlService var
           const cfg = router.urlService.config;
           const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
           const prot = cfg.protocol();
           const host = cfg.host();
           const port = cfg.port();
-          const portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          const portStr = port === 80 || port === 443 ? '' : `:${port}`;
           expect(href).toBe(`${prot}://${host}${portStr}/base/hello/world#frag`);
         });
       });
@@ -298,22 +303,22 @@ describe('UrlRouter', function () {
       describe('with base="/base/index.html"', () => {
         beforeEach(() => applyBaseTag('/base/index.html'));
 
-        it('should prefix the href with /base/ but not with index.html', function () {
+        it('should prefix the href with /base/ but not with index.html', function() {
           expect(urlRouter.href(matcher('/foo'))).toBe('/base/foo');
         });
 
-        it('should include #fragments', function () {
+        it('should include #fragments', function() {
           expect(urlRouter.href(matcher('/foo'), { '#': 'hello' })).toBe('/base/foo#hello');
         });
 
-        it('should return absolute URLs', function () {
+        it('should return absolute URLs', function() {
           // don't use urlService var
           const cfg = router.urlService.config;
           const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
           const prot = cfg.protocol();
           const host = cfg.host();
           const port = cfg.port();
-          const portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          const portStr = port === 80 || port === 443 ? '' : `:${port}`;
           expect(href).toBe(`${prot}://${host}${portStr}/base/hello/world#frag`);
         });
       });
@@ -321,22 +326,22 @@ describe('UrlRouter', function () {
       describe('with base="http://localhost:8080/base/"', () => {
         beforeEach(() => applyBaseTag('http://localhost:8080/base/'));
 
-        it('should prefix the href with /base/', function () {
+        it('should prefix the href with /base/', function() {
           expect(urlRouter.href(matcher('/foo'))).toBe('/base/foo');
         });
 
-        it('should include #fragments', function () {
+        it('should include #fragments', function() {
           expect(urlRouter.href(matcher('/foo'), { '#': 'hello' })).toBe('/base/foo#hello');
         });
 
-        it('should return absolute URLs', function () {
+        it('should return absolute URLs', function() {
           // don't use urlService var
           const cfg = router.urlService.config;
           const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
           const prot = cfg.protocol();
           const host = cfg.host();
           const port = cfg.port();
-          const portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          const portStr = port === 80 || port === 443 ? '' : `:${port}`;
           expect(href).toBe(`${prot}://${host}${portStr}/base/hello/world#frag`);
         });
       });
@@ -344,18 +349,18 @@ describe('UrlRouter', function () {
       describe('with base="http://localhost:8080/base"', () => {
         beforeEach(() => applyBaseTag('http://localhost:8080/base'));
 
-        it('should not prefix the href with /base', function () {
+        it('should not prefix the href with /base', function() {
           expect(urlRouter.href(matcher('/foo'))).toBe('/foo');
         });
 
-        it('should return absolute URLs', function () {
+        it('should return absolute URLs', function() {
           // don't use urlService var
           const cfg = router.urlService.config;
           const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
           const prot = cfg.protocol();
           const host = cfg.host();
           const port = cfg.port();
-          const portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          const portStr = port === 80 || port === 443 ? '' : `:${port}`;
           expect(href).toBe(`${prot}://${host}${portStr}/hello/world#frag`);
         });
       });
@@ -363,22 +368,22 @@ describe('UrlRouter', function () {
       describe('with base="http://localhost:8080/base/index.html"', () => {
         beforeEach(() => applyBaseTag('http://localhost:8080/base/index.html'));
 
-        it('should prefix the href with /base/', function () {
+        it('should prefix the href with /base/', function() {
           expect(urlRouter.href(matcher('/foo'))).toBe('/base/foo');
         });
 
-        it('should include #fragments', function () {
+        it('should include #fragments', function() {
           expect(urlRouter.href(matcher('/foo'), { '#': 'hello' })).toBe('/base/foo#hello');
         });
 
-        it('should return absolute URLs', function () {
+        it('should return absolute URLs', function() {
           // don't use urlService var
           const cfg = router.urlService.config;
           const href = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
           const prot = cfg.protocol();
           const host = cfg.host();
           const port = cfg.port();
-          const portStr = (port === 80 || port === 443) ? '' : `:${port}`;
+          const portStr = port === 80 || port === 443 ? '' : `:${port}`;
           expect(href).toBe(`${prot}://${host}${portStr}/base/hello/world#frag`);
         });
       });
@@ -386,10 +391,9 @@ describe('UrlRouter', function () {
   });
 
   describe('Url Rule priority', () => {
-
     let matchlog: string[];
-    beforeEach(() => matchlog = []);
-    const log = (id) => () => (matchlog.push(id), null);
+    beforeEach(() => (matchlog = []));
+    const log = id => () => (matchlog.push(id), null);
 
     it('should prioritize a path with a static string over a param 1', () => {
       const spy = spyOn(stateService, 'transitionTo');
@@ -400,7 +404,7 @@ describe('UrlRouter', function () {
       expect(spy).toHaveBeenCalledWith(A, { pA: 'AAA' }, _anything);
 
       urlService.url('/BBB');
-      expect(spy).toHaveBeenCalledWith(B, { }, _anything);
+      expect(spy).toHaveBeenCalledWith(B, {}, _anything);
     });
 
     it('should prioritize a path with a static string over a param 2', () => {
@@ -413,7 +417,7 @@ describe('UrlRouter', function () {
       expect(spy).toHaveBeenCalledWith(A, { pA: 'AAA' }, _anything);
 
       urlService.url('/foo/BBB');
-      expect(spy).toHaveBeenCalledWith(B, { }, _anything);
+      expect(spy).toHaveBeenCalledWith(B, {}, _anything);
     });
 
     it('should prioritize a path with a static string over a param 3', () => {
@@ -541,7 +545,7 @@ describe('UrlRouter', function () {
 
   describe('lazy loaded state url', () => {
     // Test for https://github.com/ui-router/core/issues/19
-    it('should obey rule priority ordering', (done) => {
+    it('should obey rule priority ordering', done => {
       const registry = router.stateRegistry;
       let loadedState;
       const lazyLoad = () => {
@@ -574,7 +578,7 @@ describe('UrlRouter.deferIntercept', () => {
     $url = router.urlService;
   });
 
-  it('should allow location changes to be deferred', function () {
+  it('should allow location changes to be deferred', function() {
     const log = [];
 
     $ur.rule($ur.urlRuleFactory.create(/.*/, () => log.push($url.path())));

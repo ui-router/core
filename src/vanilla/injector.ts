@@ -4,12 +4,18 @@
  */
 /** */
 import {
-  extend, assertPredicate, isFunction, isArray, isInjectable, $InjectorLike, IInjectable,
+  extend,
+  assertPredicate,
+  isFunction,
+  isArray,
+  isInjectable,
+  $InjectorLike,
+  IInjectable,
 } from '../common/index';
 
 // globally available injectables
 const globals = {};
-const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
 const ARGUMENT_NAMES = /([^\s,]+)/g;
 
 /**
@@ -64,7 +70,7 @@ export const $injector = {
   get: name => globals[name],
 
   /** Returns true if an object named `name` exists in global DI */
-  has: (name) => $injector.get(name) != null,
+  has: name => $injector.get(name) != null,
 
   /**
    * Injects a function
@@ -76,7 +82,10 @@ export const $injector = {
   invoke: (fn: IInjectable, context?, locals?) => {
     const all = extend({}, globals, locals || {});
     const params = $injector.annotate(fn);
-    const ensureExist = assertPredicate((key: string) => all.hasOwnProperty(key), key => `DI can't find injectable: '${key}'`);
+    const ensureExist = assertPredicate(
+      (key: string) => all.hasOwnProperty(key),
+      key => `DI can't find injectable: '${key}'`,
+    );
     const args = params.filter(ensureExist).map(x => all[x]);
     if (isFunction(fn)) return fn.apply(context, args);
     else return (fn as any[]).slice(-1)[0].apply(context, args);

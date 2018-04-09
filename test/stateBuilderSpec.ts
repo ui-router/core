@@ -14,7 +14,9 @@ describe('StateBuilder', function() {
     urlMatcherFactory = router.urlMatcherFactory;
     matcher = registry.matcher;
     builder = registry['builder'];
-    builder.builder('views', (state, parent) => { return state.views || { $default: {} }; });
+    builder.builder('views', (state, parent) => {
+      return state.views || { $default: {} };
+    });
 
     registry.register({ name: 'home' });
     registry.register({ name: 'home.about' });
@@ -28,7 +30,7 @@ describe('StateBuilder', function() {
     registry.register({ name: 'home.withData', data: { val1: 'foo', val2: 'bar' } });
     registry.register({ name: 'home.withData.child', data: { val2: 'baz' } });
 
-    states = registry.get().reduce((acc, state) => (acc[state.name] = state, acc), {});
+    states = registry.get().reduce((acc, state) => ((acc[state.name] = state), acc), {});
   });
 
   beforeEach(function() {
@@ -127,7 +129,12 @@ describe('StateBuilder', function() {
       spyOn(urlMatcherFactory, 'isMatcher').and.returnValue(false);
 
       expect(function() {
-        builder.builder('url')({ toString: function() { return 'foo'; }, url: { foo: 'bar' } });
+        builder.builder('url')({
+          toString: function() {
+            return 'foo';
+          },
+          url: { foo: 'bar' },
+        });
       }).toThrowError(Error, "Invalid url '[object Object]' in state 'foo'");
 
       expect(urlMatcherFactory.isMatcher).toHaveBeenCalledWith({ foo: 'bar' });
@@ -145,15 +152,15 @@ describe('StateBuilder', function() {
       params: { foo: 'foo' },
       // views: {},
       data: { foo: 'foo' },
-      onExit: function () { },
-      onRetain: function () { },
-      onEnter: function () { },
-      lazyLoad: function () { },
+      onExit: function() {},
+      onRetain: function() {},
+      onEnter: function() {},
+      lazyLoad: function() {},
       redirectTo: 'target_',
     };
 
     MyStateClass.prototype = proto;
-    function MyStateClass () { }
+    function MyStateClass() {}
 
     const nestedProto = {
       parent: 'name_',
@@ -161,7 +168,7 @@ describe('StateBuilder', function() {
     };
 
     MyNestedStateClass.prototype = nestedProto;
-    function MyNestedStateClass () { }
+    function MyNestedStateClass() {}
 
     let router, myBuiltState: StateObject, myNestedBuiltState: StateObject;
     beforeEach(() => {

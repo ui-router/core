@@ -25,10 +25,10 @@ const defaultOptions: TransitionHookOptions = {
 };
 
 export type GetResultHandler = (hook: TransitionHook) => ResultHandler;
-export type GetErrorHandler  = (hook: TransitionHook) => ErrorHandler;
+export type GetErrorHandler = (hook: TransitionHook) => ErrorHandler;
 
-export type ResultHandler = (result: HookResult)      => Promise<HookResult>;
-export type ErrorHandler  = (error: any)              => Promise<any>;
+export type ResultHandler = (result: HookResult) => Promise<HookResult>;
+export type ErrorHandler = (error: any) => Promise<any>;
 
 /** @hidden */
 export class TransitionHook {
@@ -39,31 +39,28 @@ export class TransitionHook {
    * Each HookType chooses a GetResultHandler (See: [[TransitionService._defineCoreEvents]])
    */
   static HANDLE_RESULT: GetResultHandler = (hook: TransitionHook) => (result: HookResult) =>
-      hook.handleHookResult(result);
+    hook.handleHookResult(result);
 
   /**
    * If the result is a promise rejection, log it.
    * Otherwise, ignore the result.
    */
   static LOG_REJECTED_RESULT: GetResultHandler = (hook: TransitionHook) => (result: HookResult) => {
-    isPromise(result) && result.catch(err =>
-        hook.logError(Rejection.normalize(err)));
+    isPromise(result) && result.catch(err => hook.logError(Rejection.normalize(err)));
     return undefined;
-  }
+  };
 
   /**
    * These GetErrorHandler(s) are used by [[invokeHook]] below
    * Each HookType chooses a GetErrorHandler (See: [[TransitionService._defineCoreEvents]])
    */
-  static LOG_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) =>
-      hook.logError(error);
+  static LOG_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) => hook.logError(error);
 
-  static REJECT_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) =>
-      silentRejection(error);
+  static REJECT_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) => silentRejection(error);
 
   static THROW_ERROR: GetErrorHandler = (hook: TransitionHook) => (error: any) => {
     throw error;
-  }
+  };
 
   /**
    * Chains together an array of TransitionHooks.
@@ -85,11 +82,9 @@ export class TransitionHook {
    */
   static chain(hooks: TransitionHook[], waitFor?: Promise<any>): Promise<any> {
     // Chain the next hook off the previous
-    const createHookChainR = (prev: Promise<any>, nextHook: TransitionHook) =>
-      prev.then(() => nextHook.invokeHook());
+    const createHookChainR = (prev: Promise<any>, nextHook: TransitionHook) => prev.then(() => nextHook.invokeHook());
     return hooks.reduce(createHookChainR, waitFor || services.$q.when());
   }
-
 
   /**
    * Invokes all the provided TransitionHooks, in order.
@@ -109,8 +104,7 @@ export class TransitionHook {
       if (isPromise(hookResult)) {
         const remainingHooks = hooks.slice(idx + 1);
 
-        return TransitionHook.chain(remainingHooks, hookResult)
-          .then(doneCallback);
+        return TransitionHook.chain(remainingHooks, hookResult).then(doneCallback);
       }
     }
 
@@ -124,16 +118,17 @@ export class TransitionHook {
     hooks.forEach(hook => hook.invokeHook());
   }
 
-  constructor(private transition: Transition,
-              private stateContext: StateDeclaration,
-              private registeredHook: RegisteredHook,
-              private options: TransitionHookOptions) {
+  constructor(
+    private transition: Transition,
+    private stateContext: StateDeclaration,
+    private registeredHook: RegisteredHook,
+    private options: TransitionHookOptions,
+  ) {
     this.options = defaults(options, defaultOptions);
     this.type = registeredHook.eventType;
   }
 
-  private isSuperseded = () =>
-    this.type.hookPhase === TransitionHookPhase.RUN && !this.options.transition.isActive();
+  private isSuperseded = () => this.type.hookPhase === TransitionHookPhase.RUN && !this.options.transition.isActive();
 
   logError(err): any {
     this.transition.router.stateService.defaultErrorHandler()(err);
@@ -149,24 +144,19 @@ export class TransitionHook {
     const options = this.options;
     trace.traceHookInvocation(this, this.transition, options);
 
-    const invokeCallback = () =>
-        hook.callback.call(options.bind, this.transition, this.stateContext);
+    const invokeCallback = () => hook.callback.call(options.bind, this.transition, this.stateContext);
 
-    const normalizeErr = err =>
-        Rejection.normalize(err).toPromise();
+    const normalizeErr = err => Rejection.normalize(err).toPromise();
 
-    const handleError = err =>
-        hook.eventType.getErrorHandler(this)(err);
+    const handleError = err => hook.eventType.getErrorHandler(this)(err);
 
-    const handleResult = result =>
-        hook.eventType.getResultHandler(this)(result);
+    const handleResult = result => hook.eventType.getResultHandler(this)(result);
 
     try {
       const result = invokeCallback();
 
       if (!this.type.synchronous && isPromise(result)) {
-        return result.catch(normalizeErr)
-            .then(handleResult, handleError);
+        return result.catch(normalizeErr).then(handleResult, handleError);
       } else {
         return handleResult(result);
       }
@@ -215,7 +205,6 @@ export class TransitionHook {
     }
   }
 
-
   /**
    * Return a Rejection promise if the transition is no longer current due
    * to a stopped router (disposed), or a new transition has started and superseded this one.
@@ -243,9 +232,8 @@ export class TransitionHook {
   toString() {
     const { options, registeredHook } = this;
     const event = parse('traceData.hookType')(options) || 'internal',
-        context = parse('traceData.context.state.name')(options) || parse('traceData.context')(options) || 'unknown',
-        name = fnToString(registeredHook.callback);
+      context = parse('traceData.context.state.name')(options) || parse('traceData.context')(options) || 'unknown',
+      name = fnToString(registeredHook.callback);
     return `${event} context: ${context}, ${maxLength(200, name)}`;
   }
-
 }

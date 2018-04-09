@@ -11,7 +11,7 @@ describe('HookBuilder:', function() {
   let root: StateObject = null;
 
   let log = '';
-  const logHook = (name) => () => log += `${name};`;
+  const logHook = name => () => (log += `${name};`);
 
   beforeEach(() => {
     log = '';
@@ -26,9 +26,7 @@ describe('HookBuilder:', function() {
       A: {
         B: {
           C: {
-            D: {
-
-            },
+            D: {},
           },
         },
       },
@@ -66,7 +64,6 @@ describe('HookBuilder:', function() {
   const getFn = x => x['registeredHook']['callback'];
 
   describe('HookMatchCriteria', function() {
-
     describe('.to', function() {
       it('should match a transition with same to state', function() {
         trans.onBefore({ to: 'A.B.C' }, callback);
@@ -85,14 +82,13 @@ describe('HookBuilder:', function() {
       });
 
       it('should match a transition using a function', function() {
-        trans.onBefore({ to: (state) => state.name === 'A.B' }, callback);
+        trans.onBefore({ to: state => state.name === 'A.B' }, callback);
         expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(getFn)).toEqual([]);
 
-        trans.onBefore({ to: (state) => state.name === 'A.B.C' }, callback);
+        trans.onBefore({ to: state => state.name === 'A.B.C' }, callback);
         expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(getFn)).toEqual([callback]);
       });
     });
-
 
     describe('.from', function() {
       it('should match a transition with same from state', function() {
@@ -106,14 +102,13 @@ describe('HookBuilder:', function() {
       });
 
       it('should match a transition using a function', function() {
-        trans.onBefore({ from: (state) => state.name === 'A.B' }, callback);
+        trans.onBefore({ from: state => state.name === 'A.B' }, callback);
         expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(getFn)).toEqual([]);
 
-        trans.onBefore({ from: (state) => state.name === 'A' }, callback);
+        trans.onBefore({ from: state => state.name === 'A' }, callback);
         expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(getFn)).toEqual([callback]);
       });
     });
-
 
     describe('.to and .from', function() {
       it('should match a transition with same to and from state', function() {
@@ -127,14 +122,12 @@ describe('HookBuilder:', function() {
       });
     });
 
-
     describe('.entering', function() {
       it("should match a transition that will enter the 'entering' state", function() {
         trans.onBefore({ entering: 'A.B.C' }, callback);
         expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(getFn)).toEqual([callback]);
       });
     });
-
 
     describe('.retained', function() {
       it('should match a transition where the state is already entered, and will not exit', function() {
@@ -147,7 +140,6 @@ describe('HookBuilder:', function() {
         expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(getFn)).toEqual([]);
       });
     });
-
 
     describe('.exiting', function() {
       it("should match a transition that will exit the 'exiting' state", function() {
@@ -164,20 +156,28 @@ describe('HookBuilder:', function() {
     });
 
     describe('should have the correct state context', function() {
-      const hookTypeByName = name =>
-          $trans._pluginapi._getEvents().filter(type => type.name === name)[0];
+      const hookTypeByName = name => $trans._pluginapi._getEvents().filter(type => type.name === name)[0];
 
-      const context = hook =>
-          hook.stateContext && hook.stateContext.name;
+      const context = hook => hook.stateContext && hook.stateContext.name;
 
       it('; onBefore should not have a state context', function() {
         trans.onBefore({}, callback);
-        expect(hb.buildHooksForPhase(TransitionHookPhase.BEFORE).map(context).reduce(uniqR, [])).toEqual([null]);
+        expect(
+          hb
+            .buildHooksForPhase(TransitionHookPhase.BEFORE)
+            .map(context)
+            .reduce(uniqR, []),
+        ).toEqual([null]);
       });
 
       it('; onStart should not have a state context', function() {
         trans.onStart({}, callback);
-        expect(hb.buildHooks(hookTypeByName('onStart')).map(context).reduce(uniqR, [])).toEqual([null]);
+        expect(
+          hb
+            .buildHooks(hookTypeByName('onStart'))
+            .map(context)
+            .reduce(uniqR, []),
+        ).toEqual([null]);
       });
 
       it('; onEnter should be bound to the entering state(s)', function() {
@@ -202,15 +202,26 @@ describe('HookBuilder:', function() {
 
       it('; onSuccess should not have a state context', function() {
         trans.onSuccess({}, callback);
-        expect(hb.buildHooksForPhase(TransitionHookPhase.SUCCESS).map(context).reduce(uniqR, [])).toEqual([null]);
+        expect(
+          hb
+            .buildHooksForPhase(TransitionHookPhase.SUCCESS)
+            .map(context)
+            .reduce(uniqR, []),
+        ).toEqual([null]);
       });
 
       it('; onError should not have a state context', function() {
-        trans.onStart({}, () => { throw new Error('shuckydarn'); });
+        trans.onStart({}, () => {
+          throw new Error('shuckydarn');
+        });
         trans.onError({}, callback);
-        expect(hb.buildHooksForPhase(TransitionHookPhase.ERROR).map(context).reduce(uniqR, [])).toEqual([null]);
+        expect(
+          hb
+            .buildHooksForPhase(TransitionHookPhase.ERROR)
+            .map(context)
+            .reduce(uniqR, []),
+        ).toEqual([null]);
       });
-
     });
   });
 });

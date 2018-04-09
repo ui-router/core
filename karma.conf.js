@@ -2,7 +2,7 @@
 var karma = require('karma');
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
-module.exports = function (karma) {
+module.exports = function(karma) {
   var config = {
     singleRun: true,
     autoWatch: false,
@@ -10,7 +10,7 @@ module.exports = function (karma) {
 
     // level of logging
     // possible values: LOG_DISABLE, LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DEBUG
-    logLevel: "warn",
+    logLevel: 'warn',
     // possible values: 'dots', 'progress'
     reporters: 'dots',
     colors: true,
@@ -22,7 +22,7 @@ module.exports = function (karma) {
 
     browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
-      ChromeHeadlessNoSandbox: { base: 'ChromeHeadless', flags: ['--no-sandbox'] }
+      ChromeHeadlessNoSandbox: { base: 'ChromeHeadless', flags: ['--no-sandbox'] },
     },
 
     frameworks: ['jasmine'],
@@ -39,7 +39,7 @@ module.exports = function (karma) {
       mode: 'development',
 
       resolve: {
-        extensions: ['.js', '.ts']
+        extensions: ['.js', '.ts'],
       },
 
       module: {
@@ -51,13 +51,11 @@ module.exports = function (karma) {
               configFile: 'test/tsconfig.json',
               transpileOnly: true,
             },
-          }
-        ]
+          },
+        ],
       },
 
-      plugins: [
-        new ForkTsCheckerWebpackPlugin()
-      ],
+      plugins: [new ForkTsCheckerWebpackPlugin()],
     },
 
     webpackMiddleware: {
@@ -69,7 +67,6 @@ module.exports = function (karma) {
     preprocessors: {
       'test/index.js': ['webpack', 'sourcemap'],
     },
-
   };
 
   karma.set(config);

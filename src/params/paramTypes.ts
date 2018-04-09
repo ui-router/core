@@ -189,7 +189,6 @@ export class ParamTypes {
    */
   static any: ParamTypeDefinition;
 
-
   /** @hidden */
   types: any;
   /** @hidden */
@@ -198,13 +197,22 @@ export class ParamTypes {
   typeQueue: any[] = [];
 
   /** @internalapi */
-  private defaultTypes: any = pick(ParamTypes.prototype, ['hash', 'string', 'query', 'path', 'int', 'bool', 'date', 'json', 'any']);
+  private defaultTypes: any = pick(ParamTypes.prototype, [
+    'hash',
+    'string',
+    'query',
+    'path',
+    'int',
+    'bool',
+    'date',
+    'json',
+    'any',
+  ]);
 
   /** @internalapi */
   constructor() {
     // Register default types. Store them in the prototype of this.types.
-    const makeType = (definition: ParamTypeDefinition, name: string) =>
-        new ParamType(extend({ name }, definition));
+    const makeType = (definition: ParamTypeDefinition, name: string) => new ParamType(extend({ name }, definition));
     this.types = inherit(map(this.defaultTypes, makeType), {});
   }
 
@@ -244,10 +252,8 @@ export class ParamTypes {
 
 /** @hidden */
 function initDefaultTypes() {
-
-  const makeDefaultType = (def) => {
-    const valToString = (val: any) =>
-        val != null ? val.toString() : val;
+  const makeDefaultType = def => {
+    const valToString = (val: any) => (val != null ? val.toString() : val);
 
     const defaultTypeBase = {
       encode: valToString,
@@ -284,7 +290,7 @@ function initDefaultTypes() {
     }),
 
     bool: makeDefaultType({
-      encode: (val: any) => val && 1 || 0,
+      encode: (val: any) => (val && 1) || 0,
       decode: (val: string) => parseInt(val, 10) !== 0,
       is: is(Boolean),
       pattern: /0|1/,
@@ -292,21 +298,18 @@ function initDefaultTypes() {
 
     date: makeDefaultType({
       encode: function(val: any) {
-        return !this.is(val) ? undefined : [
-          val.getFullYear(),
-          ('0' + (val.getMonth() + 1)).slice(-2),
-          ('0' + val.getDate()).slice(-2),
-        ].join('-');
+        return !this.is(val)
+          ? undefined
+          : [val.getFullYear(), ('0' + (val.getMonth() + 1)).slice(-2), ('0' + val.getDate()).slice(-2)].join('-');
       },
       decode: function(val: string) {
-        if (this.is(val)) return <any> val as Date;
+        if (this.is(val)) return (<any>val) as Date;
         const match = this.capture.exec(val);
         return match ? new Date(match[1], match[2] - 1, match[3]) : undefined;
       },
       is: (val: any) => val instanceof Date && !isNaN(val.valueOf()),
       equals(l: any, r: any) {
-        return ['getFullYear', 'getMonth', 'getDate']
-            .reduce((acc, fn) => acc && l[fn]() === r[fn](), true);
+        return ['getFullYear', 'getMonth', 'getDate'].reduce((acc, fn) => acc && l[fn]() === r[fn](), true);
       },
       pattern: /[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[1-2][0-9]|3[0-1])/,
       capture: /([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/,
@@ -331,4 +334,3 @@ function initDefaultTypes() {
 }
 
 initDefaultTypes();
-

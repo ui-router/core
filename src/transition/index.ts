@@ -20,4 +20,3 @@ export * from './transition';
 export * from './transitionHook';
 export * from './transitionEventType';
 export * from './transitionService';
-

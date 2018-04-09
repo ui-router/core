@@ -8,7 +8,11 @@ import { stringify } from '../common/strings';
 import { is } from '../common/hof';
 
 export enum RejectType {
-  SUPERSEDED = 2, ABORTED = 3, INVALID = 4, IGNORED = 5, ERROR = 6,
+  SUPERSEDED = 2,
+  ABORTED = 3,
+  INVALID = 4,
+  IGNORED = 5,
+  ERROR = 6,
 }
 
 /** @hidden */
@@ -23,7 +27,7 @@ export class Rejection {
 
   /** Returns true if the obj is a rejected promise created from the `asPromise` factory */
   static isRejectionPromise(obj: any): boolean {
-    return obj && (typeof obj.then === 'function') && is(Rejection)(obj._transitionRejection);
+    return obj && typeof obj.then === 'function' && is(Rejection)(obj._transitionRejection);
   }
 
   /** Returns a Rejection due to transition superseded */
@@ -85,8 +89,7 @@ export class Rejection {
   }
 
   toString() {
-    const detailString = (d: any) =>
-        d && d.toString !== Object.prototype.toString ? d.toString() : stringify(d);
+    const detailString = (d: any) => (d && d.toString !== Object.prototype.toString ? d.toString() : stringify(d));
     const detail = detailString(this.detail);
     const { $id, type, message } = this;
     return `Transition Rejection($id: ${$id} type: ${type}, message: ${message}, detail: ${detail})`;

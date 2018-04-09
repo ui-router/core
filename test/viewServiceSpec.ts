@@ -12,9 +12,7 @@ const statetree = {
   A: {
     B: {
       C: {
-        D: {
-
-        },
+        D: {},
       },
     },
   },

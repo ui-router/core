@@ -7,7 +7,6 @@ import { ViewConfig } from '../view/interface';
 import { TransitionHookFn } from '../transition/interface';
 import { TransitionService } from '../transition/transitionService';
 
-
 /**
  * A [[TransitionHookFn]] which waits for the views to load
  *
@@ -24,7 +23,7 @@ const loadEnteringViews: TransitionHookFn = (transition: Transition) => {
 };
 
 export const registerLoadEnteringViews = (transitionService: TransitionService) =>
-    transitionService.onFinish({}, loadEnteringViews);
+  transitionService.onFinish({}, loadEnteringViews);
 
 /**
  * A [[TransitionHookFn]] which activates the new views when a transition is successful.
@@ -50,4 +49,4 @@ const activateViews: TransitionHookFn = (transition: Transition) => {
 };
 
 export const registerActivateViews = (transitionService: TransitionService) =>
-    transitionService.onSuccess({}, activateViews);
+  transitionService.onSuccess({}, activateViews);

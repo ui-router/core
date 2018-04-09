@@ -37,4 +37,4 @@ const updateGlobalState = (trans: Transition) => {
 };
 
 export const registerUpdateGlobalState = (transitionService: TransitionService) =>
-    transitionService.onCreate({}, updateGlobalState);
+  transitionService.onCreate({}, updateGlobalState);

@@ -27,13 +27,13 @@ export interface TransitionOptions {
    *
    * @default `true`
    */
-  location    ?: (boolean|string);
+  location?: boolean | string;
 
   /**
    * When transitioning to relative path (e.g '`^`'), this option defines which state to be relative from.
    * @default `$state.current`
    */
-  relative    ?: (string|StateDeclaration|StateObject);
+  relative?: string | StateDeclaration | StateObject;
 
   /**
    * This option sets whether or not the transition's parameter values should be inherited from
@@ -44,12 +44,12 @@ export interface TransitionOptions {
    *
    * @default `false`
    */
-  inherit     ?: boolean;
+  inherit?: boolean;
 
   /**
    * @deprecated
    */
-  notify      ?: boolean;
+  notify?: boolean;
 
   /**
    * This option may be used to force states which are currently active to reload.
@@ -71,32 +71,32 @@ export interface TransitionOptions {
    *
    * @default `false`
    */
-  reload      ?: (boolean|string|StateDeclaration|StateObject);
+  reload?: boolean | string | StateDeclaration | StateObject;
   /**
    * You can define your own Transition Options inside this property and use them, e.g., from a Transition Hook
    */
-  custom      ?: any;
+  custom?: any;
   /** @internalapi */
-  reloadState ?: (StateObject);
+  reloadState?: StateObject;
   /** @internalapi
    * If this transition is a redirect, this property should be the original Transition (which was redirected to this one)
    */
   redirectedFrom?: Transition;
   /** @internalapi */
-  current     ?: () => Transition;
+  current?: () => Transition;
   /** @internalapi */
-  source      ?: 'sref' | 'url' | 'redirect' | 'otherwise' | 'unknown';
+  source?: 'sref' | 'url' | 'redirect' | 'otherwise' | 'unknown';
 }
 
 /** @internalapi */
 export interface TransitionHookOptions {
-  current             ?: () => Transition;  // path?
-  transition          ?: Transition;
-  hookType            ?: string;
-  target              ?: any;
-  traceData           ?: any;
-  bind                ?: any;
-  stateHook           ?: boolean;
+  current?: () => Transition; // path?
+  transition?: Transition;
+  hookType?: string;
+  target?: any;
+  traceData?: any;
+  bind?: any;
+  stateHook?: boolean;
 }
 
 /**
@@ -170,7 +170,11 @@ export interface TreeChanges {
   entering: PathNode[];
 }
 
-export type IHookRegistration = (matchCriteria: HookMatchCriteria, callback: HookFn, options?: HookRegOptions) => Function;
+export type IHookRegistration = (
+  matchCriteria: HookMatchCriteria,
+  callback: HookFn,
+  options?: HookRegOptions,
+) => Function;
 
 /**
  * The signature for Transition Hooks.
@@ -237,7 +241,7 @@ export interface TransitionCreateHookFn {
   (transition: Transition): void;
 }
 
-export type HookFn = (TransitionHookFn|TransitionStateHookFn|TransitionCreateHookFn);
+export type HookFn = TransitionHookFn | TransitionStateHookFn | TransitionCreateHookFn;
 
 /**
  * The return value of a [[TransitionHookFn]] or [[TransitionStateHookFn]]
@@ -252,7 +256,7 @@ export type HookFn = (TransitionHookFn|TransitionStateHookFn|TransitionCreateHoo
  *    - If the promise resolves to anything else, the transition will resume
  * - Anything else: the transition will resume
  */
-export type HookResult = (boolean | TargetState | void | Promise<boolean|TargetState|void>);
+export type HookResult = boolean | TargetState | void | Promise<boolean | TargetState | void>;
 
 /**
  * These options may be provided when registering a Transition Hook (such as `onStart`)
@@ -830,7 +834,16 @@ export interface PathType {
  *
  * Or, `true` to always match
  */
-export type HookMatchCriterion = (string|IStateMatch|boolean);
+export type HookMatchCriterion = string | IStateMatch | boolean;
 
-export enum TransitionHookPhase { CREATE, BEFORE, RUN, SUCCESS, ERROR }
-export enum TransitionHookScope { TRANSITION, STATE }
+export enum TransitionHookPhase {
+  CREATE,
+  BEFORE,
+  RUN,
+  SUCCESS,
+  ERROR,
+}
+export enum TransitionHookScope {
+  TRANSITION,
+  STATE,
+}

@@ -15,7 +15,6 @@ import { StateObject } from '../state/stateObject';
 import { PathNode } from '../path/pathNode';
 import { isNullOrUndefined } from '../common/predicates';
 
-
 // TODO: explicitly make this user configurable
 export let defaultResolvePolicy: ResolvePolicy = {
   when: 'LAZY',
@@ -44,14 +43,13 @@ export class Resolvable implements ResolvableLiteral {
   resolved = false;
   promise: Promise<any> = undefined;
 
-  static fromData = (token: any, data: any) =>
-    new Resolvable(token, () => data, null, null, data);
+  static fromData = (token: any, data: any) => new Resolvable(token, () => data, null, null, data);
 
   /** This constructor creates a Resolvable copy */
-  constructor(resolvable: Resolvable)
+  constructor(resolvable: Resolvable);
 
   /** This constructor creates a new Resolvable from the plain old [[ResolvableLiteral]] javascript object */
-  constructor(resolvable: ResolvableLiteral)
+  constructor(resolvable: ResolvableLiteral);
 
   /**
    * This constructor creates a new `Resolvable`
@@ -72,7 +70,7 @@ export class Resolvable implements ResolvableLiteral {
    * @param policy the [[ResolvePolicy]] defines when and how the Resolvable is processed
    * @param data Pre-resolved data. If the resolve value is already known, it may be provided here.
    */
-  constructor(token: any, resolveFn: Function, deps?: any[], policy?: ResolvePolicy, data?: any)
+  constructor(token: any, resolveFn: Function, deps?: any[], policy?: ResolvePolicy, data?: any);
   constructor(arg1: any, resolveFn?: Function, deps?: any[], policy?: ResolvePolicy, data?: any) {
     if (arg1 instanceof Resolvable) {
       extend(this, arg1);
@@ -89,14 +87,14 @@ export class Resolvable implements ResolvableLiteral {
       this.resolved = data !== undefined;
       this.promise = this.resolved ? services.$q.when(this.data) : undefined;
     } else if (isObject(arg1) && arg1.token && (arg1.hasOwnProperty('resolveFn') || arg1.hasOwnProperty('data'))) {
-      const literal = <ResolvableLiteral> arg1;
+      const literal = <ResolvableLiteral>arg1;
       return new Resolvable(literal.token, literal.resolveFn, literal.deps, literal.policy, literal.data);
     }
   }
 
   getPolicy(state: StateObject): ResolvePolicy {
     const thisPolicy = this.policy || {};
-    const statePolicy = state && state.resolvePolicy || {};
+    const statePolicy = (state && state.resolvePolicy) || {};
     return {
       when: thisPolicy.when || statePolicy.when || defaultResolvePolicy.when,
       async: thisPolicy.async || statePolicy.async || defaultResolvePolicy.async,
@@ -115,12 +113,12 @@ export class Resolvable implements ResolvableLiteral {
 
     // Gets all dependencies from ResolveContext and wait for them to be resolved
     const getResolvableDependencies = () =>
-        $q.all(resolveContext.getDependencies(this).map(resolvable =>
-            resolvable.get(resolveContext, trans))) as Promise<any[]>;
+      $q.all(resolveContext.getDependencies(this).map(resolvable => resolvable.get(resolveContext, trans))) as Promise<
+        any[]
+      >;
 
     // Invokes the resolve function passing the resolved dependencies as arguments
-    const invokeResolveFn = (resolvedDeps: any[]) =>
-        this.resolveFn.apply(null, resolvedDeps);
+    const invokeResolveFn = (resolvedDeps: any[]) => this.resolveFn.apply(null, resolvedDeps);
 
     /**
      * For RXWAIT policy:
@@ -132,7 +130,10 @@ export class Resolvable implements ResolvableLiteral {
      */
     const waitForRx = (observable$: any) => {
       const cached = observable$.cache(1);
-      return cached.take(1).toPromise().then(() => cached);
+      return cached
+        .take(1)
+        .toPromise()
+        .then(() => cached);
     };
 
     // If the resolve policy is RXWAIT, wait for the observable to emit something. otherwise pass through.
@@ -150,11 +151,12 @@ export class Resolvable implements ResolvableLiteral {
     };
 
     // Sets the promise property first, then getsResolvableDependencies in the context of the promise chain. Always waits one tick.
-    return this.promise = $q.when()
-        .then(getResolvableDependencies)
-        .then(invokeResolveFn)
-        .then(maybeWaitForRx)
-        .then(applyResolvedValue);
+    return (this.promise = $q
+      .when()
+      .then(getResolvableDependencies)
+      .then(invokeResolveFn)
+      .then(maybeWaitForRx)
+      .then(applyResolvedValue));
   }
 
   /**

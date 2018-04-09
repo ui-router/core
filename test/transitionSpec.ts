@@ -1,13 +1,20 @@
 import { PathNode } from '../src/path/pathNode';
 import {
-    UIRouter, RejectType, Rejection, pluck, services, TransitionService, StateService, Resolvable, Transition,
+  UIRouter,
+  RejectType,
+  Rejection,
+  pluck,
+  services,
+  TransitionService,
+  StateService,
+  Resolvable,
+  Transition,
 } from '../src/index';
 import { tree2Array, PromiseResult } from './_testUtils';
 import { TestingPlugin } from './_testingPlugin';
 import { equals } from '../src/common/common';
 
-describe('transition', function () {
-
+describe('transition', function() {
   let router: UIRouter;
   let $transitions: TransitionService;
   let $state: StateService;
@@ -18,20 +25,22 @@ describe('transition', function () {
     return $transitions.create(fromPath, $state.target(to, null, options));
   }
 
-  const _delay = (millis) =>
-      new Promise(resolve => setTimeout(resolve, millis));
-  const delay = (millis) => () => _delay(millis);
+  const _delay = millis => new Promise(resolve => setTimeout(resolve, millis));
+  const delay = millis => () => _delay(millis);
 
-  const tick = (val?) =>
-      new Promise((resolve) => setTimeout(() => resolve(val)));
+  const tick = (val?) => new Promise(resolve => setTimeout(() => resolve(val)));
 
   // Use this in a .then(go('from', 'to')) when you want to run a transition you expect to succeed
-  const go = (from, to, options?) =>
-      () => makeTransition(from, to, options).run().then(tick);
+  const go = (from, to, options?) => () =>
+    makeTransition(from, to, options)
+      .run()
+      .then(tick);
 
   // Use this in a .then(goFail('from', 'to')) when you want to run a transition you expect to fail
-  const goFail = (from, to, options?) =>
-      () => makeTransition(from, to, options).run().catch(tick);
+  const goFail = (from, to, options?) => () =>
+    makeTransition(from, to, options)
+      .run()
+      .catch(tick);
 
   beforeEach(() => {
     router = new UIRouter();
@@ -66,19 +75,19 @@ describe('transition', function () {
 
   describe('service', () => {
     describe('async event hooks:', () => {
-      it('$transition$.promise should resolve on success', (done) => {
+      it('$transition$.promise should resolve on success', done => {
         const result = new PromiseResult();
         $transitions.onStart({ from: '*', to: 'second' }, function($transition$) {
           result.setPromise($transition$.promise);
         });
 
         Promise.resolve()
-            .then(go('', 'second'))
-            .then(() => expect(result.called()).toEqual({ resolve: true, reject: false, complete: true }))
-            .then(done);
+          .then(go('', 'second'))
+          .then(() => expect(result.called()).toEqual({ resolve: true, reject: false, complete: true }))
+          .then(done);
       });
 
-      it('$transition$.promise should reject on error', (done) => {
+      it('$transition$.promise should reject on error', done => {
         const result = new PromiseResult();
 
         $transitions.onStart({ from: '*', to: 'third' }, function($transition$) {
@@ -87,17 +96,17 @@ describe('transition', function () {
         });
 
         Promise.resolve()
-            .then(goFail('', 'third'))
-            .then(() => {
-              expect(result.called()).toEqual({ resolve: false, reject: true, complete: true });
-              expect(result.get().reject instanceof Rejection).toBeTruthy();
-              expect(result.get().reject.message).toEqual('The transition errored');
-              expect(result.get().reject.detail.message).toEqual('transition failed');
-            })
-            .then(done);
+          .then(goFail('', 'third'))
+          .then(() => {
+            expect(result.called()).toEqual({ resolve: false, reject: true, complete: true });
+            expect(result.get().reject instanceof Rejection).toBeTruthy();
+            expect(result.get().reject.message).toEqual('The transition errored');
+            expect(result.get().reject.detail.message).toEqual('transition failed');
+          })
+          .then(done);
       });
 
-      it('$transition$.promise should reject on error in synchronous hooks', ((done) => {
+      it('$transition$.promise should reject on error in synchronous hooks', done => {
         const result = new PromiseResult();
 
         $transitions.onBefore({ from: '*', to: 'third' }, function($transition$) {
@@ -106,17 +115,17 @@ describe('transition', function () {
         });
 
         Promise.resolve()
-            .then(goFail('', 'third'))
-            .then(() => {
-              expect(result.called()).toEqual({ resolve: false, reject: true, complete: true });
-              expect(result.get().reject instanceof Rejection).toBeTruthy();
-              expect(result.get().reject.message).toEqual('The transition errored');
-              expect(result.get().reject.detail.message).toEqual('transition failed');
-            })
-            .then(done);
-      }));
+          .then(goFail('', 'third'))
+          .then(() => {
+            expect(result.called()).toEqual({ resolve: false, reject: true, complete: true });
+            expect(result.get().reject instanceof Rejection).toBeTruthy();
+            expect(result.get().reject.message).toEqual('The transition errored');
+            expect(result.get().reject.detail.message).toEqual('transition failed');
+          })
+          .then(done);
+      });
 
-      it('should receive the transition as the first parameter', ((done) => {
+      it('should receive the transition as the first parameter', done => {
         let t = null;
 
         $transitions.onStart({ from: '*', to: 'second' }, function(trans) {
@@ -124,14 +133,15 @@ describe('transition', function () {
         });
 
         const tsecond = makeTransition('', 'second');
-        tsecond.run()
-            .then(tick)
-            .then(() => expect(t).toBe(tsecond))
-            .then(done);
-      }));
+        tsecond
+          .run()
+          .then(tick)
+          .then(() => expect(t).toBe(tsecond))
+          .then(done);
+      });
 
       // Test for #2972 and https://github.com/ui-router/react/issues/3
-      it('should reject transitions that are superseded by a new transition', ((done) => {
+      it('should reject transitions that are superseded by a new transition', done => {
         $state.defaultErrorHandler(function() {});
         router.stateRegistry.register({
           name: 'slowResolve',
@@ -143,25 +153,25 @@ describe('transition', function () {
         const results = { success: 0, error: 0 };
         const success = () => results.success++;
         const error = () => results.error++;
-        $transitions.onBefore({}, trans => { trans.promise.then(success, error); });
+        $transitions.onBefore({}, trans => {
+          trans.promise.then(success, error);
+        });
 
         $state.go('slowResolve');
 
         _delay(20)
-            .then(() =>
-                $state.go('A').transition.promise)
-            .then(delay(50))
-            .then(() =>
-                expect(results).toEqual({ success: 1, error: 1 }))
-            .then(done);
-      }));
+          .then(() => $state.go('A').transition.promise)
+          .then(delay(50))
+          .then(() => expect(results).toEqual({ success: 1, error: 1 }))
+          .then(done);
+      });
 
       describe('.onCreate()', function() {
         beforeEach(() => $state.defaultErrorHandler(() => {}));
 
         it('should pass the transition', () => {
           let log = '';
-          $transitions.onCreate({}, t => log += `${t.from().name};${t.to().name};`);
+          $transitions.onCreate({}, t => (log += `${t.from().name};${t.to().name};`));
 
           log += 'create;';
           makeTransition('first', 'second');
@@ -170,20 +180,20 @@ describe('transition', function () {
           expect(log).toBe('create;first;second;created;');
         });
 
-        it('should run in priority order', (() => {
+        it('should run in priority order', () => {
           let log = '';
-          $transitions.onCreate({}, t => (log += '2;', null), { priority: 2 });
-          $transitions.onCreate({}, t => (log += '3;', null), { priority: 3 });
-          $transitions.onCreate({}, t => (log += '1;', null), { priority: 1 });
+          $transitions.onCreate({}, t => ((log += '2;'), null), { priority: 2 });
+          $transitions.onCreate({}, t => ((log += '3;'), null), { priority: 3 });
+          $transitions.onCreate({}, t => ((log += '1;'), null), { priority: 1 });
 
           log += 'create;';
           makeTransition('first', 'second');
           log += 'created;';
 
           expect(log).toBe('create;3;2;1;created;');
-        }));
+        });
 
-        it('should ignore return values', ((done) => {
+        it('should ignore return values', done => {
           $transitions.onCreate({}, t => false);
           $transitions.onCreate({}, t => new Promise(resolve => resolve(false)));
 
@@ -192,10 +202,12 @@ describe('transition', function () {
             expect($state.current.name).toBe('second');
             done();
           });
-        }));
+        });
 
         it('should fail on error', () => {
-          $transitions.onCreate({}, () => { throw 'doh'; });
+          $transitions.onCreate({}, () => {
+            throw 'doh';
+          });
           expect(() => makeTransition('first', 'second')).toThrow();
         });
       });
@@ -203,9 +215,9 @@ describe('transition', function () {
       describe('.onBefore()', function() {
         beforeEach(() => $state.defaultErrorHandler(() => {}));
 
-        it('should stop running remaining hooks if hook modifies transition synchronously', ((done) => {
+        it('should stop running remaining hooks if hook modifies transition synchronously', done => {
           let counter = 0;
-          const increment = (amount) => {
+          const increment = amount => {
             return () => {
               counter += amount;
               return false;
@@ -221,15 +233,21 @@ describe('transition', function () {
             .then(goFail('second', 'third'))
             .then(() => expect(counter).toBe(2))
             .then(done);
-        }));
+        });
 
-        it('should stop running remaining hooks when synchronous result throws or returns false|TargetState', ((done) => {
+        it('should stop running remaining hooks when synchronous result throws or returns false|TargetState', done => {
           let current = null;
 
-          $transitions.onBefore({}, (t) => { current = t.to().name; });
-          $transitions.onBefore({ to: 'first' }, () => {
-            throw Error('first-error');
-          }, { priority: 1 });
+          $transitions.onBefore({}, t => {
+            current = t.to().name;
+          });
+          $transitions.onBefore(
+            { to: 'first' },
+            () => {
+              throw Error('first-error');
+            },
+            { priority: 1 },
+          );
           $transitions.onBefore({ to: 'second' }, () => false, { priority: 3 });
           $transitions.onBefore({ to: 'third' }, () => $state.target('A'), { priority: 2 });
 
@@ -252,158 +270,178 @@ describe('transition', function () {
             .then(go('A', 'B'))
             .then(() => expect(current).toBe('B'))
             .then(done);
-        }));
+        });
       });
 
       describe('.onStart()', function() {
-        it('should fire matching events when transition starts', ((done) => {
+        it('should fire matching events when transition starts', done => {
           let t = null;
           $transitions.onStart({ from: 'first', to: 'second' }, function($transition$) {
             t = $transition$;
           });
 
           Promise.resolve()
-              .then(go('first', 'third'))
-              .then(() => expect(t).toBeNull())
-              .then(go('first', 'second'))
-              .then(() => expect(t).not.toBeNull())
-              .then(done);
-        }));
+            .then(go('first', 'third'))
+            .then(() => expect(t).toBeNull())
+            .then(go('first', 'second'))
+            .then(() => expect(t).not.toBeNull())
+            .then(done);
+        });
 
-        it('should get Transition as an argument, and a null state', ((done) => {
+        it('should get Transition as an argument, and a null state', done => {
           const args = { trans: undefined, state: undefined };
-          $transitions.onStart({ from: '*', to: 'third' }, <any> function(trans, state) {
+          $transitions.onStart({ from: '*', to: 'third' }, <any>function(trans, state) {
             args.trans = trans;
             args.state = state;
           });
 
           const transition = makeTransition('', 'third');
           const result = new PromiseResult(transition.promise);
-          transition.run()
-              .then(tick)
-              .then(() => {
-                expect(result.called()).toEqual({ resolve: true, reject: false, complete: true });
-                expect(typeof args.trans.from).toBe('function');
-                expect(args.state).toBeNull();
-              })
-              .then(done);
-        }));
+          transition
+            .run()
+            .then(tick)
+            .then(() => {
+              expect(result.called()).toEqual({ resolve: true, reject: false, complete: true });
+              expect(typeof args.trans.from).toBe('function');
+              expect(args.state).toBeNull();
+            })
+            .then(done);
+        });
       });
 
       describe('.onEnter()', function() {
-        it('should get Transition and the state being entered as arguments', ((done) => {
+        it('should get Transition and the state being entered as arguments', done => {
           const states = [];
           const args = { trans: undefined, state: undefined, third: undefined };
 
-          $transitions.onEnter({ entering: '*' }, <any> function(trans, state, third) {
+          $transitions.onEnter({ entering: '*' }, <any>function(trans, state, third) {
             states.push(state);
             args.trans = trans;
             args.third = third;
           });
 
           Promise.resolve()
-              .then(go('', 'D'))
-              .then(() => {
-                expect(pluck(states, 'name')).toEqual(['A', 'B', 'C', 'D']);
-                expect(typeof args.trans.from).toBe('function');
-                expect(args.third).toBeUndefined();
-              })
-              .then(done);
-        }));
+            .then(go('', 'D'))
+            .then(() => {
+              expect(pluck(states, 'name')).toEqual(['A', 'B', 'C', 'D']);
+              expect(typeof args.trans.from).toBe('function');
+              expect(args.third).toBeUndefined();
+            })
+            .then(done);
+        });
 
-        it('should be called on only states being entered', ((done) => {
+        it('should be called on only states being entered', done => {
           let states = [];
-          $transitions.onEnter({ entering: '**' }, function(trans, state) { states.push(state); });
+          $transitions.onEnter({ entering: '**' }, function(trans, state) {
+            states.push(state);
+          });
 
           Promise.resolve()
-              .then(go('B', 'D'))
-              .then(() => expect(pluck(states, 'name')).toEqual([ 'C', 'D' ]))
-              .then(() => states = [])
-              .then(go('H', 'D'))
-              .then(() => expect(pluck(states, 'name')).toEqual([ 'B', 'C', 'D' ]))
-              .then(done);
-        }));
+            .then(go('B', 'D'))
+            .then(() => expect(pluck(states, 'name')).toEqual(['C', 'D']))
+            .then(() => (states = []))
+            .then(go('H', 'D'))
+            .then(() => expect(pluck(states, 'name')).toEqual(['B', 'C', 'D']))
+            .then(done);
+        });
 
-        it('should be called only when from state matches and the state being enter matches to', ((done) => {
-          let states = [], states2 = [];
-          $transitions.onEnter({ from: '*', entering: 'C' }, function(trans, state) { states.push(state); });
-          $transitions.onEnter({ from: 'B', entering: 'C' }, function(trans, state) { states2.push(state); });
+        it('should be called only when from state matches and the state being enter matches to', done => {
+          let states = [],
+            states2 = [];
+          $transitions.onEnter({ from: '*', entering: 'C' }, function(trans, state) {
+            states.push(state);
+          });
+          $transitions.onEnter({ from: 'B', entering: 'C' }, function(trans, state) {
+            states2.push(state);
+          });
 
           Promise.resolve()
-              .then(go('A', 'D'))
-              .then(() => {
-                expect(pluck(states, 'name')).toEqual([ 'C' ]);
-                expect(pluck(states2, 'name')).toEqual([ ]);
-              })
+            .then(go('A', 'D'))
+            .then(() => {
+              expect(pluck(states, 'name')).toEqual(['C']);
+              expect(pluck(states2, 'name')).toEqual([]);
+            })
 
-              .then(() => { states = []; states2 = []; })
-              .then(go('B', 'D'))
-              .then(() => {
-                expect(pluck(states, 'name')).toEqual([ 'C' ]);
-                expect(pluck(states2, 'name')).toEqual([ 'C' ]);
-              })
+            .then(() => {
+              states = [];
+              states2 = [];
+            })
+            .then(go('B', 'D'))
+            .then(() => {
+              expect(pluck(states, 'name')).toEqual(['C']);
+              expect(pluck(states2, 'name')).toEqual(['C']);
+            })
 
-              .then(done);
-        }));
+            .then(done);
+        });
       });
 
       describe('.onExit()', function() {
-        it('should get Transition and the state being exited as arguments', ((done) => {
+        it('should get Transition and the state being exited as arguments', done => {
           const args = { trans: undefined, state: undefined, third: undefined };
           const states = [];
 
-          $transitions.onExit({ exiting: '**' }, <any> function(trans, state, third) {
+          $transitions.onExit({ exiting: '**' }, <any>function(trans, state, third) {
             states.push(state);
             args.trans = trans;
             args.third = third;
           });
 
           Promise.resolve()
-              .then(go('D', 'H'))
-              .then(() => {
-                expect(pluck(states, 'name')).toEqual([ 'D', 'C', 'B' ]);
-                expect(typeof args.trans.from).toBe('function');
-                expect(args.third).toBeUndefined();
-              })
-              .then(done);
+            .then(go('D', 'H'))
+            .then(() => {
+              expect(pluck(states, 'name')).toEqual(['D', 'C', 'B']);
+              expect(typeof args.trans.from).toBe('function');
+              expect(args.third).toBeUndefined();
+            })
+            .then(done);
+        });
 
-        }));
-
-        it('should be called on only states being exited', ((done) => {
+        it('should be called on only states being exited', done => {
           let states = [];
-          $transitions.onExit({ exiting: '*' }, function(trans, state) { states.push(state); });
+          $transitions.onExit({ exiting: '*' }, function(trans, state) {
+            states.push(state);
+          });
 
           Promise.resolve()
-              .then(go('D', 'B'))
-              .then(() => expect(pluck(states, 'name')).toEqual([ 'D', 'C' ]))
-              .then(() => states = [])
-              .then(go('H', 'D'))
-              .then(() => expect(pluck(states, 'name')).toEqual([ 'H', 'G' ]))
-              .then(done);
-        }));
+            .then(go('D', 'B'))
+            .then(() => expect(pluck(states, 'name')).toEqual(['D', 'C']))
+            .then(() => (states = []))
+            .then(go('H', 'D'))
+            .then(() => expect(pluck(states, 'name')).toEqual(['H', 'G']))
+            .then(done);
+        });
 
-        it('should be called only when the to state matches and the state being exited matches the from state', ((done) => {
-          let states = [], states2 = [];
-          $transitions.onExit({ exiting: 'D', to: '*' }, function(trans, state) { states.push(state); });
-          $transitions.onExit({ exiting: 'D', to: 'C' }, function(trans, state) { states2.push(state); });
+        it('should be called only when the to state matches and the state being exited matches the from state', done => {
+          let states = [],
+            states2 = [];
+          $transitions.onExit({ exiting: 'D', to: '*' }, function(trans, state) {
+            states.push(state);
+          });
+          $transitions.onExit({ exiting: 'D', to: 'C' }, function(trans, state) {
+            states2.push(state);
+          });
 
           Promise.resolve()
-              .then(go('D', 'B'))
-              .then(() => {
-                expect(pluck(states, 'name')).toEqual([ 'D' ]);
-                expect(pluck(states2, 'name')).toEqual([ ]);
-              })
-              .then(() => { states = []; states2 = []; })
-              .then(go('D', 'C'))
-              .then(() => {
-                expect(pluck(states, 'name')).toEqual([ 'D' ]);
-                expect(pluck(states2, 'name')).toEqual([ 'D' ]);
-              })
-              .then(done);
-        }));
+            .then(go('D', 'B'))
+            .then(() => {
+              expect(pluck(states, 'name')).toEqual(['D']);
+              expect(pluck(states2, 'name')).toEqual([]);
+            })
+            .then(() => {
+              states = [];
+              states2 = [];
+            })
+            .then(go('D', 'C'))
+            .then(() => {
+              expect(pluck(states, 'name')).toEqual(['D']);
+              expect(pluck(states2, 'name')).toEqual(['D']);
+            })
+            .then(done);
+        });
 
         // test for #3081
-        it('should inject resolve values from the exited state', ((done) => {
+        it('should inject resolve values from the exited state', done => {
           router.stateRegistry.register({
             name: 'design',
             url: '/design',
@@ -416,90 +454,118 @@ describe('transition', function () {
           });
 
           Promise.resolve()
-              .then(() => $state.go('design'))
-              .then(() => $state.go('A'));
-        }));
+            .then(() => $state.go('design'))
+            .then(() => $state.go('A'));
+        });
       });
 
       describe('.onSuccess()', function() {
         beforeEach(() => $state.defaultErrorHandler(function() {}));
 
-        it('should only be called if the transition succeeds', ((done) => {
+        it('should only be called if the transition succeeds', done => {
           let states = [];
-          $transitions.onSuccess({ from: '*', to: '*' }, function(trans) { states.push(trans.to().name); });
-          $transitions.onEnter({ from: 'A', entering: 'C' }, function() { return false; });
+          $transitions.onSuccess({ from: '*', to: '*' }, function(trans) {
+            states.push(trans.to().name);
+          });
+          $transitions.onEnter({ from: 'A', entering: 'C' }, function() {
+            return false;
+          });
 
           Promise.resolve()
-              .then(goFail('A', 'C'))
-              .then(() => expect(states).toEqual([ ]))
-              .then(() => states = [])
-              .then(go('B', 'C'))
-              .then(() => expect(states).toEqual([ 'C' ]))
-              .then(done);
-        }));
+            .then(goFail('A', 'C'))
+            .then(() => expect(states).toEqual([]))
+            .then(() => (states = []))
+            .then(go('B', 'C'))
+            .then(() => expect(states).toEqual(['C']))
+            .then(done);
+        });
 
-        it('should call all .onSuccess() even when callbacks fail (throw errors, etc)', ((done) => {
+        it('should call all .onSuccess() even when callbacks fail (throw errors, etc)', done => {
           const states = [];
           $transitions.onSuccess({ from: '*', to: '*' }, () => false);
           $transitions.onSuccess({ from: '*', to: '*' }, () => $state.target('A'));
-          $transitions.onSuccess({ from: '*', to: '*' }, function() { throw new Error('oops!'); });
-          $transitions.onSuccess({ from: '*', to: '*' }, function(trans) { states.push(trans.to().name); });
+          $transitions.onSuccess({ from: '*', to: '*' }, function() {
+            throw new Error('oops!');
+          });
+          $transitions.onSuccess({ from: '*', to: '*' }, function(trans) {
+            states.push(trans.to().name);
+          });
 
           Promise.resolve()
-              .then(go('B', 'C'))
-              .then(() => expect(states).toEqual([ 'C' ]))
-              .then(done);
-        }));
+            .then(go('B', 'C'))
+            .then(() => expect(states).toEqual(['C']))
+            .then(done);
+        });
       });
 
       describe('.onError()', function() {
-        it('should be called if the transition aborts.', ((done) => {
+        it('should be called if the transition aborts.', done => {
           const states = [];
-          $transitions.onEnter({ from: 'A', entering: 'C' }, function() { return false; });
-          $transitions.onError({ }, function(trans) { states.push(trans.to().name); });
+          $transitions.onEnter({ from: 'A', entering: 'C' }, function() {
+            return false;
+          });
+          $transitions.onError({}, function(trans) {
+            states.push(trans.to().name);
+          });
 
           Promise.resolve()
-              .then(goFail('A', 'D'))
-              .then(() => expect(states).toEqual([ 'D' ]))
-              .then(done);
-        }));
+            .then(goFail('A', 'D'))
+            .then(() => expect(states).toEqual(['D']))
+            .then(done);
+        });
 
-        it('should be called if any part of the transition fails.', ((done) => {
+        it('should be called if any part of the transition fails.', done => {
           const states = [];
-          $transitions.onEnter({ from: 'A', entering: 'C' }, function() { throw new Error('oops!');  });
-          $transitions.onError({ }, function(trans) { states.push(trans.to().name); });
+          $transitions.onEnter({ from: 'A', entering: 'C' }, function() {
+            throw new Error('oops!');
+          });
+          $transitions.onError({}, function(trans) {
+            states.push(trans.to().name);
+          });
 
           Promise.resolve()
-              .then(goFail('A', 'D'))
-              .then(() => expect(states).toEqual([ 'D' ]))
-              .then(done);
-        }));
+            .then(goFail('A', 'D'))
+            .then(() => expect(states).toEqual(['D']))
+            .then(done);
+        });
 
-        it('should be called if an onBefore hook fails.', ((done) => {
+        it('should be called if an onBefore hook fails.', done => {
           const states = [];
-          $transitions.onBefore({ from: 'A', entering: 'C' }, function() { throw new Error('oops!');  });
-          $transitions.onError({ }, function(trans) { states.push(trans.to().name); });
+          $transitions.onBefore({ from: 'A', entering: 'C' }, function() {
+            throw new Error('oops!');
+          });
+          $transitions.onError({}, function(trans) {
+            states.push(trans.to().name);
+          });
 
           Promise.resolve()
-              .then(goFail('A', 'D'))
-              .then(() => expect(states).toEqual([ 'D' ]))
-              .then(done);
-        }));
+            .then(goFail('A', 'D'))
+            .then(() => expect(states).toEqual(['D']))
+            .then(done);
+        });
 
-        it('should be called for only handlers matching the transition.', ((done) => {
+        it('should be called for only handlers matching the transition.', done => {
           const hooks = [];
-          $transitions.onEnter({ from: 'A', entering: 'C' }, function() { throw new Error('oops!');  });
-          $transitions.onError({ from: '*', to: '*' }, function() { hooks.push('splatsplat'); });
-          $transitions.onError({ from: 'A', to: 'C' }, function() { hooks.push('AC'); });
-          $transitions.onError({ from: 'A', to: 'D' }, function() { hooks.push('AD'); });
+          $transitions.onEnter({ from: 'A', entering: 'C' }, function() {
+            throw new Error('oops!');
+          });
+          $transitions.onError({ from: '*', to: '*' }, function() {
+            hooks.push('splatsplat');
+          });
+          $transitions.onError({ from: 'A', to: 'C' }, function() {
+            hooks.push('AC');
+          });
+          $transitions.onError({ from: 'A', to: 'D' }, function() {
+            hooks.push('AD');
+          });
 
           Promise.resolve()
-              .then(goFail('A', 'D'))
-              .then(() => expect(hooks).toEqual([ 'splatsplat', 'AD' ]))
-              .then(done);
-        }));
+            .then(goFail('A', 'D'))
+            .then(() => expect(hooks).toEqual(['splatsplat', 'AD']))
+            .then(done);
+        });
 
-        it('should call all error handlers when transition fails.', ((done) => {
+        it('should call all error handlers when transition fails.', done => {
           let count = 0;
 
           $state.defaultErrorHandler(() => {});
@@ -521,112 +587,147 @@ describe('transition', function () {
           });
 
           Promise.resolve()
-              .then(goFail('B', 'C'))
-              .then(() => expect(count).toBe(1111))
-              .then(done);
-        }));
+            .then(goFail('B', 'C'))
+            .then(() => expect(count).toBe(1111))
+            .then(done);
+        });
       });
 
       // Test for #2866
-      it('should have access to the failure reason in transition.error().', ((done) => {
+      it('should have access to the failure reason in transition.error().', done => {
         const error = new Error('oops!');
         let transError;
-        $transitions.onEnter({ from: 'A', entering: 'C' }, function() { throw error;  });
-        $transitions.onError({ }, function(trans) { transError = trans.error(); });
+        $transitions.onEnter({ from: 'A', entering: 'C' }, function() {
+          throw error;
+        });
+        $transitions.onError({}, function(trans) {
+          transError = trans.error();
+        });
 
         Promise.resolve()
-            .then(goFail('A', 'D'))
-            .then(() => expect(transError.detail).toBe(error))
-            .then(done);
-      }));
+          .then(goFail('A', 'D'))
+          .then(() => expect(transError.detail).toBe(error))
+          .then(done);
+      });
 
-      it("return value of 'false' should reject the transition with ABORT status", ((done) => {
-        let states = [], rejection, transition = makeTransition('', 'D');
-        $transitions.onEnter({ entering: '*' }, function(trans, state) { states.push(state); });
-        $transitions.onEnter({ from: '*', entering: 'C' }, function() { return false; });
+      it("return value of 'false' should reject the transition with ABORT status", done => {
+        let states = [],
+          rejection,
+          transition = makeTransition('', 'D');
+        $transitions.onEnter({ entering: '*' }, function(trans, state) {
+          states.push(state);
+        });
+        $transitions.onEnter({ from: '*', entering: 'C' }, function() {
+          return false;
+        });
 
-        transition.promise.catch(function(err) { rejection = err; });
-        transition.run()
-            .catch(tick)
-            .then(() => {
-              expect(pluck(states, 'name')).toEqual([ 'A', 'B', 'C' ]);
-              expect(rejection.type).toEqual(RejectType.ABORTED);
-            })
-            .then(done);
-      }));
+        transition.promise.catch(function(err) {
+          rejection = err;
+        });
+        transition
+          .run()
+          .catch(tick)
+          .then(() => {
+            expect(pluck(states, 'name')).toEqual(['A', 'B', 'C']);
+            expect(rejection.type).toEqual(RejectType.ABORTED);
+          })
+          .then(done);
+      });
 
-      it('return value of type Transition should abort the transition with SUPERSEDED status', ((done) => {
-        let states = [], rejection, transition = makeTransition('A', 'D');
-        $transitions.onEnter({ entering: '*' }, function(trans, state) { states.push(state); });
+      it('return value of type Transition should abort the transition with SUPERSEDED status', done => {
+        let states = [],
+          rejection,
+          transition = makeTransition('A', 'D');
+        $transitions.onEnter({ entering: '*' }, function(trans, state) {
+          states.push(state);
+        });
         $transitions.onEnter({ from: '*', entering: 'C' }, () => $state.target('B'));
-        transition.promise.catch(function(err) { rejection = err; });
+        transition.promise.catch(function(err) {
+          rejection = err;
+        });
 
-        transition.run()
-            .catch(tick)
-            .then(() => {
-              expect(pluck(states, 'name')).toEqual([ 'B', 'C' ]);
-              expect(rejection.type).toEqual(RejectType.SUPERSEDED);
-              expect(rejection.detail.name()).toEqual('B');
-              expect(rejection.redirected).toEqual(true);
-            })
-            .then(done);
-      }));
+        transition
+          .run()
+          .catch(tick)
+          .then(() => {
+            expect(pluck(states, 'name')).toEqual(['B', 'C']);
+            expect(rejection.type).toEqual(RejectType.SUPERSEDED);
+            expect(rejection.detail.name()).toEqual('B');
+            expect(rejection.redirected).toEqual(true);
+          })
+          .then(done);
+      });
 
-      it('hooks which start a new transition should cause the old transition to be rejected.', ((done) => {
+      it('hooks which start a new transition should cause the old transition to be rejected.', done => {
         let current = null;
         function currenTransition() {
           return current;
         }
 
-        let states = [], rejection, transition2, transition2success,
-            transition = current = makeTransition('A', 'D', { current: currenTransition });
+        let states = [],
+          rejection,
+          transition2,
+          transition2success,
+          transition = (current = makeTransition('A', 'D', { current: currenTransition }));
 
-        $transitions.onEnter({ entering: '*', to: '*' }, function(trans, state) { states.push(state); });
+        $transitions.onEnter({ entering: '*', to: '*' }, function(trans, state) {
+          states.push(state);
+        });
         $transitions.onEnter({ from: 'A', entering: 'C' }, function() {
           transition2 = current = makeTransition('A', 'G', { current: currenTransition }); // similar to using $state.go() in a controller, etc.
           transition2.run();
         });
 
-        transition.promise.catch(function(err) { rejection = err; });
-        transition.run()
-            .then(tick, tick)
-            .then(() => {
-              // .onEnter() from A->C should have set transition2.
-              transition2.promise.then(function() { transition2success = true; });
-            })
-            .then(tick, tick)
-            .then(() => {
-              expect(pluck(states, 'name')).toEqual([ 'B', 'C', 'G' ]);
-              expect(rejection instanceof Rejection).toBeTruthy();
-              expect(rejection.type).toEqual(RejectType.SUPERSEDED);
-              expect(rejection.detail.to().name).toEqual('G');
-              expect(rejection.detail.from().name).toEqual('A');
-              expect(rejection.redirected).toBeUndefined();
+        transition.promise.catch(function(err) {
+          rejection = err;
+        });
+        transition
+          .run()
+          .then(tick, tick)
+          .then(() => {
+            // .onEnter() from A->C should have set transition2.
+            transition2.promise.then(function() {
+              transition2success = true;
+            });
+          })
+          .then(tick, tick)
+          .then(() => {
+            expect(pluck(states, 'name')).toEqual(['B', 'C', 'G']);
+            expect(rejection instanceof Rejection).toBeTruthy();
+            expect(rejection.type).toEqual(RejectType.SUPERSEDED);
+            expect(rejection.detail.to().name).toEqual('G');
+            expect(rejection.detail.from().name).toEqual('A');
+            expect(rejection.redirected).toBeUndefined();
 
-              expect(transition2success).toBe(true);
-            })
-            .then(done);
-      }));
+            expect(transition2success).toBe(true);
+          })
+          .then(done);
+      });
 
-      it('hooks which return a promise should resolve the promise before continuing', (done) => {
-        const log = [], transition = makeTransition('A', 'D');
+      it('hooks which return a promise should resolve the promise before continuing', done => {
+        const log = [],
+          transition = makeTransition('A', 'D');
         $transitions.onEnter({ from: '*', entering: '*' }, function(trans, state) {
           log.push('#' + state.name);
 
-          return new Promise<void>(resolve => setTimeout(() => {
-            log.push('^' + state.name);
-            resolve();
-          }));
+          return new Promise<void>(resolve =>
+            setTimeout(() => {
+              log.push('^' + state.name);
+              resolve();
+            }),
+          );
         });
 
-        transition.run()
-            .then(tick, tick)
-            .then(() => expect(log.join('')).toBe('#B^B#C^C#D^D'))
-            .then(done);
+        transition
+          .run()
+          .then(tick, tick)
+          .then(() => expect(log.join('')).toBe('#B^B#C^C#D^D'))
+          .then(done);
       });
 
-      it('hooks which return a promise should resolve the promise before continuing', ((done) => {
-        const log = [], transition = makeTransition('A', 'D');
+      it('hooks which return a promise should resolve the promise before continuing', done => {
+        const log = [],
+          transition = makeTransition('A', 'D');
         const $q = services.$q;
         const defers = { B: $q.defer(), C: $q.defer(), D: $q.defer() };
         function resolveDeferredFor(name) {
@@ -640,35 +741,46 @@ describe('transition', function () {
           return defers[state.name].promise;
         });
 
-        transition.promise.then(function() { log.push('DONE'); });
+        transition.promise.then(function() {
+          log.push('DONE');
+        });
         transition.run();
 
-        tick().then(() => expect(log.join(';')).toBe('#B'))
+        tick()
+          .then(() => expect(log.join(';')).toBe('#B'))
 
-            .then(() => resolveDeferredFor('B'))
-            .then(() => expect(log.join(';')).toBe('#B;^B;#C'))
+          .then(() => resolveDeferredFor('B'))
+          .then(() => expect(log.join(';')).toBe('#B;^B;#C'))
 
-            .then(() => resolveDeferredFor('C'))
-            .then(() => expect(log.join(';')).toBe('#B;^B;#C;^C;#D'))
+          .then(() => resolveDeferredFor('C'))
+          .then(() => expect(log.join(';')).toBe('#B;^B;#C;^C;#D'))
 
-            .then(() => resolveDeferredFor('D'))
-            .then(() => expect(log.join(';')).toBe('#B;^B;#C;^C;#D;^D;DONE'))
+          .then(() => resolveDeferredFor('D'))
+          .then(() => expect(log.join(';')).toBe('#B;^B;#C;^C;#D;^D;DONE'))
 
-            .then(done, done);
-      }));
+          .then(done, done);
+      });
 
-      it('hooks can add resolves to a $transition$ and they will be available to be injected in nested states', ((done) => {
-        const log = [], transition = makeTransition('A', 'D');
+      it('hooks can add resolves to a $transition$ and they will be available to be injected in nested states', done => {
+        const log = [],
+          transition = makeTransition('A', 'D');
         const $q = services.$q;
         const defer = $q.defer();
 
-        $transitions.onEnter({ entering: '**' }, function logEnter(trans, state) {
-          log.push('Entered#' + state.name);
-        }, { priority: -1 });
+        $transitions.onEnter(
+          { entering: '**' },
+          function logEnter(trans, state) {
+            log.push('Entered#' + state.name);
+          },
+          { priority: -1 },
+        );
 
         $transitions.onEnter({ entering: 'B' }, function addResolves($transition$: Transition) {
           log.push('adding resolve');
-          const resolveFn = function () { log.push('resolving'); return defer.promise; };
+          const resolveFn = function() {
+            log.push('resolving');
+            return defer.promise;
+          };
           $transition$.addResolvable(new Resolvable('newResolve', resolveFn));
         });
 
@@ -676,30 +788,43 @@ describe('transition', function () {
           log.push(trans.injector().get('newResolve'));
         });
 
-        transition.promise.then(function() { log.push('DONE!'); });
+        transition.promise.then(function() {
+          log.push('DONE!');
+        });
 
         transition.run();
 
-        tick().then(() => expect(log.join(';')).toBe('adding resolve;Entered#B;resolving'))
-            .then(() => defer.resolve('resolvedval'))
-            .then(tick, tick)
-            .then(() => expect(log.join(';')).toBe('adding resolve;Entered#B;resolving;resolvedval;Entered#C;Entered#D;DONE!'))
-            .then(done, done);
-      }));
+        tick()
+          .then(() => expect(log.join(';')).toBe('adding resolve;Entered#B;resolving'))
+          .then(() => defer.resolve('resolvedval'))
+          .then(tick, tick)
+          .then(() =>
+            expect(log.join(';')).toBe('adding resolve;Entered#B;resolving;resolvedval;Entered#C;Entered#D;DONE!'),
+          )
+          .then(done, done);
+      });
 
       // test for https://github.com/angular-ui/ui-router/issues/3544
-      it('hooks can add resolves to a $transition$ and they will be available in onSuccess', ((done) => {
-        const log = [], transition = makeTransition('A', 'B');
+      it('hooks can add resolves to a $transition$ and they will be available in onSuccess', done => {
+        const log = [],
+          transition = makeTransition('A', 'B');
         const $q = services.$q;
         const defer = $q.defer();
 
-        $transitions.onEnter({ entering: '**' }, function logEnter(trans, state) {
-          log.push('Entered#' + state.name);
-        }, { priority: -1 });
+        $transitions.onEnter(
+          { entering: '**' },
+          function logEnter(trans, state) {
+            log.push('Entered#' + state.name);
+          },
+          { priority: -1 },
+        );
 
         $transitions.onEnter({ entering: 'B' }, function addResolves($transition$: Transition) {
           log.push('adding resolve');
-          const resolveFn = function () { log.push('resolving'); return defer.promise; };
+          const resolveFn = function() {
+            log.push('resolving');
+            return defer.promise;
+          };
           $transition$.addResolvable(new Resolvable('newResolve', resolveFn));
         });
 
@@ -708,22 +833,30 @@ describe('transition', function () {
           log.push(trans.injector().get('newResolve'));
         });
 
-        transition.promise.then(function() { log.push('DONE!'); });
+        transition.promise.then(function() {
+          log.push('DONE!');
+        });
 
         transition.run();
 
-        tick().then(() => expect(log.join(';')).toBe('adding resolve;Entered#B;resolving'))
-            .then(() => defer.resolve('resolvedval'))
-            .then(tick, tick)
-            .then(() => expect(log.join(';')).toBe('adding resolve;Entered#B;resolving;SUCCESS!;resolvedval;DONE!'))
-            .then(done, done);
-      }));
+        tick()
+          .then(() => expect(log.join(';')).toBe('adding resolve;Entered#B;resolving'))
+          .then(() => defer.resolve('resolvedval'))
+          .then(tick, tick)
+          .then(() => expect(log.join(';')).toBe('adding resolve;Entered#B;resolving;SUCCESS!;resolvedval;DONE!'))
+          .then(done, done);
+      });
 
       // Test for https://github.com/ui-router/core/issues/32
-      it('should match "" (empty string) to root state only', async (done) => {
-        const beforeLog = [], successLog = [];
-        router.transitionService.onBefore({ from: '', to: '**' }, trans => { beforeLog.push(trans.from().name); });
-        router.transitionService.onSuccess({ from: '', to: '**' }, trans => { successLog.push(trans.from().name); });
+      it('should match "" (empty string) to root state only', async done => {
+        const beforeLog = [],
+          successLog = [];
+        router.transitionService.onBefore({ from: '', to: '**' }, trans => {
+          beforeLog.push(trans.from().name);
+        });
+        router.transitionService.onSuccess({ from: '', to: '**' }, trans => {
+          successLog.push(trans.from().name);
+        });
 
         await $state.go('A');
         expect(beforeLog).toEqual(successLog);
@@ -738,9 +871,15 @@ describe('transition', function () {
         done();
       });
 
-      it('should be invoked only once if invokeLimit is 1', (done) => {
+      it('should be invoked only once if invokeLimit is 1', done => {
         let count = 0;
-        $transitions.onStart({ }, function() { count++; }, { invokeLimit: 1 });
+        $transitions.onStart(
+          {},
+          function() {
+            count++;
+          },
+          { invokeLimit: 1 },
+        );
 
         Promise.resolve()
           .then(() => expect(count).toBe(0))
@@ -753,22 +892,24 @@ describe('transition', function () {
           .then(done);
       });
 
-      it('should be invoked only twice if invokeLimit is 2', (done) => {
+      it('should be invoked only twice if invokeLimit is 2', done => {
         let count = 0;
-        $transitions.onStart({ }, () => {
-          count++; }, { invokeLimit: 2 });
+        $transitions.onStart(
+          {},
+          () => {
+            count++;
+          },
+          { invokeLimit: 2 },
+        );
 
         Promise.resolve()
           .then(() => expect(count).toBe(0))
           .then(go('A', 'D'))
-          .then(() =>
-            expect(count).toBe(1))
+          .then(() => expect(count).toBe(1))
           .then(go('D', 'A'))
-          .then(() =>
-            expect(count).toBe(2))
+          .then(() => expect(count).toBe(2))
           .then(go('A', 'D'))
-          .then(() =>
-            expect(count).toBe(2))
+          .then(() => expect(count).toBe(2))
           .then(done);
       });
     });
@@ -776,12 +917,16 @@ describe('transition', function () {
     describe('redirected transition', () => {
       let urlRedirect, requiresAuth;
       beforeEach(() => {
-        urlRedirect = router.stateRegistry.register({ name: 'urlRedirect', url: '/urlRedirect', redirectTo: 'redirectTarget' });
+        urlRedirect = router.stateRegistry.register({
+          name: 'urlRedirect',
+          url: '/urlRedirect',
+          redirectTo: 'redirectTarget',
+        });
         requiresAuth = router.stateRegistry.register({ name: 'requiresAuth', url: '/requiresAuth' });
         router.stateRegistry.register({ name: 'redirectTarget', url: '/redirectTarget' });
       });
 
-      it('should not replace the current url when redirecting a state.go transition', async (done) => {
+      it('should not replace the current url when redirecting a state.go transition', async done => {
         const spy = spyOn(router.urlService, 'url').and.callThrough();
 
         await $state.go('urlRedirect');
@@ -790,7 +935,7 @@ describe('transition', function () {
         done();
       });
 
-      it('should replace the current url when redirecting a url sync', (done) => {
+      it('should replace the current url when redirecting a url sync', done => {
         const url = spyOn(router.urlService, 'url').and.callThrough();
         const transitionTo = spyOn(router.stateService, 'transitionTo').and.callThrough();
 
@@ -810,7 +955,7 @@ describe('transition', function () {
         router.urlService.url('/urlRedirect');
       });
 
-      it('should not replace the current url when redirecting a url sync with { location: false }', (done) => {
+      it('should not replace the current url when redirecting a url sync with { location: false }', done => {
         router.transitionService.onBefore({ to: 'requiresAuth' }, trans => {
           return router.stateService.target('redirectTarget', null, { location: false });
         });
@@ -832,38 +977,37 @@ describe('transition', function () {
 
         router.urlService.url('/requiresAuth');
       });
-
     });
   });
 
   describe('Transition() instance', function() {
     describe('.entering', function() {
-      it('should return the path elements being entered', (() => {
+      it('should return the path elements being entered', () => {
         let t = makeTransition('', 'A');
-        expect(pluck(t.entering(), 'name')).toEqual([ 'A' ]);
+        expect(pluck(t.entering(), 'name')).toEqual(['A']);
 
         t = makeTransition('', 'D');
-        expect(pluck(t.entering(), 'name')).toEqual([ 'A', 'B', 'C', 'D' ]);
-      }));
+        expect(pluck(t.entering(), 'name')).toEqual(['A', 'B', 'C', 'D']);
+      });
 
-      it('should not include already entered elements', (() => {
+      it('should not include already entered elements', () => {
         const t = makeTransition('B', 'D');
-        expect(pluck(t.entering(), 'name')).toEqual([ 'C', 'D' ]);
-      }));
+        expect(pluck(t.entering(), 'name')).toEqual(['C', 'D']);
+      });
     });
 
     describe('.exiting', function() {
-      it('should return the path elements being exited', (() => {
+      it('should return the path elements being exited', () => {
         let t = makeTransition('D', 'C');
-        expect(pluck(t.exiting(), 'name')).toEqual([ 'D' ]);
+        expect(pluck(t.exiting(), 'name')).toEqual(['D']);
 
         t = makeTransition('D', 'A');
-        expect(pluck(t.exiting(), 'name')).toEqual([ 'D', 'C', 'B' ]);
-      }));
+        expect(pluck(t.exiting(), 'name')).toEqual(['D', 'C', 'B']);
+      });
     });
 
     describe('.is', function() {
-      it('should match globs', (() => {
+      it('should match globs', () => {
         const t = makeTransition('', 'first');
 
         expect(t.is({ to: 'first' })).toBe(true);
@@ -880,38 +1024,78 @@ describe('transition', function () {
 
         expect(t.is({ to: ['', 'third'] })).toBe(false);
         expect(t.is({ to: '**', from: 'first' })).toBe(false);
-      }));
+      });
 
-      it('should match using functions', (() => {
+      it('should match using functions', () => {
         const t = makeTransition('', 'first');
 
-        expect(t.is({ to: function(state) { return state.name === 'first'; } })).toBe(true);
-        expect(t.is({ from: function(state) { return state.name === ''; } })).toBe(true);
-        expect(t.is({
-          to: function(state) { return state.name === 'first'; },
-          from: function(state) { return state.name === ''; },
-        })).toBe(true);
+        expect(
+          t.is({
+            to: function(state) {
+              return state.name === 'first';
+            },
+          }),
+        ).toBe(true);
+        expect(
+          t.is({
+            from: function(state) {
+              return state.name === '';
+            },
+          }),
+        ).toBe(true);
+        expect(
+          t.is({
+            to: function(state) {
+              return state.name === 'first';
+            },
+            from: function(state) {
+              return state.name === '';
+            },
+          }),
+        ).toBe(true);
 
-        expect(t.is({
-          to: function(state) { return state.name === 'first'; },
-          from: '**',
-        })).toBe(true);
+        expect(
+          t.is({
+            to: function(state) {
+              return state.name === 'first';
+            },
+            from: '**',
+          }),
+        ).toBe(true);
 
-        expect(t.is({ to: function(state) { return state.name === 'second'; } })).toBe(false);
-        expect(t.is({ from: function(state) { return state.name === 'first'; } })).toBe(false);
-        expect(t.is({
-          to: function(state) { return state.name === 'first'; },
-          from: function(state) { return state.name === 'second'; },
-        })).toBe(false);
+        expect(
+          t.is({
+            to: function(state) {
+              return state.name === 'second';
+            },
+          }),
+        ).toBe(false);
+        expect(
+          t.is({
+            from: function(state) {
+              return state.name === 'first';
+            },
+          }),
+        ).toBe(false);
+        expect(
+          t.is({
+            to: function(state) {
+              return state.name === 'first';
+            },
+            from: function(state) {
+              return state.name === 'second';
+            },
+          }),
+        ).toBe(false);
 
-//        expect(t.is({ to: ["", "third"] })).toBe(false);
-//        expect(t.is({ to: "**", from: "first" })).toBe(false);
-      }));
+        //        expect(t.is({ to: ["", "third"] })).toBe(false);
+        //        expect(t.is({ to: "**", from: "first" })).toBe(false);
+      });
     });
   });
 
   describe('inherited params', () => {
-    it('should inherit params when trans options `inherit: true`', async(done) => {
+    it('should inherit params when trans options `inherit: true`', async done => {
       router.stateRegistry.register({ name: 'foo', url: '/:path?query1&query2' });
 
       await $state.go('foo', { path: 'abc', query1: 'def', query2: 'ghi' });
@@ -923,7 +1107,7 @@ describe('transition', function () {
       done();
     });
 
-    it('should not inherit params when param declaration has inherit: false', async(done) => {
+    it('should not inherit params when param declaration has inherit: false', async done => {
       router.stateRegistry.register({
         name: 'foo',
         url: '/:path?query1&query2',
@@ -941,7 +1125,7 @@ describe('transition', function () {
       done();
     });
 
-    it('should not inherit previous params when new params are passed', async(done) => {
+    it('should not inherit previous params when new params are passed', async done => {
       router.stateRegistry.register({
         name: 'foo',
         url: '?fooParam',
@@ -956,13 +1140,25 @@ describe('transition', function () {
       done();
     });
 
-    it('should not inherit params whose type has inherit: false', async(done) => {
+    it('should not inherit params whose type has inherit: false', async done => {
       router.urlService.config.type('inherit', {
-        inherit: true, encode: x => x, decode: x => x, is: () => true, equals: equals, pattern: /.*/, raw: false,
+        inherit: true,
+        encode: x => x,
+        decode: x => x,
+        is: () => true,
+        equals: equals,
+        pattern: /.*/,
+        raw: false,
       });
 
       router.urlService.config.type('noinherit', {
-        inherit: false, encode: x => x, decode: x => x, is: () => true, equals: equals, pattern: /.*/, raw: false,
+        inherit: false,
+        encode: x => x,
+        decode: x => x,
+        is: () => true,
+        equals: equals,
+        pattern: /.*/,
+        raw: false,
       });
 
       router.stateRegistry.register({
@@ -979,7 +1175,7 @@ describe('transition', function () {
       done();
     });
 
-    it('should not inherit the "hash" param value', async(done) => {
+    it('should not inherit the "hash" param value', async done => {
       router.stateRegistry.register({ name: 'hash', url: '/hash' });
       router.stateRegistry.register({ name: 'other', url: '/other' });
 
@@ -1004,7 +1200,7 @@ describe('transition', function () {
   });
 
   describe('from previous transitions', () => {
-    it('should get their Transition resolves cleaned up', async(done) => {
+    it('should get their Transition resolves cleaned up', async done => {
       router.stateRegistry.register({ name: 'resolve', resolve: { foo: () => 'Some data' } });
       const trans = router.stateService.go('resolve').transition;
       await trans.promise;

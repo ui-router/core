@@ -25,8 +25,8 @@ export class StateParams {
   $inherit(newParams: Obj, $current: StateObject, $to: StateObject) {
     let parentParams: string[];
     const parents = ancestors($current, $to),
-        inherited: Obj = {},
-        inheritList: string[] = [];
+      inherited: Obj = {},
+      inheritList: string[] = [];
 
     for (const i in parents) {
       if (!parents[i] || !parents[i].params) continue;
@@ -42,4 +42,3 @@ export class StateParams {
     return extend({}, inherited, newParams);
   }
 }
-

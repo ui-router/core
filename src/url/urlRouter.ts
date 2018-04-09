@@ -12,7 +12,16 @@ import { UIRouter } from '../router';
 import { is, pattern, val } from '../common/hof';
 import { UrlRuleFactory } from './urlRule';
 import { TargetState } from '../state/targetState';
-import { MatcherUrlRule, MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi, UrlSyncApi } from './interface';
+import {
+  MatcherUrlRule,
+  MatchResult,
+  UrlParts,
+  UrlRule,
+  UrlRuleHandlerFn,
+  UrlRuleMatchFn,
+  UrlRulesApi,
+  UrlSyncApi,
+} from './interface';
 import { TargetStateDef } from '../state/interface';
 import { stripLastPathElement } from '../common';
 
@@ -25,12 +34,11 @@ function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHr
 }
 
 /** @hidden */
-const prioritySort = (a: UrlRule, b: UrlRule) =>
-  (b.priority || 0) - (a.priority || 0);
+const prioritySort = (a: UrlRule, b: UrlRule) => (b.priority || 0) - (a.priority || 0);
 
 /** @hidden */
 const typeSort = (a: UrlRule, b: UrlRule) => {
-  const weights = { 'STATE': 4, 'URLMATCHER': 4, 'REGEXP': 3, 'RAW': 2, 'OTHER': 1 };
+  const weights = { STATE: 4, URLMATCHER: 4, REGEXP: 3, RAW: 2, OTHER: 1 };
   return (weights[a.type] || 0) - (weights[b.type] || 0);
 };
 
@@ -115,7 +123,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
   /** @inheritdoc */
   sort(compareFn?: (a: UrlRule, b: UrlRule) => number) {
-    this._rules = this.stableSort(this._rules, this._sortFn = compareFn || this._sortFn);
+    this._rules = this.stableSort(this._rules, (this._sortFn = compareFn || this._sortFn));
     this._sorted = true;
   }
 
@@ -128,9 +136,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
     arrOfWrapper.sort((wrapperA, wrapperB) => {
       const cmpDiff = compareFn(wrapperA.elem, wrapperB.elem);
-      return cmpDiff === 0
-        ? wrapperA.idx - wrapperB.idx
-        : cmpDiff;
+      return cmpDiff === 0 ? wrapperA.idx - wrapperB.idx : cmpDiff;
     });
 
     return arrOfWrapper.map(wrapper => wrapper.elem);
@@ -166,7 +172,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
       const current = checkRule(rules[i]);
       // Pick the best MatchResult
-      best = (!best || current && current.weight > best.weight) ? current : best;
+      best = !best || (current && current.weight > best.weight) ? current : best;
     }
 
     return best;
@@ -177,11 +183,13 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
     if (evt && evt.defaultPrevented) return;
 
     const router = this._router,
-        $url = router.urlService,
-        $state = router.stateService;
+      $url = router.urlService,
+      $state = router.stateService;
 
     const url: UrlParts = {
-      path: $url.path(), search: $url.search(), hash: $url.hash(),
+      path: $url.path(),
+      search: $url.search(),
+      hash: $url.hash(),
     };
 
     const best = this.match(url);
@@ -201,7 +209,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
       this._stopFn && this._stopFn();
       delete this._stopFn;
     } else {
-      return this._stopFn = this._stopFn || this._router.urlService.onChange(evt => this.sync(evt));
+      return (this._stopFn = this._stopFn || this._router.urlService.onChange(evt => this.sync(evt)));
     }
   }
 
@@ -230,7 +238,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * @param params
    * @param options
    */
-  push(urlMatcher: UrlMatcher, params?: RawParams, options?: { replace?: (string|boolean) }) {
+  push(urlMatcher: UrlMatcher, params?: RawParams, options?: { replace?: string | boolean }) {
     const replace = options && !!options.replace;
     this._router.urlService.url(urlMatcher.format(params || {}), replace);
   }
@@ -271,13 +279,12 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
       return url;
     }
 
-    const slash = (!isHtml5 && url ? '/' : '');
+    const slash = !isHtml5 && url ? '/' : '';
     const cfgPort = cfg.port();
-    const port = <any> (cfgPort === 80 || cfgPort === 443 ? '' : ':' + cfgPort);
+    const port = <any>(cfgPort === 80 || cfgPort === 443 ? '' : ':' + cfgPort);
 
     return [cfg.protocol(), '://', cfg.host(), port, slash, url].join('');
   }
-
 
   /**
    * Manually adds a URL Rule.
@@ -314,7 +321,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   }
 
   /** @inheritdoc */
-  otherwise(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef) {
+  otherwise(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef) {
     const handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
 
     this._otherwiseFn = this.urlRuleFactory.create(val(true), handlerFn);
@@ -326,13 +333,17 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
     const handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
 
     const matchFn: UrlRuleMatchFn = (urlParts, router) =>
-        router.globals.transitionHistory.size() === 0 && !!/^\/?$/.exec(urlParts.path);
+      router.globals.transitionHistory.size() === 0 && !!/^\/?$/.exec(urlParts.path);
 
     this.rule(this.urlRuleFactory.create(matchFn, handlerFn));
   }
 
   /** @inheritdoc */
-  when(matcher: (RegExp|UrlMatcher|string), handler: string|UrlRuleHandlerFn, options?: { priority: number }): UrlRule {
+  when(
+    matcher: RegExp | UrlMatcher | string,
+    handler: string | UrlRuleHandlerFn,
+    options?: { priority: number },
+  ): UrlRule {
     const rule = this.urlRuleFactory.create(matcher, handler);
     if (isDefined(options && options.priority)) rule.priority = options.priority;
     this.rule(rule);
@@ -346,9 +357,9 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   }
 }
 
-function getHandlerFn(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef): UrlRuleHandlerFn {
+function getHandlerFn(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef): UrlRuleHandlerFn {
   if (!isFunction(handler) && !isString(handler) && !is(TargetState)(handler) && !TargetState.isDef(handler)) {
     throw new Error("'handler' must be a string, function, TargetState, or have a state: 'newtarget' property");
   }
-  return isFunction(handler) ? handler as UrlRuleHandlerFn : val(handler);
+  return isFunction(handler) ? (handler as UrlRuleHandlerFn) : val(handler);
 }

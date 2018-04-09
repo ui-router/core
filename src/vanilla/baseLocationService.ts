@@ -49,8 +49,8 @@ export abstract class BaseLocationServices implements LocationServices, Disposab
    */
   protected abstract _set(state: any, title: string, url: string, replace: boolean);
 
-  hash   = () => parseUrl(this._get()).hash;
-  path   = () => parseUrl(this._get()).path;
+  hash = () => parseUrl(this._get()).hash;
+  path = () => parseUrl(this._get()).path;
   search = () => getParams(parseUrl(this._get()).search);
 
   url(url?: string, replace = true): string {

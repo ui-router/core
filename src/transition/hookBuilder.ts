@@ -7,8 +7,13 @@ import { extend, tail, assertPredicate, unnestR, identity } from '../common/comm
 import { isArray } from '../common/predicates';
 
 import {
-    TransitionOptions, TransitionHookOptions, IHookRegistry, TreeChanges, IMatchingNodes,
-    TransitionHookPhase, TransitionHookScope,
+  TransitionOptions,
+  TransitionHookOptions,
+  IHookRegistry,
+  TreeChanges,
+  IMatchingNodes,
+  TransitionHookPhase,
+  TransitionHookScope,
 } from './interface';
 
 import { Transition } from './transition';
@@ -34,14 +39,15 @@ import { RegisteredHook } from './hookRegistry';
  *
  */
 export class HookBuilder {
-  constructor(private transition: Transition) { }
+  constructor(private transition: Transition) {}
 
   buildHooksForPhase(phase: TransitionHookPhase): TransitionHook[] {
     const $transitions = this.transition.router.transitionService;
-    return $transitions._pluginapi._getEvents(phase)
-        .map(type => this.buildHooks(type))
-        .reduce(unnestR, [])
-        .filter(identity);
+    return $transitions._pluginapi
+      ._getEvents(phase)
+      .map(type => this.buildHooks(type))
+      .reduce(unnestR, [])
+      .filter(identity);
   }
 
   /**
@@ -61,34 +67,38 @@ export class HookBuilder {
     const matchingHooks = this.getMatchingHooks(hookType, treeChanges);
     if (!matchingHooks) return [];
 
-    const baseHookOptions = <TransitionHookOptions> {
+    const baseHookOptions = <TransitionHookOptions>{
       transition: transition,
       current: transition.options().current,
     };
 
     const makeTransitionHooks = (hook: RegisteredHook) => {
-       // Fetch the Nodes that caused this hook to match.
-       const matches: IMatchingNodes = hook.matches(treeChanges);
-       // Select the PathNode[] that will be used as TransitionHook context objects
-       const matchingNodes: PathNode[] = matches[hookType.criteriaMatchPath.name];
+      // Fetch the Nodes that caused this hook to match.
+      const matches: IMatchingNodes = hook.matches(treeChanges);
+      // Select the PathNode[] that will be used as TransitionHook context objects
+      const matchingNodes: PathNode[] = matches[hookType.criteriaMatchPath.name];
 
-       // Return an array of HookTuples
-       return matchingNodes.map(node => {
-         const _options = extend({
-           bind: hook.bind,
-           traceData: { hookType: hookType.name, context: node },
-         }, baseHookOptions);
+      // Return an array of HookTuples
+      return matchingNodes.map(node => {
+        const _options = extend(
+          {
+            bind: hook.bind,
+            traceData: { hookType: hookType.name, context: node },
+          },
+          baseHookOptions,
+        );
 
-         const state = hookType.criteriaMatchPath.scope === TransitionHookScope.STATE ? node.state.self : null;
-         const transitionHook = new TransitionHook(transition, state, hook, _options);
-         return <HookTuple> { hook, node, transitionHook };
-       });
+        const state = hookType.criteriaMatchPath.scope === TransitionHookScope.STATE ? node.state.self : null;
+        const transitionHook = new TransitionHook(transition, state, hook, _options);
+        return <HookTuple>{ hook, node, transitionHook };
+      });
     };
 
-    return matchingHooks.map(makeTransitionHooks)
-        .reduce(unnestR, [])
-        .sort(tupleSort(hookType.reverseSort))
-        .map(tuple => tuple.transitionHook);
+    return matchingHooks
+      .map(makeTransitionHooks)
+      .reduce(unnestR, [])
+      .sort(tupleSort(hookType.reverseSort))
+      .map(tuple => tuple.transitionHook);
   }
 
   /**
@@ -107,16 +117,21 @@ export class HookBuilder {
 
     // Instance and Global hook registries
     const $transitions = this.transition.router.transitionService;
-    const registries = isCreate ? [ $transitions ] : [ this.transition, $transitions ];
+    const registries = isCreate ? [$transitions] : [this.transition, $transitions];
 
-    return registries.map((reg: IHookRegistry) => reg.getHooks(hookType.name))    // Get named hooks from registries
-        .filter(assertPredicate(isArray, `broken event named: ${hookType.name}`)) // Sanity check
-        .reduce(unnestR, [])                                                      // Un-nest RegisteredHook[][] to RegisteredHook[] array
-        .filter(hook => hook.matches(treeChanges));                               // Only those satisfying matchCriteria
+    return registries
+      .map((reg: IHookRegistry) => reg.getHooks(hookType.name)) // Get named hooks from registries
+      .filter(assertPredicate(isArray, `broken event named: ${hookType.name}`)) // Sanity check
+      .reduce(unnestR, []) // Un-nest RegisteredHook[][] to RegisteredHook[] array
+      .filter(hook => hook.matches(treeChanges)); // Only those satisfying matchCriteria
   }
 }
 
-interface HookTuple { hook: RegisteredHook, node: PathNode, transitionHook: TransitionHook }
+interface HookTuple {
+  hook: RegisteredHook;
+  node: PathNode;
+  transitionHook: TransitionHook;
+}
 
 /**
  * A factory for a sort function for HookTuples.

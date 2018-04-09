@@ -59,16 +59,16 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
     router.urlService.sync();
   }
 
-  const promises = transition.entering()
-      .filter(state => !!state.$$state().lazyLoad)
-      .map(state => lazyLoadState(transition, state));
+  const promises = transition
+    .entering()
+    .filter(state => !!state.$$state().lazyLoad)
+    .map(state => lazyLoadState(transition, state));
 
   return services.$q.all(promises).then(retryTransition);
 };
 
 export const registerLazyLoadHook = (transitionService: TransitionService) =>
-    transitionService.onBefore({ entering: (state) => !!state.lazyLoad }, lazyLoadHook);
-
+  transitionService.onBefore({ entering: state => !!state.lazyLoad }, lazyLoadHook);
 
 /**
  * Invokes a state's lazy load function
@@ -83,22 +83,22 @@ export function lazyLoadState(transition: Transition, state: StateDeclaration): 
   // Store/get the lazy load promise on/from the hookfn so it doesn't get re-invoked
   let promise = lazyLoadFn['_promise'];
   if (!promise) {
-    const success = (result) => {
+    const success = result => {
       delete state.lazyLoad;
       delete state.$$state().lazyLoad;
       delete lazyLoadFn['_promise'];
       return result;
     };
 
-    const error = (err) => {
+    const error = err => {
       delete lazyLoadFn['_promise'];
       return services.$q.reject(err);
     };
 
-    promise = lazyLoadFn['_promise'] =
-        services.$q.when(lazyLoadFn(transition, state))
-            .then(updateStateRegistry)
-            .then(success, error);
+    promise = lazyLoadFn['_promise'] = services.$q
+      .when(lazyLoadFn(transition, state))
+      .then(updateStateRegistry)
+      .then(success, error);
   }
 
   /** Register any lazy loaded state definitions */

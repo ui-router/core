@@ -22,5 +22,5 @@ export class MemoryLocationConfig implements LocationConfig {
   host = () => this._host;
   baseHref = () => this._baseHref;
   html5Mode = () => false;
-  hashPrefix = (newval?) => isDefined(newval) ? this._hashPrefix = newval : this._hashPrefix;
+  hashPrefix = (newval?) => (isDefined(newval) ? (this._hashPrefix = newval) : this._hashPrefix);
 }

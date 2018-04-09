@@ -91,7 +91,7 @@ export interface UrlMatcherConfig {
    *      the parameter value from the URL and replace it with this string.
    * @returns the current value of defaultSquashPolicy
    */
-  defaultSquashPolicy(value?: (boolean|string)): (boolean|string);
+  defaultSquashPolicy(value?: boolean | string): boolean | string;
 
   /**
    * Creates and registers a custom [[ParamTypeDefinition]] object
@@ -164,7 +164,7 @@ export interface UrlSyncApi {
    * });
    * ```
    */
-  listen(enabled?: boolean): Function
+  listen(enabled?: boolean): Function;
 
   /**
    * Disables monitoring of the URL.
@@ -190,7 +190,7 @@ export interface UrlSyncApi {
    * @param defer Indicates whether to defer location change interception.
    *        Passing no parameter is equivalent to `true`.
    */
-  deferIntercept(defer?: boolean)
+  deferIntercept(defer?: boolean);
 }
 
 /**
@@ -305,7 +305,11 @@ export interface UrlRulesApi {
    *
    * @return the registered [[UrlRule]]
    */
-  when(matcher: (RegExp|UrlMatcher|string), handler: string|UrlRuleHandlerFn, options?: { priority: number }): UrlRule;
+  when(
+    matcher: RegExp | UrlMatcher | string,
+    handler: string | UrlRuleHandlerFn,
+    options?: { priority: number },
+  ): UrlRule;
 
   /**
    * Defines the state, url, or behavior to use when no other rule matches the URL.
@@ -350,7 +354,7 @@ export interface UrlRulesApi {
    *
    * @param handler The url path to redirect to, or a function which returns the url path (or performs custom logic).
    */
-  otherwise(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef): void;
+  otherwise(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef): void;
 
   /**
    * Defines the initial state, path, or behavior to use when the app starts.
@@ -387,7 +391,7 @@ export interface UrlRulesApi {
    *
    * @param handler The initial state or url path, or a function which returns the state or url path (or performs custom logic).
    */
-  initial(handler: string|UrlRuleHandlerFn|TargetState|TargetStateDef, options?: { priority: number }): void;
+  initial(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef, options?: { priority: number }): void;
 
   /**
    * Gets all registered rules
@@ -459,7 +463,7 @@ export interface UrlRuleMatchFn {
  * If the handler returns a [[TargetState]], the target state is activated.
  */
 export interface UrlRuleHandlerFn {
-  (matchValue?: any, url?: UrlParts, router?: UIRouter): (string|TargetState|TargetStateDef|void);
+  (matchValue?: any, url?: UrlParts, router?: UIRouter): string | TargetState | TargetStateDef | void;
 }
 
 /** @internalapi */
@@ -518,7 +522,7 @@ export interface UrlRule {
 
 /** @internalapi */
 export interface MatcherUrlRule extends UrlRule {
-  type: 'URLMATCHER'|'STATE';
+  type: 'URLMATCHER' | 'STATE';
   urlMatcher: UrlMatcher;
 }
 

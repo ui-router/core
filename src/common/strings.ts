@@ -43,8 +43,8 @@ export function padString(length: number, str: string) {
 
 export function kebobString(camelCase: string) {
   return camelCase
-      .replace(/^([A-Z])/, $1 => $1.toLowerCase()) // replace first char
-      .replace(/([A-Z])/g, $1 => '-' + $1.toLowerCase()); // replace rest
+    .replace(/^([A-Z])/, $1 => $1.toLowerCase()) // replace first char
+    .replace(/([A-Z])/g, $1 => '-' + $1.toLowerCase()); // replace rest
 }
 
 function _toJson(obj: Obj) {
@@ -54,7 +54,6 @@ function _toJson(obj: Obj) {
 function _fromJson(json: string) {
   return isString(json) ? JSON.parse(json) : json;
 }
-
 
 function promiseToString(p: Promise<any>) {
   return `Promise(${JSON.stringify(p)})`;
@@ -74,24 +73,26 @@ export function functionToString(fn: Function) {
 
 export function fnToString(fn: IInjectable) {
   const _fn = isArray(fn) ? fn.slice(-1)[0] : fn;
-  return _fn && _fn.toString() || 'undefined';
+  return (_fn && _fn.toString()) || 'undefined';
 }
 
 let stringifyPatternFn: (val: any) => string = null;
 const stringifyPattern = function(value: any) {
   const isRejection = Rejection.isRejectionPromise;
 
-  stringifyPatternFn = <any> stringifyPatternFn || pattern([
-    [not(isDefined),  val('undefined')],
-    [isNull,          val('null')],
-    [isPromise,       val('[Promise]')],
-    [isRejection,     (x: any) => x._transitionRejection.toString()],
-    [is(Rejection),   invoke('toString')],
-    [is(Transition),  invoke('toString')],
-    [is(Resolvable),  invoke('toString')],
-    [isInjectable,    functionToString],
-    [val(true),       identity],
-  ]);
+  stringifyPatternFn =
+    <any>stringifyPatternFn ||
+    pattern([
+      [not(isDefined), val('undefined')],
+      [isNull, val('null')],
+      [isPromise, val('[Promise]')],
+      [isRejection, (x: any) => x._transitionRejection.toString()],
+      [is(Rejection), invoke('toString')],
+      [is(Transition), invoke('toString')],
+      [is(Resolvable), invoke('toString')],
+      [isInjectable, functionToString],
+      [val(true), identity],
+    ]);
 
   return stringifyPatternFn(value);
 };
@@ -123,7 +124,7 @@ export const stripLastPathElement = (str: string) => str.replace(/\/[^/]*$/, '')
 export const splitHash = beforeAfterSubstr('#');
 export const splitQuery = beforeAfterSubstr('?');
 export const splitEqual = beforeAfterSubstr('=');
-export const trimHashVal = (str: string) => str ? str.replace(/^#/, '') : '';
+export const trimHashVal = (str: string) => (str ? str.replace(/^#/, '') : '');
 
 /**
  * Splits on a delimiter, but returns the delimiters in the array
@@ -137,10 +138,8 @@ export const trimHashVal = (str: string) => str ? str.replace(/^#/, '') : '';
  */
 export function splitOnDelim(delim: string) {
   const re = new RegExp('(' + delim + ')', 'g');
-  return (str: string) =>
-      str.split(re).filter(identity);
+  return (str: string) => str.split(re).filter(identity);
 }
-
 
 /**
  * Reduce fn that joins neighboring strings
@@ -155,8 +154,6 @@ export function splitOnDelim(delim: string) {
  * ```
  */
 export function joinNeighborsR(acc: any[], x: any) {
-  if (isString(tail(acc)) && isString(x))
-    return acc.slice(0, -1).concat(tail(acc) + x);
+  if (isString(tail(acc)) && isString(x)) return acc.slice(0, -1).concat(tail(acc) + x);
   return pushR(acc, x);
 }
-

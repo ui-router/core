@@ -10,7 +10,14 @@ import { is, pattern } from '../common/hof';
 import { StateObject } from '../state/stateObject';
 import { RawParams } from '../params/interface';
 import {
-    UrlRule, UrlRuleMatchFn, UrlRuleHandlerFn, UrlRuleType, UrlParts, MatcherUrlRule, StateRule, RegExpRule,
+  UrlRule,
+  UrlRuleMatchFn,
+  UrlRuleHandlerFn,
+  UrlRuleType,
+  UrlParts,
+  MatcherUrlRule,
+  StateRule,
+  RegExpRule,
 } from './interface';
 
 /**
@@ -25,22 +32,24 @@ import {
  * @internalapi
  */
 export class UrlRuleFactory {
-  static isUrlRule = obj =>
-    obj && ['type', 'match', 'handler'].every(key => isDefined(obj[key]));
+  static isUrlRule = obj => obj && ['type', 'match', 'handler'].every(key => isDefined(obj[key]));
 
-  constructor(public router: UIRouter) { }
+  constructor(public router: UIRouter) {}
 
   compile(str: string) {
     return this.router.urlMatcherFactory.compile(str);
   }
 
-  create(what: string|UrlMatcher|StateObject|RegExp|UrlRuleMatchFn, handler?: string|UrlRuleHandlerFn): UrlRule {
+  create(
+    what: string | UrlMatcher | StateObject | RegExp | UrlRuleMatchFn,
+    handler?: string | UrlRuleHandlerFn,
+  ): UrlRule {
     const makeRule = pattern([
-      [isString,       (_what: string)         => makeRule(this.compile(_what))],
-      [is(UrlMatcher), (_what: UrlMatcher)     => this.fromUrlMatcher(_what, handler)],
-      [isState,        (_what: StateObject)    => this.fromState(_what, this.router)],
-      [is(RegExp),     (_what: RegExp)         => this.fromRegExp(_what, handler)],
-      [isFunction,     (_what: UrlRuleMatchFn) => new BaseUrlRule(_what, handler as UrlRuleHandlerFn)],
+      [isString, (_what: string) => makeRule(this.compile(_what))],
+      [is(UrlMatcher), (_what: UrlMatcher) => this.fromUrlMatcher(_what, handler)],
+      [isState, (_what: StateObject) => this.fromState(_what, this.router)],
+      [is(RegExp), (_what: RegExp) => this.fromRegExp(_what, handler)],
+      [isFunction, (_what: UrlRuleMatchFn) => new BaseUrlRule(_what, handler as UrlRuleHandlerFn)],
     ]);
 
     const rule = makeRule(what);
@@ -84,7 +93,7 @@ export class UrlRuleFactory {
    * var result = rule.handler(match); // '/home/123/456'
    * ```
    */
-  fromUrlMatcher(urlMatcher: UrlMatcher, handler: string|UrlMatcher|UrlRuleHandlerFn): MatcherUrlRule {
+  fromUrlMatcher(urlMatcher: UrlMatcher, handler: string | UrlMatcher | UrlRuleHandlerFn): MatcherUrlRule {
     let _handler: UrlRuleHandlerFn = handler as any;
     if (isString(handler)) handler = this.router.urlMatcherFactory.compile(handler);
     if (is(UrlMatcher)(handler)) _handler = (match: RawParams) => (handler as UrlMatcher).format(match);
@@ -109,7 +118,6 @@ export class UrlRuleFactory {
     const details = { urlMatcher, matchPriority, type: 'URLMATCHER' };
     return extend(new BaseUrlRule(matchUrlParamters, _handler), details) as MatcherUrlRule;
   }
-
 
   /**
    * A UrlRule which matches a state by its url
@@ -174,7 +182,7 @@ export class UrlRuleFactory {
    * var result = rule.handler(match); // '/home/bar'
    * ```
    */
-  fromRegExp(regexp: RegExp, handler: string|UrlRuleHandlerFn): RegExpRule {
+  fromRegExp(regexp: RegExp, handler: string | UrlRuleHandlerFn): RegExpRule {
     if (regexp.global || regexp.sticky) throw new Error('Rule RegExp must not be global or sticky');
 
     /**
@@ -183,14 +191,12 @@ export class UrlRuleFactory {
      * they will be replaced by the captures from [[match]]
      */
     const redirectUrlTo = (match: RegExpExecArray) =>
-        // Interpolates matched values into $1 $2, etc using a String.replace()-style pattern
-        (handler as string).replace(/\$(\$|\d{1,2})/, (m, what) =>
-            match[what === '$' ? 0 : Number(what)]);
+      // Interpolates matched values into $1 $2, etc using a String.replace()-style pattern
+      (handler as string).replace(/\$(\$|\d{1,2})/, (m, what) => match[what === '$' ? 0 : Number(what)]);
 
     const _handler = isString(handler) ? redirectUrlTo : handler;
 
-    const matchParamsFromRegexp = (url: UrlParts): RegExpExecArray =>
-        regexp.exec(url.path);
+    const matchParamsFromRegexp = (url: UrlParts): RegExpExecArray => regexp.exec(url.path);
 
     const details = { regexp, type: 'REGEXP' };
     return extend(new BaseUrlRule(matchParamsFromRegexp, _handler), details) as RegExpRule;
@@ -208,7 +214,7 @@ export class BaseUrlRule implements UrlRule {
   priority: number;
   type: UrlRuleType = 'RAW';
   handler: UrlRuleHandlerFn;
-  matchPriority = (match) => 0 - this.$id;
+  matchPriority = match => 0 - this.$id;
 
   constructor(public match: UrlRuleMatchFn, handler?: UrlRuleHandlerFn) {
     this.handler = handler || identity;

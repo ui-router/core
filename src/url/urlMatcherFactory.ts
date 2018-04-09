@@ -22,21 +22,18 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
   /** @hidden */ paramTypes = new ParamTypes();
   /** @hidden */ _isCaseInsensitive = false;
   /** @hidden */ _isStrictMode = true;
-  /** @hidden */ _defaultSquashPolicy: (boolean|string) = false;
+  /** @hidden */ _defaultSquashPolicy: boolean | string = false;
 
   /** @internalapi Creates a new [[Param]] for a given location (DefType) */
   paramFactory: ParamFactory = {
     /** Creates a new [[Param]] from a CONFIG block */
-    fromConfig: (id: string, type: ParamType, config: any) =>
-      new Param(id, type, config, DefType.CONFIG, this),
+    fromConfig: (id: string, type: ParamType, config: any) => new Param(id, type, config, DefType.CONFIG, this),
 
     /** Creates a new [[Param]] from a url PATH */
-    fromPath: (id: string, type: ParamType, config: any) =>
-      new Param(id, type, config, DefType.PATH, this),
+    fromPath: (id: string, type: ParamType, config: any) => new Param(id, type, config, DefType.PATH, this),
 
     /** Creates a new [[Param]] from a url SEARCH */
-    fromSearch: (id: string, type: ParamType, config: any) =>
-      new Param(id, type, config, DefType.SEARCH, this),
+    fromSearch: (id: string, type: ParamType, config: any) => new Param(id, type, config, DefType.SEARCH, this),
   };
 
   constructor() {
@@ -45,24 +42,24 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
 
   /** @inheritdoc */
   caseInsensitive(value?: boolean): boolean {
-    return this._isCaseInsensitive = isDefined(value) ? value : this._isCaseInsensitive;
+    return (this._isCaseInsensitive = isDefined(value) ? value : this._isCaseInsensitive);
   }
 
   /** @inheritdoc */
   strictMode(value?: boolean): boolean {
-    return this._isStrictMode = isDefined(value) ? value : this._isStrictMode;
+    return (this._isStrictMode = isDefined(value) ? value : this._isStrictMode);
   }
 
   /** @inheritdoc */
-  defaultSquashPolicy(value?: (boolean|string)) {
+  defaultSquashPolicy(value?: boolean | string) {
     if (isDefined(value) && value !== true && value !== false && !isString(value))
       throw new Error(`Invalid squash policy: ${value}. Valid policies: false, true, arbitrary-string`);
-    return this._defaultSquashPolicy = isDefined(value) ? value : this._defaultSquashPolicy;
+    return (this._defaultSquashPolicy = isDefined(value) ? value : this._defaultSquashPolicy);
   }
 
   /** @hidden */
-  private _getConfig = (config) =>
-      extend({ strict: this._isStrictMode, caseInsensitive: this._isCaseInsensitive }, config);
+  private _getConfig = config =>
+    extend({ strict: this._isStrictMode, caseInsensitive: this._isCaseInsensitive }, config);
 
   /**
    * Creates a [[UrlMatcher]] for the specified pattern.

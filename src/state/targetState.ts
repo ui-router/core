@@ -47,8 +47,7 @@ export class TargetState {
   private _options: TransitionOptions;
 
   /** Returns true if the object has a state property that might be a state or state name */
-  static isDef = (obj): obj is TargetStateDef =>
-    obj && obj.state && (isString(obj.state) || isString(obj.state.name));
+  static isDef = (obj): obj is TargetStateDef => obj && obj.state && (isString(obj.state) || isString(obj.state.name));
 
   /**
    * The TargetState constructor
@@ -78,7 +77,7 @@ export class TargetState {
 
   /** The name of the state this object targets */
   name(): string {
-    return this._definition && this._definition.name || <string> this._identifier;
+    return (this._definition && this._definition.name) || <string>this._identifier;
   }
 
   /** The identifier used when creating this TargetState */
@@ -118,15 +117,13 @@ export class TargetState {
 
   /** If the object is invalid, returns the reason why */
   error(): string {
-    const base = <any> this.options().relative;
+    const base = <any>this.options().relative;
     if (!this._definition && !!base) {
       const stateName = base.name ? base.name : base;
       return `Could not resolve '${this.name()}' from state '${stateName}'`;
     }
-    if (!this._definition)
-      return `No such state '${this.name()}'`;
-    if (!this._definition.self)
-      return `State '${this.name()}' has an invalid definition`;
+    if (!this._definition) return `No such state '${this.name()}'`;
+    if (!this._definition.self) return `State '${this.name()}' has an invalid definition`;
   }
 
   toString() {

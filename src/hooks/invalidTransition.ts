@@ -17,4 +17,4 @@ function invalidTransitionHook(trans: Transition) {
 }
 
 export const registerInvalidTransitionHook = (transitionService: TransitionService) =>
-    transitionService.onBefore({}, invalidTransitionHook, { priority: -10000 });
+  transitionService.onBefore({}, invalidTransitionHook, { priority: -10000 });

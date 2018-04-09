@@ -16,11 +16,12 @@ export class StateQueueManager implements Disposable {
   matcher: StateMatcher;
 
   constructor(
-      private $registry: StateRegistry,
-      private $urlRouter: UrlRouter,
-      public states: { [key: string]: StateObject; },
-      public builder: StateBuilder,
-      public listeners: StateRegistryListener[]) {
+    private $registry: StateRegistry,
+    private $urlRouter: UrlRouter,
+    public states: { [key: string]: StateObject },
+    public builder: StateBuilder,
+    public listeners: StateRegistryListener[],
+  ) {
     this.queue = [];
     this.matcher = $registry.matcher;
   }
@@ -48,10 +49,9 @@ export class StateQueueManager implements Disposable {
   flush() {
     const { queue, states, builder } = this;
     const registered: StateObject[] = [], // states that got registered
-        orphans: StateObject[] = [], // states that don't yet have a parent registered
-        previousQueueLength = {}; // keep track of how long the queue when an orphan was first encountered
-    const getState = (name) =>
-        this.states.hasOwnProperty(name) && this.states[name];
+      orphans: StateObject[] = [], // states that don't yet have a parent registered
+      previousQueueLength = {}; // keep track of how long the queue when an orphan was first encountered
+    const getState = name => this.states.hasOwnProperty(name) && this.states[name];
 
     while (queue.length > 0) {
       const state: StateObject = queue.shift();

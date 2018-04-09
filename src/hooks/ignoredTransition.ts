@@ -32,4 +32,4 @@ function ignoredHook(trans: Transition) {
 }
 
 export const registerIgnoredTransitionHook = (transitionService: TransitionService) =>
-    transitionService.onBefore({}, ignoredHook, { priority: -9999 });
+  transitionService.onBefore({}, ignoredHook, { priority: -9999 });

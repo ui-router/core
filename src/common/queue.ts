@@ -5,7 +5,7 @@ export class Queue<T> {
   private _evictListeners: ((item: T) => void)[] = [];
   public onEvict = pushTo(this._evictListeners);
 
-  constructor(private _items: T[] = [], private _limit: number = null) { }
+  constructor(private _items: T[] = [], private _limit: number = null) {}
 
   enqueue(item: T) {
     const items = this._items;
@@ -21,8 +21,7 @@ export class Queue<T> {
   }
 
   dequeue(): T {
-    if (this.size())
-      return this._items.splice(0, 1)[0];
+    if (this.size()) return this._items.splice(0, 1)[0];
   }
 
   clear(): Array<T> {
@@ -45,7 +44,6 @@ export class Queue<T> {
   }
 
   peekHead(): T {
-    if (this.size())
-      return this._items[0];
+    if (this.size()) return this._items[0];
   }
 }
