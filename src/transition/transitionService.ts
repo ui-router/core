@@ -348,9 +348,11 @@ export class TransitionService implements IHookRegistry, Disposable {
 
     this._eventTypes.push(eventType);
     makeEvent(this, this, eventType);
-  } // tslint:disable-next-line
+  }
 
-  /** @hidden */ private _getEvents(phase?: TransitionHookPhase): TransitionEventType[] {
+  /** @hidden */
+  // tslint:disable-next-line
+  private _getEvents(phase?: TransitionHookPhase): TransitionEventType[] {
     const transitionHookTypes = isDefined(phase)
       ? this._eventTypes.filter(type => type.hookPhase === phase)
       : this._eventTypes.slice();
@@ -376,9 +378,11 @@ export class TransitionService implements IHookRegistry, Disposable {
    */
   private _definePathType(name: string, hookScope: TransitionHookScope) {
     this._criteriaPaths[name] = { name, scope: hookScope };
-  } // tslint:disable-next-line
+  }
 
-  /** * @hidden */ private _getPathTypes(): PathTypes {
+  /** * @hidden */
+  // tslint:disable-next-line
+  private _getPathTypes(): PathTypes {
     return this._criteriaPaths;
   }
 

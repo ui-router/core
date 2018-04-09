@@ -211,8 +211,8 @@ export const mergeR = (memo: Obj, item: Obj) => extend(memo, item);
 export function ancestors(first: StateObject, second: StateObject) {
   const path: StateObject[] = [];
 
+  // tslint:disable-next-line:forin
   for (const n in first.path) {
-    // tslint:disable-line:forin
     if (first.path[n] !== second.path[n]) break;
     path.push(first.path[n]);
   }
@@ -599,8 +599,8 @@ function _equals(o1: any, o2: any): boolean {
   if (predicates.map(any).reduce((b, fn) => b || !!fn(tup), false)) return false;
 
   const keys: { [i: string]: boolean } = {};
+  // tslint:disable-next-line:forin
   for (const key in o1) {
-    // tslint:disable-line:forin
     if (!_equals(o1[key], o2[key])) return false;
     keys[key] = true;
   }

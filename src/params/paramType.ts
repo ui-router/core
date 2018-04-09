@@ -67,8 +67,9 @@ export class ParamType implements ParamTypeDefinition {
   }
   /** @inheritdoc */
   equals(a: any, b: any): boolean {
+    // tslint:disable-next-line:triple-equals
     return a == b;
-  } // tslint:disable-line:triple-equals
+  }
 
   $subPattern() {
     const sub = this.pattern.toString();

@@ -12,13 +12,16 @@ import { UrlConfigApi, UrlSyncApi, UrlRulesApi, UrlParts, MatchResult } from './
 const makeStub = (keys: string[]): any =>
   keys.reduce((acc, key) => ((acc[key] = notImplemented(key)), acc), { dispose: noop });
 
-/* tslint:disable:align */
-/** @hidden */ const locationServicesFns = ['url', 'path', 'search', 'hash', 'onChange'];
-/** @hidden */ const locationConfigFns = ['port', 'protocol', 'host', 'baseHref', 'html5Mode', 'hashPrefix'];
-/** @hidden */ const umfFns = ['type', 'caseInsensitive', 'strictMode', 'defaultSquashPolicy'];
-/** @hidden */ const rulesFns = ['sort', 'when', 'initial', 'otherwise', 'rules', 'rule', 'removeRule'];
-/** @hidden */ const syncFns = ['deferIntercept', 'listen', 'sync', 'match'];
-/* tslint:enable:align */
+/** @hidden */
+const locationServicesFns = ['url', 'path', 'search', 'hash', 'onChange'];
+/** @hidden */
+const locationConfigFns = ['port', 'protocol', 'host', 'baseHref', 'html5Mode', 'hashPrefix'];
+/** @hidden */
+const umfFns = ['type', 'caseInsensitive', 'strictMode', 'defaultSquashPolicy'];
+/** @hidden */
+const rulesFns = ['sort', 'when', 'initial', 'otherwise', 'rules', 'rule', 'removeRule'];
+/** @hidden */
+const syncFns = ['deferIntercept', 'listen', 'sync', 'match'];
 
 /**
  * API for URL management

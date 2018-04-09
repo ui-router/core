@@ -36,7 +36,6 @@ export type ResolveTypes = Resolvable | ResolvableLiteral | ProviderLike;
  * @internalapi
  */
 export interface _ViewDeclaration {
-  // tslint:disable-line
   /**
    * The raw name for the view declaration, i.e., the [[StateDeclaration.views]] property name.
    * @internalapi
