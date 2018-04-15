@@ -36,6 +36,7 @@ import { UIRouter } from '../router';
 import { UIInjector } from '../interface';
 import { RawParams } from '../params/interface';
 import { ResolvableLiteral } from '../resolve/interface';
+import { Rejection } from './rejectFactory';
 
 /** @hidden */
 const stateSelf: (_state: StateObject) => StateDeclaration = prop('self');
@@ -87,7 +88,7 @@ export class Transition implements IHookRegistry {
   /** @hidden */
   _aborted: boolean;
   /** @hidden */
-  private _error: any;
+  private _error: Rejection;
 
   /** @hidden Holds the hook registration functions such as those passed to Transition.onStart() */
   _registeredHooks: RegisteredHooks = {};
@@ -703,7 +704,7 @@ export class Transition implements IHookRegistry {
       runAllHooks(getHooksFor(TransitionHookPhase.SUCCESS));
     };
 
-    const transitionError = (reason: any) => {
+    const transitionError = (reason: Rejection) => {
       trace.traceError(reason, this);
       this.success = false;
       this._deferred.reject(reason);
@@ -770,20 +771,23 @@ export class Transition implements IHookRegistry {
    * If the transition is invalid (and could not be run), returns the reason the transition is invalid.
    * If the transition was valid and ran, but was not successful, returns the reason the transition failed.
    *
-   * @returns an error message explaining why the transition is invalid, or the reason the transition failed.
+   * @returns a transition rejection explaining why the transition is invalid, or the reason the transition failed.
    */
-  error() {
+  error(): Rejection {
     const state: StateObject = this.$to();
 
-    if (state.self.abstract) return `Cannot transition to abstract state '${state.name}'`;
+    if (state.self.abstract) {
+      return Rejection.invalid(`Cannot transition to abstract state '${state.name}'`);
+    }
 
-    const paramDefs = state.parameters(),
-      values = this.params();
+    const paramDefs = state.parameters();
+    const values = this.params();
     const invalidParams = paramDefs.filter(param => !param.validates(values[param.id]));
+
     if (invalidParams.length) {
-      return `Param values not valid for state '${state.name}'. Invalid params: [ ${invalidParams
-        .map(param => param.id)
-        .join(', ')} ]`;
+      const invalidValues = invalidParams.map(param => `[${param.id}:${stringify(values[param.id])}]`).join(', ');
+      const detail = `The following parameter values are not valid for state '${state.name}': ${invalidValues}`;
+      return Rejection.invalid(detail);
     }
 
     if (this.success === false) return this._error;

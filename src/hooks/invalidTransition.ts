@@ -12,7 +12,7 @@ import { Transition } from '../transition/transition';
  */
 function invalidTransitionHook(trans: Transition) {
   if (!trans.valid()) {
-    throw new Error(trans.error());
+    throw new Error(trans.error().toString());
   }
 }
 
