@@ -3,6 +3,7 @@ build_packages
 _bundles
 site
 stats.html
+yarn-error.log
 
 # common
 *~
