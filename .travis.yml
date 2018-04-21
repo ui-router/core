@@ -5,13 +5,11 @@ before_install:
 - export PATH=$HOME/.yarn/bin:$PATH
 - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.5.1
 script:
-- tsc
-- yarn test
-- yarn docs
-- yarn test:downstream
+- tsc &&
+  yarn test &&
+  yarn docs &&
+  yarn test:downstream
 env:
-  global:
-    secure: bEGHePu9rkjcy5Pq3RQQfCIRzAfCSxH7dZsdOJd3pAXEGbkhuCOAGFV0v+NVbRBWNYv0yIExwwu2VOVfAPGqmmuhzE8Uq/WZeLWUbUA1oSIN7t9IkYRKIdoE36o85eyRxSTP6w3dtMHXLeMvPbgtgEUVrgPztBVe3ySoQ+nA3jbgZ/fBpuEevJ2dAxwybbtRwZBflplUumpwmy1pSiLHptdFXsxmmLr0hOjx+WZd38jMZo4H4vV9zo6wz34hjf+j1f0jsjmsKgpRVPLADtLTcqIfEegSG7vLmlFJLGBtBZ6UhIioZseZTVOi2wq1hK0E+3SzPJVXhu3h7VsIBVgCaaYJQ07p7q9LszwWwxHHzePLBtV77J6mJ1zZFbS/PHmVHnfU/gz5+l2Te2KSkvFYbq9uVXd4CLLeR1xdECwX8qiXMtUOk7IauVVzFtLCPRVksmEjClJNf1tAi+j9nKezYHQ8LPSqTyoxo/0PhQJ0U3pCQuKGTxO9lDi63Gks9lr87N+yrn81W+2wbGKL6iqItKPAQ5Tcl5FbhmwUk40p0Sz1KNjBWepREQAeCgRKFN4y/Xhi6Mn1TydwE9zHXdfIiWNYaxl0LjXMnAMahvO2+m5NClDWhzBii21JsdMyUS3TUFGyVIfok2M+uaM2NZn7GLNRSOGarBpLhF/5lci/9kY=
 notifications:
   slack:
     on_success: never
@@ -21,7 +19,6 @@ sudo: false
 git:
   depth: 3
 cache:
-  yarn: true
   directories:
   - node_modules
   - ".downstream_cache"
