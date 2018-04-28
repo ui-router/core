@@ -112,6 +112,21 @@ describe('StateRegistry', () => {
       expect(registry.get().map(x => x.name)).toEqual(['', 'A', 'A.B', 'A.B.C', 'A.B.C.D', 'A.B.C.D.E', 'A.B.C.D.E.F']);
     });
 
+    it('should be invoked with `registered` when there are orphaned states', () => {
+      const gState = { name: 'A.B.C.D.E.F.G' };
+      const fState = { name: 'A.B.C.D.E.F' };
+      const eState = { name: 'A.B.C.D.E' };
+
+      registry.register(gState);
+
+      expect(changes.registered).toEqual([]);
+
+      registry.register(eState);
+      expect(changes.registered).toEqual([eState]);
+
+      expect(registry.get().map(x => x.name)).toEqual(['', 'A', 'A.B', 'A.B.C', 'A.B.C.D', 'A.B.C.D.E']);
+    });
+
     it('should be invoked with `deregistered` when a state is deregistered', () => {
       registry.deregister('A.B.C.D');
 
