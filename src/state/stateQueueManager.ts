@@ -52,6 +52,11 @@ export class StateQueueManager implements Disposable {
       orphans: StateObject[] = [], // states that don't yet have a parent registered
       previousQueueLength = {}; // keep track of how long the queue when an orphan was first encountered
     const getState = name => this.states.hasOwnProperty(name) && this.states[name];
+    const notifyListeners = () => {
+      if (registered.length) {
+        this.listeners.forEach(listener => listener('registered', registered.map(s => s.self)));
+      }
+    };
 
     while (queue.length > 0) {
       const state: StateObject = queue.shift();
@@ -84,6 +89,7 @@ export class StateQueueManager implements Disposable {
         // Wait until two consecutive iterations where no additional states were dequeued successfully.
         // throw new Error(`Cannot register orphaned state '${name}'`);
         queue.push(state);
+        notifyListeners();
         return states;
       } else if (orphanIdx < 0) {
         orphans.push(state);
@@ -92,10 +98,7 @@ export class StateQueueManager implements Disposable {
       queue.push(state);
     }
 
-    if (registered.length) {
-      this.listeners.forEach(listener => listener('registered', registered.map(s => s.self)));
-    }
-
+    notifyListeners();
     return states;
   }
 
