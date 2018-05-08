@@ -87,13 +87,15 @@ const consoletable = isFunction(console.table) ? console.table.bind(console) : c
  *
  * `trace.enable(1)`
  */
-export enum Category {
+enum Category {
   RESOLVE,
   TRANSITION,
   HOOK,
   UIVIEW,
   VIEWCONFIG,
 }
+
+export { Category };
 
 /** @hidden */
 const _tid = parse('$id');

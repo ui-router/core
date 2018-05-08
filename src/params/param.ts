@@ -19,11 +19,12 @@ const isShorthand = (cfg: ParamDeclaration) =>
   ['value', 'type', 'squash', 'array', 'dynamic'].filter(hasOwn.bind(cfg || {})).length === 0;
 
 /** @internalapi */
-export enum DefType {
+enum DefType {
   PATH,
   SEARCH,
   CONFIG,
 }
+export { DefType };
 
 /** @hidden */
 function unwrapShorthand(cfg: ParamDeclaration): ParamDeclaration {
@@ -49,7 +50,11 @@ function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, i
     const type =
       location === DefType.CONFIG
         ? 'any'
-        : location === DefType.PATH ? 'path' : location === DefType.SEARCH ? 'query' : 'string';
+        : location === DefType.PATH
+          ? 'path'
+          : location === DefType.SEARCH
+            ? 'query'
+            : 'string';
     return paramTypes.type(type);
   }
   return cfg.type instanceof ParamType ? cfg.type : paramTypes.type(cfg.type as string);

@@ -7,7 +7,7 @@ import { extend, silentRejection } from '../common/common';
 import { stringify } from '../common/strings';
 import { is } from '../common/hof';
 
-export enum RejectType {
+enum RejectType {
   /**
    * A new transition superseded this one.
    *
@@ -49,6 +49,8 @@ export enum RejectType {
    */
   ERROR = 6,
 }
+
+export { RejectType };
 
 /** @hidden */
 let id = 0;
