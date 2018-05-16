@@ -93,7 +93,7 @@ export interface TransitionServicePluginAPI {
     reverseSort?: boolean,
     getResultHandler?: GetResultHandler,
     getErrorHandler?: GetErrorHandler,
-    rejectIfSuperseded?: boolean,
+    rejectIfSuperseded?: boolean
   );
 
   /**
@@ -245,7 +245,7 @@ export class TransitionService implements IHookRegistry, Disposable {
       hooksArray.forEach(hook => {
         hook._deregistered = true;
         removeFrom(hooksArray, hook);
-      }),
+      })
     );
   }
 
@@ -280,7 +280,7 @@ export class TransitionService implements IHookRegistry, Disposable {
       NORMAL_SORT,
       TH.LOG_REJECTED_RESULT,
       TH.THROW_ERROR,
-      SYNCHRONOUS,
+      SYNCHRONOUS
     );
 
     this._defineEvent('onBefore', Phase.BEFORE, 0, paths.to);
@@ -299,7 +299,7 @@ export class TransitionService implements IHookRegistry, Disposable {
       NORMAL_SORT,
       TH.LOG_REJECTED_RESULT,
       TH.LOG_ERROR,
-      SYNCHRONOUS,
+      SYNCHRONOUS
     );
     this._defineEvent(
       'onError',
@@ -309,7 +309,7 @@ export class TransitionService implements IHookRegistry, Disposable {
       NORMAL_SORT,
       TH.LOG_REJECTED_RESULT,
       TH.LOG_ERROR,
-      SYNCHRONOUS,
+      SYNCHRONOUS
     );
   }
 
@@ -333,7 +333,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     reverseSort = false,
     getResultHandler: GetResultHandler = TransitionHook.HANDLE_RESULT,
     getErrorHandler: GetErrorHandler = TransitionHook.REJECT_ERROR,
-    synchronous = false,
+    synchronous = false
   ) {
     const eventType = new TransitionEventType(
       name,
@@ -343,7 +343,7 @@ export class TransitionService implements IHookRegistry, Disposable {
       reverseSort,
       getResultHandler,
       getErrorHandler,
-      synchronous,
+      synchronous
     );
 
     this._eventTypes.push(eventType);

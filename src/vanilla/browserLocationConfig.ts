@@ -41,7 +41,9 @@ export class BrowserLocationConfig implements LocationConfig {
   baseHref(href?: string): string {
     return isDefined(href)
       ? (this._baseHref = href)
-      : isDefined(this._baseHref) ? this._baseHref : this.applyDocumentBaseHref();
+      : isDefined(this._baseHref)
+        ? this._baseHref
+        : this.applyDocumentBaseHref();
   }
 
   applyDocumentBaseHref() {

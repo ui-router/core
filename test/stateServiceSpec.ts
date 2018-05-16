@@ -228,7 +228,7 @@ describe('stateService', function() {
               const changed = Param.changed(
                 stateObject.parameters({ inherit: true }),
                 trans.params('to'),
-                trans.params('from'),
+                trans.params('from')
               )
                 .map(param => param.id + '=' + trans.params('to')[param.id])
                 .join(',');
@@ -250,7 +250,7 @@ describe('stateService', function() {
           () => {
             dynlog += 'success;';
           },
-          { priority: 1 },
+          { priority: 1 }
         );
         $transitions.onRetain({ retained: 'dyn' }, logChangedParams('[', ']'));
         $transitions.onRetain({ retained: 'dyn.child' }, logChangedParams('{', '}'));
@@ -781,7 +781,7 @@ describe('stateService', function() {
       await $state.transitionTo(A, {});
 
       expect(log).toBe(
-        'A.onExit;' + 'D.onEnter;' + 'D;' + 'DD.onEnter;' + 'DD;' + 'DD.onExit;' + 'D.onExit;' + 'A.onEnter;' + 'A;',
+        'A.onExit;' + 'D.onEnter;' + 'D;' + 'DD.onEnter;' + 'DD;' + 'DD.onExit;' + 'D.onExit;' + 'A.onEnter;' + 'A;'
       );
 
       done();

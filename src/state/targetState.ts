@@ -67,7 +67,7 @@ export class TargetState {
     private _stateRegistry: StateRegistry,
     private _identifier: StateOrName,
     _params?: RawParams,
-    _options?: TransitionOptions,
+    _options?: TransitionOptions
   ) {
     this._identifier = _identifier;
     this._params = extend({}, _params || {});

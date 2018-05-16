@@ -150,7 +150,7 @@ export class Param {
     type: ParamType,
     config: ParamDeclaration,
     location: DefType,
-    urlMatcherFactory: UrlMatcherFactory,
+    urlMatcherFactory: UrlMatcherFactory
   ) {
     config = unwrapShorthand(config);
     type = getType(config, type, location, id, urlMatcherFactory.paramTypes);
@@ -196,7 +196,7 @@ export class Param {
         throw new Error(
           `Default value (${defaultValue}) for parameter '${this.id}' is not an instance of ParamType (${
             this.type.name
-          })`,
+          })`
         );
 
       if (this.config.$$fn['__cacheable']) {

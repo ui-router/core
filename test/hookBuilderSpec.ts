@@ -166,7 +166,7 @@ describe('HookBuilder:', function() {
           hb
             .buildHooksForPhase(TransitionHookPhase.BEFORE)
             .map(context)
-            .reduce(uniqR, []),
+            .reduce(uniqR, [])
         ).toEqual([null]);
       });
 
@@ -176,7 +176,7 @@ describe('HookBuilder:', function() {
           hb
             .buildHooks(hookTypeByName('onStart'))
             .map(context)
-            .reduce(uniqR, []),
+            .reduce(uniqR, [])
         ).toEqual([null]);
       });
 
@@ -206,7 +206,7 @@ describe('HookBuilder:', function() {
           hb
             .buildHooksForPhase(TransitionHookPhase.SUCCESS)
             .map(context)
-            .reduce(uniqR, []),
+            .reduce(uniqR, [])
         ).toEqual([null]);
       });
 
@@ -219,7 +219,7 @@ describe('HookBuilder:', function() {
           hb
             .buildHooksForPhase(TransitionHookPhase.ERROR)
             .map(context)
-            .reduce(uniqR, []),
+            .reduce(uniqR, [])
         ).toEqual([null]);
       });
     });

@@ -74,7 +74,7 @@ export class RegisteredHook {
     public callback: HookFn,
     public matchCriteria: HookMatchCriteria,
     public removeHookFromRegistry: (hook: RegisteredHook) => void,
-    options: HookRegOptions = {} as any,
+    options: HookRegOptions = {} as any
   ) {
     this.priority = options.priority || 0;
     this.bind = options.bind || null;
@@ -150,7 +150,7 @@ export class RegisteredHook {
         mn[pathtype.name] = this._matchingNodes(nodes, criteria[pathtype.name]);
         return mn;
       },
-      {} as IMatchingNodes,
+      {} as IMatchingNodes
     );
   }
 
@@ -178,7 +178,7 @@ export class RegisteredHook {
 export function makeEvent(
   registry: IHookRegistry,
   transitionService: TransitionService,
-  eventType: TransitionEventType,
+  eventType: TransitionEventType
 ) {
   // Create the object which holds the registered transition hooks.
   const _registeredHooks = (registry._registeredHooks = registry._registeredHooks || {});
@@ -195,7 +195,7 @@ export function makeEvent(
       callback,
       matchObject,
       removeHookFn,
-      options,
+      options
     );
     hooks.push(registeredHook);
     return registeredHook.deregister.bind(registeredHook);

@@ -85,7 +85,7 @@ export class HookBuilder {
             bind: hook.bind,
             traceData: { hookType: hookType.name, context: node },
           },
-          baseHookOptions,
+          baseHookOptions
         );
 
         const state = hookType.criteriaMatchPath.scope === TransitionHookScope.STATE ? node.state.self : null;

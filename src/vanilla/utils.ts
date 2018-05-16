@@ -62,7 +62,7 @@ export function locationPluginFactory(
   name: string,
   isHtml5: boolean,
   serviceClass: { new (uiRouter?: UIRouter): LocationServices },
-  configurationClass: { new (uiRouter?: UIRouter, isHtml5?: boolean): LocationConfig },
+  configurationClass: { new (uiRouter?: UIRouter, isHtml5?: boolean): LocationConfig }
 ) {
   return function(uiRouter: UIRouter) {
     const service = (uiRouter.locationService = new serviceClass(uiRouter));

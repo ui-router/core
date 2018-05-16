@@ -173,7 +173,7 @@ export interface TreeChanges {
 export type IHookRegistration = (
   matchCriteria: HookMatchCriteria,
   callback: HookFn,
-  options?: HookRegOptions,
+  options?: HookRegOptions
 ) => Function;
 
 /**

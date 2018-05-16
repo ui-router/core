@@ -319,7 +319,7 @@ export class StateBuilder {
       if (!builders.hasOwnProperty(key)) continue;
       const chain = builders[key].reduce(
         (parentFn: BuilderFunction, step: BuilderFunction) => _state => step(_state, parentFn),
-        noop,
+        noop
       );
       state[key] = chain(state);
     }

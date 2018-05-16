@@ -158,7 +158,7 @@ describe('StateRegistry', () => {
     it('should remove the callback when the deregister function is invoked', () => {
       let log = '';
       const deregister1fn = registry.onStatesChanged(
-        (event, states) => (log += `1: [${event}:${states.map(s => s.name).join(',')}]`),
+        (event, states) => (log += `1: [${event}:${states.map(s => s.name).join(',')}]`)
       );
       registry.onStatesChanged((event, states) => (log += `2: [${event}:${states.map(s => s.name).join(',')}]`));
       registry.register({ name: 'A2' });

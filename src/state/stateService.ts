@@ -292,7 +292,7 @@ export class StateService {
 
     if (options.reload && !options.reloadState)
       throw new Error(
-        `No such reload state '${isString(options.reload) ? options.reload : (<any>options.reload).name}'`,
+        `No such reload state '${isString(options.reload) ? options.reload : (<any>options.reload).name}'`
       );
 
     return new TargetState(this.router.stateRegistry, identifier, params, options);

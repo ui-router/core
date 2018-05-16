@@ -122,7 +122,7 @@ export class TransitionHook {
     private transition: Transition,
     private stateContext: StateDeclaration,
     private registeredHook: RegisteredHook,
-    private options: TransitionHookOptions,
+    private options: TransitionHookOptions
   ) {
     this.options = defaults(options, defaultOptions);
     this.type = registeredHook.eventType;

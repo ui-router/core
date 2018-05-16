@@ -139,7 +139,7 @@ export class UrlMatcher {
         `%5C%${c
           .charCodeAt(0)
           .toString(16)
-          .toUpperCase()}`,
+          .toUpperCase()}`
     );
   }
 
@@ -390,7 +390,7 @@ export class UrlMatcher {
           this.config.strict === false ? '/?' : '',
           '$',
         ].join(''),
-        this.config.caseInsensitive ? 'i' : undefined,
+        this.config.caseInsensitive ? 'i' : undefined
       );
     }).exec(path);
 

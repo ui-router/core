@@ -246,7 +246,7 @@ describe('transition', function() {
             () => {
               throw Error('first-error');
             },
-            { priority: 1 },
+            { priority: 1 }
           );
           $transitions.onBefore({ to: 'second' }, () => false, { priority: 3 });
           $transitions.onBefore({ to: 'third' }, () => $state.target('A'), { priority: 2 });
@@ -714,7 +714,7 @@ describe('transition', function() {
             setTimeout(() => {
               log.push('^' + state.name);
               resolve();
-            }),
+            })
           );
         });
 
@@ -772,7 +772,7 @@ describe('transition', function() {
           function logEnter(trans, state) {
             log.push('Entered#' + state.name);
           },
-          { priority: -1 },
+          { priority: -1 }
         );
 
         $transitions.onEnter({ entering: 'B' }, function addResolves($transition$: Transition) {
@@ -799,7 +799,7 @@ describe('transition', function() {
           .then(() => defer.resolve('resolvedval'))
           .then(tick, tick)
           .then(() =>
-            expect(log.join(';')).toBe('adding resolve;Entered#B;resolving;resolvedval;Entered#C;Entered#D;DONE!'),
+            expect(log.join(';')).toBe('adding resolve;Entered#B;resolving;resolvedval;Entered#C;Entered#D;DONE!')
           )
           .then(done, done);
       });
@@ -816,7 +816,7 @@ describe('transition', function() {
           function logEnter(trans, state) {
             log.push('Entered#' + state.name);
           },
-          { priority: -1 },
+          { priority: -1 }
         );
 
         $transitions.onEnter({ entering: 'B' }, function addResolves($transition$: Transition) {
@@ -878,7 +878,7 @@ describe('transition', function() {
           function() {
             count++;
           },
-          { invokeLimit: 1 },
+          { invokeLimit: 1 }
         );
 
         Promise.resolve()
@@ -899,7 +899,7 @@ describe('transition', function() {
           () => {
             count++;
           },
-          { invokeLimit: 2 },
+          { invokeLimit: 2 }
         );
 
         Promise.resolve()
@@ -1034,14 +1034,14 @@ describe('transition', function() {
             to: function(state) {
               return state.name === 'first';
             },
-          }),
+          })
         ).toBe(true);
         expect(
           t.is({
             from: function(state) {
               return state.name === '';
             },
-          }),
+          })
         ).toBe(true);
         expect(
           t.is({
@@ -1051,7 +1051,7 @@ describe('transition', function() {
             from: function(state) {
               return state.name === '';
             },
-          }),
+          })
         ).toBe(true);
 
         expect(
@@ -1060,7 +1060,7 @@ describe('transition', function() {
               return state.name === 'first';
             },
             from: '**',
-          }),
+          })
         ).toBe(true);
 
         expect(
@@ -1068,14 +1068,14 @@ describe('transition', function() {
             to: function(state) {
               return state.name === 'second';
             },
-          }),
+          })
         ).toBe(false);
         expect(
           t.is({
             from: function(state) {
               return state.name === 'first';
             },
-          }),
+          })
         ).toBe(false);
         expect(
           t.is({
@@ -1085,7 +1085,7 @@ describe('transition', function() {
             from: function(state) {
               return state.name === 'second';
             },
-          }),
+          })
         ).toBe(false);
 
         //        expect(t.is({ to: ["", "third"] })).toBe(false);

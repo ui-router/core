@@ -42,7 +42,7 @@ export class UrlRuleFactory {
 
   create(
     what: string | UrlMatcher | StateObject | RegExp | UrlRuleMatchFn,
-    handler?: string | UrlRuleHandlerFn,
+    handler?: string | UrlRuleHandlerFn
   ): UrlRule {
     const makeRule = pattern([
       [isString, (_what: string) => makeRule(this.compile(_what))],

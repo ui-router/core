@@ -20,7 +20,7 @@ export class StateQueueManager implements Disposable {
     private $urlRouter: UrlRouter,
     public states: { [key: string]: StateObject },
     public builder: StateBuilder,
-    public listeners: StateRegistryListener[],
+    public listeners: StateRegistryListener[]
   ) {
     this.queue = [];
     this.matcher = $registry.matcher;

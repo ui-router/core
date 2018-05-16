@@ -604,7 +604,7 @@ export class Transition implements IHookRegistry {
     const matchingEnteringNodes: PathNode[] = PathUtils.matching(
       redirectEnteringNodes,
       originalEnteringNodes,
-      PathUtils.nonDynamicParams,
+      PathUtils.nonDynamicParams
     ).filter(not(nodeIsReloading(targetState.options().reloadState)));
 
     // Use the existing (possibly pre-resolved) resolvables for the matching entering nodes.

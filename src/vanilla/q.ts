@@ -56,7 +56,7 @@ export const $q = {
         values.reduce((acc, tuple) => {
           acc[tuple.key] = tuple.val;
           return acc;
-        }, {}),
+        }, {})
       );
     }
   },

@@ -342,7 +342,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   when(
     matcher: RegExp | UrlMatcher | string,
     handler: string | UrlRuleHandlerFn,
-    options?: { priority: number },
+    options?: { priority: number }
   ): UrlRule {
     const rule = this.urlRuleFactory.create(matcher, handler);
     if (isDefined(options && options.priority)) rule.priority = options.priority;

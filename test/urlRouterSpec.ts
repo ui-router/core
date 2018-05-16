@@ -22,7 +22,7 @@ describe('UrlRouter', function() {
   const matcher = (...strings: string[]) =>
     strings.reduce(
       (prev: UrlMatcher, str) => (prev ? prev.append(urlMatcherFactory.compile(str)) : urlMatcherFactory.compile(str)),
-      undefined,
+      undefined
     );
 
   const matcherRule = (...strings: string[]) => urlRouter.urlRuleFactory.create(matcher(...strings));

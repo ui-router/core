@@ -27,7 +27,7 @@ export const hashLocationPlugin: (router: UIRouter) => LocationPlugin = location
   'vanilla.hashBangLocation',
   false,
   HashLocationService,
-  BrowserLocationConfig,
+  BrowserLocationConfig
 );
 
 /** A `UIRouterPlugin` that gets/sets the current location using the browser's `location` and `history` apis */
@@ -35,7 +35,7 @@ export const pushStateLocationPlugin: (router: UIRouter) => LocationPlugin = loc
   'vanilla.pushStateLocation',
   true,
   PushStateLocationService,
-  BrowserLocationConfig,
+  BrowserLocationConfig
 );
 
 /** A `UIRouterPlugin` that gets/sets the current location from an in-memory object */
@@ -43,5 +43,5 @@ export const memoryLocationPlugin: (router: UIRouter) => LocationPlugin = locati
   'vanilla.memoryLocation',
   false,
   MemoryLocationService,
-  MemoryLocationConfig,
+  MemoryLocationConfig
 );

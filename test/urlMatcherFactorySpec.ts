@@ -297,14 +297,14 @@ describe('UrlMatcher', function() {
       expect(
         param2.type.equals(
           [new Date(2014, 11, 15), new Date(2014, 10, 15)],
-          [new Date(2014, 11, 15), new Date(2014, 10, 15)],
-        ),
+          [new Date(2014, 11, 15), new Date(2014, 10, 15)]
+        )
       ).toBe(true);
       expect(
         param2.type.equals(
           [new Date(2014, 11, 15), new Date(2014, 9, 15)],
-          [new Date(2014, 11, 15), new Date(2014, 10, 15)],
-        ),
+          [new Date(2014, 11, 15), new Date(2014, 10, 15)]
+        )
       ).toBe(false);
     });
 
@@ -521,7 +521,7 @@ describe('UrlMatcher', function() {
       expect(m.format({ 'param1[]': ['bar-'] })).toEqual('/foo/bar%5C%2D');
       expect(m.format({ 'param1[]': ['bar-', '-baz'] })).toEqual('/foo/bar%5C%2D-%5C%2Dbaz');
       expect(m.format({ 'param1[]': ['bar-bar-bar-', '-baz-baz-baz'] })).toEqual(
-        '/foo/bar%5C%2Dbar%5C%2Dbar%5C%2D-%5C%2Dbaz%5C%2Dbaz%5C%2Dbaz',
+        '/foo/bar%5C%2Dbar%5C%2Dbar%5C%2D-%5C%2Dbaz%5C%2Dbaz%5C%2Dbaz'
       );
     });
 

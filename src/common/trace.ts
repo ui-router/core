@@ -211,7 +211,7 @@ export class Trace {
   traceResolvableResolved(resolvable: Resolvable, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
     console.log(
-      `${transLbl(trans)}:               <- Resolved  ${resolvable} to: ${maxLength(200, stringify(resolvable.data))}`,
+      `${transLbl(trans)}:               <- Resolved  ${resolvable} to: ${maxLength(200, stringify(resolvable.data))}`
     );
   }
 

@@ -114,7 +114,7 @@ export class UIRouter {
    */
   constructor(
     public locationService: LocationServices = UrlService.locationServiceStub,
-    public locationConfig: LocationConfig = UrlService.locationConfigStub,
+    public locationConfig: LocationConfig = UrlService.locationConfigStub
   ) {
     this.viewService._pluginapi._rootViewContext(this.stateRegistry.root());
     this.globals.$current = this.stateRegistry.root();

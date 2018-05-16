@@ -84,7 +84,7 @@ export const $injector = {
     const params = $injector.annotate(fn);
     const ensureExist = assertPredicate(
       (key: string) => all.hasOwnProperty(key),
-      key => `DI can't find injectable: '${key}'`,
+      key => `DI can't find injectable: '${key}'`
     );
     const args = params.filter(ensureExist).map(x => all[x]);
     if (isFunction(fn)) return fn.apply(context, args);

@@ -17,7 +17,7 @@ describe('common', function() {
       expect(
         filter([0, 1, 0, 2, 0, 3, 4], function(v) {
           return !!v;
-        }),
+        })
       ).toEqual([1, 2, 3, 4]);
     });
 

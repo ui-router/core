@@ -308,7 +308,7 @@ export interface UrlRulesApi {
   when(
     matcher: RegExp | UrlMatcher | string,
     handler: string | UrlRuleHandlerFn,
-    options?: { priority: number },
+    options?: { priority: number }
   ): UrlRule;
 
   /**
