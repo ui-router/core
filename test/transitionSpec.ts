@@ -1,18 +1,18 @@
-import { PathNode } from '../src/path/pathNode';
 import {
-  UIRouter,
-  RejectType,
-  Rejection,
+  equals,
+  PathNode,
   pluck,
-  services,
-  TransitionService,
-  StateService,
+  Rejection,
+  RejectType,
   Resolvable,
+  services,
+  StateService,
   Transition,
-} from '../src/index';
-import { tree2Array, PromiseResult } from './_testUtils';
+  TransitionService,
+  UIRouter,
+} from '../src';
+import { PromiseResult, tree2Array } from './_testUtils';
 import { TestingPlugin } from './_testingPlugin';
-import { equals } from '../src/common/common';
 
 describe('transition', function() {
   let router: UIRouter;
