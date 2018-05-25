@@ -6,7 +6,7 @@
  * @module common_strings
  */ /** */
 
-import { isString, isArray, isDefined, isNull, isPromise, isInjectable, isObject } from './predicates';
+import { isString, isArray, isDefined, isUndefined, isNull, isPromise, isInjectable, isObject } from './predicates';
 import { Rejection } from '../transition/rejectFactory';
 import { IInjectable, identity, Obj, tail, pushR } from './common';
 import { pattern, is, not, val, invoke } from './hof';
@@ -106,6 +106,13 @@ export function stringify(o: any) {
       seen.push(value);
     }
     return stringifyPattern(value);
+  }
+
+  if (isUndefined(o)) {
+    // Workaround for IE & Edge Spec incompatibility where replacer function would not be called when JSON.stringify
+    // is given `undefined` as value. To work around that, we simply detect `undefined` and bail out early by
+    // manually stringifying it.
+    return format(o);
   }
 
   return JSON.stringify(o, (key, value) => format(value)).replace(/\\"/g, '"');
