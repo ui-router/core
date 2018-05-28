@@ -2944,7 +2944,7 @@ jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
 
-json-parse-better-errors@^1.0.1:
+json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"
 
@@ -5715,8 +5715,8 @@ webpack-sources@^1.0.1, webpack-sources@^1.1.0:
     source-map "~0.6.1"
 
 webpack@^4.8.3:
-  version "4.8.3"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.8.3.tgz#957c8e80000f9e5cc03d775e78b472d8954f4eeb"
+  version "4.9.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.9.1.tgz#fa7bd738b17fd7f09f37da461b2f5c16c6565f34"
   dependencies:
     "@webassemblyjs/ast" "1.4.3"
     "@webassemblyjs/wasm-edit" "1.4.3"
@@ -5728,6 +5728,7 @@ webpack@^4.8.3:
     chrome-trace-event "^0.1.1"
     enhanced-resolve "^4.0.0"
     eslint-scope "^3.7.1"
+    json-parse-better-errors "^1.0.2"
     loader-runner "^2.3.0"
     loader-utils "^1.1.0"
     memory-fs "~0.4.1"
