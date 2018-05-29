@@ -1199,6 +1199,74 @@ describe('transition', function() {
     });
   });
 
+  describe('paramsChanged()', () => {
+    beforeEach(() => {
+      router.stateRegistry.register({ name: 'stateA', url: '/stateA/:param1/:param2' });
+      router.stateRegistry.register({ name: 'stateB', url: '/stateB/:param3' });
+      router.stateRegistry.register({ name: 'stateB.nest', url: '/nest/:param4' });
+    });
+
+    it('should contain only changed param values', async done => {
+      await $state.go('stateA', { param1: 'abc', param2: 'def' });
+      const goPromise = $state.go('stateA', { param1: 'abc', param2: 'xyz' });
+      await goPromise;
+
+      const changed = goPromise.transition.paramsChanged();
+      expect(Object.keys(changed)).toEqual(['param2']);
+      expect(changed).toEqual({ param2: 'xyz' });
+
+      done();
+    });
+
+    it('should contain new params values when switching states', async done => {
+      await $state.go('stateB', { param3: '123' });
+      const goPromise = $state.go('stateB.nest', { param3: '123', param4: '456' });
+      await goPromise;
+
+      const changed = goPromise.transition.paramsChanged();
+      expect(Object.keys(changed)).toEqual(['param4']);
+      expect(changed).toEqual({ param4: '456' });
+
+      done();
+    });
+
+    it('should contain removed params with `undefined` when switching states', async done => {
+      await $state.go('stateB.nest', { param3: '123', param4: '456' });
+      const goPromise = $state.go('stateB');
+      await goPromise;
+
+      const changed = goPromise.transition.paramsChanged();
+      expect(Object.keys(changed)).toEqual(['param4']);
+      expect(changed).toEqual({ param4: undefined });
+
+      done();
+    });
+
+    it('should contain removed params with `undefined` when switching states', async done => {
+      await $state.go('stateB.nest', { param3: '123', param4: '456' });
+      const goPromise = $state.go('stateB');
+      await goPromise;
+
+      const changed = goPromise.transition.paramsChanged();
+      expect(Object.keys(changed)).toEqual(['param4']);
+      expect(changed).toEqual({ param4: undefined });
+
+      done();
+    });
+
+    it('should contain added and removed params', async done => {
+      await $state.go('stateB.nest', { param3: '123', param4: '456' });
+      const goPromise = $state.go('stateA', { param1: 'abc', param2: 'def' });
+      await goPromise;
+
+      const changed = goPromise.transition.paramsChanged();
+      expect(Object.keys(changed).sort()).toEqual(['param1', 'param2', 'param3', 'param4']);
+      expect(changed).toEqual({ param1: 'abc', param2: 'def', param3: undefined, param4: undefined });
+
+      done();
+    });
+  });
+
   describe('from previous transitions', () => {
     it('should get their Transition resolves cleaned up', async done => {
       router.stateRegistry.register({ name: 'resolve', resolve: { foo: () => 'Some data' } });

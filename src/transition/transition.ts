@@ -37,6 +37,7 @@ import { UIInjector } from '../interface';
 import { RawParams } from '../params/interface';
 import { ResolvableLiteral } from '../resolve/interface';
 import { Rejection } from './rejectFactory';
+import { applyPairs, flattenR, uniqR } from '../common';
 
 /** @hidden */
 const stateSelf: (_state: StateObject) => StateDeclaration = prop('self');
@@ -284,6 +285,87 @@ export class Transition implements IHookRegistry {
   params<T>(pathname?: string): T;
   params(pathname = 'to') {
     return Object.freeze(this._treeChanges[pathname].map(prop('paramValues')).reduce(mergeR, {}));
+  }
+
+  /**
+   * Gets the new values of any parameters that changed during this transition.
+   *
+   * Returns any parameter values that have changed during a transition, as key/value pairs.
+   *
+   * - Any parameter values that have changed will be present on the returned object reflecting the new value.
+   * - Any parameters that *not* have changed will not be present on the returned object.
+   * - Any new parameters that weren't present in the "from" state, but are now present in the "to" state will be present on the returned object.
+   * - Any previous parameters that are no longer present (because the "to" state doesn't have them) will be included with a value of `undefined`.
+   *
+   * The returned object is immutable.
+   *
+   * #### Examples:
+   *
+   * Given:
+   * ```js
+   * var stateA = { name: 'stateA', url: '/stateA/:param1/param2' }
+   * var stateB = { name: 'stateB', url: '/stateB/:param3' }
+   * var stateC = { name: 'stateB.nest', url: '/nest/:param4' }
+   * ```
+   *
+   * #### Example 1
+   *
+   * From `/stateA/abc/def` to `/stateA/abc/xyz`
+   *
+   * ```js
+   * var changed = transition.paramsChanged()
+   * // changed is { param2: 'xyz' }
+   * ```
+   *
+   * The value of `param2` changed to `xyz`.
+   * The value of `param1` stayed the same so its value is not present.
+   *
+   * #### Example 2
+   *
+   * From `/stateA/abc/def` to `/stateB/123`
+   *
+   * ```js
+   * var changed = transition.paramsChanged()
+   * // changed is { param1: undefined, param2: undefined, param3: '123' }
+   * ```
+   *
+   * The value `param3` is present because it is a new param.
+   * Both `param1` and `param2` are no longer present so their value is undefined.
+   *
+   * #### Example 3
+   *
+   * From `/stateB/123` to `/stateB/123/nest/456`
+   *
+   * ```js
+   * var changed = transition.paramsChanged()
+   * // changed is { param4: '456' }
+   * ```
+   *
+   * The value `param4` is present because it is a new param.
+   * The value of `param3` did not change, so its value is not present.
+   *
+   * @returns an immutable object with changed parameter keys/values.
+   */
+  paramsChanged(): { [paramName: string]: any };
+  paramsChanged<T>(): T;
+  paramsChanged() {
+    const fromParams = this.params('from');
+    const toParams = this.params('to');
+
+    // All the parameters declared on both the "to" and "from" paths
+    const allParamDescriptors: Param[] = []
+      .concat(this._treeChanges.to)
+      .concat(this._treeChanges.from)
+      .map(pathNode => pathNode.paramSchema)
+      .reduce(flattenR, [])
+      .reduce(uniqR, []);
+
+    const changedParamDescriptors = Param.changed(allParamDescriptors, fromParams, toParams);
+
+    return changedParamDescriptors.reduce((changedValues, descriptor) => {
+      changedValues[descriptor.id] = toParams[descriptor.id];
+      return changedValues;
+    }, {});
   }
 
   /**
