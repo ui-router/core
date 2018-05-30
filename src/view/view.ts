@@ -2,19 +2,22 @@
  * @coreapi
  * @module view
  */ /** for typedoc */
-import { equals, applyPairs, removeFrom, TypedMap, inArray } from '../common/common';
+import { equals, applyPairs, removeFrom, TypedMap, inArray, find } from '../common/common';
 import { curry, prop } from '../common/hof';
 import { isString, isArray } from '../common/predicates';
 import { trace } from '../common/trace';
 import { PathNode } from '../path/pathNode';
 import { ActiveUIView, ViewContext, ViewConfig } from './interface';
 import { _ViewDeclaration } from '../state/interface';
+import { UIRouter } from '../router';
 
 export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig | ViewConfig[];
 
 export interface ViewServicePluginAPI {
   _rootViewContext(context?: ViewContext): ViewContext;
   _viewConfigFactory(viewType: string, factory: ViewConfigFactory);
+  /** @param id router.$id + "." + uiView.id */
+  _registeredUIView(id: string): ActiveUIView;
   _registeredUIViews(): ActiveUIView[];
   _activeViewConfigs(): ViewConfig[];
   _onSync(listener: ViewSyncListener): Function;
@@ -56,6 +59,7 @@ export class ViewService {
   public _pluginapi: ViewServicePluginAPI = {
     _rootViewContext: this._rootViewContext.bind(this),
     _viewConfigFactory: this._viewConfigFactory.bind(this),
+    _registeredUIView: (id: string) => find(this._uiViews, view => `${this.router.$id}.${view.id}` === id),
     _registeredUIViews: () => this._uiViews,
     _activeViewConfigs: () => this._viewConfigs,
     _onSync: (listener: ViewSyncListener) => {
@@ -187,7 +191,7 @@ export class ViewService {
     return { uiViewName, uiViewContextAnchor };
   }
 
-  constructor() {}
+  constructor(private router: UIRouter) {}
 
   private _rootViewContext(context?: ViewContext): ViewContext {
     return (this._rootContext = context || this._rootContext);

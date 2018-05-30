@@ -54,6 +54,16 @@ describe('View Service', () => {
     });
   });
 
+  describe('_pluginapi._registeredUIView', () => {
+    it('should return a ui-view from an id', () => {
+      expect($view._pluginapi._registeredUIView(`${router.$id}.0`)).toBeUndefined();
+
+      const uiView = makeUIView();
+      $view.registerUIView(uiView);
+      expect($view._pluginapi._registeredUIView(`${router.$id}.${uiView.id}`)).toBe(uiView);
+    });
+  });
+
   describe('onSync', () => {
     it('registers view sync listeners', () => {
       function listener(tuples: ViewTuple[]) {}

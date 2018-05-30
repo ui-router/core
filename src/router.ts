@@ -43,7 +43,7 @@ export class UIRouter {
   trace: Trace = trace;
 
   /** Provides services related to ui-view synchronization */
-  viewService = new ViewService();
+  viewService = new ViewService(this);
 
   /** Global router state */
   globals: UIRouterGlobals = new UIRouterGlobals();
