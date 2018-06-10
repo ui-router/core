@@ -66,11 +66,11 @@
   "jsnext:main": "lib-esm/index.js",
   "license": "MIT",
   "devDependencies": {
-    "@types/jasmine": "^2.8.7",
+    "@types/jasmine": "^2.8.8",
     "@types/jquery": "^3.3.2",
     "@uirouter/publish-scripts": "^2.3.18",
     "dts-downlevel": "^0.3.0",
-    "fork-ts-checker-webpack-plugin": "^0.4.1",
+    "fork-ts-checker-webpack-plugin": "^0.4.2",
     "husky": "^0.14.3",
     "jasmine-core": "^3.1.0",
     "karma": "^2.0.2",
@@ -80,16 +80,16 @@
     "karma-script-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.0",
-    "prettier": "^1.11.1",
-    "pretty-quick": "^1.5.0",
-    "rollup": "^0.59.1",
+    "prettier": "^1.13.5",
+    "pretty-quick": "^1.6.0",
+    "rollup": "^0.60.1",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-uglify": "^4.0.0",
-    "ts-loader": "^4.3.0",
+    "ts-loader": "^4.4.1",
     "tslint": "^5.10.0",
     "tslint-eslint-rules": "^5.3.1",
-    "typescript": "^2.8.3",
-    "webpack": "^4.8.3"
+    "typescript": "^2.9.1",
+    "webpack": "^4.12.0"
   }
 }
