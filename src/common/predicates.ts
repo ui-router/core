@@ -23,7 +23,6 @@ export const isObject = (x: any) => x !== null && typeof x === 'object';
 export const isArray = Array.isArray;
 export const isDate: (x: any) => x is Date = <any>((x: any) => toStr.call(x) === '[object Date]');
 export const isRegExp: (x: any) => x is RegExp = <any>((x: any) => toStr.call(x) === '[object RegExp]');
-export const isState: (x: any) => x is StateObject = StateObject.isState;
 
 /**
  * Predicate which checks if a value is injectable
@@ -45,4 +44,10 @@ export function isInjectable(val: any) {
  *
  * It is probably a Promise if it's an object, and it has a `then` property which is a Function
  */
-export const isPromise = <(x: any) => x is Promise<any>>and(isObject, pipe(prop('then'), isFunction));
+export const isPromise = <(x: any) => x is Promise<any>>and(
+  isObject,
+  pipe(
+    prop('then'),
+    isFunction
+  )
+);
