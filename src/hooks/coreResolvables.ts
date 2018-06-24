@@ -3,9 +3,8 @@ import { Transition } from '../transition/transition';
 import { UIRouter } from '../router';
 import { TransitionService } from '../transition/transitionService';
 import { Resolvable } from '../resolve';
-import { extend, inArray, map, mapObj, uniqR, unnestR, values } from '../common';
+import { inArray, uniqR, unnestR, values } from '../common';
 import { PathNode } from '../path';
-import { TreeChanges } from '../transition';
 
 function addCoreResolvables(trans: Transition) {
   trans.addResolvable(Resolvable.fromData(UIRouter, trans.router), '');
