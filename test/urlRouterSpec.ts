@@ -261,6 +261,13 @@ describe('UrlRouter', function() {
       expect(actual).toBe('http://localhost/#/hello/world#frag');
     });
 
+    it('should return absolute URLs with base path', function() {
+      router.urlService.config.baseHref();
+      spyOn(router.urlService.config, 'baseHref').and.returnValue('/basehref');
+      const actual = urlRouter.href(matcher('/hello/:name'), { name: 'world', '#': 'frag' }, { absolute: true });
+      expect(actual).toBe('http://localhost/basehref#/hello/world#frag');
+    });
+
     describe('in html5mode', () => {
       let baseTag: HTMLBaseElement;
       const applyBaseTag = (href: string) => {

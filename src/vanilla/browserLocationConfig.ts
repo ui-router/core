@@ -3,7 +3,7 @@
  * @module vanilla
  */
 /** */
-import { isDefined } from '../common/predicates';
+import { isDefined, isUndefined } from '../common/predicates';
 import { LocationConfig } from '../common/coreservices';
 
 /** A `LocationConfig` that delegates to the browser's `location` object */
@@ -39,16 +39,15 @@ export class BrowserLocationConfig implements LocationConfig {
   }
 
   baseHref(href?: string): string {
-    return isDefined(href)
-      ? (this._baseHref = href)
-      : isDefined(this._baseHref)
-        ? this._baseHref
-        : this.applyDocumentBaseHref();
+    if (isDefined(href)) this._baseHref = href;
+    if (isUndefined(this._baseHref)) this._baseHref = this.getBaseHref();
+    return this._baseHref;
   }
 
-  applyDocumentBaseHref() {
+  private getBaseHref() {
     const baseTag: HTMLBaseElement = document.getElementsByTagName('base')[0];
-    return (this._baseHref = baseTag ? baseTag.href.substr(location.origin.length) : location.pathname || '/');
+    if (!baseTag || !baseTag.href) return location.pathname || '/';
+    return baseTag.href.replace(/^(https?:)?\/\/[^/]*/, '');
   }
 
   dispose() {}
