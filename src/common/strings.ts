@@ -6,12 +6,10 @@
  * @module common_strings
  */ /** */
 
-import { isString, isArray, isDefined, isUndefined, isNull, isPromise, isInjectable, isObject } from './predicates';
+import { isArray, isFunction, isInjectable, isNull, isObject, isPromise, isString, isUndefined } from './predicates';
 import { Rejection } from '../transition/rejectFactory';
-import { IInjectable, identity, Obj, tail, pushR } from './common';
-import { pattern, is, not, val, invoke } from './hof';
-import { Transition } from '../transition/transition';
-import { Resolvable } from '../resolve/resolvable';
+import { identity, IInjectable, pushR, tail } from './common';
+import { pattern, val } from './hof';
 
 /**
  * Returns a string shortened to a maximum length
@@ -47,18 +45,6 @@ export function kebobString(camelCase: string) {
     .replace(/([A-Z])/g, $1 => '-' + $1.toLowerCase()); // replace rest
 }
 
-function _toJson(obj: Obj) {
-  return JSON.stringify(obj);
-}
-
-function _fromJson(json: string) {
-  return isString(json) ? JSON.parse(json) : json;
-}
-
-function promiseToString(p: Promise<any>) {
-  return `Promise(${JSON.stringify(p)})`;
-}
-
 export function functionToString(fn: Function) {
   const fnStr = fnToString(fn);
   const namedFunctionMatch = fnStr.match(/^(function [^ ]+\([^)]*\))/);
@@ -76,26 +62,19 @@ export function fnToString(fn: IInjectable) {
   return (_fn && _fn.toString()) || 'undefined';
 }
 
-let stringifyPatternFn: (val: any) => string = null;
-const stringifyPattern = function(value: any) {
-  const isRejection = Rejection.isRejectionPromise;
+const isRejection = Rejection.isRejectionPromise;
+const hasToString = (obj: any) =>
+  isObject(obj) && !isArray(obj) && obj.constructor !== Object && isFunction(obj.toString);
 
-  stringifyPatternFn =
-    <any>stringifyPatternFn ||
-    pattern([
-      [not(isDefined), val('undefined')],
-      [isNull, val('null')],
-      [isPromise, val('[Promise]')],
-      [isRejection, (x: any) => x._transitionRejection.toString()],
-      [is(Rejection), invoke('toString')],
-      [is(Transition), invoke('toString')],
-      [is(Resolvable), invoke('toString')],
-      [isInjectable, functionToString],
-      [val(true), identity],
-    ]);
-
-  return stringifyPatternFn(value);
-};
+const stringifyPattern = pattern([
+  [isUndefined, val('undefined')],
+  [isNull, val('null')],
+  [isPromise, val('[Promise]')],
+  [isRejection, (x: any) => x._transitionRejection.toString()],
+  [hasToString, (x: object) => x.toString()],
+  [isInjectable, functionToString],
+  [val(true), identity],
+]) as (val: any) => string;
 
 export function stringify(o: any) {
   const seen: any[] = [];
