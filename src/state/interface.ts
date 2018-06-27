@@ -110,29 +110,6 @@ export type RedirectToResult = string | TargetState | { state?: string; params?:
  *
  * registry.register(foldersState);
  * ```
- *
- * A state declaration may also be an ES6 class which implements the StateDeclaration interface
- * and has a `@State()` decorator
- *
- * #### Example:
- * ```js
- * import { State } from "@uirouter/core"
- * import { FolderService } from "../folder.service"
- * // StateDeclaration class
- * @State()
- * export class FoldersState implements StateDeclaration {
- *   name: 'folders',
- *   url: '/folders',
- *   component: FoldersComponent
- *
- *   @Resolve({ deps: [ FolderService ] })
- *   allfolders(FolderService) {
- *       return FolderService.list();
- *   },
- * }
- *
- * registry.register(FoldersState);
- * ```
  */
 export interface StateDeclaration {
   /**
