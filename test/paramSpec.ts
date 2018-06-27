@@ -39,53 +39,75 @@ describe('parameters', () => {
     let router: UIRouter = null;
     let state: StateObject = null;
 
-    const customTypeA: ParamTypeDefinition = {
+    const base: ParamTypeDefinition = {
       encode: val => (val ? 'true' : 'false'),
       decode: str => (str === 'true' ? true : str === 'false' ? false : undefined),
-      dynamic: false,
       equals: (a, b) => a === b,
-      inherit: true,
       is: val => typeof val === 'boolean',
       pattern: /(?:true|false)/,
-      raw: true,
     };
 
-    const customTypeB: ParamTypeDefinition = {
-      encode: val => (val ? 'true' : 'false'),
-      decode: str => (str === 'true' ? true : str === 'false' ? false : undefined),
+    const customTypeA: ParamTypeDefinition = Object.assign({}, base, {
       dynamic: true,
-      equals: (a, b) => a === b,
-      inherit: false,
-      is: val => typeof val === 'boolean',
-      pattern: /(?:true|false)/,
-      raw: false,
-    };
+      inherit: true,
+      raw: true,
+    });
 
-    describe('as a simple path parameter', () => {
+    const customTypeB: ParamTypeDefinition = Object.assign({}, base, {
+      dynamic: false,
+      inherit: false,
+      raw: false,
+    });
+
+    const customTypeC: ParamTypeDefinition = Object.assign({}, base);
+
+    describe('with as a simple path parameter', () => {
       beforeEach(() => {
         router = new UIRouter();
         router.urlService.config.type('customTypeA', customTypeA);
         router.urlService.config.type('customTypeB', customTypeB);
+        router.urlService.config.type('customTypeC', customTypeC);
 
         state = router.stateRegistry.register({
           name: 'state',
-          url: '/{paramA:customTypeA}/{paramB:customTypeB}',
+          url: '/{paramA:customTypeA}/{paramB:customTypeB}/{paramC:customTypeC}',
         });
       });
 
-      it('should use `dynamic` from the custom type', () => {
-        expect(state.parameter('paramA').dynamic).toEqual(customTypeA.dynamic);
-        expect(state.parameter('paramB').dynamic).toEqual(customTypeB.dynamic);
+      it('should use `dynamic` from the custom type customTypeA', () => {
+        expect(state.parameter('paramA').dynamic).toBe(true);
       });
 
-      it('should use `inherit` from the custom type', () => {
-        expect(state.parameter('paramA').inherit).toEqual(customTypeA.inherit);
-        expect(state.parameter('paramB').inherit).toEqual(customTypeB.inherit);
+      it('should use `dynamic` from the custom type customTypeB', () => {
+        expect(state.parameter('paramB').dynamic).toBe(false);
       });
 
-      it('should use `raw` from the custom type', () => {
-        expect(state.parameter('paramA').raw).toEqual(customTypeA.raw);
-        expect(state.parameter('paramB').raw).toEqual(customTypeB.raw);
+      it('should use default value `dynamic`: false for custom type customTypeC', () => {
+        expect(state.parameter('paramC').dynamic).toBe(false);
+      });
+
+      it('should use `inherit` from the custom type customTypeA', () => {
+        expect(state.parameter('paramA').inherit).toBe(true);
+      });
+
+      it('should use `inherit` from the custom type customTypeB', () => {
+        expect(state.parameter('paramB').inherit).toBe(false);
+      });
+
+      it('should use default value `inherit`: true for the custom type customTypeC', () => {
+        expect(state.parameter('paramC').inherit).toBe(true);
+      });
+
+      it('should use `raw` from the custom type customTypeA', () => {
+        expect(state.parameter('paramA').raw).toBe(true);
+      });
+
+      it('should use `raw` from the custom type customTypeB', () => {
+        expect(state.parameter('paramB').raw).toBe(false);
+      });
+
+      it('should use default value `raw`: false for the custom type customTypeC', () => {
+        expect(state.parameter('paramC').raw).toBe(false);
       });
     });
 
@@ -94,27 +116,72 @@ describe('parameters', () => {
         router = new UIRouter();
         router.urlService.config.type('customTypeA', customTypeA);
         router.urlService.config.type('customTypeB', customTypeB);
+        router.urlService.config.type('customTypeC', customTypeC);
 
         state = router.stateRegistry.register({
           name: 'state',
-          url: '/{paramA[]:customTypeA}/{paramB[]:customTypeB}',
+          url: '/{paramA[]:customTypeA}/{paramB[]:customTypeB}/{paramC[]:customTypeC}',
         });
       });
 
-      it('should use `dynamic` from the custom type', () => {
-        expect(state.parameter('paramA[]').dynamic).toEqual(customTypeA.dynamic);
-        expect(state.parameter('paramB[]').dynamic).toEqual(customTypeB.dynamic);
+      it('should use `dynamic` from the custom type customTypeA', () => {
+        expect(state.parameter('paramA[]').dynamic).toBe(true);
       });
 
-      it('should use `inherit` from the custom type', () => {
-        expect(state.parameter('paramA[]').inherit).toEqual(customTypeA.inherit);
-        expect(state.parameter('paramB[]').inherit).toEqual(customTypeB.inherit);
+      it('should use `dynamic` from the custom type customTypeB', () => {
+        expect(state.parameter('paramB[]').dynamic).toBe(false);
       });
 
-      // Test for https://github.com/ui-router/core/issues/178
-      it('should use `raw` from the custom type', () => {
-        expect(state.parameter('paramA[]').raw).toEqual(customTypeA.raw);
-        expect(state.parameter('paramB[]').raw).toEqual(customTypeB.raw);
+      it('should use default value `dynamic`: false for custom type customTypeC', () => {
+        expect(state.parameter('paramC[]').dynamic).toBe(false);
+      });
+
+      it('should use `inherit` from the custom type customTypeA', () => {
+        expect(state.parameter('paramA[]').inherit).toBe(true);
+      });
+
+      it('should use `inherit` from the custom type customTypeB', () => {
+        expect(state.parameter('paramB[]').inherit).toBe(false);
+      });
+
+      it('should use default value `inherit`: true for the custom type customTypeC', () => {
+        expect(state.parameter('paramC[]').inherit).toBe(true);
+      });
+
+      it('should use `raw` from the custom type customTypeA', () => {
+        expect(state.parameter('paramA[]').raw).toBe(true);
+      });
+
+      it('should use `raw` from the custom type customTypeB', () => {
+        expect(state.parameter('paramB[]').raw).toBe(false);
+      });
+
+      it('should use default value `raw`: false for the custom type customTypeC', () => {
+        expect(state.parameter('paramC[]').raw).toBe(false);
+      });
+    });
+
+    describe('with dynamic flag on the state', () => {
+      beforeEach(() => {
+        router = new UIRouter();
+        router.urlService.config.type('customTypeA', Object.assign({}, customTypeA, { dynamic: false }));
+        router.urlService.config.type('customTypeB', Object.assign({}, customTypeB, { dynamic: true }));
+        router.urlService.config.type('customTypeC', customTypeC);
+
+        state = router.stateRegistry.register({
+          name: 'state',
+          dynamic: true,
+          url: '/{paramA:customTypeA}/{paramB:customTypeB}/{paramC:customTypeC}',
+          params: { paramB: { dynamic: false } },
+        });
+      });
+
+      it('should prefer the dynamic flag on the type, if specified', () => {
+        expect(state.parameter('paramA').dynamic).toBe(false);
+      });
+
+      it('should prefer the dynamic flag on the param declaration, if specified', () => {
+        expect(state.parameter('paramB').dynamic).toBe(false);
       });
     });
   });
