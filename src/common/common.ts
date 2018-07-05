@@ -193,9 +193,8 @@ export const deregAll = (functions: Function[]) =>
  * Earlier objects in the defaultsList take precedence when applying defaults.
  */
 export function defaults(opts, ...defaultsList: Obj[]) {
-  const _defaultsList = defaultsList.concat({}).reverse();
-  const defaultVals = extend.apply(null, _defaultsList);
-  return extend({}, defaultVals, pick(opts || {}, Object.keys(defaultVals)));
+  const defaultVals = extend({}, ...defaultsList.reverse());
+  return extend(defaultVals, pick(opts || {}, Object.keys(defaultVals)));
 }
 
 /** Reduce function that merges each element of the list into a single object, using extend */
