@@ -133,7 +133,7 @@ export interface ParamDeclaration {
    * - Non-url parameters (`param: { foo: null }`): `any`
    *
    */
-  type: string | ParamType;
+  type?: string | ParamType;
 
   /**
    * The parameter's `array` mode
@@ -168,7 +168,7 @@ export interface ParamDeclaration {
    * @default `auto` for query parameters, such as `url: '/foo?queryParam'`
    * @default `true` if the parameter name ends in `[]`, such as `url: '/foo/{implicitArrayParam:int[]}'`
    */
-  array: boolean;
+  array?: boolean;
 
   /**
    * Squash mode: omit default parameter values in URL
@@ -223,7 +223,7 @@ export interface ParamDeclaration {
    *
    * Default: If squash is not set, it uses the configured default squash policy. (See [[defaultSquashPolicy]]())
    */
-  squash: boolean | string;
+  squash?: boolean | string;
 
   /**
    * @internalapi
@@ -242,7 +242,7 @@ export interface ParamDeclaration {
    * ]
    * ```
    */
-  replace: Replace[];
+  replace?: Replace[];
 
   /**
    * @hidden
@@ -250,7 +250,7 @@ export interface ParamDeclaration {
    *
    * This is not part of the declaration; it is a calculated value depending on if a default value was specified or not.
    */
-  isOptional: boolean;
+  isOptional?: boolean;
 
   /**
    * Dynamic flag
@@ -272,7 +272,7 @@ export interface ParamDeclaration {
    *
    * Default: `false`
    */
-  dynamic: boolean;
+  dynamic?: boolean;
 
   /**
    * Disables url-encoding of parameter values
@@ -310,7 +310,7 @@ export interface ParamDeclaration {
    *
    * Default: `false`
    */
-  raw: boolean;
+  raw?: boolean;
 
   /**
    * Enables/disables inheriting of this parameter's value
@@ -348,7 +348,7 @@ export interface ParamDeclaration {
    *
    * Default: `true`
    */
-  inherit: boolean;
+  inherit?: boolean;
 }
 
 /** @internalapi */
