@@ -677,7 +677,19 @@ export interface StateDeclaration {
   lazyLoad?: (transition: Transition, state: StateDeclaration) => Promise<LazyLoadResult>;
 
   /**
-   * @deprecated define individual parameters as [[ParamDeclaration.dynamic]]
+   * Marks all the state's parameters as `dynamic`.
+   *
+   * All parameters on the state will use this value for `dynamic` as a default.
+   * Individual parameters may override this default using [[ParamDeclaration.dynamic]] in the [[params]] block.
+   *
+   * Note: this value overrides the `dynamic` value on a custom parameter type ([[ParamTypeDefinition.dynamic]]).
+   */
+  dynamic?: boolean;
+
+  /**
+   * Marks all query parameters as [[ParamDeclaration.dynamic]]
+   *
+   * @deprecated use either [[dynamic]] or [[ParamDeclaration.dynamic]]
    */
   reloadOnSearch?: boolean;
 }

@@ -205,7 +205,7 @@ describe('UrlRouter', function() {
 
     it('can push location changes with no parameters', function() {
       spyOn(router.urlService, 'url');
-      urlRouter.push(urlMatcherFactory.compile('/hello/:name', { params: { name: '' } }));
+      urlRouter.push(urlMatcherFactory.compile('/hello/:name', { state: { params: { name: '' } } }));
       expect(router.urlService.url).toHaveBeenCalledWith('/hello/', undefined);
     });
 

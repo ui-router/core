@@ -10,6 +10,7 @@ import { services } from '../common/coreservices';
 import { ParamType } from './paramType';
 import { ParamTypes } from './paramTypes';
 import { UrlMatcherFactory } from '../url/urlMatcherFactory';
+import { StateDeclaration } from '../state';
 
 /** @hidden */
 const hasOwn = Object.prototype.hasOwnProperty;
@@ -26,18 +27,25 @@ enum DefType {
 }
 export { DefType };
 
+function getParamDeclaration(paramName: string, location: DefType, state: StateDeclaration): ParamDeclaration {
+  const noReloadOnSearch = (state.reloadOnSearch === false && location === DefType.SEARCH) || undefined;
+  const dynamic = [state.dynamic, noReloadOnSearch].find(isDefined);
+  const defaultConfig = isDefined(dynamic) ? { dynamic } : {};
+  const paramConfig = unwrapShorthand(state && state.params && state.params[paramName]);
+  return extend(defaultConfig, paramConfig);
+}
+
 /** @hidden */
 function unwrapShorthand(cfg: ParamDeclaration): ParamDeclaration {
-  cfg = (isShorthand(cfg) && ({ value: cfg } as any)) || cfg;
+  cfg = isShorthand(cfg) ? ({ value: cfg } as ParamDeclaration) : cfg;
 
   getStaticDefaultValue['__cacheable'] = true;
   function getStaticDefaultValue() {
     return cfg.value;
   }
 
-  return extend(cfg, {
-    $$fn: isInjectable(cfg.value) ? cfg.value : getStaticDefaultValue,
-  });
+  const $$fn = isInjectable(cfg.value) ? cfg.value : getStaticDefaultValue;
+  return extend(cfg, { $$fn });
 }
 
 /** @hidden */
@@ -148,11 +156,11 @@ export class Param {
   constructor(
     id: string,
     type: ParamType,
-    config: ParamDeclaration,
     location: DefType,
-    urlMatcherFactory: UrlMatcherFactory
+    urlMatcherFactory: UrlMatcherFactory,
+    state: StateDeclaration
   ) {
-    config = unwrapShorthand(config);
+    const config: ParamDeclaration = getParamDeclaration(id, location, state);
     type = getType(config, type, location, id, urlMatcherFactory.paramTypes);
     const arrayMode = getArrayMode();
     type = arrayMode ? type.$asArray(arrayMode, location === DefType.SEARCH) : type;

@@ -91,10 +91,10 @@ describe('StateBuilder', function() {
       spyOn(urlMatcherFactory, 'compile').and.returnValue(url);
       spyOn(urlMatcherFactory, 'isMatcher').and.returnValue(true);
 
-      expect(builder.builder('url')({ url: '^/foo' })).toBe(url);
+      const state = StateObject.create({ url: '^/foo' });
+      expect(builder.builder('url')(state)).toBe(url);
       expect(urlMatcherFactory.compile).toHaveBeenCalledWith('/foo', {
-        params: {},
-        paramMap: jasmine.any(Function),
+        state: jasmine.objectContaining({ url: '^/foo' }),
       });
       expect(urlMatcherFactory.isMatcher).toHaveBeenCalledWith(url);
     });
@@ -112,7 +112,7 @@ describe('StateBuilder', function() {
     });
 
     it('should pass through empty URLs', function() {
-      expect(builder.builder('url')({ url: null })).toBeNull();
+      expect(builder.builder('url')(StateObject.create({ url: null }))).toBeNull();
     });
 
     it('should pass through custom UrlMatchers', function() {
@@ -120,7 +120,7 @@ describe('StateBuilder', function() {
       const url = new UrlMatcher('/', paramTypes, null);
       spyOn(urlMatcherFactory, 'isMatcher').and.returnValue(true);
       spyOn(root.url, 'append').and.returnValue(url);
-      expect(builder.builder('url')({ url: url })).toBe(url);
+      expect(builder.builder('url')({ self: { url } })).toBe(url);
       expect(urlMatcherFactory.isMatcher).toHaveBeenCalledWith(url);
       expect(root.url.append).toHaveBeenCalledWith(url);
     });
@@ -130,10 +130,10 @@ describe('StateBuilder', function() {
 
       expect(function() {
         builder.builder('url')({
-          toString: function() {
-            return 'foo';
+          toString: () => 'foo',
+          self: {
+            url: { foo: 'bar' },
           },
-          url: { foo: 'bar' },
         });
       }).toThrowError(Error, "Invalid url '[object Object]' in state 'foo'");
 

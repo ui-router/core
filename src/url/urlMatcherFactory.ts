@@ -10,7 +10,25 @@ import { ParamTypes } from '../params/paramTypes';
 import { ParamTypeDefinition } from '../params/interface';
 import { Disposable } from '../interface';
 import { ParamType } from '../params/paramType';
-import { ParamFactory, UrlMatcherConfig } from './interface';
+import { UrlMatcherCompileConfig, UrlMatcherConfig } from './interface';
+import { StateDeclaration } from '../state';
+
+/** @internalapi */
+export class ParamFactory {
+  fromConfig(id: string, type: ParamType, state: StateDeclaration) {
+    return new Param(id, type, DefType.CONFIG, this.umf, state);
+  }
+
+  fromPath(id: string, type: ParamType, state: StateDeclaration) {
+    return new Param(id, type, DefType.PATH, this.umf, state);
+  }
+
+  fromSearch(id: string, type: ParamType, state: StateDeclaration) {
+    return new Param(id, type, DefType.SEARCH, this.umf, state);
+  }
+
+  constructor(private umf: UrlMatcherFactory) {}
+}
 
 /**
  * Factory for [[UrlMatcher]] instances.
@@ -25,16 +43,7 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
   /** @hidden */ _defaultSquashPolicy: boolean | string = false;
 
   /** @internalapi Creates a new [[Param]] for a given location (DefType) */
-  paramFactory: ParamFactory = {
-    /** Creates a new [[Param]] from a CONFIG block */
-    fromConfig: (id: string, type: ParamType, config: any) => new Param(id, type, config, DefType.CONFIG, this),
-
-    /** Creates a new [[Param]] from a url PATH */
-    fromPath: (id: string, type: ParamType, config: any) => new Param(id, type, config, DefType.PATH, this),
-
-    /** Creates a new [[Param]] from a url SEARCH */
-    fromSearch: (id: string, type: ParamType, config: any) => new Param(id, type, config, DefType.SEARCH, this),
-  };
+  paramFactory = new ParamFactory(this);
 
   constructor() {
     extend(this, { UrlMatcher, Param });
@@ -57,10 +66,6 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
     return (this._defaultSquashPolicy = isDefined(value) ? value : this._defaultSquashPolicy);
   }
 
-  /** @hidden */
-  private _getConfig = config =>
-    extend({ strict: this._isStrictMode, caseInsensitive: this._isCaseInsensitive }, config);
-
   /**
    * Creates a [[UrlMatcher]] for the specified pattern.
    *
@@ -68,8 +73,12 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
    * @param config  The config object hash.
    * @returns The UrlMatcher.
    */
-  compile(pattern: string, config?: { [key: string]: any }) {
-    return new UrlMatcher(pattern, this.paramTypes, this.paramFactory, this._getConfig(config));
+  compile(pattern: string, config?: UrlMatcherCompileConfig) {
+    // backward-compatible support for config.params -> config.state.params
+    const params = config && !config.state && (config as any).params;
+    config = params ? { state: { params }, ...config } : config;
+    const globalConfig = { strict: this._isStrictMode, caseInsensitive: this._isCaseInsensitive };
+    return new UrlMatcher(pattern, this.paramTypes, this.paramFactory, extend(globalConfig, config));
   }
 
   /**

@@ -3,27 +3,17 @@
  * @module url
  */
 /** for typedoc */
-import {
-  map,
-  defaults,
-  inherit,
-  identity,
-  unnest,
-  tail,
-  find,
-  Obj,
-  pairs,
-  allTrueR,
-  unnestR,
-  arrayTuples,
-} from '../common/common';
+import { map, inherit, identity, unnest, tail, find, Obj, allTrueR, unnestR, arrayTuples } from '../common/common';
 import { prop, propEq } from '../common/hof';
 import { isArray, isString, isDefined } from '../common/predicates';
 import { Param, DefType } from '../params/param';
 import { ParamTypes } from '../params/paramTypes';
 import { RawParams } from '../params/interface';
-import { ParamFactory } from './interface';
+import { UrlMatcherCompileConfig } from './interface';
 import { joinNeighborsR, splitOnDelim } from '../common/strings';
+import { ParamType } from '../params';
+import { defaults } from '../common';
+import { ParamFactory } from './urlMatcherFactory';
 
 /** @hidden */
 function quoteRegExp(str: any, param?: any) {
@@ -60,6 +50,20 @@ interface UrlMatcherCache {
   parent?: UrlMatcher;
   pattern?: RegExp;
 }
+
+/** @hidden */
+interface MatchDetails {
+  id: string;
+  regexp: string;
+  segment: string;
+  type: ParamType;
+}
+
+const defaultConfig: UrlMatcherCompileConfig = {
+  state: { params: {} },
+  strict: true,
+  caseInsensitive: true,
+};
 
 /**
  * Matches URLs against patterns.
@@ -126,6 +130,8 @@ export class UrlMatcher {
   private _segments: string[] = [];
   /** @hidden */
   private _compiled: string[] = [];
+  /** @hidden */
+  private readonly config: UrlMatcherCompileConfig;
 
   /** The pattern that was passed into the constructor */
   public pattern: string;
@@ -229,18 +235,12 @@ export class UrlMatcher {
   /**
    * @param pattern The pattern to compile into a matcher.
    * @param paramTypes The [[ParamTypes]] registry
-   * @param config  A configuration object
-   * - `caseInsensitive` - `true` if URL matching should be case insensitive, otherwise `false`, the default value (for backward compatibility) is `false`.
-   * - `strict` - `false` if matching against a URL with a trailing slash should be treated as equivalent to a URL without a trailing slash, the default value is `true`.
+   * @param paramFactory A [[ParamFactory]] object
+   * @param config  A [[UrlMatcherCompileConfig]] configuration object
    */
-  constructor(pattern: string, paramTypes: ParamTypes, paramFactory: ParamFactory, public config?: any) {
+  constructor(pattern: string, paramTypes: ParamTypes, paramFactory: ParamFactory, config?: UrlMatcherCompileConfig) {
+    this.config = config = defaults(config, defaultConfig);
     this.pattern = pattern;
-    this.config = defaults(this.config, {
-      params: {},
-      strict: true,
-      caseInsensitive: false,
-      paramMap: identity,
-    });
 
     // Find all placeholders and create a compiled pattern, using either classic or curly syntax:
     //   '*' name
@@ -258,8 +258,8 @@ export class UrlMatcher {
     const placeholder = /([:*])([\w\[\]]+)|\{([\w\[\]]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g;
     const searchPlaceholder = /([:]?)([\w\[\].-]+)|\{([\w\[\].-]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g;
     const patterns: any[][] = [];
-    let last = 0,
-      matchArray: RegExpExecArray;
+    let last = 0;
+    let matchArray: RegExpExecArray;
 
     const checkParamErrors = (id: string) => {
       if (!UrlMatcher.nameValidator.test(id)) throw new Error(`Invalid parameter name '${id}' in pattern '${pattern}'`);
@@ -269,7 +269,7 @@ export class UrlMatcher {
 
     // Split into static segments separated by path parameter placeholders.
     // The number of segments is always 1 more than the number of parameters.
-    const matchDetails = (m: RegExpExecArray, isSearch: boolean) => {
+    const matchDetails = (m: RegExpExecArray, isSearch: boolean): MatchDetails => {
       // IE[78] returns '' for unmatched groups instead of null
       const id: string = m[2] || m[3];
       const regexp: string = isSearch ? m[4] : m[4] || (m[1] === '*' ? '[\\s\\S]*' : null);
@@ -282,23 +282,23 @@ export class UrlMatcher {
       return {
         id,
         regexp,
-        cfg: this.config.params[id],
         segment: pattern.substring(last, m.index),
         type: !regexp ? null : paramTypes.type(regexp) || makeRegexpType(regexp),
       };
     };
 
-    let p: any, segment: string;
+    let details: MatchDetails;
+    let segment: string;
 
     // tslint:disable-next-line:no-conditional-assignment
     while ((matchArray = placeholder.exec(pattern))) {
-      p = matchDetails(matchArray, false);
-      if (p.segment.indexOf('?') >= 0) break; // we're into the search part
+      details = matchDetails(matchArray, false);
+      if (details.segment.indexOf('?') >= 0) break; // we're into the search part
 
-      checkParamErrors(p.id);
-      this._params.push(paramFactory.fromPath(p.id, p.type, this.config.paramMap(p.cfg, false)));
-      this._segments.push(p.segment);
-      patterns.push([p.segment, tail(this._params)]);
+      checkParamErrors(details.id);
+      this._params.push(paramFactory.fromPath(details.id, details.type, config.state));
+      this._segments.push(details.segment);
+      patterns.push([details.segment, tail(this._params)]);
       last = placeholder.lastIndex;
     }
     segment = pattern.substring(last);
@@ -315,9 +315,9 @@ export class UrlMatcher {
 
         // tslint:disable-next-line:no-conditional-assignment
         while ((matchArray = searchPlaceholder.exec(search))) {
-          p = matchDetails(matchArray, true);
-          checkParamErrors(p.id);
-          this._params.push(paramFactory.fromSearch(p.id, p.type, this.config.paramMap(p.cfg, true)));
+          details = matchDetails(matchArray, true);
+          checkParamErrors(details.id);
+          this._params.push(paramFactory.fromSearch(details.id, details.type, config.state));
           last = placeholder.lastIndex;
           // check if ?&
         }

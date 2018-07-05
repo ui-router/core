@@ -11,22 +11,19 @@
  */ /** */
 import { LocationConfig } from '../common/coreservices';
 import { ParamType } from '../params/paramType';
-import { Param } from '../params/param';
 import { UIRouter } from '../router';
 import { TargetState } from '../state/targetState';
 import { TargetStateDef } from '../state/interface';
 import { UrlMatcher } from './urlMatcher';
 import { StateObject } from '../state/stateObject';
-import { ParamTypeDefinition } from '../params/interface';
+import { ParamTypeDefinition } from '../params';
+import { StateDeclaration } from '../state';
 
-/** @internalapi */
-export interface ParamFactory {
-  /** Creates a new [[Param]] from a CONFIG block */
-  fromConfig(id: string, type: ParamType, config: any): Param;
-  /** Creates a new [[Param]] from a url PATH */
-  fromPath(id: string, type: ParamType, config: any): Param;
-  /** Creates a new [[Param]] from a url SEARCH */
-  fromSearch(id: string, type: ParamType, config: any): Param;
+export interface UrlMatcherCompileConfig {
+  // If state is provided, use the configuration in the `params` block
+  state?: StateDeclaration;
+  strict?: boolean;
+  caseInsensitive?: boolean;
 }
 
 /**

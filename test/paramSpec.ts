@@ -35,31 +35,31 @@ describe('parameters', () => {
     });
   });
 
+  const customTypeBase: ParamTypeDefinition = {
+    encode: val => (val ? 'true' : 'false'),
+    decode: str => (str === 'true' ? true : str === 'false' ? false : undefined),
+    equals: (a, b) => a === b,
+    is: val => typeof val === 'boolean',
+    pattern: /(?:true|false)/,
+  };
+
   describe('from a custom type', () => {
     let router: UIRouter = null;
     let state: StateObject = null;
 
-    const base: ParamTypeDefinition = {
-      encode: val => (val ? 'true' : 'false'),
-      decode: str => (str === 'true' ? true : str === 'false' ? false : undefined),
-      equals: (a, b) => a === b,
-      is: val => typeof val === 'boolean',
-      pattern: /(?:true|false)/,
-    };
-
-    const customTypeA: ParamTypeDefinition = Object.assign({}, base, {
+    const customTypeA: ParamTypeDefinition = Object.assign({}, customTypeBase, {
       dynamic: true,
       inherit: true,
       raw: true,
     });
 
-    const customTypeB: ParamTypeDefinition = Object.assign({}, base, {
+    const customTypeB: ParamTypeDefinition = Object.assign({}, customTypeBase, {
       dynamic: false,
       inherit: false,
       raw: false,
     });
 
-    const customTypeC: ParamTypeDefinition = Object.assign({}, base);
+    const customTypeC: ParamTypeDefinition = Object.assign({}, customTypeBase);
 
     describe('with as a simple path parameter', () => {
       beforeEach(() => {
@@ -160,29 +160,77 @@ describe('parameters', () => {
         expect(state.parameter('paramC[]').raw).toBe(false);
       });
     });
+  });
 
-    describe('with dynamic flag on the state', () => {
-      beforeEach(() => {
-        router = new UIRouter();
-        router.urlService.config.type('customTypeA', Object.assign({}, customTypeA, { dynamic: false }));
-        router.urlService.config.type('customTypeB', Object.assign({}, customTypeB, { dynamic: true }));
-        router.urlService.config.type('customTypeC', customTypeC);
+  describe('parameters on a state with a dynamic flag', () => {
+    let router: UIRouter;
+    beforeEach(() => (router = new UIRouter()));
 
-        state = router.stateRegistry.register({
-          name: 'state',
-          dynamic: true,
-          url: '/{paramA:customTypeA}/{paramB:customTypeB}/{paramC:customTypeC}',
-          params: { paramB: { dynamic: false } },
-        });
+    it('should use the states dynamic flag for each param', () => {
+      const state = router.stateRegistry.register({
+        name: 'state',
+        dynamic: true,
+        url: '/:param1/:param2',
       });
 
-      it('should prefer the dynamic flag on the type, if specified', () => {
-        expect(state.parameter('paramA').dynamic).toBe(false);
+      expect(state.parameter('param1').dynamic).toBe(true);
+      expect(state.parameter('param2').dynamic).toBe(true);
+    });
+
+    it('should prefer the dynamic: true flag from the state over the dynamic flag on a custom type', () => {
+      router.urlService.config.type('dynFalse', { ...customTypeBase, dynamic: false });
+      router.urlService.config.type('dynTrue', { ...customTypeBase, dynamic: true });
+
+      const state = router.stateRegistry.register({
+        name: 'state',
+        dynamic: true,
+        url: '/{param1:dynFalse}/{param2:dynTrue}',
       });
 
-      it('should prefer the dynamic flag on the param declaration, if specified', () => {
-        expect(state.parameter('paramB').dynamic).toBe(false);
+      expect(state.parameter('param1').dynamic).toBe(true);
+      expect(state.parameter('param2').dynamic).toBe(true);
+    });
+
+    it('should prefer the dynamic: false flag from the state over the dynamic flag on a custom type', () => {
+      router.urlService.config.type('dynFalse', { ...customTypeBase, dynamic: false });
+      router.urlService.config.type('dynTrue', { ...customTypeBase, dynamic: true });
+
+      const state = router.stateRegistry.register({
+        name: 'state',
+        dynamic: false,
+        url: '/{param1:dynFalse}/{param2:dynTrue}',
       });
+
+      expect(state.parameter('param1').dynamic).toBe(false);
+      expect(state.parameter('param2').dynamic).toBe(false);
+    });
+
+    it('should prefer the dynamic flag from a param declaration', () => {
+      const state = router.stateRegistry.register({
+        name: 'state',
+        dynamic: true,
+        url: '/{param1}',
+        params: {
+          param1: { dynamic: false },
+        },
+      });
+
+      expect(state.parameter('param1').dynamic).toBe(false);
+    });
+
+    it('should prefer the dynamic flag from a param definition over both the state and custom type flag', () => {
+      router.urlService.config.type('dynTrue', { ...customTypeBase, dynamic: true });
+
+      const state = router.stateRegistry.register({
+        name: 'state',
+        dynamic: true,
+        url: '/{param1:dynTrue}',
+        params: {
+          param1: { dynamic: false },
+        },
+      });
+
+      expect(state.parameter('param1').dynamic).toBe(false);
     });
   });
 });
