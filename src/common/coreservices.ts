@@ -7,11 +7,13 @@
 /** for typedoc */
 import { IInjectable, Obj } from './common';
 import { Disposable } from '../interface';
-import { UrlParts } from '../url/interface';
 
-export let notImplemented = (fnname: string) => () => {
-  throw new Error(`${fnname}(): No coreservices implementation for UI-Router is loaded.`);
+const noImpl = (fnname: string) => () => {
+  throw new Error(`No implementation for ${fnname}. The framework specific code did not implement this method.`);
 };
+
+export const makeStub = <T>(service: string, methods: (keyof T)[]): T =>
+  methods.reduce((acc, key) => ((acc[key] = noImpl(`${service}.${key}()`) as any), acc), {} as T);
 
 const services: CoreServices = {
   $q: undefined,

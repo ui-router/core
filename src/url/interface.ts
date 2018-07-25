@@ -388,7 +388,7 @@ export interface UrlRulesApi {
    *
    * @param handler The initial state or url path, or a function which returns the state or url path (or performs custom logic).
    */
-  initial(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef, options?: { priority: number }): void;
+  initial(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef): void;
 
   /**
    * Gets all registered rules

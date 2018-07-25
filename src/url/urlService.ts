@@ -4,95 +4,34 @@
  */ /** */
 
 import { UIRouter } from '../router';
-import { LocationServices, notImplemented, LocationConfig } from '../common/coreservices';
-import { noop, createProxyFunctions } from '../common/common';
-import { UrlConfigApi, UrlSyncApi, UrlRulesApi, UrlParts, MatchResult } from './interface';
+import { LocationServices } from '../common/coreservices';
+import { MatchResult, UrlConfigApi, UrlParts, UrlRulesApi, UrlSyncApi } from './interface';
+import { UrlRules } from './urlRulesApi';
+import { UrlConfig } from './urlConfigApi';
 
-/** @hidden */
-const makeStub = (keys: string[]): any =>
-  keys.reduce((acc, key) => ((acc[key] = notImplemented(key)), acc), { dispose: noop });
-
-/** @hidden */
-const locationServicesFns = ['url', 'path', 'search', 'hash', 'onChange'];
-/** @hidden */
-const locationConfigFns = ['port', 'protocol', 'host', 'baseHref', 'html5Mode', 'hashPrefix'];
-/** @hidden */
-const umfFns = ['type', 'caseInsensitive', 'strictMode', 'defaultSquashPolicy'];
-/** @hidden */
-const rulesFns = ['sort', 'when', 'initial', 'otherwise', 'rules', 'rule', 'removeRule'];
-/** @hidden */
-const syncFns = ['deferIntercept', 'listen', 'sync', 'match'];
-
-/**
- * API for URL management
- */
+/** API for URL management */
 export class UrlService implements LocationServices, UrlSyncApi {
-  /** @hidden */
-  static locationServiceStub: LocationServices = makeStub(locationServicesFns);
-  /** @hidden */
-  static locationConfigStub: LocationConfig = makeStub(locationConfigFns);
-
   /**
    * A nested API for managing URL rules and rewrites
    *
    * See: [[UrlRulesApi]] for details
    */
-  rules: UrlRulesApi;
-
+  public rules: UrlRulesApi = new UrlRules(this.router);
   /**
    * A nested API to configure the URL and retrieve URL information
    *
    * See: [[UrlConfigApi]] for details
    */
-  config: UrlConfigApi;
+  public config: UrlConfigApi = new UrlConfig(this.router);
+  constructor(/** @hidden */ private router: UIRouter) {}
 
-  /** @hidden */
-  private router: UIRouter;
-
-  /** @hidden */
-  constructor(router: UIRouter, lateBind = true) {
-    this.router = router;
-    this.rules = {} as any;
-    this.config = {} as any;
-
-    // proxy function calls from UrlService to the LocationService/LocationConfig
-    const locationServices = () => router.locationService;
-    createProxyFunctions(locationServices, this, locationServices, locationServicesFns, lateBind);
-
-    const locationConfig = () => router.locationConfig;
-    createProxyFunctions(locationConfig, this.config, locationConfig, locationConfigFns, lateBind);
-
-    const umf = () => router.urlMatcherFactory;
-    createProxyFunctions(umf, this.config, umf, umfFns);
-
-    const urlRouter = () => router.urlRouter;
-    createProxyFunctions(urlRouter, this.rules, urlRouter, rulesFns);
-    createProxyFunctions(urlRouter, this, urlRouter, syncFns);
-  }
-
-  /** @inheritdoc */
-  url(): string;
-  /** @inheritdoc */
-  url(newurl: string, replace?: boolean, state?): void;
-  url(newurl?, replace?, state?): any {
-    return;
-  }
-  /** @inheritdoc */
-  path(): string {
-    return;
-  }
-  /** @inheritdoc */
-  search(): { [key: string]: any } {
-    return;
-  }
-  /** @inheritdoc */
-  hash(): string {
-    return;
-  }
-  /** @inheritdoc */
-  onChange(callback: Function): Function {
-    return;
-  }
+  // Delegate these calls to the current LocationServices implementation
+  /** @inheritdoc */ public url = (newurl?: string, replace?: boolean, state?: any): string =>
+    this.router.locationService.url(newurl, replace, state);
+  /** @inheritdoc */ public path = (): string => this.router.locationService.path();
+  /** @inheritdoc */ public search = (): { [key: string]: any } => this.router.locationService.search();
+  /** @inheritdoc */ public hash = (): string => this.router.locationService.hash();
+  /** @inheritdoc */ public onChange = (callback: Function): Function => this.router.locationService.onChange(callback);
 
   /**
    * Returns the current URL parts
@@ -101,26 +40,16 @@ export class UrlService implements LocationServices, UrlSyncApi {
    *
    * @returns the current url parts
    */
-  parts(): UrlParts {
+  public parts(): UrlParts {
     return { path: this.path(), search: this.search(), hash: this.hash() };
   }
 
-  dispose() {}
+  public dispose() {}
 
-  /** @inheritdoc */
-  sync(evt?) {
-    return;
-  }
-  /** @inheritdoc */
-  listen(enabled?: boolean): Function {
-    return;
-  }
-  /** @inheritdoc */
-  deferIntercept(defer?: boolean) {
-    return;
-  }
-  /** @inheritdoc */
-  match(urlParts: UrlParts): MatchResult {
-    return;
-  }
+  // Delegate these calls to the UrlRouter
+  // TODO: move impl from UrlRouter into this class
+  /** @inheritdoc */ public sync = (evt?) => this.router.urlRouter.sync(evt);
+  /** @inheritdoc */ public listen = (enabled?: boolean): Function => this.router.urlRouter.listen(enabled);
+  /** @inheritdoc */ public deferIntercept = (defer?: boolean) => this.router.urlRouter.deferIntercept(defer);
+  /** @inheritdoc */ public match = (urlParts: UrlParts): MatchResult => this.router.urlRouter.match(urlParts);
 }

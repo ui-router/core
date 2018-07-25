@@ -15,9 +15,19 @@ import { isFunction } from './common/predicates';
 import { UrlService } from './url/urlService';
 import { LocationServices, LocationConfig } from './common/coreservices';
 import { Trace, trace } from './common/trace';
+import { makeStub } from './common';
 
 /** @hidden */
 let _routerInstance = 0;
+
+/** @hidden */
+const locSvcFns: (keyof LocationServices)[] = ['url', 'path', 'search', 'hash', 'onChange'];
+/** @hidden */
+const locCfgFns: (keyof LocationConfig)[] = ['port', 'protocol', 'host', 'baseHref', 'html5Mode', 'hashPrefix'];
+/** @hidden */
+const locationServiceStub = makeStub<LocationServices>('LocationServices', locSvcFns);
+/** @hidden */
+const locationConfigStub = makeStub<LocationConfig>('LocationConfig', locCfgFns);
 
 /**
  * The master class used to instantiate an instance of UI-Router.
@@ -113,8 +123,8 @@ export class UIRouter {
    * @internalapi
    */
   constructor(
-    public locationService: LocationServices = UrlService.locationServiceStub,
-    public locationConfig: LocationConfig = UrlService.locationConfigStub
+    public locationService: LocationServices = locationServiceStub,
+    public locationConfig: LocationConfig = locationConfigStub
   ) {
     this.viewService._pluginapi._rootViewContext(this.stateRegistry.root());
     this.globals.$current = this.stateRegistry.root();
