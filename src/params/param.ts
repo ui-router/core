@@ -2,7 +2,7 @@
  * @coreapi
  * @module params
  */ /** for typedoc */
-import { extend, filter, map, allTrueR } from '../common/common';
+import { extend, filter, map, allTrueR, find } from '../common/common';
 import { prop } from '../common/hof';
 import { isInjectable, isDefined, isString, isArray, isUndefined } from '../common/predicates';
 import { RawParams, ParamDeclaration } from '../params/interface';
@@ -29,7 +29,7 @@ export { DefType };
 
 function getParamDeclaration(paramName: string, location: DefType, state: StateDeclaration): ParamDeclaration {
   const noReloadOnSearch = (state.reloadOnSearch === false && location === DefType.SEARCH) || undefined;
-  const dynamic = [state.dynamic, noReloadOnSearch].find(isDefined);
+  const dynamic = find([state.dynamic, noReloadOnSearch], isDefined);
   const defaultConfig = isDefined(dynamic) ? { dynamic } : {};
   const paramConfig = unwrapShorthand(state && state.params && state.params[paramName]);
   return extend(defaultConfig, paramConfig);
