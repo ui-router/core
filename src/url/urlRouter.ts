@@ -123,7 +123,18 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
   /** @inheritdoc */
   sort(compareFn?: (a: UrlRule, b: UrlRule) => number) {
-    this._rules = this.stableSort(this._rules, (this._sortFn = compareFn || this._sortFn));
+    const sorted = this.stableSort(this._rules, (this._sortFn = compareFn || this._sortFn));
+
+    // precompute _sortGroup values and apply to each rule
+    let group = 0;
+    for (let i = 0; i < sorted.length; i++) {
+      sorted[i]._group = group;
+      if (i < sorted.length - 1 && this._sortFn(sorted[i], sorted[i + 1]) !== 0) {
+        group++;
+      }
+    }
+
+    this._rules = sorted;
     this._sorted = true;
   }
 
@@ -148,11 +159,8 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * @returns {MatchResult}
    */
   match(url: UrlParts): MatchResult {
-    this.ensureSorted();
-
     url = extend({ path: '', search: {}, hash: '' }, url);
     const rules = this.rules();
-    if (this._otherwiseFn) rules.push(this._otherwiseFn);
 
     // Checks a single rule. Returns { rule: rule, match: match, weight: weight } if it matched, or undefined
 
@@ -168,7 +176,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
     let best: MatchResult;
     for (let i = 0; i < rules.length; i++) {
       // Stop when there is a 'best' rule and the next rule sorts differently than it.
-      if (best && this._sortFn(rules[i], best.rule) !== 0) break;
+      if (best && best.rule._group !== rules[i]._group) break;
 
       const current = checkRule(rules[i]);
       // Pick the best MatchResult
@@ -317,7 +325,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
   /** @inheritdoc */
   rules(): UrlRule[] {
     this.ensureSorted();
-    return this._rules.slice();
+    return this._rules.concat(this._otherwiseFn ? [this._otherwiseFn] : []);
   }
 
   /** @inheritdoc */

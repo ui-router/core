@@ -487,6 +487,9 @@ export interface UrlRule {
    */
   priority: number;
 
+  /** @hidden */
+  _group: number;
+
   /** The type of the rule */
   type: UrlRuleType;
 

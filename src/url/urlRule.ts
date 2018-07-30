@@ -213,6 +213,7 @@ export class UrlRuleFactory {
 export class BaseUrlRule implements UrlRule {
   $id: number;
   priority: number;
+  _group: number;
   type: UrlRuleType = 'RAW';
   handler: UrlRuleHandlerFn;
   matchPriority = match => 0 - this.$id;
