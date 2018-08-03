@@ -69,11 +69,20 @@ When the `UISref` is clicked, it should initiate a transition to the linked stat
 
 When combined with a `UISref`, a `UISrefActive` toggles a CSS class on/off when its `UISref` is active/inactive.
 
-### Bootstrap mechanism (optional)
+### Integrate with your framework's bootstrap mechanism (optional)
 
 Implement framework specific bootstrap requirements, if any.
 For example, UI-Router for Angular 1 and Angular 2 integrates with the ng1/ng2 Dependency Injection lifecycles.
 On the other hand, UI-Router for React uses a simple JavaScript based bootstrap, i.e., `new UIRouterReact().start();`.
+
+### Minimal Example
+
+This example doesn't have UIView, UISref, or anything like that.
+It bootstrap the router and naively manipulates the DOM when states are activated.
+
+https://stackblitz.com/edit/ui-router-plain-javascript?file=index.js
+
+Note: do not model your own router off this example, it is meant to show only the bare minimum.
 
 ## Getting help
 
