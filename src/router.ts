@@ -134,7 +134,7 @@ export class UIRouter {
     this.disposable(this.stateService);
     this.disposable(this.stateRegistry);
     this.disposable(this.transitionService);
-    this.disposable(this.urlRouter);
+    this.disposable(this.urlService);
     this.disposable(locationService);
     this.disposable(locationConfig);
   }

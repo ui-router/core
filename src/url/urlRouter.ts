@@ -3,27 +3,13 @@
  * @module url
  */
 /** for typedoc */
-import { createProxyFunctions, extend, removeFrom } from '../common/common';
-import { isDefined, isFunction, isString } from '../common/predicates';
-import { UrlMatcher } from './urlMatcher';
-import { RawParams } from '../params/interface';
-import { Disposable } from '../interface';
-import { UIRouter } from '../router';
-import { is, pattern, val } from '../common/hof';
-import { UrlRuleFactory } from './urlRule';
-import { TargetState } from '../state/targetState';
-import {
-  MatcherUrlRule,
-  MatchResult,
-  UrlParts,
-  UrlRule,
-  UrlRuleHandlerFn,
-  UrlRuleMatchFn,
-  UrlRulesApi,
-  UrlSyncApi,
-} from './interface';
-import { TargetStateDef } from '../state/interface';
 import { stripLastPathElement } from '../common';
+import { UrlMatcher } from './urlMatcher';
+import { RawParams } from '../params';
+import { UIRouter } from '../router';
+import { UrlRuleFactory } from './urlRule';
+import { MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn } from './interface';
+import { TargetState, TargetStateDef } from '../state';
 
 /** @hidden */
 function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHref: string): string {
@@ -33,55 +19,6 @@ function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHr
   return url;
 }
 
-/** @hidden */
-const prioritySort = (a: UrlRule, b: UrlRule) => (b.priority || 0) - (a.priority || 0);
-
-/** @hidden */
-const typeSort = (a: UrlRule, b: UrlRule) => {
-  const weights = { STATE: 4, URLMATCHER: 4, REGEXP: 3, RAW: 2, OTHER: 1 };
-  return (weights[a.type] || 0) - (weights[b.type] || 0);
-};
-
-/** @hidden */
-const urlMatcherSort = (a: MatcherUrlRule, b: MatcherUrlRule) =>
-  !a.urlMatcher || !b.urlMatcher ? 0 : UrlMatcher.compare(a.urlMatcher, b.urlMatcher);
-
-/** @hidden */
-const idSort = (a: UrlRule, b: UrlRule) => {
-  // Identically sorted STATE and URLMATCHER best rule will be chosen by `matchPriority` after each rule matches the URL
-  const useMatchPriority = { STATE: true, URLMATCHER: true };
-  const equal = useMatchPriority[a.type] && useMatchPriority[b.type];
-  return equal ? 0 : (a.$id || 0) - (b.$id || 0);
-};
-
-/**
- * Default rule priority sorting function.
- *
- * Sorts rules by:
- *
- * - Explicit priority (set rule priority using [[UrlRulesApi.when]])
- * - Rule type (STATE: 4, URLMATCHER: 4, REGEXP: 3, RAW: 2, OTHER: 1)
- * - `UrlMatcher` specificity ([[UrlMatcher.compare]]): works for STATE and URLMATCHER types to pick the most specific rule.
- * - Rule registration order (for rule types other than STATE and URLMATCHER)
- *   - Equally sorted State and UrlMatcher rules will each match the URL.
- *     Then, the *best* match is chosen based on how many parameter values were matched.
- *
- * @coreapi
- */
-let defaultRuleSortFn: (a: UrlRule, b: UrlRule) => number;
-defaultRuleSortFn = (a, b) => {
-  let cmp = prioritySort(a, b);
-  if (cmp !== 0) return cmp;
-
-  cmp = typeSort(a, b);
-  if (cmp !== 0) return cmp;
-
-  cmp = urlMatcherSort(a as MatcherUrlRule, b as MatcherUrlRule);
-  if (cmp !== 0) return cmp;
-
-  return idSort(a, b);
-};
-
 /**
  * Updates URL and responds to URL changes
  *
@@ -89,136 +26,15 @@ defaultRuleSortFn = (a, b) => {
  * This class is now considered to be an internal API
  * Use the [[UrlService]] instead.
  * For configuring URL rules, use the [[UrlRulesApi]] which can be found as [[UrlService.rules]].
- *
- * This class updates the URL when the state changes.
- * It also responds to changes in the URL.
  */
-export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
+export class UrlRouter {
   /** used to create [[UrlRule]] objects for common cases */
   public urlRuleFactory: UrlRuleFactory;
-
-  /** @hidden */ private _router: UIRouter;
   /** @hidden */ private location: string;
-  /** @hidden */ private _sortFn = defaultRuleSortFn;
-  /** @hidden */ private _stopFn: Function;
-  /** @hidden */ _rules: UrlRule[] = [];
-  /** @hidden */ private _otherwiseFn: UrlRule;
-  /** @hidden */ interceptDeferred = false;
-  /** @hidden */ private _id = 0;
-  /** @hidden */ private _sorted = false;
 
   /** @hidden */
-  constructor(router: UIRouter) {
-    this._router = router;
+  constructor(/** @hidden */ private router: UIRouter) {
     this.urlRuleFactory = new UrlRuleFactory(router);
-    createProxyFunctions(val(UrlRouter.prototype), this, val(this));
-  }
-
-  /** @internalapi */
-  dispose() {
-    this.listen(false);
-    this._rules = [];
-    delete this._otherwiseFn;
-  }
-
-  /** @inheritdoc */
-  sort(compareFn?: (a: UrlRule, b: UrlRule) => number) {
-    const sorted = this.stableSort(this._rules, (this._sortFn = compareFn || this._sortFn));
-
-    // precompute _sortGroup values and apply to each rule
-    let group = 0;
-    for (let i = 0; i < sorted.length; i++) {
-      sorted[i]._group = group;
-      if (i < sorted.length - 1 && this._sortFn(sorted[i], sorted[i + 1]) !== 0) {
-        group++;
-      }
-    }
-
-    this._rules = sorted;
-    this._sorted = true;
-  }
-
-  private ensureSorted() {
-    this._sorted || this.sort();
-  }
-
-  private stableSort(arr, compareFn) {
-    const arrOfWrapper = arr.map((elem, idx) => ({ elem, idx }));
-
-    arrOfWrapper.sort((wrapperA, wrapperB) => {
-      const cmpDiff = compareFn(wrapperA.elem, wrapperB.elem);
-      return cmpDiff === 0 ? wrapperA.idx - wrapperB.idx : cmpDiff;
-    });
-
-    return arrOfWrapper.map(wrapper => wrapper.elem);
-  }
-
-  /**
-   * Given a URL, check all rules and return the best [[MatchResult]]
-   * @param url
-   * @returns {MatchResult}
-   */
-  match(url: UrlParts): MatchResult {
-    url = extend({ path: '', search: {}, hash: '' }, url);
-    const rules = this.rules();
-
-    // Checks a single rule. Returns { rule: rule, match: match, weight: weight } if it matched, or undefined
-
-    const checkRule = (rule: UrlRule): MatchResult => {
-      const match = rule.match(url, this._router);
-      return match && { match, rule, weight: rule.matchPriority(match) };
-    };
-
-    // The rules are pre-sorted.
-    // - Find the first matching rule.
-    // - Find any other matching rule that sorted *exactly the same*, according to `.sort()`.
-    // - Choose the rule with the highest match weight.
-    let best: MatchResult;
-    for (let i = 0; i < rules.length; i++) {
-      // Stop when there is a 'best' rule and the next rule sorts differently than it.
-      if (best && best.rule._group !== rules[i]._group) break;
-
-      const current = checkRule(rules[i]);
-      // Pick the best MatchResult
-      best = !best || (current && current.weight > best.weight) ? current : best;
-    }
-
-    return best;
-  }
-
-  /** @inheritdoc */
-  sync(evt?) {
-    if (evt && evt.defaultPrevented) return;
-
-    const router = this._router,
-      $url = router.urlService,
-      $state = router.stateService;
-
-    const url: UrlParts = {
-      path: $url.path(),
-      search: $url.search(),
-      hash: $url.hash(),
-    };
-
-    const best = this.match(url);
-
-    const applyResult = pattern([
-      [isString, (newurl: string) => $url.url(newurl, true)],
-      [TargetState.isDef, (def: TargetStateDef) => $state.go(def.state, def.params, def.options)],
-      [is(TargetState), (target: TargetState) => $state.go(target.state(), target.params(), target.options())],
-    ]);
-
-    applyResult(best && best.rule.handler(best.match, url, router));
-  }
-
-  /** @inheritdoc */
-  listen(enabled?: boolean): Function {
-    if (enabled === false) {
-      this._stopFn && this._stopFn();
-      delete this._stopFn;
-    } else {
-      return (this._stopFn = this._stopFn || this._router.urlService.onChange(evt => this.sync(evt)));
-    }
   }
 
   /**
@@ -226,7 +42,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    * @internalapi
    */
   update(read?: boolean) {
-    const $url = this._router.locationService;
+    const $url = this.router.locationService;
     if (read) {
       this.location = $url.url();
       return;
@@ -248,7 +64,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
    */
   push(urlMatcher: UrlMatcher, params?: RawParams, options?: { replace?: string | boolean }) {
     const replace = options && !!options.replace;
-    this._router.urlService.url(urlMatcher.format(params || {}), replace);
+    this.router.urlService.url(urlMatcher.format(params || {}), replace);
   }
 
   /**
@@ -276,7 +92,7 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
 
     options = options || { absolute: false };
 
-    const cfg = this._router.urlService.config;
+    const cfg = this.router.urlService.config;
     const isHtml5 = cfg.html5Mode();
     if (!isHtml5 && url !== null) {
       url = '#' + cfg.hashPrefix() + url;
@@ -294,80 +110,39 @@ export class UrlRouter implements UrlRulesApi, UrlSyncApi, Disposable {
     return [cfg.protocol(), '://', cfg.host(), port, slash, url].join('');
   }
 
-  /**
-   * Manually adds a URL Rule.
-   *
-   * Usually, a url rule is added using [[StateDeclaration.url]] or [[when]].
-   * This api can be used directly for more control (to register a [[BaseUrlRule]], for example).
-   * Rules can be created using [[UrlRouter.urlRuleFactory]], or create manually as simple objects.
-   *
-   * A rule should have a `match` function which returns truthy if the rule matched.
-   * It should also have a `handler` function which is invoked if the rule is the best match.
-   *
-   * @return a function that deregisters the rule
-   */
-  rule(rule: UrlRule): Function {
-    if (!UrlRuleFactory.isUrlRule(rule)) throw new Error('invalid rule');
-    rule.$id = this._id++;
-    rule.priority = rule.priority || 0;
-
-    this._rules.push(rule);
-    this._sorted = false;
-
-    return () => this.removeRule(rule);
+  // Delegate these calls to [[UrlService]]
+  /** @deprecated use [[UrlService.sync]]*/
+  public sync = (evt?) => this.router.urlService.sync(evt);
+  /** @deprecated use [[UrlService.listen]]*/
+  public listen = (enabled?: boolean): Function => this.router.urlService.listen(enabled);
+  /** @deprecated use [[UrlService.deferIntercept]]*/
+  public deferIntercept = (defer?: boolean) => this.router.urlService.deferIntercept(defer);
+  /** @deprecated use [[UrlService.interceptDeferred]]*/
+  public get interceptDeferred() {
+    return this.router.urlService.interceptDeferred;
   }
+  /** @deprecated use [[UrlService.match]]*/
+  public match = (urlParts: UrlParts): MatchResult => this.router.urlService.match(urlParts);
 
-  /** @inheritdoc */
-  removeRule(rule): void {
-    removeFrom(this._rules, rule);
-  }
-
-  /** @inheritdoc */
-  rules(): UrlRule[] {
-    this.ensureSorted();
-    return this._rules.concat(this._otherwiseFn ? [this._otherwiseFn] : []);
-  }
-
-  /** @inheritdoc */
-  otherwise(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef) {
-    const handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
-
-    this._otherwiseFn = this.urlRuleFactory.create(val(true), handlerFn);
-    this._sorted = false;
-  }
-
-  /** @inheritdoc */
-  initial(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef) {
-    const handlerFn: UrlRuleHandlerFn = getHandlerFn(handler);
-
-    const matchFn: UrlRuleMatchFn = (urlParts, router) =>
-      router.globals.transitionHistory.size() === 0 && !!/^\/?$/.exec(urlParts.path);
-
-    this.rule(this.urlRuleFactory.create(matchFn, handlerFn));
-  }
-
-  /** @inheritdoc */
-  when(
+  // Delegate these calls to [[UrlRules]]
+  /** @deprecated use [[UrlRules.initial]]*/
+  public initial = (handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef): void =>
+    this.router.urlService.rules.initial(handler);
+  /** @deprecated use [[UrlRules.otherwise]]*/
+  public otherwise = (handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef): void =>
+    this.router.urlService.rules.otherwise(handler);
+  /** @deprecated use [[UrlRules.removeRule]]*/
+  public removeRule = (rule: UrlRule): void => this.router.urlService.rules.removeRule(rule);
+  /** @deprecated use [[UrlRules.rule]]*/
+  public rule = (rule: UrlRule): Function => this.router.urlService.rules.rule(rule);
+  /** @deprecated use [[UrlRules.rules]]*/
+  public rules = (): UrlRule[] => this.router.urlService.rules.rules();
+  /** @deprecated use [[UrlRules.sort]]*/
+  public sort = (compareFn?: (a: UrlRule, b: UrlRule) => number) => this.router.urlService.rules.sort(compareFn);
+  /** @deprecated use [[UrlRules.when]]*/
+  public when = (
     matcher: RegExp | UrlMatcher | string,
     handler: string | UrlRuleHandlerFn,
     options?: { priority: number }
-  ): UrlRule {
-    const rule = this.urlRuleFactory.create(matcher, handler);
-    if (isDefined(options && options.priority)) rule.priority = options.priority;
-    this.rule(rule);
-    return rule;
-  }
-
-  /** @inheritdoc */
-  deferIntercept(defer?: boolean) {
-    if (defer === undefined) defer = true;
-    this.interceptDeferred = defer;
-  }
-}
-
-function getHandlerFn(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef): UrlRuleHandlerFn {
-  if (!isFunction(handler) && !isString(handler) && !is(TargetState)(handler) && !TargetState.isDef(handler)) {
-    throw new Error("'handler' must be a string, function, TargetState, or have a state: 'newtarget' property");
-  }
-  return isFunction(handler) ? (handler as UrlRuleHandlerFn) : val(handler);
+  ): UrlRule => this.router.urlService.rules.when(matcher, handler, options);
 }

@@ -1,30 +1,23 @@
-/** @module state */ /** for typedoc */
-import { inArray } from '../common/common';
-import { isString } from '../common/predicates';
-import { StateDeclaration, _StateDeclaration } from './interface';
+/** @module state */
+/** for typedoc */
+import { inArray, isString, prop } from '../common';
+import { _StateDeclaration } from './interface';
 import { StateObject } from './stateObject';
 import { StateBuilder } from './stateBuilder';
-import { StateRegistryListener, StateRegistry } from './stateRegistry';
+import { StateRegistryListener } from './stateRegistry';
 import { Disposable } from '../interface';
-import { UrlRouter } from '../url/urlRouter';
-import { prop } from '../common/hof';
-import { StateMatcher } from './stateMatcher';
+import { UIRouter } from '../router';
 
 /** @internalapi */
 export class StateQueueManager implements Disposable {
-  queue: StateObject[];
-  matcher: StateMatcher;
+  queue: StateObject[] = [];
 
   constructor(
-    private $registry: StateRegistry,
-    private $urlRouter: UrlRouter,
+    private router: UIRouter,
     public states: { [key: string]: StateObject },
     public builder: StateBuilder,
     public listeners: StateRegistryListener[]
-  ) {
-    this.queue = [];
-    this.matcher = $registry.matcher;
-  }
+  ) {}
 
   /** @internalapi */
   dispose() {
@@ -73,7 +66,7 @@ export class StateQueueManager implements Disposable {
         const existingFutureState = getState(name + '.**');
         if (existingFutureState) {
           // Remove future state of the same name
-          this.$registry.deregister(existingFutureState);
+          this.router.stateRegistry.deregister(existingFutureState);
         }
 
         states[name] = state;
@@ -104,7 +97,7 @@ export class StateQueueManager implements Disposable {
 
   attachRoute(state: StateObject) {
     if (state.abstract || !state.url) return;
-
-    this.$urlRouter.rule(this.$urlRouter.urlRuleFactory.create(state));
+    const rulesApi = this.router.urlService.rules;
+    rulesApi.rule(rulesApi.urlRuleFactory.create(state));
   }
 }

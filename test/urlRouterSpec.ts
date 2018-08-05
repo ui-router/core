@@ -41,15 +41,16 @@ describe('UrlRouter', function() {
 
   it('should throw on non-function rules', function() {
     expect(function() {
-      urlRouter.rule(null);
+      router.urlService.rules.rule(null);
     }).toThrowError(/invalid rule/);
+
     expect(function() {
-      urlRouter.otherwise(null);
+      router.urlService.rules.otherwise(null);
     }).toThrowError(/must be a/);
   });
 
   it('should execute rewrite rules', function() {
-    urlRouter.rule(urlRouter.urlRuleFactory.create(/\/baz/, '/b4z'));
+    router.urlService.rules.rule(urlRouter.urlRuleFactory.create(/\/baz/, '/b4z'));
 
     locationService.url('/foo');
     expect(locationService.path()).toBe('/foo');
@@ -59,12 +60,12 @@ describe('UrlRouter', function() {
   });
 
   it('should keep otherwise last', function() {
-    urlRouter.otherwise('/otherwise');
+    router.urlService.rules.otherwise('/otherwise');
 
     locationService.url('/lastrule');
     expect(locationService.path()).toBe('/otherwise');
 
-    urlRouter.when('/lastrule', noop);
+    router.urlService.rules.when('/lastrule', noop);
 
     locationService.url('/lastrule');
     expect(locationService.path()).toBe('/lastrule');
@@ -76,8 +77,8 @@ describe('UrlRouter', function() {
       router.stateRegistry.register({ name: 'bar', url: '/bar' });
       router.stateRegistry.register({ name: 'otherwise', url: '/otherwise' });
 
-      urlRouter.initial('/foo');
-      urlRouter.otherwise('/otherwise');
+      router.urlService.rules.initial('/foo');
+      router.urlService.rules.otherwise('/otherwise');
     });
 
     it("should activate the initial path when initial path matches ''", function() {
@@ -106,8 +107,8 @@ describe('UrlRouter', function() {
       router.stateRegistry.register({ name: 'bar', url: '/bar' });
       router.stateRegistry.register({ name: 'otherwise', url: '/otherwise' });
 
-      urlRouter.initial({ state: 'foo' });
-      urlRouter.otherwise({ state: 'otherwise' });
+      router.urlService.rules.initial({ state: 'foo' });
+      router.urlService.rules.otherwise({ state: 'otherwise' });
 
       goSpy = spyOn(stateService, 'transitionTo').and.callThrough();
     });
@@ -139,18 +140,19 @@ describe('UrlRouter', function() {
       matchPriority: () => 0,
       $id: 0,
       priority: 0,
+      _group: 0,
       type: 'OTHER',
     };
 
-    const dereg = urlRouter.rule(rule as any);
+    const dereg = router.urlService.rules.rule(rule as any);
 
-    urlRouter.sync();
+    router.urlService.sync();
     expect(count).toBe(1);
-    urlRouter.sync();
+    router.urlService.sync();
     expect(count).toBe(2);
 
     dereg();
-    urlRouter.sync();
+    router.urlService.sync();
     expect(count).toBe(2);
   });
 
@@ -162,28 +164,29 @@ describe('UrlRouter', function() {
       matchPriority: () => 0,
       $id: 0,
       priority: 0,
+      _group: 0,
       type: 'OTHER',
     };
-    urlRouter.rule(rule as any);
+    router.urlService.rules.rule(rule as any);
 
-    urlRouter.sync();
+    router.urlService.sync();
     expect(count).toBe(1);
-    urlRouter.sync();
+    router.urlService.sync();
     expect(count).toBe(2);
 
-    urlRouter.removeRule(rule);
-    urlRouter.sync();
+    router.urlService.rules.removeRule(rule);
+    router.urlService.sync();
     expect(count).toBe(2);
   });
 
   it('`when` should return the new rule', function() {
     let calls = 0;
     locationService.url('/foo');
-    const rule = urlRouter.when('/foo', function() {
+    const rule = router.urlService.rules.when('/foo', function() {
       calls++;
     });
 
-    urlRouter.sync();
+    router.urlService.sync();
     expect(calls).toBe(1);
 
     expect(typeof rule.match).toBe('function');
@@ -268,7 +271,7 @@ describe('UrlRouter', function() {
       expect(actual).toBe('http://localhost/basehref#/hello/world#frag');
     });
 
-    describe('in html5mode', () => {
+    describe('when using pushstate/html5mode', () => {
       let baseTag: HTMLBaseElement;
       const applyBaseTag = (href: string) => {
         baseTag = document.createElement('base');
@@ -281,7 +284,6 @@ describe('UrlRouter', function() {
       beforeEach(() => {
         router.dispose(router.getPlugin('vanilla.memoryLocation'));
         router.plugin(pushStateLocationPlugin);
-        router.urlService = new UrlService(router, false);
       });
 
       describe('with base="/base/"', () => {
@@ -428,9 +430,9 @@ describe('UrlRouter', function() {
     });
 
     it('should prioritize a path with a static string over a param 3', () => {
-      urlRouter.when(matcher('/foo', '/:p1', '/tail'), log('p1'));
-      urlRouter.when(matcher('/foo', '/AAA', '/tail'), log('AAA'));
-      urlRouter.when(matcher('/foo', '/BBB/tail'), log('BBB'));
+      router.urlService.rules.when(matcher('/foo', '/:p1', '/tail'), log('p1'));
+      router.urlService.rules.when(matcher('/foo', '/AAA', '/tail'), log('AAA'));
+      router.urlService.rules.when(matcher('/foo', '/BBB/tail'), log('BBB'));
 
       urlService.url('/foo/AAA/tail');
       expect(matchlog).toEqual(['AAA']);
@@ -443,8 +445,8 @@ describe('UrlRouter', function() {
     });
 
     it('should prioritize a path with a static string over a param 4', () => {
-      urlRouter.when(matcher('/foo', '/:p1/:p2', '/tail'), log('p1'));
-      urlRouter.when(matcher('/foo', '/:p1/AAA', '/tail'), log('AAA'));
+      router.urlService.rules.when(matcher('/foo', '/:p1/:p2', '/tail'), log('p1'));
+      router.urlService.rules.when(matcher('/foo', '/:p1/AAA', '/tail'), log('AAA'));
 
       urlService.url('/foo/xyz/AAA/tail');
       expect(matchlog).toEqual(['AAA']);
@@ -454,8 +456,8 @@ describe('UrlRouter', function() {
     });
 
     it('should prioritize a path with a static string over a param 5', () => {
-      urlRouter.when(matcher('/foo/:p1/:p2/tail'), log('p1'));
-      urlRouter.when(matcher('/foo', '/:p1/AAA', '/tail'), log('AAA'));
+      router.urlService.rules.when(matcher('/foo/:p1/:p2/tail'), log('p1'));
+      router.urlService.rules.when(matcher('/foo', '/:p1/AAA', '/tail'), log('AAA'));
 
       urlService.url('/foo/xyz/AAA/tail');
       expect(matchlog).toEqual(['AAA']);
@@ -466,7 +468,7 @@ describe('UrlRouter', function() {
 
     // Tests for https://github.com/ui-router/core/issues/66
     it('should sort shorter paths before longer paths, all else equal', () => {
-      const cmp = (urlRouter as any)._sortFn;
+      const cmp = (router.urlService.rules as any)._sortFn;
       expect(cmp(matcherRule('/'), matcherRule('/a'))).toBeLessThan(0);
       expect(cmp(matcherRule('/a'), matcherRule('/a/b'))).toBeLessThan(0);
       expect(cmp(matcherRule('/a'), matcherRule('/a/:id'))).toBeLessThan(0);
@@ -474,7 +476,7 @@ describe('UrlRouter', function() {
     });
 
     it('should sort static strings before params', () => {
-      const cmp = (urlRouter as any)._sortFn;
+      const cmp = (router.urlService.rules as any)._sortFn;
       expect(cmp(matcherRule('/a'), matcherRule('/:id'))).toBeLessThan(0);
       expect(cmp(matcherRule('/a/:id'), matcherRule('/:id2/:id3'))).toBeLessThan(0);
       expect(cmp(matcherRule('/a/:id/:id2'), matcherRule('/:id3/:id4/:id5'))).toBeLessThan(0);
@@ -482,7 +484,7 @@ describe('UrlRouter', function() {
     });
 
     it('should sort same-level paths equally', () => {
-      const cmp = (urlRouter as any)._sortFn;
+      const cmp = (router.urlService.rules as any)._sortFn;
       expect(cmp(matcherRule('/a'), matcherRule('/b'))).toBe(0);
       expect(cmp(matcherRule('/a/x'), matcherRule('/b/x'))).toBe(0);
       expect(cmp(matcherRule('/:id1'), matcherRule('/:id2'))).toBe(0);
@@ -490,8 +492,8 @@ describe('UrlRouter', function() {
     });
 
     it('should prioritize a path with a static string over a param 6', () => {
-      urlRouter.when(matcher('/foo/:p1/:p2/tail'), log('p1'));
-      urlRouter.when(matcher('/foo', '/:p1/AAA', '/:p2'), log('AAA'));
+      router.urlService.rules.when(matcher('/foo/:p1/:p2/tail'), log('p1'));
+      router.urlService.rules.when(matcher('/foo', '/:p1/AAA', '/:p2'), log('AAA'));
 
       urlService.url('/foo/xyz/AAA/tail');
       expect(matchlog).toEqual(['AAA']);
@@ -501,8 +503,8 @@ describe('UrlRouter', function() {
     });
 
     it('should prioritize a rule with a higher priority', () => {
-      urlRouter.when(matcher('/foo', '/:p1', '/:p2'), log('1'), { priority: 1 });
-      urlRouter.when(matcher('/foo/123/456'), log('2'));
+      router.urlService.rules.when(matcher('/foo', '/:p1', '/:p2'), log('1'), { priority: 1 });
+      router.urlService.rules.when(matcher('/foo/123/456'), log('2'));
       urlService.url('/foo/123/456');
 
       expect(matchlog).toEqual(['1']);
@@ -510,8 +512,8 @@ describe('UrlRouter', function() {
 
     describe('rules which sort identically', () => {
       it('should prioritize the rule with the highest number of matched param values', () => {
-        urlRouter.when(matcher('/foo/:p1/:p2'), log('1'));
-        urlRouter.when(matcher('/foo/:p1/:p2?query'), log('2'));
+        router.urlService.rules.when(matcher('/foo/:p1/:p2'), log('1'));
+        router.urlService.rules.when(matcher('/foo/:p1/:p2?query'), log('2'));
 
         urlService.url('/foo/123/456');
         expect(matchlog).toEqual(['1']);
@@ -531,20 +533,20 @@ describe('UrlRouter', function() {
     });
 
     it('should return the best match for a URL 1', () => {
-      const match: MatchResult = urlRouter.match({ path: '/BBB' });
+      const match: MatchResult = router.urlService.match({ path: '/BBB' });
       expect(match.rule.type).toBe('STATE');
       expect(match.rule['state']).toBe(B);
     });
 
     it('should return the best match for a URL 2', () => {
-      const match: MatchResult = urlRouter.match({ path: '/EEE' });
+      const match: MatchResult = router.urlService.match({ path: '/EEE' });
       expect(match.rule.type).toBe('STATE');
       expect(match.rule['state']).toBe(A);
       expect(match.match).toEqual({ pA: 'EEE' });
     });
 
     it('should return the best match for a URL 3', () => {
-      const match: MatchResult = urlRouter.match({ path: '/CCC' });
+      const match: MatchResult = router.urlService.match({ path: '/CCC' });
       expect(match.rule.type).toBe('URLMATCHER');
       expect(match.rule).toBe(CCC);
     });
@@ -576,26 +578,28 @@ describe('UrlRouter', function() {
 });
 
 describe('UrlRouter.deferIntercept', () => {
-  let $ur, $url;
+  let router: UIRouter;
   beforeEach(function() {
-    const router = new UIRouter();
-    router.urlRouter.deferIntercept();
+    router = new UIRouter();
+    router.urlService.deferIntercept();
     router.plugin(TestingPlugin);
-    $ur = router.urlRouter;
-    $url = router.urlService;
   });
 
   it('should allow location changes to be deferred', function() {
     const log = [];
 
-    $ur.rule($ur.urlRuleFactory.create(/.*/, () => log.push($url.path())));
+    const handler = () => {
+      log.push(router.urlService.path());
+    };
+    const rule = router.urlService.rules.urlRuleFactory.create(/.*/, handler);
+    router.urlService.rules.rule(rule);
 
-    $url.url('/foo');
+    router.urlService.url('/foo');
 
     expect(log).toEqual([]);
 
-    $ur.listen();
-    $ur.sync();
+    router.urlService.listen();
+    router.urlService.sync();
 
     expect(log).toEqual(['/foo']);
   });

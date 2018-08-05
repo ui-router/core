@@ -45,6 +45,7 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
   /** @internalapi Creates a new [[Param]] for a given location (DefType) */
   paramFactory = new ParamFactory(this);
 
+  // TODO: move implementations to UrlConfig (urlService.config)
   constructor() {
     extend(this, { UrlMatcher, Param });
   }

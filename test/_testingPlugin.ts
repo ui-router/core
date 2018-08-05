@@ -12,18 +12,14 @@ export class TestingPlugin extends UIRouterPluginBase {
     super();
     router.plugin(vanilla.servicesPlugin);
     router.plugin(vanilla.memoryLocationPlugin);
-    // bind the location proxy functions immediately
-    router.urlService = new UrlService(router, false);
-
     this.addErrorLoopHandler();
-
     this.startRouter();
   }
 
   startRouter() {
     this.router.urlMatcherFactory.$get();
-    if (!this.router.urlRouter.interceptDeferred) {
-      this.router.urlRouter.listen();
+    if (!this.router.urlService.interceptDeferred) {
+      this.router.urlService.listen();
     }
   }
 

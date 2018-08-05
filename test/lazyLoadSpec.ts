@@ -1,5 +1,4 @@
 import { UIRouter, TransitionService, StateService } from '../src/index';
-import * as vanilla from '../src/vanilla';
 
 import { StateRegistry } from '../src/state/stateRegistry';
 import { UrlRouter } from '../src/url/urlRouter';
@@ -284,7 +283,7 @@ describe('future state', function() {
 
     it('triggered by a URL sync should re-parse the URL to activate the lazy loaded state', done => {
       router.urlService.url('/a/def');
-      $urlRouter.sync();
+      router.urlService.sync();
       $transitions.onSuccess({}, () => {
         expect($state.current.name).toBe('A');
         expect($state.params).toEqualValues({ id: 'def' });
@@ -341,7 +340,7 @@ describe('future state', function() {
 
     it('should re-parse the URL to activate the final state', done => {
       router.urlService.url('/a/def/b');
-      $urlRouter.sync();
+      router.urlService.sync();
       $transitions.onSuccess({}, () => {
         expect($state.current.name).toBe('A.B');
         expect($state.params).toEqualValues({ id: 'def' });
@@ -509,7 +508,7 @@ describe('future state', function() {
 
     it('should load and activate a nested future state by url sync', done => {
       router.urlService.url('/a/aid/b/bid');
-      $urlRouter.sync();
+      router.urlService.sync();
       $transitions.onSuccess({}, trans => {
         expect($state.current.name).toBe('A.B');
         expect($state.params).toEqualValues({ aid: 'aid', bid: 'bid' });

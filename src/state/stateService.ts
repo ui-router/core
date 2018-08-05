@@ -524,9 +524,8 @@ export class StateService {
     if (!nav || nav.url === undefined || nav.url === null) {
       return null;
     }
-    return this.router.urlRouter.href(nav.url, params, {
-      absolute: options.absolute,
-    });
+
+    return this.router.urlRouter.href(nav.url, params, { absolute: options.absolute });
   }
 
   /** @hidden */

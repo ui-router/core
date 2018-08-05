@@ -35,10 +35,10 @@ export class StateRegistry {
   listeners: StateRegistryListener[] = [];
 
   /** @internalapi */
-  constructor(private _router: UIRouter) {
+  constructor(private router: UIRouter) {
     this.matcher = new StateMatcher(this.states);
-    this.builder = new StateBuilder(this.matcher, _router.urlMatcherFactory);
-    this.stateQueue = new StateQueueManager(this, _router.urlRouter, this.states, this.builder, this.listeners);
+    this.builder = new StateBuilder(this.matcher, router.urlMatcherFactory);
+    this.stateQueue = new StateQueueManager(router, this.states, this.builder, this.listeners);
     this._registerRoot();
   }
 
@@ -143,12 +143,14 @@ export class StateRegistry {
     const deregistered: StateObject[] = [state].concat(children).reverse();
 
     deregistered.forEach(_state => {
-      const $ur = this._router.urlRouter;
+      const rulesApi = this.router.urlService.rules;
+
       // Remove URL rule
-      $ur
+      rulesApi
         .rules()
         .filter(propEq('state', _state))
-        .forEach($ur.removeRule.bind($ur));
+        .forEach(rule => rulesApi.removeRule(rule));
+
       // Remove state from registry
       delete this.states[_state.name];
     });

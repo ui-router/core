@@ -71,14 +71,15 @@ describe('StateRegistry', () => {
 
       spyOn($state, 'transitionTo');
       router.urlService.url('/foo');
-      router.urlRouter.sync();
+      router.urlService.sync();
       expect($state.transitionTo['calls'].mostRecent().args[0]).toBe(state.$$state());
+      expect(router.urlService.rules.rules().length).toBe(1);
 
       registry.deregister(state);
       $state.transitionTo['calls'].reset();
-      router.urlRouter.sync();
+      router.urlService.sync();
       expect($state.transitionTo['calls'].count()).toBe(0);
-      expect(router.urlRouter._rules.length).toBe(0);
+      expect(router.urlService.rules.rules().length).toBe(0);
     });
   });
 
