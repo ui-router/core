@@ -5,8 +5,8 @@
 import { UIRouter } from '../router';
 import { extend, is, isString, LocationServices, pattern } from '../common';
 import { MatchResult, UrlParts, UrlRule, UrlSyncApi } from './interface';
-import { UrlRules } from './urlRulesApi';
-import { UrlConfig } from './urlConfigApi';
+import { UrlRules } from './urlRules';
+import { UrlConfig } from './urlConfig';
 import { TargetState, TargetStateDef } from '../state';
 
 /** API for URL management */
