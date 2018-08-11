@@ -1,8 +1,4 @@
-/**
- * @coreapi
- * @module state
- */
-/** */
+/** @publicapi @module state */ /** */
 import {
   createProxyFunctions,
   defaults,
@@ -85,7 +81,7 @@ export class StateService {
   }
 
   /** @internalapi */
-  constructor(private router: UIRouter) {
+  constructor(/** @hidden */ private router: UIRouter) {
     const getters = ['current', '$current', 'params', 'transition'];
     const boundFns = Object.keys(StateService.prototype).filter(not(inArray(getters)));
     createProxyFunctions(val(StateService.prototype), this, val(this), boundFns);

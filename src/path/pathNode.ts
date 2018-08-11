@@ -1,4 +1,4 @@
-/** @module path */ /** for typedoc */
+/** @internalapi @module path */ /** */
 import { extend, applyPairs, find, allTrueR, pairs, arrayTuples } from '../common/common';
 import { propEq } from '../common/hof';
 import { StateObject } from '../state/stateObject';
@@ -8,8 +8,6 @@ import { Resolvable } from '../resolve/resolvable';
 import { ViewConfig } from '../view/interface';
 
 /**
- * @internalapi
- *
  * A node in a [[TreeChanges]] path
  *
  * For a [[TreeChanges]] path, this class holds the stateful information for a single node in the path.

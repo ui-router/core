@@ -4,8 +4,7 @@
  * Although these functions are exported, they are subject to change without notice.
  *
  * @module common_predicates
- */
-/** */
+ */ /** */
 import { and, not, pipe, prop, or } from './hof';
 import { Predicate } from './common'; // has or is using
 import { StateObject } from '../state/stateObject';

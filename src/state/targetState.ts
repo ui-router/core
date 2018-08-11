@@ -1,7 +1,4 @@
-/**
- * @coreapi
- * @module state
- */ /** for typedoc */
+/** @publicapi @module state */ /** */
 
 import { StateDeclaration, StateOrName, TargetStateDef } from './interface';
 import { TransitionOptions } from '../transition/interface';

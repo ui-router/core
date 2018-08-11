@@ -1,4 +1,4 @@
-/** @module resolve */ /** for typedoc */
+/** @publicapi @module resolve */ /** */
 export * from './interface';
 export * from './resolvable';
 export * from './resolveContext';

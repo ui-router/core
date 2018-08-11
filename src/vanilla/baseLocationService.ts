@@ -1,8 +1,4 @@
-/**
- * @internalapi
- * @module vanilla
- */ /** */
-
+/** @internalapi @module vanilla */ /** */
 import { deregAll, isDefined, LocationServices, removeFrom, root } from '../common';
 import { Disposable } from '../interface';
 import { UIRouter } from '../router';

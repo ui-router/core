@@ -1,6 +1,2 @@
-/**
- * @internalapi
- * @module vanilla
- */
-/** */
+/** @internalapi @module vanilla */ /** */
 export * from './vanilla/index';

@@ -1,8 +1,4 @@
-/**
- * @coreapi
- * @module params
- */
-/** */
+/** @publicapi @module params */ /** */
 import { extend, filter, map } from '../common/common';
 import { isArray, isDefined } from '../common/predicates';
 import { ParamTypeDefinition } from './interface';

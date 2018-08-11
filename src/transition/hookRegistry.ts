@@ -1,7 +1,4 @@
-/**
- * @coreapi
- * @module transition
- */ /** for typedoc */
+/** @publicapi @module transition */ /** */
 import { isString, isFunction, Glob, extend, removeFrom, tail, values, identity, mapObj } from '../common';
 import { PathNode } from '../path/pathNode';
 import {

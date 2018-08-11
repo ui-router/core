@@ -1,4 +1,4 @@
-/** @module hooks */ /** */
+/** @internalapi @module hooks */ /** */
 import { Transition } from '../transition/transition';
 import { UIRouter } from '../router';
 import { TransitionService } from '../transition/transitionService';

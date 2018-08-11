@@ -8,10 +8,8 @@
  * - [[Transition]]
  * - [[HookFn]], [[TransitionHookFn]], [[TransitionStateHookFn]], [[HookMatchCriteria]], [[HookResult]]
  *
- * @coreapi
- * @preferred
- * @module transition
- */ /** for typedoc */
+ * @preferred @publicapi @module transition
+ */ /** */
 export * from './interface';
 export * from './hookBuilder';
 export * from './hookRegistry';

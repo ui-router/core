@@ -1,33 +1,26 @@
-/**
- * @internalapi
- * @module url
- */ /** for typedoc */
-import { forEach, extend } from '../common/common';
-import { isObject, isDefined, isFunction, isString } from '../common/predicates';
+/** @publicapi @module url */ /** */
+import { extend, forEach, isDefined, isFunction, isObject } from '../common';
 import { UrlMatcher } from './urlMatcher';
-import { Param, DefType } from '../params/param';
-import { ParamTypes } from '../params/paramTypes';
-import { ParamTypeDefinition } from '../params/interface';
-import { Disposable } from '../interface';
-import { ParamType } from '../params/paramType';
-import { UrlMatcherCompileConfig, UrlMatcherConfig } from './interface';
+import { DefType, Param, ParamType, ParamTypeDefinition } from '../params';
+import { UrlMatcherCompileConfig } from './interface';
 import { StateDeclaration } from '../state';
+import { UIRouter } from '../router';
 
 /** @internalapi */
 export class ParamFactory {
   fromConfig(id: string, type: ParamType, state: StateDeclaration) {
-    return new Param(id, type, DefType.CONFIG, this.umf, state);
+    return new Param(id, type, DefType.CONFIG, this.router.urlService.config, state);
   }
 
   fromPath(id: string, type: ParamType, state: StateDeclaration) {
-    return new Param(id, type, DefType.PATH, this.umf, state);
+    return new Param(id, type, DefType.PATH, this.router.urlService.config, state);
   }
 
   fromSearch(id: string, type: ParamType, state: StateDeclaration) {
-    return new Param(id, type, DefType.SEARCH, this.umf, state);
+    return new Param(id, type, DefType.SEARCH, this.router.urlService.config, state);
   }
 
-  constructor(private umf: UrlMatcherFactory) {}
+  constructor(private router: UIRouter) {}
 }
 
 /**
@@ -35,36 +28,16 @@ export class ParamFactory {
  *
  * The factory is available to ng1 services as
  * `$urlMatcherFactory` or ng1 providers as `$urlMatcherFactoryProvider`.
+ *
+ * @internalapi
  */
-export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
-  /** @hidden */ paramTypes = new ParamTypes();
-  /** @hidden */ _isCaseInsensitive = false;
-  /** @hidden */ _isStrictMode = true;
-  /** @hidden */ _defaultSquashPolicy: boolean | string = false;
-
+export class UrlMatcherFactory {
   /** @internalapi Creates a new [[Param]] for a given location (DefType) */
-  paramFactory = new ParamFactory(this);
+  paramFactory = new ParamFactory(this.router);
 
   // TODO: move implementations to UrlConfig (urlService.config)
-  constructor() {
+  constructor(/** @hidden */ private router: UIRouter) {
     extend(this, { UrlMatcher, Param });
-  }
-
-  /** @inheritdoc */
-  caseInsensitive(value?: boolean): boolean {
-    return (this._isCaseInsensitive = isDefined(value) ? value : this._isCaseInsensitive);
-  }
-
-  /** @inheritdoc */
-  strictMode(value?: boolean): boolean {
-    return (this._isStrictMode = isDefined(value) ? value : this._isStrictMode);
-  }
-
-  /** @inheritdoc */
-  defaultSquashPolicy(value?: boolean | string) {
-    if (isDefined(value) && value !== true && value !== false && !isString(value))
-      throw new Error(`Invalid squash policy: ${value}. Valid policies: false, true, arbitrary-string`);
-    return (this._defaultSquashPolicy = isDefined(value) ? value : this._defaultSquashPolicy);
   }
 
   /**
@@ -75,11 +48,12 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
    * @returns The UrlMatcher.
    */
   compile(pattern: string, config?: UrlMatcherCompileConfig) {
+    const urlConfig = this.router.urlService.config;
     // backward-compatible support for config.params -> config.state.params
     const params = config && !config.state && (config as any).params;
     config = params ? { state: { params }, ...config } : config;
-    const globalConfig = { strict: this._isStrictMode, caseInsensitive: this._isCaseInsensitive };
-    return new UrlMatcher(pattern, this.paramTypes, this.paramFactory, extend(globalConfig, config));
+    const globalConfig = { strict: urlConfig._isStrictMode, caseInsensitive: urlConfig._isCaseInsensitive };
+    return new UrlMatcher(pattern, urlConfig.paramTypes, this.paramFactory, extend(globalConfig, config));
   }
 
   /**
@@ -100,39 +74,25 @@ export class UrlMatcherFactory implements Disposable, UrlMatcherConfig {
     return result;
   }
 
-  /**
-   * Creates and registers a custom [[ParamType]] object
-   *
-   * A [[ParamType]] can be used to generate URLs with typed parameters.
-   *
-   * @param name  The type name.
-   * @param definition The type definition. See [[ParamTypeDefinition]] for information on the values accepted.
-   * @param definitionFn A function that is injected before the app runtime starts.
-   *        The result of this function should be a [[ParamTypeDefinition]].
-   *        The result is merged into the existing `definition`.
-   *        See [[ParamType]] for information on the values accepted.
-   *
-   * @returns - if a type was registered: the [[UrlMatcherFactory]]
-   *   - if only the `name` parameter was specified: the currently registered [[ParamType]] object, or undefined
-   *
-   * Note: Register custom types *before using them* in a state definition.
-   *
-   * See [[ParamTypeDefinition]] for examples
-   */
-  type(name: string, definition?: ParamTypeDefinition, definitionFn?: () => ParamTypeDefinition) {
-    const type = this.paramTypes.type(name, definition, definitionFn);
-    return !isDefined(definition) ? type : this;
-  }
-
   /** @hidden */
   $get() {
-    this.paramTypes.enqueue = false;
-    this.paramTypes._flushTypeQueue();
+    const urlConfig = this.router.urlService.config;
+    urlConfig.paramTypes.enqueue = false;
+    urlConfig.paramTypes._flushTypeQueue();
     return this;
   }
 
-  /** @internalapi */
-  dispose() {
-    this.paramTypes.dispose();
-  }
+  /** @deprecated use [[UrlConfig.caseInsensitive]] */
+  caseInsensitive = (value?: boolean) => this.router.urlService.config.caseInsensitive(value);
+
+  /** @deprecated use [[UrlConfig.defaultSquashPolicy]] */
+  defaultSquashPolicy = (value?: boolean | string) => this.router.urlService.config.defaultSquashPolicy(value);
+
+  /** @deprecated use [[UrlConfig.strictMode]] */
+  strictMode = (value?: boolean) => this.router.urlService.config.strictMode(value);
+
+  /** @deprecated use [[UrlConfig.type]] */
+  type = (name: string, definition?: ParamTypeDefinition, definitionFn?: () => ParamTypeDefinition) => {
+    return this.router.urlService.config.type(name, definition, definitionFn) || this;
+  };
 }

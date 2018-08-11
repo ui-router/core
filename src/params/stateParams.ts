@@ -1,8 +1,4 @@
-/**
- * @coreapi
- * @module params
- */
-/** */
+/** @publicapi @module params */ /** */
 import { extend, ancestors, Obj } from '../common/common';
 import { StateObject } from '../state/stateObject';
 

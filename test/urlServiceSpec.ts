@@ -53,7 +53,7 @@ describe('Facades delegating to the UrlService classes', () => {
     expectProxyCall(() => router.urlRouter, () => router.urlService, 'deferIntercept');
   });
 
-  // UrlService -> LocationConfig
+  // UrlConfig -> LocationConfig
 
   it('should pass config.port() through to LocationConfig', () => {
     expectProxyCall(() => router.urlService.config, () => router.locationConfig, 'port');
@@ -82,19 +82,19 @@ describe('Facades delegating to the UrlService classes', () => {
   // UrlService.ConfigApi -> UrlMatcherFactory
 
   it('should pass config.type() through to UrlRouter', () => {
-    expectProxyCall(() => router.urlService.config, () => router.urlMatcherFactory, 'type', ['foo']);
+    expectProxyCall(() => router.urlMatcherFactory, () => router.urlService.config, 'type', ['foo']);
   });
 
   it('should pass config.caseInsensitive() through to UrlRouter', () => {
-    expectProxyCall(() => router.urlService.config, () => router.urlMatcherFactory, 'caseInsensitive');
+    expectProxyCall(() => router.urlMatcherFactory, () => router.urlService.config, 'caseInsensitive');
   });
 
   it('should pass config.strictMode() through to UrlRouter', () => {
-    expectProxyCall(() => router.urlService.config, () => router.urlMatcherFactory, 'strictMode');
+    expectProxyCall(() => router.urlMatcherFactory, () => router.urlService.config, 'strictMode');
   });
 
   it('should pass config.defaultSquashPolicy() through to UrlRouter', () => {
-    expectProxyCall(() => router.urlService.config, () => router.urlMatcherFactory, 'defaultSquashPolicy');
+    expectProxyCall(() => router.urlMatcherFactory, () => router.urlService.config, 'defaultSquashPolicy');
   });
 
   // UrlRouter -> UrlRules

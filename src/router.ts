@@ -1,7 +1,4 @@
-/**
- * @coreapi
- * @module core
- */ /** */
+/** @publicapi @module core */ /** */
 import { UrlMatcherFactory } from './url/urlMatcherFactory';
 import { UrlRouter } from './url/urlRouter';
 import { TransitionService } from './transition/transitionService';
@@ -65,7 +62,7 @@ export class UIRouter {
    * Deprecated for public use. Use [[urlService]] instead.
    * @deprecated Use [[urlService]] instead
    */
-  urlMatcherFactory: UrlMatcherFactory = new UrlMatcherFactory();
+  urlMatcherFactory: UrlMatcherFactory = new UrlMatcherFactory(this);
 
   /**
    * Deprecated for public use. Use [[urlService]] instead.
@@ -73,14 +70,14 @@ export class UIRouter {
    */
   urlRouter: UrlRouter = new UrlRouter(this);
 
+  /** Provides services related to the URL */
+  urlService: UrlService = new UrlService(this);
+
   /** Provides a registry for states, and related registration services */
   stateRegistry: StateRegistry = new StateRegistry(this);
 
   /** Provides services related to states */
   stateService = new StateService(this);
-
-  /** Provides services related to the URL */
-  urlService: UrlService = new UrlService(this);
 
   /** @hidden plugin instances are registered here */
   private _plugins: { [key: string]: UIRouterPlugin } = {};

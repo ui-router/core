@@ -1,8 +1,4 @@
-/**
- * @coreapi
- * @module transition
- */
-/** for typedoc */
+/** @publicapi @module transition */ /** */
 import { trace } from '../common/trace';
 import { services } from '../common/coreservices';
 import { stringify } from '../common/strings';

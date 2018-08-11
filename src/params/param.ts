@@ -1,7 +1,4 @@
-/**
- * @coreapi
- * @module params
- */ /** for typedoc */
+/** @publicapi @module params */ /** */
 import { extend, filter, map, allTrueR, find } from '../common/common';
 import { prop } from '../common/hof';
 import { isInjectable, isDefined, isString, isArray, isUndefined } from '../common/predicates';
@@ -9,8 +6,8 @@ import { RawParams, ParamDeclaration } from '../params/interface';
 import { services } from '../common/coreservices';
 import { ParamType } from './paramType';
 import { ParamTypes } from './paramTypes';
-import { UrlMatcherFactory } from '../url/urlMatcherFactory';
 import { StateDeclaration } from '../state';
+import { UrlConfig } from '../url';
 
 /** @hidden */
 const hasOwn = Object.prototype.hasOwnProperty;
@@ -27,6 +24,7 @@ enum DefType {
 }
 export { DefType };
 
+/** @internalapi */
 function getParamDeclaration(paramName: string, location: DefType, state: StateDeclaration): ParamDeclaration {
   const noReloadOnSearch = (state.reloadOnSearch === false && location === DefType.SEARCH) || undefined;
   const dynamic = find([state.dynamic, noReloadOnSearch], isDefined);
@@ -153,21 +151,15 @@ export class Param {
     return params.map(param => param.validates(values[param.id])).reduce(allTrueR, true);
   }
 
-  constructor(
-    id: string,
-    type: ParamType,
-    location: DefType,
-    urlMatcherFactory: UrlMatcherFactory,
-    state: StateDeclaration
-  ) {
+  constructor(id: string, type: ParamType, location: DefType, urlConfig: UrlConfig, state: StateDeclaration) {
     const config: ParamDeclaration = getParamDeclaration(id, location, state);
-    type = getType(config, type, location, id, urlMatcherFactory.paramTypes);
+    type = getType(config, type, location, id, urlConfig.paramTypes);
     const arrayMode = getArrayMode();
     type = arrayMode ? type.$asArray(arrayMode, location === DefType.SEARCH) : type;
     const isOptional = config.value !== undefined || location === DefType.SEARCH;
     const dynamic = isDefined(config.dynamic) ? !!config.dynamic : !!type.dynamic;
     const raw = isDefined(config.raw) ? !!config.raw : !!type.raw;
-    const squash = getSquashPolicy(config, isOptional, urlMatcherFactory.defaultSquashPolicy());
+    const squash = getSquashPolicy(config, isOptional, urlConfig.defaultSquashPolicy());
     const replace = getReplace(config, arrayMode, isOptional, squash);
     const inherit = isDefined(config.inherit) ? !!config.inherit : !!type.inherit;
 

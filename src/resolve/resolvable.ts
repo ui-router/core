@@ -1,7 +1,4 @@
-/**
- * @coreapi
- * @module resolve
- */ /** for typedoc */
+/** @publicapi @module resolve */ /** */
 import { extend, equals, inArray, identity } from '../common/common';
 import { services } from '../common/coreservices';
 import { trace } from '../common/trace';

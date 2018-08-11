@@ -1,4 +1,4 @@
-/** @module transition */ /** */
+/** @publicapi @module transition */ /** */
 import { TransitionHookPhase, PathType } from './interface';
 import { GetErrorHandler, GetResultHandler, TransitionHook } from './transitionHook';
 /**

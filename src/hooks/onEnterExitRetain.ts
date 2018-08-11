@@ -1,5 +1,4 @@
-/** @module hooks */
-/** for typedoc */
+/** @internalapi @module hooks */ /** */
 import { TransitionStateHookFn } from '../transition/interface';
 import { Transition } from '../transition/transition';
 import { TransitionService } from '../transition/transitionService';

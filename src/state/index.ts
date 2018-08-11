@@ -16,10 +16,8 @@
  *     - Note: Bootstrap state registration differs by front-end framework.
  *   - Get notified of state registration/deregistration using [[StateRegistry.onStatesChanged]].
  *
- * @coreapi
- * @preferred
- * @module state
- */ /** for typedoc */
+ * @preferred @publicapi @module state
+ */ /** */
 export * from './interface';
 export * from './stateBuilder';
 export * from './stateObject';

@@ -1,8 +1,4 @@
-/**
- * @internalapi
- * @module vanilla
- */
-/** */
+/** @internalapi @module vanilla */ /** */
 import { UIRouter } from '../router';
 import { BaseLocationServices } from './baseLocationService';
 import { LocationConfig, root, splitHash, splitQuery, stripLastPathElement } from '../common';

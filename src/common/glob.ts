@@ -1,7 +1,4 @@
-/**
- * @coreapi
- * @module core
- */
+/** @publicapi @module core */
 /**
  * Matches state names using glob-like pattern strings.
  *

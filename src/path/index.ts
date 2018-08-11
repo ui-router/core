@@ -1,3 +1,3 @@
-/** @module path */ /** for typedoc */
+/** @internalapi @module path */ /** */
 export * from './pathNode';
 export * from './pathUtils';

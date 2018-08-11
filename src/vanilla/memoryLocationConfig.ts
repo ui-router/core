@@ -1,8 +1,4 @@
-/**
- * @internalapi
- * @module vanilla
- */
-/** */
+/** @internalapi @module vanilla */ /** */
 import { LocationConfig } from '../common/coreservices';
 import { isDefined } from '../common/predicates';
 import { noop } from '../common/common';

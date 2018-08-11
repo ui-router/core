@@ -1,8 +1,4 @@
-/**
- * @coreapi
- * @module transition
- */
-/** for typedoc */
+/** @publicapi @module transition */ /** */
 import {
   IHookRegistry,
   TransitionOptions,
@@ -163,13 +159,15 @@ export class TransitionService implements IHookRegistry, Disposable {
     this._router = _router;
     this.$view = _router.viewService;
     this._deregisterHookFns = <any>{};
-    this._pluginapi = <TransitionServicePluginAPI>createProxyFunctions(val(this), {}, val(this), [
-      '_definePathType',
-      '_defineEvent',
-      '_getPathTypes',
-      '_getEvents',
-      'getHooks',
-    ]);
+    this._pluginapi = <TransitionServicePluginAPI>(
+      createProxyFunctions(val(this), {}, val(this), [
+        '_definePathType',
+        '_defineEvent',
+        '_getPathTypes',
+        '_getEvents',
+        'getHooks',
+      ])
+    );
 
     this._defineCorePaths();
     this._defineCoreEvents();

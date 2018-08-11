@@ -1,8 +1,4 @@
-/**
- * @coreapi
- * @module params
- */
-/** */
+/** @publicapi @module params */ /** */
 import { fromJson, toJson, identity, equals, inherit, map, extend, pick } from '../common/common';
 import { isDefined, isNullOrUndefined } from '../common/predicates';
 import { is } from '../common/hof';
@@ -26,6 +22,12 @@ import { ParamTypeDefinition } from './interface';
  * - [[date]]
  * - [[json]]
  * - [[any]]
+ *
+ * To register custom parameter types, use [[UrlConfig.type]], i.e.,
+ *
+ * ```js
+ * router.urlService.config.type(customType)
+ * ```
  */
 export class ParamTypes {
   /**
@@ -70,7 +72,6 @@ export class ParamTypes {
    *
    * This parameter type is used for the `#` parameter (the hash)
    * It behaves the same as the [[string]] parameter type.
-   * @coreapi
    */
   static hash: ParamTypeDefinition;
 

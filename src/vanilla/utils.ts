@@ -1,8 +1,4 @@
-/**
- * @internalapi
- * @module vanilla
- */
-/** */
+/** @internalapi @module vanilla */ /** */
 import {
   LocationConfig,
   LocationServices,

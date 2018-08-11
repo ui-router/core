@@ -5,9 +5,8 @@
  *
  * Typically, resolve is configured on a state using a [[StateDeclaration.resolve]] declaration.
  *
- * @coreapi
- * @module resolve
- */ /** for typedoc */
+ * @publicapi @module resolve
+ */ /** */
 import { Resolvable } from './resolvable';
 
 /**

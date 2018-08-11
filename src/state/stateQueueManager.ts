@@ -1,5 +1,4 @@
-/** @module state */
-/** for typedoc */
+/** @publicapi @module state */ /** */
 import { inArray, isString, prop } from '../common';
 import { _StateDeclaration } from './interface';
 import { StateObject } from './stateObject';

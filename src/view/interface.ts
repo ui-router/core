@@ -1,9 +1,10 @@
-/** @module view */ /** for typedoc */
+/** @publicapi @module view */ /** */
 import { _ViewDeclaration } from '../state/interface';
 import { PathNode } from '../path/pathNode';
 
 /**
  * The context ref can be anything that has a `name` and a `parent` reference to another IContextRef
+ * @internalapi
  */
 export interface ViewContext {
   name: string;

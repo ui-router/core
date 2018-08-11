@@ -1,7 +1,4 @@
-/**
- * @coreapi
- * @module view
- */ /** for typedoc */
+/** @publicapi @module view */ /** */
 import { equals, applyPairs, removeFrom, TypedMap, inArray, find } from '../common/common';
 import { curry, prop } from '../common/hof';
 import { isString, isArray } from '../common/predicates';
@@ -50,12 +47,13 @@ export interface ViewSyncListener {
  *
  */
 export class ViewService {
-  private _uiViews: ActiveUIView[] = [];
-  private _viewConfigs: ViewConfig[] = [];
-  private _rootContext: ViewContext;
-  private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
-  private _listeners: ViewSyncListener[] = [];
+  /** @hidden */ private _uiViews: ActiveUIView[] = [];
+  /** @hidden */ private _viewConfigs: ViewConfig[] = [];
+  /** @hidden */ private _rootContext: ViewContext;
+  /** @hidden */ private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
+  /** @hidden */ private _listeners: ViewSyncListener[] = [];
 
+  /** @internalapi */
   public _pluginapi: ViewServicePluginAPI = {
     _rootViewContext: this._rootViewContext.bind(this),
     _viewConfigFactory: this._viewConfigFactory.bind(this),
@@ -191,12 +189,14 @@ export class ViewService {
     return { uiViewName, uiViewContextAnchor };
   }
 
-  constructor(private router: UIRouter) {}
+  /** @hidden */
+  constructor(/** @hidden */ private router: UIRouter) {}
 
+  /** @hidden */
   private _rootViewContext(context?: ViewContext): ViewContext {
     return (this._rootContext = context || this._rootContext);
   }
-
+  /** @hidden */
   private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
     this._viewConfigFactories[viewType] = factory;
   }

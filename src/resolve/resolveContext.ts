@@ -1,5 +1,4 @@
-/** @module resolve */
-/** for typedoc */
+/** @publicapi @module resolve */ /** */
 import { find, tail, uniqR, unnestR, inArray } from '../common/common';
 import { propEq, not } from '../common/hof';
 import { trace } from '../common/trace';
@@ -189,6 +188,7 @@ export class ResolveContext {
   }
 }
 
+/** @internalapi */
 class UIInjectorImpl implements UIInjector {
   native: $InjectorLike;
 

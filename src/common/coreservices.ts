@@ -2,11 +2,11 @@
  * This module is a stub for core services such as Dependency Injection or Browser Location.
  * Core services may be implemented by a specific framework, such as ng1 or ng2, or be pure javascript.
  *
- * @module common
- */
-/** for typedoc */
+ * @publicapi @module common
+ */ /** */
 import { IInjectable, Obj } from './common';
 import { Disposable } from '../interface';
+import { UrlConfig, UrlService } from '../url';
 
 const noImpl = (fnname: string) => () => {
   throw new Error(`No implementation for ${fnname}. The framework specific code did not implement this method.`);
@@ -48,154 +48,48 @@ export interface CoreServices {
   $injector: $InjectorLike;
 }
 
+/**
+ * Handles low level URL read/write
+ *
+ * This service handles low level reads and updates of the URL and listens for url changes.
+ * Implementors should pass these through to the underlying URL mechanism.
+ * The underlying URL mechanism might be browser APIs, framework APIs, or some 3rd party URL management library.
+ *
+ * UI-Router Core includes three basic implementations:
+ *
+ * - [[PushStateLocationService]]
+ * - [[HashLocationService]]
+ * - [[MemoryLocationService]]
+ */
 export interface LocationServices extends Disposable {
-  /**
-   * Gets the current url string
-   *
-   * The URL is normalized using the internal [[path]]/[[search]]/[[hash]] values.
-   *
-   * For example, the URL may be stored in the hash ([[HashLocationServices]]) or
-   * have a base HREF prepended ([[PushStateLocationServices]]).
-   *
-   * The raw URL in the browser might be:
-   *
-   * ```
-   * http://mysite.com/somepath/index.html#/internal/path/123?param1=foo#anchor
-   * ```
-   *
-   * or
-   *
-   * ```
-   * http://mysite.com/basepath/internal/path/123?param1=foo#anchor
-   * ```
-   *
-   * then this method returns:
-   *
-   * ```
-   * /internal/path/123?param1=foo#anchor
-   * ```
-   *
-   *
-   * #### Example:
-   * ```js
-   * locationServices.url(); // "/some/path?query=value#anchor"
-   * ```
-   *
-   * @returns the current value of the url, as a string.
-   */
-  url(): string;
-
-  /**
-   * Updates the url, or gets the current url
-   *
-   * Updates the url, changing it to the value in `newurl`
-   *
-   * #### Example:
-   * ```js
-   * locationServices.url("/some/path?query=value#anchor", true);
-   * ```
-   *
-   * @param newurl The new value for the URL.
-   *               This url should reflect only the new internal [[path]], [[search]], and [[hash]] values.
-   *               It should not include the protocol, site, port, or base path of an absolute HREF.
-   * @param replace When true, replaces the current history entry (instead of appending it) with this new url
-   * @param state The history's state object, i.e., pushState (if the LocationServices implementation supports it)
-   * @return the url (after potentially being processed)
-   */
-  url(newurl: string, replace?: boolean, state?: any): string;
-
-  /**
-   * Gets the path part of the current url
-   *
-   * If the current URL is `/some/path?query=value#anchor`, this returns `/some/path`
-   *
-   * @return the path portion of the url
-   */
-  path(): string;
-
-  /**
-   * Gets the search part of the current url as an object
-   *
-   * If the current URL is `/some/path?query=value#anchor`, this returns `{ query: 'value' }`
-   *
-   * @return the search (querystring) portion of the url, as an object
-   */
-  search(): { [key: string]: any };
-
-  /**
-   * Gets the hash part of the current url
-   *
-   * If the current URL is `/some/path?query=value#anchor`, this returns `anchor`
-   *
-   * @return the hash (anchor) portion of the url
-   */
-  hash(): string;
-
-  /**
-   * Registers a url change handler
-   *
-   * #### Example:
-   * ```js
-   * let deregisterFn = locationServices.onChange((evt) => console.log("url change", evt));
-   * ```
-   *
-   * @param callback a function that will be called when the url is changing
-   * @return a function that de-registers the callback
-   */
-  onChange(callback: Function): Function;
+  /** See: [[UrlService.url]] */ url: UrlService['url'];
+  /** See: [[UrlService.path]] */ path: UrlService['path'];
+  /** See: [[UrlService.search]] */ search: UrlService['search'];
+  /** See: [[UrlService.hash]] */ hash: UrlService['hash'];
+  /** See: [[UrlService.onChange]] */ onChange: UrlService['onChange'];
 }
 
 /**
- * This service returns the location configuration
+ * Returns low level URL configuration and metadata
  *
  * This service returns information about the location configuration.
  * This service is primarily used when building URLs (e.g., for `hrefs`)
+ *
+ * Implementors should pass these through to the underlying URL APIs.
+ * The underlying URL mechanism might be browser APIs, framework APIs, or some 3rd party URL management library.
+ *
+ * UI-Router Core includes two basic implementations:
+ *
+ * - [[BrowserLocationConfig]]
+ * - [[MemoryLocationConfig]]
  */
 export interface LocationConfig extends Disposable {
-  /**
-   * Gets the port, e.g., `80`
-   *
-   * @return the port number
-   */
-  port(): number;
-  /**
-   * Gets the protocol, e.g., `http`
-   *
-   * @return the protocol
-   */
-  protocol(): string;
-  /**
-   * Gets the host, e.g., `localhost`
-   *
-   * @return the protocol
-   */
-  host(): string;
-  /**
-   * Gets the base Href, e.g., `http://localhost/approot/`
-   *
-   * @return the application's base href
-   */
-  baseHref(): string;
-  /**
-   * Returns true when running in pushstate mode
-   *
-   * @return true when running in pushstate mode
-   */
-  html5Mode(): boolean;
-  /**
-   * Gets the hashPrefix (when not running in pushstate mode)
-   *
-   * If the current url is `http://localhost/app#!/uirouter/path/#anchor`, it returns `!` which is the prefix for the "hashbang" portion.
-   *
-   * @return the hash prefix
-   */
-  hashPrefix(): string;
-  /**
-   * Sets the hashPrefix (when not running in pushstate mode)
-   *
-   * @return the new hash prefix
-   */
-  hashPrefix(newprefix: string): string;
+  /** See: [[UrlConfig.port]] */ port: UrlConfig['port'];
+  /** See: [[UrlConfig.protocol]] */ protocol: UrlConfig['protocol'];
+  /** See: [[UrlConfig.host]] */ host: UrlConfig['host'];
+  /** See: [[UrlConfig.baseHref]] */ baseHref: UrlConfig['baseHref'];
+  /** See: [[UrlConfig.html5Mode]] */ html5Mode: UrlConfig['html5Mode'];
+  /** See: [[UrlConfig.hashPrefix]] */ hashPrefix: UrlConfig['hashPrefix'];
 }
 
 export { services };

@@ -1,6 +1,3 @@
-/**
- * @coreapi
- * @module view
- */ /** for typedoc */
+/** @publicapi @module view */ /** */
 export * from './interface';
 export * from './view';

@@ -1,4 +1,4 @@
-/** @module hooks */ /** */
+/** @internalapi @module hooks */ /** */
 
 import { trace } from '../common/trace';
 import { Rejection } from '../transition/rejectFactory';

@@ -1,5 +1,4 @@
-/** @module state */
-/** for typedoc */
+/** @publicapi @module state */ /** */
 import { applyPairs, extend, identity, inherit, mapObj, noop, Obj, omit, tail, values } from '../common/common';
 import { isArray, isDefined, isFunction, isString } from '../common/predicates';
 import { stringify } from '../common/strings';

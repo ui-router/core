@@ -1,4 +1,4 @@
-/** @module path */ /** for typedoc */
+/** @internalapi @module path */ /** */
 
 import {
   extend,

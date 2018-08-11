@@ -1,8 +1,4 @@
-/**
- * @internalapi
- * @module url
- */
-/** for typedoc */
+/** @publicapi @module url */ /** */
 import { stripLastPathElement } from '../common';
 import { UrlMatcher } from './urlMatcher';
 import { RawParams } from '../params';
@@ -25,7 +21,9 @@ function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHr
  * ### Deprecation warning:
  * This class is now considered to be an internal API
  * Use the [[UrlService]] instead.
- * For configuring URL rules, use the [[UrlRulesApi]] which can be found as [[UrlService.rules]].
+ * For configuring URL rules, use the [[UrlRules]] which can be found as [[UrlService.rules]].
+ *
+ * @internalapi
  */
 export class UrlRouter {
   /** used to create [[UrlRule]] objects for common cases */

@@ -1,8 +1,4 @@
-/**
- * @coreapi
- * @module url
- */
-/** for typedoc */
+/** @publicapi @module url */ /** */
 import { map, inherit, identity, unnest, tail, find, Obj, allTrueR, unnestR, arrayTuples } from '../common/common';
 import { prop, propEq } from '../common/hof';
 import { isArray, isString, isDefined } from '../common/predicates';
@@ -59,6 +55,7 @@ interface MatchDetails {
   type: ParamType;
 }
 
+/** @hidden */
 const defaultConfig: UrlMatcherCompileConfig = {
   state: { params: {} },
   strict: true,

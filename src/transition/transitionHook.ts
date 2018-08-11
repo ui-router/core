@@ -1,8 +1,4 @@
-/**
- * @coreapi
- * @module transition
- */
-/** for typedoc */
+/** @publicapi @module transition */ /** */
 import { TransitionHookOptions, HookResult, TransitionHookPhase } from './interface';
 import { defaults, noop, silentRejection } from '../common/common';
 import { fnToString, maxLength } from '../common/strings';

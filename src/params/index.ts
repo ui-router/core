@@ -3,10 +3,8 @@
  *
  * See [[ParamDeclaration]]
  *
- * @coreapi
- * @preferred
- * @module params
- */ /** for typedoc */
+ * @preferred @publicapi @module params
+ */ /** */
 export * from './interface';
 export * from './param';
 export * from './paramTypes';

@@ -1,7 +1,4 @@
-/**
- * @coreapi
- * @module url
- */ /** for typedoc */
+/** @publicapi @module url */ /** */
 export * from './interface';
 export * from './urlMatcher';
 export * from './urlMatcherFactory';

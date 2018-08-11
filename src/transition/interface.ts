@@ -1,7 +1,4 @@
-/**
- * @coreapi
- * @module transition
- */ /** for typedoc */
+/** @publicapi @module transition */ /** */
 import { StateDeclaration } from '../state/interface';
 import { Predicate } from '../common/common';
 

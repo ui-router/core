@@ -30,8 +30,7 @@
  * app.run($trace => $trace.enable());
  * ```
  *
- * @coreapi
- * @module trace
+ * @publicapi @module trace
  */
 /* tslint:disable:no-console */
 import { parse } from '../common/hof';

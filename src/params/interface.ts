@@ -1,8 +1,4 @@
-/**
- * @coreapi
- * @module params
- */ /** for typedoc */
-
+/** @publicapi @module params */ /** */
 import { ParamType } from './paramType';
 
 /**
@@ -17,8 +13,6 @@ import { ParamType } from './paramType';
  *   folderId: 'inbox'
  * }
  * ```
- *
- * @coreapi
  */
 export interface RawParams {
   [key: string]: any;
@@ -54,7 +48,6 @@ export interface RawParams {
  *   }
  * }
  * ```
- * @coreapi
  */
 export interface ParamDeclaration {
   /**
@@ -351,9 +344,28 @@ export interface ParamDeclaration {
   inherit?: boolean;
 }
 
-/** @internalapi */
+/**
+ * String replacement
+ *
+ * Represents an exact match string replacement.
+ *
+ * Note: `to` or `from` may be null or undefined, and will be tested using `===`.
+ */
 export interface Replace {
+  /**
+   * The value to replace.
+   *
+   * May be `null` or `undefined`.
+   * The entire value must match using `===`.
+   * When found, the [[to]] value is used instead.
+   */
   from: string;
+
+  /**
+   * The new value
+   *
+   * Used instead of the [[from]] value.
+   */
   to: string;
 }
 
@@ -463,8 +475,8 @@ export interface Replace {
  * $state.go('list', { item: "Ringo" });
  * ```
  *
- * See: [[UrlConfigApi.type]]
- * @coreapi
+ * See: [[UrlConfig.type]]
+ * @publicapi
  */
 export interface ParamTypeDefinition {
   /**
