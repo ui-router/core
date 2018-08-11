@@ -1,4 +1,5 @@
-/** @internalapi @module vanilla */ /** */
+/** @internalapi @module vanilla */
+/** */
 import { isDefined, isUndefined } from '../common/predicates';
 import { LocationConfig } from '../common/coreservices';
 
@@ -42,8 +43,11 @@ export class BrowserLocationConfig implements LocationConfig {
 
   private getBaseHref() {
     const baseTag: HTMLBaseElement = document.getElementsByTagName('base')[0];
-    if (!baseTag || !baseTag.href) return location.pathname || '/';
-    return baseTag.href.replace(/^(https?:)?\/\/[^/]*/, '');
+    if (baseTag && baseTag.href) {
+      return baseTag.href.replace(/^(https?:)?\/\/[^/]*/, '');
+    }
+
+    return this._isHtml5 ? '/' : location.pathname || '/';
   }
 
   dispose() {}
