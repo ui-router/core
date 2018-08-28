@@ -955,6 +955,41 @@ describe('transition', function() {
         router.urlService.url('/urlRedirect');
       });
 
+      it('should replace the current url when redirecting a url sync transition, even if the redirect is ignored', async done => {
+        router.stateRegistry.register({
+          name: 'queryparam',
+          url: '/?param',
+        });
+
+        await router.stateService.go('queryparam', { param: undefined });
+        expect(router.globals.params.param).toEqual(undefined);
+
+        router.transitionService.onStart({}, trans => {
+          // redirect transition removing ?param=foo
+          if (trans.params().param === 'foo') {
+            return trans.targetState().withParams({ param: undefined });
+          }
+        });
+
+        router.urlService.url('/?param=foo');
+        const url = spyOn(router.locationService, 'url').and.callThrough();
+        const update = spyOn(router.urlRouter, 'update').and.callThrough();
+
+        router.transitionService.onError({}, trans => {
+          if (trans.error().type === RejectType.IGNORED) {
+            setTimeout(() => {
+              expect(update.calls.count()).toBe(1);
+              expect(url.calls.count()).toBe(2);
+              expect(url.calls.argsFor(0)).toEqual([]);
+              expect(url.calls.argsFor(1)).toEqual(['/', true]);
+              expect(router.urlService.url()).toBe('/');
+              expect(router.globals.params.param).toEqual(undefined);
+              done();
+            });
+          }
+        });
+      });
+
       it('should not replace the current url when redirecting a url sync with { location: false }', done => {
         router.transitionService.onBefore({ to: 'requiresAuth' }, trans => {
           return router.stateService.target('redirectTarget', null, { location: false });

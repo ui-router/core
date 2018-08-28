@@ -349,7 +349,7 @@ export class StateService {
      */
     const rejectedTransitionHandler = (trans: Transition) => (error: any): Promise<any> => {
       if (error instanceof Rejection) {
-        const isLatest = router.globals.lastStartedTransitionId === trans.$id;
+        const isLatest = router.globals.lastStartedTransitionId <= trans.$id;
 
         if (error.type === RejectType.IGNORED) {
           isLatest && router.urlRouter.update();
