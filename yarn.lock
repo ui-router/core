@@ -1791,8 +1791,8 @@ foreach@^2.0.5:
   resolved "https://registry.yarnpkg.com/foreach/-/foreach-2.0.5.tgz#0bee005018aeb260d0a3af3ae658dd0136ec1b99"
 
 fork-ts-checker-webpack-plugin@^0.4.2:
-  version "0.4.9"
-  resolved "https://registry.yarnpkg.com/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-0.4.9.tgz#78607899d4411fdc6faeca5b4db7654c9d8d28a2"
+  version "0.4.10"
+  resolved "https://registry.yarnpkg.com/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-0.4.10.tgz#e96f87ea599af4501c1a69f44ecfb3163bbf30b9"
   dependencies:
     babel-code-frame "^6.22.0"
     chalk "^2.4.1"
