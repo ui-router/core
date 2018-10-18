@@ -60,7 +60,7 @@ export class HookBuilder {
     const treeChanges = transition.treeChanges();
 
     // Find all the matching registered hooks for a given hook type
-    const matchingHooks = this.getMatchingHooks(hookType, treeChanges);
+    const matchingHooks = this.getMatchingHooks(hookType, treeChanges, transition);
     if (!matchingHooks) return [];
 
     const baseHookOptions = <TransitionHookOptions>{
@@ -70,7 +70,7 @@ export class HookBuilder {
 
     const makeTransitionHooks = (hook: RegisteredHook) => {
       // Fetch the Nodes that caused this hook to match.
-      const matches: IMatchingNodes = hook.matches(treeChanges);
+      const matches: IMatchingNodes = hook.matches(treeChanges, transition);
       // Select the PathNode[] that will be used as TransitionHook context objects
       const matchingNodes: PathNode[] = matches[hookType.criteriaMatchPath.name];
 
@@ -108,7 +108,11 @@ export class HookBuilder {
    *
    * @returns an array of matched [[RegisteredHook]]s
    */
-  public getMatchingHooks(hookType: TransitionEventType, treeChanges: TreeChanges): RegisteredHook[] {
+  public getMatchingHooks(
+    hookType: TransitionEventType,
+    treeChanges: TreeChanges,
+    transition: Transition
+  ): RegisteredHook[] {
     const isCreate = hookType.hookPhase === TransitionHookPhase.CREATE;
 
     // Instance and Global hook registries
@@ -119,7 +123,7 @@ export class HookBuilder {
       .map((reg: IHookRegistry) => reg.getHooks(hookType.name)) // Get named hooks from registries
       .filter(assertPredicate(isArray, `broken event named: ${hookType.name}`)) // Sanity check
       .reduce(unnestR, []) // Un-nest RegisteredHook[][] to RegisteredHook[] array
-      .filter(hook => hook.matches(treeChanges)); // Only those satisfying matchCriteria
+      .filter(hook => hook.matches(treeChanges, transition)); // Only those satisfying matchCriteria
   }
 }
 

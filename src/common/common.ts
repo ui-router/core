@@ -32,6 +32,7 @@ export interface TypedMap<T> {
   [key: string]: T;
 }
 export type Predicate<X> = (x?: X) => boolean;
+export type PredicateBinary<X, Y> = (x?: X, y?: Y) => boolean;
 /**
  * An ng1-style injectable
  *

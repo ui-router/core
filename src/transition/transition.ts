@@ -247,8 +247,8 @@ export class Transition implements IHookRegistry {
       return this.is({ to: compare.$to().name, from: compare.$from().name });
     }
     return !(
-      (compare.to && !matchState(this.$to(), compare.to)) ||
-      (compare.from && !matchState(this.$from(), compare.from))
+      (compare.to && !matchState(this.$to(), compare.to, this)) ||
+      (compare.from && !matchState(this.$from(), compare.from, this))
     );
   }
 

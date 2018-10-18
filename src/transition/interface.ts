@@ -1,6 +1,6 @@
 /** @publicapi @module transition */ /** */
 import { StateDeclaration } from '../state/interface';
-import { Predicate } from '../common/common';
+import { PredicateBinary } from '../common/common';
 
 import { Transition } from './transition';
 import { StateObject } from '../state/stateObject';
@@ -716,8 +716,8 @@ export interface IHookRegistry {
   getHooks(hookName: string): RegisteredHook[];
 }
 
-/** A predicate type which tests if a [[StateObject]] passes some test. Returns a boolean. */
-export type IStateMatch = Predicate<StateObject>;
+/** A predicate type which tests if a [[StateObject]] and [[Transition]] passes some test. Returns a boolean. */
+export type IStateMatch = PredicateBinary<StateObject, Transition>;
 
 /**
  * This object is used to configure whether or not a Transition Hook is invoked for a particular transition,
@@ -763,6 +763,14 @@ export type IStateMatch = Predicate<StateObject>;
  *   to: function(state) {
  *     return state.data != null && state.data.authRequired === true;
  *   }
+ * }
+ * ```
+ * #### Example:
+ * ```js
+ * // This will match when route is just entered (initial load) or when the state is hard-refreshed
+ * // by specifying `{refresh: true}` as transition options.
+ * var match = {
+ *   from: (state, transition) => state.self.name === '' || transition.options().reload
  * }
  * ```
  *
@@ -826,7 +834,7 @@ export interface PathType {
  *
  * A [[Glob]] string that matches the name of a state.
  *
- * Or, a function with the signature `function(state) { return matches; }`
+ * Or, a function with the signature `function(state, transition) { return matches; }`
  * which should return a boolean to indicate if a state matches.
  *
  * Or, `true` to always match

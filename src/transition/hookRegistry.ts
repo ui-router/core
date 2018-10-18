@@ -18,6 +18,7 @@ import {
   IMatchingNodes,
   HookFn,
 } from './interface';
+import { Transition } from './transition';
 import { StateObject } from '../state/stateObject';
 import { TransitionEventType } from './transitionEventType';
 import { TransitionService } from './transitionService';
@@ -35,7 +36,7 @@ import { TransitionService } from './transitionService';
  * - If a function, matchState calls the function with the state and returns true if the function's result is truthy.
  * @returns {boolean}
  */
-export function matchState(state: StateObject, criterion: HookMatchCriterion) {
+export function matchState(state: StateObject, criterion: HookMatchCriterion, transition: Transition) {
   const toMatch = isString(criterion) ? [criterion] : criterion;
 
   function matchGlobs(_state: StateObject) {
@@ -51,7 +52,7 @@ export function matchState(state: StateObject, criterion: HookMatchCriterion) {
   }
 
   const matchFn = <any>(isFunction(toMatch) ? toMatch : matchGlobs);
-  return !!matchFn(state);
+  return !!matchFn(state, transition);
 }
 
 /**
@@ -93,9 +94,9 @@ export class RegisteredHook {
    * with `entering: (state) => true` which only matches when a state is actually
    * being entered.
    */
-  private _matchingNodes(nodes: PathNode[], criterion: HookMatchCriterion): PathNode[] {
+  private _matchingNodes(nodes: PathNode[], criterion: HookMatchCriterion, transition: Transition): PathNode[] {
     if (criterion === true) return nodes;
-    const matching = nodes.filter(node => matchState(node.state, criterion));
+    const matching = nodes.filter(node => matchState(node.state, criterion, transition));
     return matching.length ? matching : null;
   }
 
@@ -132,7 +133,7 @@ export class RegisteredHook {
    * };
    * ```
    */
-  private _getMatchingNodes(treeChanges: TreeChanges): IMatchingNodes {
+  private _getMatchingNodes(treeChanges: TreeChanges, transition: Transition): IMatchingNodes {
     const criteria = extend(this._getDefaultMatchCriteria(), this.matchCriteria);
     const paths: PathType[] = values(this.tranSvc._pluginapi._getPathTypes());
 
@@ -144,7 +145,7 @@ export class RegisteredHook {
         const path = treeChanges[pathtype.name] || [];
         const nodes: PathNode[] = isStateHook ? path : [tail(path)];
 
-        mn[pathtype.name] = this._matchingNodes(nodes, criteria[pathtype.name]);
+        mn[pathtype.name] = this._matchingNodes(nodes, criteria[pathtype.name], transition);
         return mn;
       },
       {} as IMatchingNodes
@@ -157,8 +158,8 @@ export class RegisteredHook {
    * @returns an IMatchingNodes object, or null. If an IMatchingNodes object is returned, its values
    * are the matching [[PathNode]]s for each [[HookMatchCriterion]] (to, from, exiting, retained, entering)
    */
-  matches(treeChanges: TreeChanges): IMatchingNodes {
-    const matches = this._getMatchingNodes(treeChanges);
+  matches(treeChanges: TreeChanges, transition: Transition): IMatchingNodes {
+    const matches = this._getMatchingNodes(treeChanges, transition);
 
     // Check if all the criteria matched the TreeChanges object
     const allMatched = values(matches).every(identity);
