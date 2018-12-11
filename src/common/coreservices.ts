@@ -8,12 +8,12 @@ import { IInjectable, Obj } from './common';
 import { Disposable } from '../interface';
 import { UrlConfig, UrlService } from '../url';
 
-const noImpl = (fnname: string) => () => {
-  throw new Error(`No implementation for ${fnname}. The framework specific code did not implement this method.`);
+const noImpl = (fnname: string, instruction: string) => () => {
+  throw new Error(`No implementation for ${fnname}.  ${instruction}`);
 };
 
-export const makeStub = <T>(service: string, methods: (keyof T)[]): T =>
-  methods.reduce((acc, key) => ((acc[key] = noImpl(`${service}.${key}()`) as any), acc), {} as T);
+export const makeStub = <T>(service: string, registerInstruction: string, methods: (keyof T)[]): T =>
+  methods.reduce((acc, key) => ((acc[key] = noImpl(`${service}.${key}()`, registerInstruction) as any), acc), {} as T);
 
 const services: CoreServices = {
   $q: undefined,

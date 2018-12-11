@@ -14,6 +14,7 @@ import { UrlMatcher } from './urlMatcher';
 import { UrlConfig } from './urlConfig';
 import { UrlRules } from './urlRules';
 import { UrlService } from './urlService';
+import { UIRouterPlugin } from '../interface';
 
 /** @internalapi */
 export interface UrlMatcherCompileConfig {
@@ -175,4 +176,34 @@ export interface StateRule extends MatcherUrlRule {
 export interface RegExpRule extends UrlRule {
   type: 'REGEXP';
   regexp: RegExp;
+}
+
+/**
+ * Handles low level URL read/write
+ *
+ * This service handles low level reads and updates of the URL and listens for url changes.
+ * Implementors should pass these through to the underlying URL mechanism.
+ * The underlying URL mechanism might be browser APIs, framework APIs, or some 3rd party URL management library.
+ *
+ * UI-Router Core includes three basic implementations:
+ *
+ * - [[PushStateLocationService]]
+ * - [[HashLocationService]]
+ * - [[MemoryLocationService]]
+ *
+ * @internalapi
+ */
+export interface UrlPlugin extends UIRouterPlugin, LocationConfig, LocationServices {
+  /** See: [[UrlService.url]] */ url: UrlService['url'];
+  /** See: [[UrlService.path]] */ path: UrlService['path'];
+  /** See: [[UrlService.search]] */ search: UrlService['search'];
+  /** See: [[UrlService.hash]] */ hash: UrlService['hash'];
+  /** See: [[UrlService.onChange]] */ onChange: UrlService['onChange'];
+
+  /** See: [[UrlConfig.port]] */ port: UrlConfig['port'];
+  /** See: [[UrlConfig.protocol]] */ protocol: UrlConfig['protocol'];
+  /** See: [[UrlConfig.host]] */ host: UrlConfig['host'];
+  /** See: [[UrlConfig.baseHref]] */ baseHref: UrlConfig['baseHref'];
+  /** See: [[UrlConfig.html5Mode]] */ html5Mode: UrlConfig['html5Mode'];
+  /** See: [[UrlConfig.hashPrefix]] */ hashPrefix: UrlConfig['hashPrefix'];
 }

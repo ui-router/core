@@ -13,6 +13,7 @@ import { UrlService } from './url/urlService';
 import { LocationServices, LocationConfig } from './common/coreservices';
 import { Trace, trace } from './common/trace';
 import { makeStub } from './common';
+import { UrlPlugin } from './url';
 
 /** @hidden */
 let _routerInstance = 0;
@@ -22,9 +23,9 @@ const locSvcFns: (keyof LocationServices)[] = ['url', 'path', 'search', 'hash', 
 /** @hidden */
 const locCfgFns: (keyof LocationConfig)[] = ['port', 'protocol', 'host', 'baseHref', 'html5Mode', 'hashPrefix'];
 /** @hidden */
-const locationServiceStub = makeStub<LocationServices>('LocationServices', locSvcFns);
+const urlPluginMessage = 'Register a UrlPlugin using router.urlPlugin(UrlPluginClass)';
 /** @hidden */
-const locationConfigStub = makeStub<LocationConfig>('LocationConfig', locCfgFns);
+const urlPluginStub = makeStub<UrlPlugin>('UrlPlugin', urlPluginMessage, [].concat(locSvcFns).concat(locCfgFns));
 
 /**
  * The master class used to instantiate an instance of UI-Router.
@@ -82,6 +83,15 @@ export class UIRouter {
   /** @hidden plugin instances are registered here */
   private _plugins: { [key: string]: UIRouterPlugin } = {};
 
+  /** @hidden url plugin instance */
+  private _urlPlugin: UrlPlugin = urlPluginStub;
+
+  /** @hidden delete this in v6.x: url plugin instance */
+  public locationService: LocationServices = urlPluginStub;
+
+  /** @hidden delete this in v6.x: url plugin instance */
+  public locationConfig: LocationConfig = urlPluginStub;
+
   /** Registers an object to be notified when the router is disposed */
   disposable(disposable: Disposable) {
     this._disposables.push(disposable);
@@ -119,10 +129,7 @@ export class UIRouter {
    * @param locationConfig a [[LocationConfig]] implementation
    * @internalapi
    */
-  constructor(
-    public locationService: LocationServices = locationServiceStub,
-    public locationConfig: LocationConfig = locationConfigStub
-  ) {
+  constructor() {
     this.viewService._pluginapi._rootViewContext(this.stateRegistry.root());
     this.globals.$current = this.stateRegistry.root();
     this.globals.current = this.globals.$current.self;
@@ -132,8 +139,6 @@ export class UIRouter {
     this.disposable(this.stateRegistry);
     this.disposable(this.transitionService);
     this.disposable(this.urlService);
-    this.disposable(locationService);
-    this.disposable(locationConfig);
   }
 
   /** Add plugin (as ES6 class) */
@@ -200,6 +205,17 @@ export class UIRouter {
     if (!pluginInstance.name) throw new Error('Required property `name` missing on plugin: ' + pluginInstance);
     this._disposables.push(pluginInstance);
     return (this._plugins[pluginInstance.name] = pluginInstance);
+  }
+
+  /** Add plugin (as ES6 class) */
+  urlPlugin<T extends UrlPlugin>(plugin: { new (router: UIRouter, options?: any): T }, options?: any): T;
+  /** Add plugin (as javascript constructor function) */
+  urlPlugin<T extends UrlPlugin>(plugin: { (router: UIRouter, options?: any): void }, options?: any): T;
+  /** Add plugin (as javascript factory function) */
+  urlPlugin<T extends UrlPlugin>(plugin: PluginFactory<T>, options?: any): T;
+  /** Sets the Url Handling implementation */
+  urlPlugin(urlPlugin: any, options) {
+    return (this.locationConfig = this.locationService = this._urlPlugin = this.plugin(urlPlugin, options));
   }
 
   /**
