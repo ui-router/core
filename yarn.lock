@@ -83,9 +83,10 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
 
-"@uirouter/publish-scripts@^2.3.18":
-  version "2.3.21"
-  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.3.21.tgz#5a86da78720b195e41e05a2d11fb4658b1b14d13"
+"@uirouter/publish-scripts@^2.3.22":
+  version "2.3.22"
+  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.3.22.tgz#39d131603c6f876aca2f1066e47e13a742c596de"
+  integrity sha512-r0KdUEqYDRg8r8haq7PcLuecBtLloa8aHwzPJ+CRcsRxpa6v5t+sYJZyw0D6K8swuRo0rnbquThUtEoi/e8uTA==
   dependencies:
     conventional-changelog "^2.0.3"
     conventional-changelog-ui-router-core "^1.4.2"
