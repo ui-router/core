@@ -22,8 +22,7 @@
     "watch:test": "karma start --singleRun=false --autoWatch=true --autoWatchInterval=1",
     "debug": "karma start --singleRun=false --autoWatch=true --autoWatchInterval=1 --browsers=ChromeCanary",
     "changelog": "update_changelog",
-    "release": "release",
-    "precommit": "pretty-quick --staged"
+    "release": "release"
   },
   "homepage": "https://ui-router.github.io",
   "contributors": [
@@ -72,7 +71,7 @@
     "@uirouter/publish-scripts": "^2.3.23",
     "dts-downlevel": "^0.3.0",
     "fork-ts-checker-webpack-plugin": "^0.4.2",
-    "husky": "^1.1.2",
+    "husky": "^1.3.1",
     "jasmine-core": "^3.1.0",
     "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.2.0",
@@ -92,5 +91,10 @@
     "tslint-eslint-rules": "^5.3.1",
     "typescript": "^3.0.3",
     "webpack": "^4.19.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }
