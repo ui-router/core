@@ -1,5 +1,5 @@
 /** @publicapi @module state */ /** */
-import { applyPairs, extend, identity, inherit, mapObj, noop, Obj, omit, tail, values } from '../common/common';
+import { applyPairs, extend, identity, inherit, mapObj, noop, Obj, omit, tail, values, copy } from '../common/common';
 import { isArray, isDefined, isFunction, isString } from '../common/predicates';
 import { stringify } from '../common/strings';
 import { is, pattern, pipe, prop, val } from '../common/hof';
@@ -57,17 +57,20 @@ function dataBuilder(state: StateObject) {
 
 const getUrlBuilder = ($urlMatcherFactoryProvider: UrlMatcherFactory, root: () => StateObject) =>
   function urlBuilder(stateObject: StateObject) {
-    const state: StateDeclaration = stateObject.self;
+    let stateDec: StateDeclaration = stateObject.self;
 
     // For future states, i.e., states whose name ends with `.**`,
     // match anything that starts with the url prefix
-    if (state && state.url && state.name && state.name.match(/\.\*\*$/)) {
-      state.url += '{remainder:any}'; // match any path (.*)
+    if (stateDec && stateDec.url && stateDec.name && stateDec.name.match(/\.\*\*$/)) {
+      const newStateDec: StateDeclaration = {};
+      copy(stateDec, newStateDec);
+      newStateDec.url += '{remainder:any}'; // match any path (.*)
+      stateDec = newStateDec;
     }
 
     const parent = stateObject.parent;
-    const parsed = parseUrl(state.url);
-    const url = !parsed ? state.url : $urlMatcherFactoryProvider.compile(parsed.val, { state });
+    const parsed = parseUrl(stateDec.url);
+    const url = !parsed ? stateDec.url : $urlMatcherFactoryProvider.compile(parsed.val, { state: stateDec });
 
     if (!url) return null;
     if (!$urlMatcherFactoryProvider.isMatcher(url)) throw new Error(`Invalid url '${url}' in state '${stateObject}'`);

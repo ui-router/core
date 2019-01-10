@@ -53,6 +53,12 @@ describe('future state', function() {
       expect($registry.get(state)).toBe(statedef);
     });
 
+    it('should not change the url of future states', () => {
+      const statedef = { name: 'future.**', url: '/future' };
+      const state = $registry.register(statedef);
+      expect($registry.get(state).url).toBe('/future');
+    });
+
     it('should replace a future state when a normal state of the same name is registered', () => {
       const state = $registry.register({ name: 'future.**' });
 
