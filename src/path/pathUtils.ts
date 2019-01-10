@@ -58,12 +58,14 @@ export class PathUtils {
    */
   static applyViewConfigs($view: ViewService, path: PathNode[], states: StateObject[]) {
     // Only apply the viewConfigs to the nodes for the given states
-    path.filter(node => inArray(states, node.state)).forEach(node => {
-      const viewDecls: _ViewDeclaration[] = values(node.state.views || {});
-      const subPath = PathUtils.subPath(path, n => n === node);
-      const viewConfigs: ViewConfig[][] = viewDecls.map(view => $view.createViewConfig(subPath, view));
-      node.views = viewConfigs.reduce(unnestR, []);
-    });
+    path
+      .filter(node => inArray(states, node.state))
+      .forEach(node => {
+        const viewDecls: _ViewDeclaration[] = values(node.state.views || {});
+        const subPath = PathUtils.subPath(path, n => n === node);
+        const viewConfigs: ViewConfig[][] = viewDecls.map(view => $view.createViewConfig(subPath, view));
+        node.views = viewConfigs.reduce(unnestR, []);
+      });
   }
 
   /**

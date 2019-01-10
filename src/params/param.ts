@@ -57,10 +57,10 @@ function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, i
       location === DefType.CONFIG
         ? 'any'
         : location === DefType.PATH
-          ? 'path'
-          : location === DefType.SEARCH
-            ? 'query'
-            : 'string';
+        ? 'path'
+        : location === DefType.SEARCH
+        ? 'query'
+        : 'string';
     return paramTypes.type(type);
   }
   return cfg.type instanceof ParamType ? cfg.type : paramTypes.type(cfg.type as string);
