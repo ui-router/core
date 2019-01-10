@@ -1,3 +1,19 @@
+## 5.0.22 (2019-01-10)
+[Compare `@uirouter/core` versions 5.0.21 and 5.0.22](https://github.com/ui-router/core/compare/5.0.21...5.0.22)
+
+### Bug Fixes
+
+* **lazyLoad:** StateBuilder should not mutate the state declaration ([1478a3c](https://github.com/ui-router/core/commit/1478a3c)), closes [/github.com/ui-router/core/commit/3cd5a2a#r31260154](https://github.com//github.com/ui-router/core/commit/3cd5a2a/issues/r31260154)
+* **state:** Update URL in response to ignored transition due to redirect ([c64c252](https://github.com/ui-router/core/commit/c64c252))
+
+
+### Features
+
+* **TransitionHook:** Pass in transition to HookMatchCriteria ([#255](https://github.com/ui-router/core/issues/255)) ([926705e](https://github.com/ui-router/core/commit/926705e))
+
+
+
+
 ## 5.0.21 (2018-08-11)
 [Compare `@uirouter/core` versions 5.0.20 and 5.0.21](https://github.com/ui-router/core/compare/5.0.20...5.0.21)
 
