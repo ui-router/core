@@ -44,7 +44,7 @@ export class BrowserLocationConfig implements LocationConfig {
   private getBaseHref() {
     const baseTag: HTMLBaseElement = document.getElementsByTagName('base')[0];
     if (baseTag && baseTag.href) {
-      return baseTag.href.replace(/^(https?:)?\/\/[^/]*/, '');
+      return baseTag.href.replace(/^([^/:]*:)?\/\/[^/]*/, '');
     }
 
     return this._isHtml5 ? '/' : location.pathname || '/';
