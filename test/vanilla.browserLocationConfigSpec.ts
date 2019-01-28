@@ -128,6 +128,24 @@ describe('BrowserLocationConfig implementation', () => {
       expect(blc.baseHref()).toBe('/base');
     });
 
+    it('strips off the http origin', () => {
+      applyBaseTag('http://localhost/base');
+      const blc = new BrowserLocationConfig();
+      expect(blc.baseHref()).toBe('/base');
+    });
+
+    it('strips off the https origin', () => {
+      applyBaseTag('https://localhost/base');
+      const blc = new BrowserLocationConfig();
+      expect(blc.baseHref()).toBe('/base');
+    });
+
+    it('supports chrome-extension:// urls', () => {
+      applyBaseTag('chrome-extension://cckppebifaokhmbkciccdindfbmacjcj/baseHref/');
+      const blc = new BrowserLocationConfig();
+      expect(blc.baseHref()).toBe('/baseHref/');
+    });
+
     it('uses location.pathname if <base> is not present', () => {
       const blc = new BrowserLocationConfig();
       expect(blc.baseHref()).toBe(location.pathname);
