@@ -269,5 +269,5 @@ export class UrlService implements LocationServices, UrlSyncApi {
    * @param callback a function that will be called when the url is changing
    * @return a function that de-registers the callback
    */
-  public onChange = (callback: Function): Function => this.router.locationService.onChange(callback);
+  public onChange = (callback: EventListener): Function => this.router.locationService.onChange(callback);
 }
