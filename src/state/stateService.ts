@@ -500,7 +500,7 @@ export class StateService {
    *
    * @returns {string} compiled state url
    */
-  href(stateOrName: StateOrName, params: RawParams, options?: HrefOptions): string {
+  href(stateOrName: StateOrName, params?: RawParams, options?: HrefOptions): string {
     const defaultHrefOpts = {
       lossy: true,
       inherit: true,
