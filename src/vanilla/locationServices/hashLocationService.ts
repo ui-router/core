@@ -1,6 +1,6 @@
 /** @packageDocumentation @internalapi @module vanilla */
-import { root, trimHashVal } from '../common';
-import { UIRouter } from '../router';
+import { root, trimHashVal } from '../../common';
+import { UIRouter } from '../../router';
 import { BaseLocationServices } from './baseLocationService';
 
 /** A `LocationServices` that uses the browser hash "#" to get/set the current location */

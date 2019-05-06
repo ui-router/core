@@ -204,7 +204,7 @@ export class UrlService implements LocationServices, UrlSyncApi {
    *
    * #### Example:
    * ```js
-   * locationServices.url(); // "/some/path?query=value#anchor"
+   * urlService.url(); // "/some/path?query=value#anchor"
    * ```
    *
    * ### Updating the URL
@@ -213,7 +213,7 @@ export class UrlService implements LocationServices, UrlSyncApi {
    *
    * #### Example:
    * ```js
-   * locationServices.url("/some/path?query=value#anchor", true);
+   * urlService.url("/some/path?query=value#anchor", true);
    * ```
    *
    * @param newurl The new value for the URL.
@@ -225,7 +225,7 @@ export class UrlService implements LocationServices, UrlSyncApi {
    * @return the url (after potentially being processed)
    */
   public url = (newurl?: string, replace?: boolean, state?: any): string =>
-    this.router.locationService.url(newurl, replace, state);
+    this.router.urlPlugin().url(newurl, replace, state);
 
   /**
    * Gets the path part of the current url
@@ -234,7 +234,7 @@ export class UrlService implements LocationServices, UrlSyncApi {
    *
    * @return the path portion of the url
    */
-  public path = (): string => this.router.locationService.path();
+  public path = (): string => this.router.urlPlugin().path();
 
   /**
    * Gets the search part of the current url as an object
@@ -243,7 +243,7 @@ export class UrlService implements LocationServices, UrlSyncApi {
    *
    * @return the search (query) portion of the url, as an object
    */
-  public search = (): { [key: string]: any } => this.router.locationService.search();
+  public search = (): { [key: string]: any } => this.router.urlPlugin().search();
 
   /**
    * Gets the hash part of the current url
@@ -252,7 +252,7 @@ export class UrlService implements LocationServices, UrlSyncApi {
    *
    * @return the hash (anchor) portion of the url
    */
-  public hash = (): string => this.router.locationService.hash();
+  public hash = (): string => this.router.urlPlugin().hash();
 
   /**
    * @internalapi
@@ -263,11 +263,11 @@ export class UrlService implements LocationServices, UrlSyncApi {
    *
    * #### Example:
    * ```js
-   * let deregisterFn = locationServices.onChange((evt) => console.log("url change", evt));
+   * let deregisterFn = urlPlugin.onChange((evt) => console.log("url change", evt));
    * ```
    *
    * @param callback a function that will be called when the url is changing
    * @return a function that de-registers the callback
    */
-  public onChange = (callback: EventListener): Function => this.router.locationService.onChange(callback);
+  public onChange = (callback: EventListener): Function => this.router.urlPlugin().onChange(callback);
 }

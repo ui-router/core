@@ -3,18 +3,11 @@
  *
  * @packageDocumentation @internalapi @module vanilla
  */
-export * from './interface';
-
-export * from './q';
 export * from './injector';
-
-export * from './baseLocationService';
-export * from './hashLocationService';
-export * from './memoryLocationService';
-export * from './pushStateLocationService';
-
-export * from './memoryLocationConfig';
-export * from './browserLocationConfig';
-
-export * from './utils';
+export * from './interface';
+export * from './locationServices';
+export * from './locatonConfig';
 export * from './plugins';
+export * from './q';
+export * from './urlPlugins';
+export * from './utils';

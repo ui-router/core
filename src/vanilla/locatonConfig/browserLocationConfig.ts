@@ -1,6 +1,6 @@
 /** @packageDocumentation @internalapi @module vanilla */
-import { isDefined, isUndefined } from '../common/predicates';
-import { LocationConfig } from '../common/coreservices';
+import { isDefined, isUndefined } from '../../common/predicates';
+import { LocationConfig } from '../../common/coreservices';
 
 /** A `LocationConfig` that delegates to the browser's `location` object */
 export class BrowserLocationConfig implements LocationConfig {

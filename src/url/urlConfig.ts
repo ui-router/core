@@ -33,7 +33,7 @@ export class UrlConfig implements Disposable {
    *
    * @return the application's base href
    */
-  public baseHref = (): string => this.router.locationConfig.baseHref();
+  public baseHref = (): string => this.router.urlPlugin().baseHref();
 
   /**
    * Gets or sets the hashPrefix
@@ -45,34 +45,34 @@ export class UrlConfig implements Disposable {
    * @return the hash prefix
    */
 
-  public hashPrefix = (newprefix?: string): string => this.router.locationConfig.hashPrefix(newprefix);
+  public hashPrefix = (newprefix?: string): string => this.router.urlPlugin().hashPrefix(newprefix);
   /**
    * Gets the host, e.g., `localhost`
    *
    * @return the protocol
    */
-  public host = (): string => this.router.locationConfig.host();
+  public host = (): string => this.router.urlPlugin().host();
 
   /**
    * Returns true when running in pushstate mode
    *
    * @return true when running in html5 mode (pushstate mode).
    */
-  public html5Mode = (): boolean => this.router.locationConfig.html5Mode();
+  public html5Mode = (): boolean => this.router.urlPlugin().html5Mode();
 
   /**
    * Gets the port, e.g., `80`
    *
    * @return the port number
    */
-  public port = (): number => this.router.locationConfig.port();
+  public port = (): number => this.router.urlPlugin().port();
 
   /**
    * Gets the protocol, e.g., `http`
    *
    * @return the protocol
    */
-  public protocol = (): string => this.router.locationConfig.protocol();
+  public protocol = (): string => this.router.urlPlugin().protocol();
 
   /**
    * Defines whether URL matching should be case sensitive (the default behavior), or not.

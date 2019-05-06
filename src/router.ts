@@ -86,10 +86,10 @@ export class UIRouter {
   /** @hidden url plugin instance */
   private _urlPlugin: UrlPlugin = urlPluginStub;
 
-  /** @hidden delete this in v6.x: url plugin instance */
+  /** @deprecated in favor of _urlPlugin delete this in v6.x: url plugin instance */
   public locationService: LocationServices = urlPluginStub;
 
-  /** @hidden delete this in v6.x: url plugin instance */
+  /** @deprecated in favor of _urlPlugin delete this in v6.x: url plugin instance */
   public locationConfig: LocationConfig = urlPluginStub;
 
   /** Registers an object to be notified when the router is disposed */
@@ -213,8 +213,14 @@ export class UIRouter {
   urlPlugin<T extends UrlPlugin>(plugin: { (router: UIRouter, options?: any): void }, options?: any): T;
   /** Add plugin (as javascript factory function) */
   urlPlugin<T extends UrlPlugin>(plugin: PluginFactory<T>, options?: any): T;
-  /** Sets the Url Handling implementation */
-  urlPlugin(urlPlugin: any, options) {
+  /** Gets the current URLPlugin */
+  urlPlugin<T extends UrlPlugin>(): UrlPlugin;
+  /** Gets or sets the UrlPlugin (URL handling implementation) */
+  urlPlugin(urlPlugin?: any, options?) {
+    if (!urlPlugin) {
+      return this._urlPlugin;
+    }
+
     return (this.locationConfig = this.locationService = this._urlPlugin = this.plugin(urlPlugin, options));
   }
 

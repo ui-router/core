@@ -1,7 +1,7 @@
 /** @packageDocumentation @internalapi @module vanilla */
-import { UIRouter } from '../router';
+import { UIRouter } from '../../router';
 import { BaseLocationServices } from './baseLocationService';
-import { LocationConfig, root, splitHash, splitQuery, stripLastPathElement } from '../common';
+import { LocationConfig, root, splitHash, splitQuery, stripLastPathElement } from '../../common';
 
 /**
  * A `LocationServices` that gets/sets the current location using the browser's `location` and `history` apis

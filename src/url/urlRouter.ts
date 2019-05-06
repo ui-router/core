@@ -40,14 +40,14 @@ export class UrlRouter {
    * @internalapi
    */
   update(read?: boolean) {
-    const $url = this.router.locationService;
+    const urlPlugin = this.router.urlPlugin();
     if (read) {
-      this.location = $url.url();
+      this.location = urlPlugin.url();
       return;
     }
-    if ($url.url() === this.location) return;
+    if (urlPlugin.url() === this.location) return;
 
-    $url.url(this.location, true);
+    urlPlugin.url(this.location, true);
   }
 
   /**

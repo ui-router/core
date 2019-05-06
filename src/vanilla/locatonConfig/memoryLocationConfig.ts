@@ -1,7 +1,7 @@
 /** @packageDocumentation @internalapi @module vanilla */
-import { LocationConfig } from '../common/coreservices';
-import { isDefined } from '../common/predicates';
-import { noop } from '../common/common';
+import { LocationConfig } from '../../common/coreservices';
+import { isDefined } from '../../common/predicates';
+import { noop } from '../../common/common';
 
 /** A `LocationConfig` mock that gets/sets all config from an in-memory object */
 export class MemoryLocationConfig implements LocationConfig {
