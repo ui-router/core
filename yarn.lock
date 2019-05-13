@@ -16,6 +16,11 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
+"@types/anymatch@*":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@types/anymatch/-/anymatch-1.3.1.tgz#336badc1beecb9dacc38bea2cf32adf627a8421a"
+  integrity sha512-/+CRPXpBDpo2RK9C68N3b2cOvO0Cf5B9aPijHsoDQTHivnGSObdOF2BRQOYjojWTDy6nQvMjmqRXIxH55VjxxA==
+
 "@types/estree@0.0.39":
   version "0.0.39"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
@@ -92,6 +97,29 @@
 "@types/sizzle@*":
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
+
+"@types/tapable@*", "@types/tapable@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.4.tgz#b4ffc7dc97b498c969b360a41eee247f82616370"
+  integrity sha512-78AdXtlhpCHT0K3EytMpn4JNxaf5tbqbLcbIRoQIHzpTIyjpxLQKRoxU55ujBXAtg3Nl2h/XWvfDa9dsMOd0pQ==
+
+"@types/uglify-js@*":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@types/uglify-js/-/uglify-js-3.0.4.tgz#96beae23df6f561862a830b4288a49e86baac082"
+  integrity sha512-SudIN9TRJ+v8g5pTG8RRCqfqTMNqgWCKKd3vtynhGzkIIjxaicNAMuY5TRadJ6tzDu3Dotf3ngaMILtmOdmWEQ==
+  dependencies:
+    source-map "^0.6.1"
+
+"@types/webpack@^4.4.19":
+  version "4.4.31"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.31.tgz#f59b9d8210cf4d2fd254fe6d1f5ba86e557867f5"
+  integrity sha512-WNALmv/wxy2+OoF7A5GD8BVotXnkuMHlojVWKj/neFHU3Ut2Azbu1A7Yi2Vr6eX3z+31XgR/dJ5NpX4pQZ7ieQ==
+  dependencies:
+    "@types/anymatch" "*"
+    "@types/node" "*"
+    "@types/tapable" "*"
+    "@types/uglify-js" "*"
+    source-map "^0.6.0"
 
 "@uirouter/publish-scripts@^2.3.25":
   version "2.3.25"
@@ -1810,17 +1838,21 @@ foreach@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/foreach/-/foreach-2.0.5.tgz#0bee005018aeb260d0a3af3ae658dd0136ec1b99"
 
-fork-ts-checker-webpack-plugin@^0.5.2:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-0.5.2.tgz#a73b3630bd0a69409a6e4824e54c03a62fe82d8f"
-  integrity sha512-a5IG+xXyKnpruI0CP/anyRLAoxWtp3lzdG6flxicANnoSzz64b12dJ7ASAVRrI2OaWwZR2JyBaMHFQqInhWhIw==
+fork-ts-checker-webpack-plugin@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-1.3.1.tgz#56f7282973fe1df059173a6b254c0bc21f64bb3c"
+  integrity sha512-glTh+croAr7G3B4nJ9JU77o+vGem6h27bYsKEY1WDGgphwDoEUqH4vYEcR3nObb7l5axwTC9J161PypDiyuAcg==
   dependencies:
+    "@types/tapable" "^1.0.4"
+    "@types/webpack" "^4.4.19"
     babel-code-frame "^6.22.0"
     chalk "^2.4.1"
     chokidar "^2.0.4"
     micromatch "^3.1.10"
     minimatch "^3.0.4"
+    semver "^5.6.0"
     tapable "^1.0.0"
+    worker-rpc "^0.1.0"
 
 fragment-cache@^0.2.1:
   version "0.2.1"
@@ -2921,6 +2953,11 @@ merge-stream@^1.0.1:
   resolved "https://registry.yarnpkg.com/merge-stream/-/merge-stream-1.0.1.tgz#4041202d508a342ba00174008df0c251b8c135e1"
   dependencies:
     readable-stream "^2.0.1"
+
+microevent.ts@~0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/microevent.ts/-/microevent.ts-0.1.0.tgz#390748b8a515083e6b63cd5112a3f18c2fe0eba8"
+  integrity sha1-OQdIuKUVCD5rY81REqPxjC/g66g=
 
 micromatch@^2.3.11:
   version "2.3.11"
@@ -4033,9 +4070,10 @@ semver-compare@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/semver-compare/-/semver-compare-1.0.0.tgz#0dee216a1c941ab37e9efb1788f6afc5ff5537fc"
 
-"semver@2 || 3 || 4 || 5", semver@^5.3.0, semver@^5.5.0:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
+"semver@2 || 3 || 4 || 5", semver@^5.3.0, semver@^5.5.0, semver@^5.6.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.0.tgz#790a7cf6fea5459bac96110b29b60412dc8ff96b"
+  integrity sha512-Ya52jSX2u7QKghxeoFGpLwCtGlt7j0oY9DYb5apt9nPlJ42ID+ulTXESnt/qAQcoSERyZ5sl3LDIOw0nAn/5DA==
 
 semver@^6.0.0:
   version "6.0.0"
@@ -4916,6 +4954,13 @@ worker-farm@^1.5.2:
   resolved "https://registry.yarnpkg.com/worker-farm/-/worker-farm-1.6.0.tgz#aecc405976fab5a95526180846f0dba288f3a4a0"
   dependencies:
     errno "~0.1.7"
+
+worker-rpc@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/worker-rpc/-/worker-rpc-0.1.0.tgz#5f1258dca3d617cd18ca86587f8a05ac0eebd834"
+  integrity sha1-XxJY3KPWF80YyoZYf4oFrA7r2DQ=
+  dependencies:
+    microevent.ts "~0.1.0"
 
 wrap-ansi@^2.0.0:
   version "2.1.0"
