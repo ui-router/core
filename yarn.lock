@@ -4549,10 +4549,10 @@ trim-off-newlines@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
 
-ts-loader@^5.3.3:
-  version "5.4.6"
-  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-5.4.6.tgz#f786bc9b4c3d3086ad5433ae63eb1d72b09c3b17"
-  integrity sha512-sXRd5Ym7x7t78XQX1egJFs1cvM6Dkp1ApU0Hq28D3vrxFhEjc5fTheWsyKF7vEy97LCwaeQ9TrxuDHD9EksHCA==
+ts-loader@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-6.0.2.tgz#cbd46a1495668ed9d59813f5c66f4bb49ff0c14c"
+  integrity sha512-kkF3sGf3oBUehlvXI9fkbItbFTnNgGkYAz91vtWnsKAU4m+LAmQjuby7uTZNo3As+/zHLuyB052SkQDY6vLXtg==
   dependencies:
     chalk "^2.3.0"
     enhanced-resolve "^4.0.0"
