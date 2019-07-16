@@ -4072,11 +4072,7 @@ semver-compare@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/semver-compare/-/semver-compare-1.0.0.tgz#0dee216a1c941ab37e9efb1788f6afc5ff5537fc"
 
-"semver@2 || 3 || 4 || 5", semver@^5.3.0, semver@^5.5.0:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
-
-semver@^5.6.0:
+"semver@2 || 3 || 4 || 5", semver@^5.3.0, semver@^5.5.0, semver@^5.6.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.0.tgz#790a7cf6fea5459bac96110b29b60412dc8ff96b"
   integrity sha512-Ya52jSX2u7QKghxeoFGpLwCtGlt7j0oY9DYb5apt9nPlJ42ID+ulTXESnt/qAQcoSERyZ5sl3LDIOw0nAn/5DA==
@@ -4607,9 +4603,9 @@ trim-off-newlines@^1.0.0:
   resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
 
 ts-loader@^6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-6.0.2.tgz#cbd46a1495668ed9d59813f5c66f4bb49ff0c14c"
-  integrity sha512-kkF3sGf3oBUehlvXI9fkbItbFTnNgGkYAz91vtWnsKAU4m+LAmQjuby7uTZNo3As+/zHLuyB052SkQDY6vLXtg==
+  version "6.0.4"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-6.0.4.tgz#bc331ad91a887a60632d94c9f79448666f2c4b63"
+  integrity sha512-p2zJYe7OtwR+49kv4gs7v4dMrfYD1IPpOtqiSPCbe8oR+4zEBtdHwzM7A7M91F+suReqgzZrlClk4LRSSp882g==
   dependencies:
     chalk "^2.3.0"
     enhanced-resolve "^4.0.0"
