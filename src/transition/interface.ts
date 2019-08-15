@@ -118,7 +118,7 @@ export interface TransitionHookOptions {
  */
 export interface TreeChanges {
   /** @nodoc */
-  [key: string]: PathNode[];
+  [key: string]: PathNode[] | undefined;
 
   /** The path of nodes in the state tree that the transition is coming *from* */
   from: PathNode[];
