@@ -1,13 +1,13 @@
-import { ResolveContext, StateObject, PathNode, Resolvable, copy } from '../src/index';
+import { tail } from '../src/common/common';
 import { services } from '../src/common/coreservices';
-import { tree2Array } from './_testUtils';
+import { copy, CustomAsyncPolicy, PathNode, Resolvable, ResolveContext, StateObject } from '../src/index';
 import { UIRouter } from '../src/router';
-
-import { TestingPlugin } from './_testingPlugin';
+import { StateRegistry } from '../src/state/stateRegistry';
 import { StateService } from '../src/state/stateService';
 import { TransitionService } from '../src/transition/transitionService';
-import { StateRegistry } from '../src/state/stateRegistry';
-import { tail } from '../src/common/common';
+
+import { TestingPlugin } from './_testingPlugin';
+import { tree2Array } from './_testUtils';
 
 ///////////////////////////////////////////////
 
@@ -426,6 +426,7 @@ describe('Resolvables system:', function() {
       const ctx = new ResolveContext(path);
 
       let result;
+
       function checkCounts() {
         expect(result).toBe('JJ2K');
         expect(counts['_J']).toBe(1);
@@ -561,10 +562,11 @@ describe('Resolvables system:', function() {
 
   describe('NOWAIT Resolve Policy', () => {
     it('should allow a transition to complete before the resolve is settled', async done => {
-      let resolve,
-        resolvePromise = new Promise(_resolve => {
-          resolve = _resolve;
-        });
+      let resolve;
+
+      const resolvePromise = new Promise(_resolve => {
+        resolve = _resolve;
+      });
 
       $registry.register({
         name: 'nowait',
@@ -599,10 +601,11 @@ describe('Resolvables system:', function() {
     });
 
     it('should wait for WAIT resolves and not wait for NOWAIT resolves', async done => {
-      let promiseResolveFn,
-        resolvePromise = new Promise(resolve => {
-          promiseResolveFn = resolve;
-        });
+      let promiseResolveFn;
+
+      const resolvePromise = new Promise(resolve => {
+        promiseResolveFn = resolve;
+      });
 
       $registry.register({
         name: 'nowait',
@@ -633,6 +636,41 @@ describe('Resolvables system:', function() {
       });
 
       $state.go('nowait');
+    });
+  });
+
+  describe('custom Resolve Policy', () => {
+    let customResolvePolicy: CustomAsyncPolicy;
+
+    it('should wait for the promise to resolve before finishing the transition', async done => {
+      let resolve: (value: string) => void;
+
+      const resolvePromise: Promise<string> = new Promise(_resolve => {
+        resolve = _resolve;
+      });
+
+      customResolvePolicy = jasmine.createSpy('customResolvePolicy');
+
+      (customResolvePolicy as jasmine.Spy).and.callFake((data: { useMe: Promise<string> }) => {
+        return data.useMe;
+      });
+
+      resolve('myAwaitedValue');
+
+      $registry.register({
+        name: 'customPolicy',
+        resolve: {
+          customWait: () => ({ useMe: resolvePromise }),
+        },
+        resolvePolicy: { async: customResolvePolicy },
+      });
+
+      $transitions.onSuccess({}, trans => {
+        expect(customResolvePolicy).toHaveBeenCalledWith({ useMe: resolvePromise });
+        expect(trans.injector().get('customWait')).toBe('myAwaitedValue');
+      });
+
+      $state.go('customPolicy').then(done);
     });
   });
 });

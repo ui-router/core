@@ -1,8 +1,8 @@
 /** @publicapi @module resolve */ /** */
-import { extend, equals, inArray, identity } from '../common/common';
+import { extend, identity } from '../common/common';
 import { services } from '../common/coreservices';
 import { trace } from '../common/trace';
-import { ResolvePolicy, ResolvableLiteral, resolvePolicies } from './interface';
+import { ResolvePolicy, ResolvableLiteral, PolicyAsync } from './interface';
 
 import { ResolveContext } from './resolveContext';
 import { stringify } from '../common/strings';
@@ -117,26 +117,12 @@ export class Resolvable implements ResolvableLiteral {
     // Invokes the resolve function passing the resolved dependencies as arguments
     const invokeResolveFn = (resolvedDeps: any[]) => this.resolveFn.apply(null, resolvedDeps);
 
-    /**
-     * For RXWAIT policy:
-     *
-     * Given an observable returned from a resolve function:
-     * - enables .cache() mode (this allows multicast subscribers)
-     * - then calls toPromise() (this triggers subscribe() and thus fetches)
-     * - Waits for the promise, then return the cached observable (not the first emitted value).
-     */
-    const waitForRx = (observable$: any) => {
-      const cached = observable$.cache(1);
-      return cached
-        .take(1)
-        .toPromise()
-        .then(() => cached);
-    };
-
     // If the resolve policy is RXWAIT, wait for the observable to emit something. otherwise pass through.
     const node: PathNode = resolveContext.findNode(this);
     const state: StateObject = node && node.state;
-    const maybeWaitForRx = this.getPolicy(state).async === 'RXWAIT' ? waitForRx : identity;
+
+    const asyncPolicy: PolicyAsync = this.getPolicy(state).async;
+    const customAsyncPolicy = isFunction(asyncPolicy) ? asyncPolicy : identity;
 
     // After the final value has been resolved, update the state of the Resolvable
     const applyResolvedValue = (resolvedValue: any) => {
@@ -152,7 +138,7 @@ export class Resolvable implements ResolvableLiteral {
       .when()
       .then(getResolvableDependencies)
       .then(invokeResolveFn)
-      .then(maybeWaitForRx)
+      .then(customAsyncPolicy)
       .then(applyResolvedValue));
   }
 
