@@ -200,7 +200,8 @@ export interface ResolvePolicy {
 }
 
 export type PolicyWhen = 'LAZY' | 'EAGER';
-export type PolicyAsync = 'WAIT' | 'NOWAIT' | 'RXWAIT';
+export type PolicyAsync = 'WAIT' | 'NOWAIT' | CustomAsyncPolicy;
+export type CustomAsyncPolicy = <TResolveFnResult, TResolveValue>(data: TResolveFnResult) => Promise<TResolveValue>;
 
 /** @internalapi */
 export let resolvePolicies = {
