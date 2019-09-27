@@ -1,3 +1,13 @@
+## 6.0.1 (2019-09-27)
+[Compare `@uirouter/core` versions 6.0.0 and 6.0.1](https://github.com/ui-router/core/compare/6.0.0...6.0.1)
+
+### Bug Fixes
+
+* **resolve:** remove unnecessary generics from CustomAsyncPolicy ([#452](https://github.com/ui-router/core/issues/452)) ([61f4ee9](https://github.com/ui-router/core/commit/61f4ee9))
+
+
+
+
 # 6.0.0 (2019-09-26)
 [Compare `@uirouter/core` versions 5.0.23 and 6.0.0](https://github.com/ui-router/core/compare/5.0.23...6.0.0)
 
