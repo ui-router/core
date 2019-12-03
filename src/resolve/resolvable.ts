@@ -116,8 +116,6 @@ export class Resolvable implements ResolvableLiteral {
 
     // Invokes the resolve function passing the resolved dependencies as arguments
     const invokeResolveFn = (resolvedDeps: any[]) => this.resolveFn.apply(null, resolvedDeps);
-
-    // If the resolve policy is RXWAIT, wait for the observable to emit something. otherwise pass through.
     const node: PathNode = resolveContext.findNode(this);
     const state: StateObject = node && node.state;
 
