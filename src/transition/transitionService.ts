@@ -49,6 +49,7 @@ export let defaultTransOpts: TransitionOptions = {
   inherit: false,
   notify: true,
   reload: false,
+  supercede: true,
   custom: {},
   current: () => null,
   source: 'unknown',

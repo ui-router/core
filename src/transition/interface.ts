@@ -73,6 +73,18 @@ export interface TransitionOptions {
    * You can define your own Transition Options inside this property and use them, e.g., from a Transition Hook
    */
   custom?: any;
+  /**
+   * This option may be used to cancel the active transition (if one is active) in favour of the this one.
+   * This is the default behaviour or ui-router.
+   *
+   *
+   * - When `true`, the active transition will be canceled and new transition will begin.
+   * - when `false`, the transition will be canceled if a transition is already running. This can be useful in cases where
+   * you only want to navigate to a different state if you are not already navigating somewhere.
+   *
+   * @default `true`
+   */
+  supercede?: boolean;
   /** @internalapi */
   reloadState?: StateObject;
   /** @internalapi
