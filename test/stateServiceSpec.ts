@@ -637,6 +637,25 @@ describe('stateService', function() {
       done();
     });
 
+    describe('when supercede TransitionOption is false', () => {
+      it('ignores transition if another transition is running', async done => {
+        $state.defaultErrorHandler(() => null);
+        await initStateTo(A);
+
+        const activeTransition = $state.transitionTo(B, {});
+        const superseded = await $state.transitionTo(C, {}, { supercede: false }).catch(err => err);
+
+        const result: Rejection = await superseded;
+        expect(result.type).toEqual(RejectType.IGNORED);
+
+        await activeTransition;
+
+        expect($state.current).toBe(B);
+
+        done();
+      });
+    });
+
     it('aborts pending transitions (last call wins)', async done => {
       $state.defaultErrorHandler(() => null);
       await initStateTo(A);

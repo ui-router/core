@@ -338,6 +338,10 @@ export class StateService {
 
     if (!ref.valid()) return <TransitionPromise>silentRejection(ref.error());
 
+    if (options.supercede === false && getCurrent()) {
+      return <TransitionPromise>Rejection.ignored('Another transition is in progress and supercede has been set to false in TransitionOptions for the transition. So the transition was ignored in favour of the existing one in progress.').toPromise();
+    }
+
     /**
      * Special handling for Ignored, Aborted, and Redirected transitions
      *
