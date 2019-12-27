@@ -1,16 +1,24 @@
 {
-  "typescript2.2": "./test/typescript2.2",
-  "typescript2.3": "./test/typescript2.3",
-  "typescript2.4": "./test/typescript2.4",
-  "typescript2.5": "./test/typescript2.5",
-  "typescript2.6": "./test/typescript2.6",
-  "typescript2.7": "./test/typescript2.7",
-  "typescript2.8": "./test/typescript2.8",
-  "typescript3.0": "./test/typescript3.0",
-  "typescript3.1": "./test/typescript3.1",
-  "typescript3.2": "./test/typescript3.2",
-  "angular": "https://github.com/ui-router/angular.git",
-  "angularjs": "https://github.com/angular-ui/ui-router.git",
-  "react": "https://github.com/ui-router/react.git",
-  "sticky-states": "https://github.com/ui-router/sticky-states.git"
+  "angular": {
+    "angular": "https://github.com/ui-router/angular.git"
+  },
+  "angularjs": {
+    "angularjs": "https://github.com/angular-ui/ui-router.git"
+  },
+  "react": {
+    "react": "https://github.com/ui-router/react.git"
+  },
+  "other": {
+    "sticky-states": "https://github.com/ui-router/sticky-states.git",
+    "typescript2.2": "./test/typescript2.2",
+    "typescript2.3": "./test/typescript2.3",
+    "typescript2.4": "./test/typescript2.4",
+    "typescript2.5": "./test/typescript2.5",
+    "typescript2.6": "./test/typescript2.6",
+    "typescript2.7": "./test/typescript2.7",
+    "typescript2.8": "./test/typescript2.8",
+    "typescript3.0": "./test/typescript3.0",
+    "typescript3.1": "./test/typescript3.1",
+    "typescript3.2": "./test/typescript3.2"
+  }
 }
