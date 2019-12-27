@@ -21,5 +21,8 @@ idea-out
 *.ipr
 *.iws
 
+!.github
+
 # generate doc to _doc; copy to proper gh-pages dir
 _doc
+

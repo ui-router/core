@@ -1,0 +1,84 @@
+name: 'CI: UIRouter Core'
+
+on: [push]
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: yarn install --pure-lockfile
+      - name: Run Tests
+        run: yarn test
+
+  docs:
+    name: Docs can be generated
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: yarn install --pure-lockfile
+      - name: Generate Docs
+        run: yarn docs
+
+  test_downstream_angular:
+    name: Downstream Angular projects still work
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare to Test Downstream Projects
+        run: |
+          npm config set scripts-prepend-node-path auto
+          git config --global user.email uirouter@github.actions
+          git config --global user.name uirouter_github_actions
+      - name: Install Dependencies
+        run: yarn install --pure-lockfile
+      - name: Test Downstream Projects
+        run: yarn test:downstream --group angular
+
+  test_downstream_react:
+    name: Downstream React projects still work
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare to Test Downstream Projects
+        run: |
+          npm config set scripts-prepend-node-path auto
+          git config --global user.email uirouter@github.actions
+          git config --global user.name uirouter_github_actions
+      - name: Install Dependencies
+        run: yarn install --pure-lockfile
+      - name: Test Downstream Projects
+        run: yarn test:downstream --group react
+
+  test_downstream_angularjs:
+    name: Downstream AngularJS projects still work
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare to Test Downstream Projects
+        run: |
+          npm config set scripts-prepend-node-path auto
+          git config --global user.email uirouter@github.actions
+          git config --global user.name uirouter_github_actions
+      - name: Install Dependencies
+        run: yarn install --pure-lockfile
+      - name: Test Downstream Projects
+        run: yarn test:downstream --group angularjs
+
+  test_downstream_other:
+    name: Other Downstream projects still work
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare to Test Downstream Projects
+        run: |
+          npm config set scripts-prepend-node-path auto
+          git config --global user.email uirouter@github.actions
+          git config --global user.name uirouter_github_actions
+      - name: Install Dependencies
+        run: yarn install --pure-lockfile
+      - name: Test Downstream Projects
+        run: yarn test:downstream --group other
