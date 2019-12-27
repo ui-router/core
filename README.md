@@ -1,22 +1,22 @@
-# UI-Router Core &nbsp;[![Build Status](https://travis-ci.org/ui-router/core.svg?branch=master)](https://travis-ci.org/ui-router/core)
+# UI-Router Core &nbsp;[![Build Status](https://github.com/ui-router/core/workflows/CI:%20UIRouter%20Core/badge.svg)](https://github.com/ui-router/core/actions?query=workflow%3A%22CI:%20UIRouter%20Core%22)
 
-UI-Router core provides client-side [Single Page Application](https://en.wikipedia.org/wiki/Single-page_application) 
+UI-Router core provides client-side [Single Page Application](https://en.wikipedia.org/wiki/Single-page_application)
 routing for JavaScript.
 This core is framework agnostic.
 It is used to build
 [UI-Router for Angular 1](//ui-router.github.io/ng1),
-[UI-Router for Angular 2](//ui-router.github.io/ng2), and 
+[UI-Router for Angular 2](//ui-router.github.io/ng2), and
 [UI-Router React](//ui-router.github.io/react).
 
 ## SPA Routing
 
-Routing frameworks for SPAs update the browser's URL as the user navigates through the app.  Conversely, this allows 
-changes to the browser's URL to drive navigation through the app, thus allowing the user to create a bookmark to a 
+Routing frameworks for SPAs update the browser's URL as the user navigates through the app. Conversely, this allows
+changes to the browser's URL to drive navigation through the app, thus allowing the user to create a bookmark to a
 location deep within the SPA.
 
-UI-Router applications are modeled as a hierarchical tree of states. UI-Router provides a 
-[*state machine*](https://en.wikipedia.org/wiki/Finite-state_machine) to manage the transitions between those 
-application states in a transaction-like manner. 
+UI-Router applications are modeled as a hierarchical tree of states. UI-Router provides a
+[_state machine_](https://en.wikipedia.org/wiki/Finite-state_machine) to manage the transitions between those
+application states in a transaction-like manner.
 
 ## Features
 
@@ -33,7 +33,7 @@ UI-Router Core provides the following features:
   - Multiple Named Views
 - Flexible URLs and parameters
   - Path, Query, and non-URL parameters
-  - Typed parameters 
+  - Typed parameters
     - Built in: `int`, `string`, `date`, `json`
     - Custom: define your own encoding/decoding
   - Optional or required parameters
