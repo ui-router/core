@@ -45,22 +45,17 @@ import { Predicate } from './common';
  *
  * ```
  *
- * Stolen from: http://stackoverflow.com/questions/4394747/javascript-curry-function
- *
  * @param fn
  * @returns {*|function(): (*|any)}
  */
 export function curry(fn: Function): Function {
-  const initial_args = [].slice.apply(arguments, [1]);
-  const func_args_length = fn.length;
-
-  function curried(args: any[]) {
-    if (args.length >= func_args_length) return fn.apply(null, args);
-    return function() {
-      return curried(args.concat([].slice.apply(arguments)));
-    };
-  }
-  return curried(initial_args);
+  return function curried() {
+    if (arguments.length >= fn.length) {
+      return fn.apply(this, arguments);
+    }
+    const args = Array.prototype.slice.call(arguments);
+    return curried.bind(this, ...args);
+  };
 }
 
 /**
