@@ -3,6 +3,7 @@ import { isString } from '../common/predicates';
 import { StateOrName } from './interface';
 import { StateObject } from './stateObject';
 import { values } from '../common/common';
+import { safeConsole } from '../common/safeConsole';
 
 export class StateMatcher {
   constructor(private _states: { [key: string]: StateObject }) {}
@@ -29,8 +30,7 @@ export class StateMatcher {
       );
 
       if (matches.length > 1) {
-        // tslint:disable-next-line:no-console
-        console.log(
+        safeConsole.error(
           `stateMatcher.find: Found multiple matches for ${name} using glob: `,
           matches.map(match => match.name)
         );
