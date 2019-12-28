@@ -70,7 +70,7 @@
     "@types/jquery": "^3.3.2",
     "@uirouter/publish-scripts": "^2.3.43",
     "dts-downlevel": "^0.3.0",
-    "fork-ts-checker-webpack-plugin": "^1.3.7",
+    "fork-ts-checker-webpack-plugin": "^3.1.1",
     "husky": "^3.0.0",
     "jasmine-core": "^3.3.0",
     "karma": "^4.0.0",
