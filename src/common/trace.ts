@@ -32,13 +32,13 @@
  *
  * @publicapi @module trace
  */
-/* tslint:disable:no-console */
 import { parse } from '../common/hof';
 import { isFunction, isNumber } from '../common/predicates';
 import { Transition } from '../transition/transition';
 import { ViewTuple } from '../view';
 import { ActiveUIView, ViewConfig, ViewContext } from '../view/interface';
 import { stringify, functionToString, maxLength, padString } from './strings';
+import { safeConsole } from './safeConsole';
 import { Resolvable } from '../resolve/resolvable';
 import { PathNode } from '../path/pathNode';
 import { PolicyWhen } from '../resolve/interface';
@@ -57,21 +57,13 @@ function uiViewString(uiview: ActiveUIView) {
 const viewConfigString = (viewConfig: ViewConfig) => {
   const view = viewConfig.viewDecl;
   const state = view.$context.name || '(root)';
-  return `[View#${viewConfig.$id} from '${state}' state]: target ui-view: '${view.$uiViewName}@${
-    view.$uiViewContextAnchor
-  }'`;
+  return `[View#${viewConfig.$id} from '${state}' state]: target ui-view: '${view.$uiViewName}@${view.$uiViewContextAnchor}'`;
 };
 
 /** @hidden */
 function normalizedCat(input: Category | string): string {
   return isNumber(input) ? Category[input] : Category[Category[input]];
 }
-
-/** @hidden */
-const consoleLog = Function.prototype.bind.call(console.log, console);
-
-/** @hidden */
-const consoletable = isFunction(console.table) ? console.table.bind(console) : consoleLog.bind(console);
 
 /**
  * Trace categories Enum
@@ -176,13 +168,13 @@ export class Trace {
   /** @internalapi called by ui-router code */
   traceTransitionStart(trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
-    console.log(`${transLbl(trans)}: Started  -> ${stringify(trans)}`);
+    safeConsole.log(`${transLbl(trans)}: Started  -> ${stringify(trans)}`);
   }
 
   /** @internalapi called by ui-router code */
   traceTransitionIgnored(trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
-    console.log(`${transLbl(trans)}: Ignored  <> ${stringify(trans)}`);
+    safeConsole.log(`${transLbl(trans)}: Ignored  <> ${stringify(trans)}`);
   }
 
   /** @internalapi called by ui-router code */
@@ -191,25 +183,25 @@ export class Trace {
     const event = parse('traceData.hookType')(options) || 'internal',
       context = parse('traceData.context.state.name')(options) || parse('traceData.context')(options) || 'unknown',
       name = functionToString((step as any).registeredHook.callback);
-    console.log(`${transLbl(trans)}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
+    safeConsole.log(`${transLbl(trans)}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
   }
 
   /** @internalapi called by ui-router code */
   traceHookResult(hookResult: HookResult, trans: Transition, transitionOptions: any) {
     if (!this.enabled(Category.HOOK)) return;
-    console.log(`${transLbl(trans)}:   <- Hook returned: ${maxLength(200, stringify(hookResult))}`);
+    safeConsole.log(`${transLbl(trans)}:   <- Hook returned: ${maxLength(200, stringify(hookResult))}`);
   }
 
   /** @internalapi called by ui-router code */
   traceResolvePath(path: PathNode[], when: PolicyWhen, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
-    console.log(`${transLbl(trans)}:         Resolving ${path} (${when})`);
+    safeConsole.log(`${transLbl(trans)}:         Resolving ${path} (${when})`);
   }
 
   /** @internalapi called by ui-router code */
   traceResolvableResolved(resolvable: Resolvable, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
-    console.log(
+    safeConsole.log(
       `${transLbl(trans)}:               <- Resolved  ${resolvable} to: ${maxLength(200, stringify(resolvable.data))}`
     );
   }
@@ -217,19 +209,19 @@ export class Trace {
   /** @internalapi called by ui-router code */
   traceError(reason: any, trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
-    console.log(`${transLbl(trans)}: <- Rejected ${stringify(trans)}, reason: ${reason}`);
+    safeConsole.log(`${transLbl(trans)}: <- Rejected ${stringify(trans)}, reason: ${reason}`);
   }
 
   /** @internalapi called by ui-router code */
   traceSuccess(finalState: StateObject, trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
-    console.log(`${transLbl(trans)}: <- Success  ${stringify(trans)}, final state: ${finalState.name}`);
+    safeConsole.log(`${transLbl(trans)}: <- Success  ${stringify(trans)}, final state: ${finalState.name}`);
   }
 
   /** @internalapi called by ui-router code */
   traceUIViewEvent(event: string, viewData: ActiveUIView, extra = '') {
     if (!this.enabled(Category.UIVIEW)) return;
-    console.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
+    safeConsole.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
   }
 
   /** @internalapi called by ui-router code */
@@ -257,19 +249,19 @@ export class Trace {
       })
       .sort((a, b) => (a[uivheader] || '').localeCompare(b[uivheader] || ''));
 
-    consoletable(mapping);
+    safeConsole.table(mapping);
   }
 
   /** @internalapi called by ui-router code */
   traceViewServiceEvent(event: string, viewConfig: ViewConfig) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
-    console.log(`VIEWCONFIG: ${event} ${viewConfigString(viewConfig)}`);
+    safeConsole.log(`VIEWCONFIG: ${event} ${viewConfigString(viewConfig)}`);
   }
 
   /** @internalapi called by ui-router code */
   traceViewServiceUIViewEvent(event: string, viewData: ActiveUIView) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
-    console.log(`VIEWCONFIG: ${event} ${uiViewString(viewData)}`);
+    safeConsole.log(`VIEWCONFIG: ${event} ${uiViewString(viewData)}`);
   }
 }
 
