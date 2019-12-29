@@ -1,3 +1,19 @@
+## 6.0.2 (2019-12-29)
+[Compare `@uirouter/core` versions 6.0.1 and 6.0.2](https://github.com/ui-router/core/compare/6.0.1...6.0.2)
+
+### Bug Fixes
+
+* **hof:** Rewrite curry from scratch ([fc324c6](https://github.com/ui-router/core/commit/fc324c6)), closes [#350](https://github.com/ui-router/core/issues/350)
+* **IE9:** Add safeConsole so IE9 doesn't break ([9c8579d](https://github.com/ui-router/core/commit/9c8579d))
+
+
+### Features
+
+* **stateService:** add transition option 'supercede' so transition can be ignored if one is pending ([6e5a56f](https://github.com/ui-router/core/commit/6e5a56f))
+
+
+
+
 ## 6.0.1 (2019-09-27)
 [Compare `@uirouter/core` versions 6.0.0 and 6.0.1](https://github.com/ui-router/core/compare/6.0.0...6.0.1)
 
