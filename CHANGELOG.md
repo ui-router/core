@@ -1,3 +1,9 @@
+## 6.0.3 (2019-12-30)
+[Compare `@uirouter/core` versions 6.0.2 and 6.0.3](https://github.com/ui-router/core/compare/6.0.2...6.0.3)
+
+No code changes. Re-publishing because 6.0.2 was built with the wrong versin of typescript.
+
+
 ## 6.0.2 (2019-12-29)
 [Compare `@uirouter/core` versions 6.0.1 and 6.0.2](https://github.com/ui-router/core/compare/6.0.1...6.0.2)
 
