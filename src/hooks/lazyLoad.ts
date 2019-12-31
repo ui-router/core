@@ -24,7 +24,7 @@ import { StateRule } from '../url/interface';
  * ```
  * .state('abc', {
  *   component: 'fooComponent',
- *   lazyLoad: () => System.import('./fooComponent')
+ *   lazyLoad: () => import('./fooComponent')
  *   });
  * ```
  *
