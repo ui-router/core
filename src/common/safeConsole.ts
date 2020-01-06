@@ -22,7 +22,7 @@ function fallbackConsole(console) {
 
 function getSafeConsole() {
   // @ts-ignore
-  const isIE9 = document && document.documentMode && document.documentMode === 9;
+  const isIE9 = typeof document !== 'undefined' && document.documentMode && document.documentMode === 9;
   if (isIE9) {
     return window && window.console ? ie9Console(window.console) : noopConsoleStub;
   } else if (!console.table || !console.error) {
