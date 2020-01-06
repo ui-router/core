@@ -1,3 +1,13 @@
+## 6.0.4 (2020-01-06)
+[Compare `@uirouter/core` versions 6.0.3 and 6.0.4](https://github.com/ui-router/core/compare/6.0.3...6.0.4)
+
+### Bug Fixes
+
+* **safeConsole:** check if document is defined to avoid issues in node environments ([da29d88](https://github.com/ui-router/core/commit/da29d88))
+
+
+
+
 ## 6.0.3 (2019-12-30)
 [Compare `@uirouter/core` versions 6.0.2 and 6.0.3](https://github.com/ui-router/core/compare/6.0.2...6.0.3)
 
