@@ -1,4 +1,4 @@
-/** @publicapi @module transition */ /** */
+/** @packageDocumentation @publicapi @module transition */
 import {
   IHookRegistry,
   TransitionOptions,
@@ -379,7 +379,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     this._criteriaPaths[name] = { name, scope: hookScope };
   }
 
-  /** * @hidden */
+  /** @hidden */
   // tslint:disable-next-line
   private _getPathTypes(): PathTypes {
     return this._criteriaPaths;

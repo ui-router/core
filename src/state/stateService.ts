@@ -1,4 +1,4 @@
-/** @publicapi @module state */ /** */
+/** @packageDocumentation @publicapi @module state */
 import {
   createProxyFunctions,
   defaults,

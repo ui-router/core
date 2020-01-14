@@ -1,4 +1,4 @@
-/** @publicapi @module url */ /** */
+/** @packageDocumentation @publicapi @module url */
 import { Disposable } from '../interface';
 import { UIRouter } from '../router';
 import { ParamTypeDefinition, ParamTypes } from '../params';

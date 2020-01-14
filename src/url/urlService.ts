@@ -1,4 +1,4 @@
-/** @publicapi @module url */ /** */
+/** @packageDocumentation @publicapi @module url */
 import { UIRouter } from '../router';
 import { extend, is, isString, LocationServices, pattern } from '../common';
 import { MatchResult, UrlParts, UrlRule, UrlSyncApi } from './interface';

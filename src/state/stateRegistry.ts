@@ -1,4 +1,4 @@
-/** @publicapi @module state */ /** */
+/** @packageDocumentation @publicapi @module state */
 
 import { StateObject } from './stateObject';
 import { StateMatcher } from './stateMatcher';

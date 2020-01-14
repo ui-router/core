@@ -1,4 +1,4 @@
-/** @publicapi @module url */ /** */
+/** @packageDocumentation @publicapi @module url */
 import { UIRouter } from '../router';
 import { Disposable } from '../interface';
 import { MatcherUrlRule, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi } from './interface';

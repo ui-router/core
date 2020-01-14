@@ -1,4 +1,4 @@
-/** @internalapi @module vanilla */ /** */
+/** @packageDocumentation @internalapi @module vanilla */
 import { BrowserLocationConfig } from './browserLocationConfig';
 import { HashLocationService } from './hashLocationService';
 import { locationPluginFactory } from './utils';

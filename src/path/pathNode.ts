@@ -1,4 +1,4 @@
-/** @internalapi @module path */ /** */
+/** @packageDocumentation @internalapi @module path */
 import { extend, applyPairs, find, allTrueR, pairs, arrayTuples } from '../common/common';
 import { propEq } from '../common/hof';
 import { StateObject } from '../state/stateObject';

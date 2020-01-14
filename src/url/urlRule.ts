@@ -1,4 +1,4 @@
-/** @publicapi @module url */ /** */
+/** @packageDocumentation @publicapi @module url */
 import { UrlMatcher } from './urlMatcher';
 import { isString, isDefined, isFunction } from '../common/predicates';
 import { UIRouter } from '../router';

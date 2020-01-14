@@ -1,4 +1,4 @@
-/** @publicapi @module resolve */ /** */
+/** @packageDocumentation @publicapi @module resolve */
 import { find, tail, uniqR, unnestR, inArray } from '../common/common';
 import { propEq, not } from '../common/hof';
 import { trace } from '../common/trace';

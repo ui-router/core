@@ -1,4 +1,4 @@
-/** @publicapi @module state */ /** */
+/** @packageDocumentation @publicapi @module state */
 import { StateDeclaration, _ViewDeclaration, _StateDeclaration, LazyLoadResult } from './interface';
 import { defaults, values, find, inherit } from '../common/common';
 import { propEq } from '../common/hof';

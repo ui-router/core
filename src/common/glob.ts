@@ -1,4 +1,4 @@
-/** @publicapi @module core */
+/** @packageDocumentation @publicapi @module core */
 /**
  * Matches state names using glob-like pattern strings.
  *

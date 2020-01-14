@@ -1,4 +1,4 @@
-/** @internalapi @module vanilla */ /** */
+/** @packageDocumentation @internalapi @module vanilla */
 import { BaseLocationServices } from './baseLocationService';
 import { UIRouter } from '../router';
 

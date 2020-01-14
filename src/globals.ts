@@ -1,4 +1,4 @@
-/** @publicapi @module core */ /** */
+/** @packageDocumentation @publicapi @module core */
 import { StateParams } from './params/stateParams';
 import { StateDeclaration } from './state/interface';
 import { StateObject } from './state/stateObject';

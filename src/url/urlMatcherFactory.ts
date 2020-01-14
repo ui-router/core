@@ -1,4 +1,4 @@
-/** @publicapi @module url */ /** */
+/** @packageDocumentation @publicapi @module url */
 import { extend, forEach, isDefined, isFunction, isObject } from '../common';
 import { UrlMatcher } from './urlMatcher';
 import { DefType, Param, ParamType, ParamTypeDefinition } from '../params';

@@ -1,4 +1,4 @@
-/** @internalapi @module hooks */ /** */
+/** @packageDocumentation @internalapi @module hooks */
 import { noop } from '../common/common';
 import { services } from '../common/coreservices';
 import { Transition } from '../transition/transition';

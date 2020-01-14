@@ -3,8 +3,8 @@
  *
  * These functions are exported, but are subject to change without notice.
  *
- * @preferred @publicapi @module common
- */ /** */
+ * @packageDocumentation @preferred @publicapi @module common
+ */
 import { isFunction, isString, isArray, isRegExp, isDate } from './predicates';
 import { all, any, prop, curry, not } from './hof';
 import { services } from './coreservices';

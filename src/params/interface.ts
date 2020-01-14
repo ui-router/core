@@ -1,4 +1,4 @@
-/** @publicapi @module params */ /** */
+/** @packageDocumentation @publicapi @module params */
 import { ParamType } from './paramType';
 
 /**

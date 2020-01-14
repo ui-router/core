@@ -1,4 +1,4 @@
-/** @internalapi @module vanilla */ /** */
+/** @packageDocumentation @internalapi @module vanilla */
 import { isArray, isObject, $QLike } from '../common/index';
 
 /**

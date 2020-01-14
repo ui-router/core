@@ -5,8 +5,8 @@
  *
  * The primary API is found in [[UrlService]], [[UrlService.config]], and [[UrlService.rules]].
  *
- * @preferred @publicapi @module url
- */ /** */
+ * @packageDocumentation @preferred @publicapi @module url
+ */
 import { LocationConfig } from '../common';
 import { UIRouter } from '../router';
 import { StateDeclaration, StateObject, TargetState, TargetStateDef } from '../state';

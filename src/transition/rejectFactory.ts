@@ -1,4 +1,4 @@
-/** @publicapi @module transition */ /** */
+/** @packageDocumentation @publicapi @module transition */
 'use strict';
 import { extend, silentRejection } from '../common/common';
 import { stringify } from '../common/strings';

@@ -1,4 +1,4 @@
-/** @publicapi @module params */ /** */
+/** @packageDocumentation @publicapi @module params */
 import { extend, filter, map, allTrueR, find } from '../common/common';
 import { prop } from '../common/hof';
 import { isInjectable, isDefined, isString, isArray, isUndefined } from '../common/predicates';

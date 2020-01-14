@@ -1,4 +1,4 @@
-/** @publicapi @module common */ /** */
+/** @packageDocumentation @publicapi @module common */
 import { pushTo } from './common';
 
 export class Queue<T> {

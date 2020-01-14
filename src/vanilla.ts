@@ -1,2 +1,2 @@
-/** @internalapi @module vanilla */ /** */
+/** @packageDocumentation @internalapi @module vanilla */
 export * from './vanilla/index';

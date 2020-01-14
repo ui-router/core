@@ -1,4 +1,4 @@
-/** @publicapi @module state */ /** */
+/** @packageDocumentation @publicapi @module state */
 
 import { StateDeclaration, StateOrName, TargetStateDef } from './interface';
 import { TransitionOptions } from '../transition/interface';

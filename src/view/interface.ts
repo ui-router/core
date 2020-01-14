@@ -1,4 +1,4 @@
-/** @publicapi @module view */ /** */
+/** @packageDocumentation @publicapi @module view */
 import { _ViewDeclaration } from '../state/interface';
 import { PathNode } from '../path/pathNode';
 

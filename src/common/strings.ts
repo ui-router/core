@@ -3,8 +3,8 @@
  *
  * Although these functions are exported, they are subject to change without notice.
  *
- * @module common_strings
- */ /** */
+ * @packageDocumentation @module common_strings
+ */
 
 import { isArray, isFunction, isInjectable, isNull, isObject, isPromise, isString, isUndefined } from './predicates';
 import { Rejection } from '../transition/rejectFactory';

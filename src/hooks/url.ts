@@ -1,4 +1,4 @@
-/** @internalapi @module hooks */ /** */
+/** @packageDocumentation @internalapi @module hooks */
 import { UrlRouter } from '../url/urlRouter';
 import { StateService } from '../state/stateService';
 import { Transition } from '../transition/transition';

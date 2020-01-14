@@ -1,4 +1,4 @@
-/** @internalapi @module path */ /** */
+/** @packageDocumentation @internalapi @module path */
 
 import {
   extend,

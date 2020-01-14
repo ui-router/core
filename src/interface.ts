@@ -4,10 +4,8 @@
  * The classes and interfaces that are core to ui-router and do not belong
  * to a more specific subsystem (such as resolve).
  *
- * @preferred @publicapi @module core
- */ /** */
-
-// Need to import or export at least one concrete something
+ * @packageDocumentation @preferred @publicapi @module core
+ */// Need to import or export at least one concrete something
 import { noop } from './common/common';
 import { UIRouter } from './router';
 

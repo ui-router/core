@@ -1,4 +1,4 @@
-/** @publicapi @module params */ /** */
+/** @packageDocumentation @publicapi @module params */
 import { fromJson, toJson, identity, equals, inherit, map, extend, pick } from '../common/common';
 import { isDefined, isNullOrUndefined } from '../common/predicates';
 import { is } from '../common/hof';

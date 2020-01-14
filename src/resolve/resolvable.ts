@@ -1,4 +1,4 @@
-/** @publicapi @module resolve */ /** */
+/** @packageDocumentation @publicapi @module resolve */
 import { extend, identity } from '../common/common';
 import { services } from '../common/coreservices';
 import { trace } from '../common/trace';

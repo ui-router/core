@@ -1,4 +1,4 @@
-/** @publicapi @module view */ /** */
+/** @packageDocumentation @publicapi @module view */
 import { equals, applyPairs, removeFrom, TypedMap, inArray, find } from '../common/common';
 import { curry, prop } from '../common/hof';
 import { isString, isArray } from '../common/predicates';

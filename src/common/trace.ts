@@ -30,7 +30,7 @@
  * app.run($trace => $trace.enable());
  * ```
  *
- * @publicapi @module trace
+ * @packageDocumentation @publicapi @module trace
  */
 import { parse } from '../common/hof';
 import { isFunction, isNumber } from '../common/predicates';

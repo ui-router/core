@@ -1,3 +1,3 @@
-/** @internalapi @module path */ /** */
+/** @packageDocumentation @internalapi @module path */
 export * from './pathNode';
 export * from './pathUtils';

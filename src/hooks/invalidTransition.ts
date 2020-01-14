@@ -1,4 +1,4 @@
-/** @internalapi @module hooks */ /** */
+/** @packageDocumentation @internalapi @module hooks */
 
 import { TransitionService } from '../transition/transitionService';
 import { Transition } from '../transition/transition';

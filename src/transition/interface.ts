@@ -1,4 +1,4 @@
-/** @publicapi @module transition */ /** */
+/** @packageDocumentation @publicapi @module transition */
 import { StateDeclaration } from '../state/interface';
 import { PredicateBinary } from '../common/common';
 

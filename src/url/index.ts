@@ -1,4 +1,4 @@
-/** @publicapi @module url */ /** */
+/** @packageDocumentation @publicapi @module url */
 export * from './interface';
 export * from './urlMatcher';
 export * from './urlMatcherFactory';

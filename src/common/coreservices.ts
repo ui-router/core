@@ -2,8 +2,8 @@
  * This module is a stub for core services such as Dependency Injection or Browser Location.
  * Core services may be implemented by a specific framework, such as ng1 or ng2, or be pure javascript.
  *
- * @publicapi @module common
- */ /** */
+ * @packageDocumentation @publicapi @module common
+ */
 import { IInjectable, Obj } from './common';
 import { Disposable } from '../interface';
 import { UrlConfig, UrlService } from '../url';

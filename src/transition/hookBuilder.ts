@@ -1,4 +1,4 @@
-/** @publicapi @module transition */ /** */
+/** @packageDocumentation @publicapi @module transition */
 import { extend, tail, assertPredicate, unnestR, identity } from '../common/common';
 import { isArray } from '../common/predicates';
 

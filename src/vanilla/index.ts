@@ -1,8 +1,8 @@
 /**
  * Naive, pure JS implementation of core ui-router services
  *
- * @internalapi @module vanilla
- */ /** */
+ * @packageDocumentation @internalapi @module vanilla
+ */
 export * from './interface';
 
 export * from './q';

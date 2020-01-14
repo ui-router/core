@@ -1,4 +1,4 @@
-/** @publicapi @module state */ /** */
+/** @packageDocumentation @publicapi @module state */
 import { applyPairs, extend, identity, inherit, mapObj, noop, Obj, omit, tail, values, copy } from '../common/common';
 import { isArray, isDefined, isFunction, isString } from '../common/predicates';
 import { stringify } from '../common/strings';

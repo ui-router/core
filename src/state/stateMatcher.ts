@@ -1,4 +1,4 @@
-/** @publicapi @module state */ /** */
+/** @packageDocumentation @publicapi @module state */
 import { isString } from '../common/predicates';
 import { StateOrName } from './interface';
 import { StateObject } from './stateObject';

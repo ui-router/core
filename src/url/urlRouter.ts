@@ -1,4 +1,4 @@
-/** @publicapi @module url */ /** */
+/** @packageDocumentation @publicapi @module url */
 import { stripLastPathElement } from '../common';
 import { UrlMatcher } from './urlMatcher';
 import { RawParams } from '../params';

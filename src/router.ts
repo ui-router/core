@@ -1,4 +1,4 @@
-/** @publicapi @module core */ /** */
+/** @packageDocumentation @publicapi @module core */
 import { UrlMatcherFactory } from './url/urlMatcherFactory';
 import { UrlRouter } from './url/urlRouter';
 import { TransitionService } from './transition/transitionService';

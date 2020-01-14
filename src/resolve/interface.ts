@@ -5,10 +5,8 @@
  *
  * Typically, resolve is configured on a state using a [[StateDeclaration.resolve]] declaration.
  *
- * @publicapi @module resolve
- */ /** */
-import { Resolvable } from './resolvable';
-
+ * @packageDocumentation @publicapi @module resolve
+ */
 /**
  * An interface which is similar to an Angular 2 `Provider`
  */

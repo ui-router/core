@@ -3,8 +3,8 @@
  *
  * These utility functions are exported, but are subject to change without notice.
  *
- * @module common_hof
- */ /** */
+ * @packageDocumentation @module common_hof
+ */
 
 import { Predicate } from './common';
 /**

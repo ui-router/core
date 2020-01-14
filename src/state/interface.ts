@@ -1,4 +1,4 @@
-/** @publicapi @module state */ /** */
+/** @packageDocumentation @publicapi @module state */
 import { ParamDeclaration, RawParams } from '../params/interface';
 import { StateObject } from './stateObject';
 import { ViewContext } from '../view/interface';
