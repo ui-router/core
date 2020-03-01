@@ -47,7 +47,8 @@ export interface ViewSyncListener {
  *
  */
 export class ViewService {
-  /** @hidden */ private _uiViewsById: { [viewId: string]: ActiveUIView } = {};
+  /** @hidden */ private _uiViewParents: { [viewId: string]: string } = {};
+  /** @hidden */ private _registeredViewsById: { [viewId: string]: ActiveUIView } = {};
   /** @hidden */ private _viewConfigs: ViewConfig[] = [];
   /** @hidden */ private _rootContext: ViewContext;
   /** @hidden */ private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
@@ -58,8 +59,8 @@ export class ViewService {
   public _pluginapi: ViewServicePluginAPI = {
     _rootViewContext: this._rootViewContext.bind(this),
     _viewConfigFactory: this._viewConfigFactory.bind(this),
-    _registeredUIView: (id: string) => this._uiViewsById[id],
-    _registeredUIViews: () => values(this._uiViewsById),
+    _registeredUIView: (id: string) => this._registeredViewsById[id],
+    _registeredUIViews: () => values(this._registeredViewsById),
     _activeViewConfigs: () => this._viewConfigs,
     _onSync: (listener: ViewSyncListener) => {
       this._listeners.push(listener);
@@ -228,7 +229,7 @@ export class ViewService {
   }
 
   sync() {
-    const uiViewsByFqn: TypedMap<ActiveUIView> = values(this._uiViewsById)
+    const uiViewsByFqn: TypedMap<ActiveUIView> = values(this._registeredViewsById)
       .map(uiv => [uiv.fqn, uiv])
       .reduce(applyPairs, <any>{});
 
@@ -265,11 +266,11 @@ export class ViewService {
     const configureUIView = (tuple: ViewTuple) => {
       // If a parent ui-view is reconfigured, it could destroy child ui-views.
       // Before configuring a child ui-view, make sure it's still in the active uiViews array.
-      if (values(this._uiViewsById).indexOf(tuple.uiView) !== -1) tuple.uiView.configUpdated(tuple.viewConfig);
+      if (values(this._registeredViewsById).indexOf(tuple.uiView) !== -1) tuple.uiView.configUpdated(tuple.viewConfig);
     };
 
     // Sort views by FQN and state depth. Process uiviews nearest the root first.
-    const uiViewTuples = values(this._uiViewsById)
+    const uiViewTuples = values(this._registeredViewsById)
       .sort(depthCompare(uiViewDepth, 1))
       .map(matchingConfigPair);
     const matchedViewConfigs = uiViewTuples.map(tuple => tuple.viewConfig);
@@ -287,7 +288,7 @@ export class ViewService {
   /** @deprecated use registerView */
   registerUIView(uiView: ActiveUIView) {
     const getParentId = () => {
-      const uiViews = this._uiViewsById;
+      const uiViews = this._registeredViewsById;
       const fqnSegments = uiView.fqn.split('.');
       fqnSegments.pop();
       const parentFqn = fqnSegments.join('.');
@@ -322,33 +323,34 @@ export class ViewService {
    * @return a de-registration function used when the view is destroyed.
    */
   registerView(parentViewId: string, uiView: ActiveUIView): { id: string; deregister: () => void } {
-    if (parentViewId !== null && !this._uiViewsById[parentViewId]) {
+    if (parentViewId !== null && !this._registeredViewsById[parentViewId]) {
       console.error(uiView);
       throw new Error(`Tried to register a ui-view but its parent ${parentViewId} is not registered`);
     }
 
     trace.traceViewServiceUIViewEvent('-> Registering', uiView);
 
-    const uiViews = this._uiViewsById;
-
     const fqnAndTypeMatches = (uiv: ActiveUIView) => uiv.fqn === uiView.fqn && uiv.$type === uiView.$type;
-    if (values(uiViews).find(fqnAndTypeMatches)) {
+    if (values(this._registeredViewsById).find(fqnAndTypeMatches)) {
       trace.traceViewServiceUIViewEvent('!!!! duplicate uiView named:', uiView);
     }
 
     const viewIdNumber = this._uiViewCounter++;
     uiView.id = viewIdNumber; // backwards compat
     const id = `${this.router.$id}.${viewIdNumber}`;
-    uiViews[id] = uiView;
+
+    this._registeredViewsById[id] = uiView;
+    this._uiViewParents[id] = parentViewId;
     this.sync();
 
     const deregister = () => {
-      if (!uiViews[id]) {
+      if (!this._registeredViewsById[id]) {
         trace.traceViewServiceUIViewEvent('Tried removing non-registered uiView', uiView);
         return;
       }
       trace.traceViewServiceUIViewEvent('<- Deregistering', uiView);
-      delete uiViews[id];
+      delete this._registeredViewsById[id];
+      delete this._uiViewParents[id];
     };
 
     return { id, deregister };
@@ -360,7 +362,7 @@ export class ViewService {
    * @return {Array} Returns an array of fully-qualified view names.
    */
   available() {
-    return values(this._uiViewsById).map(prop('fqn'));
+    return values(this._registeredViewsById).map(prop('fqn'));
   }
 
   /**
@@ -369,7 +371,7 @@ export class ViewService {
    * @return {Array} Returns an array of fully-qualified view names.
    */
   active() {
-    return values(this._uiViewsById)
+    return values(this._registeredViewsById)
       .filter(prop('$config'))
       .map(prop('name'));
   }
