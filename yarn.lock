@@ -27,9 +27,9 @@
   integrity sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
 
 "@types/jasmine@^3.3.13":
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.2.tgz#9ff982e0ddca82f65e5d85a3f0584e9e6b92c47b"
-  integrity sha512-7hrdBDFWlTb4EhrXYRyC7i3L2kKCV0TqYbzuV+gwyPNF2V4SSHw2Vs223ai26W4tEg+t4e9Wfi1vW6JLubYPiw==
+  version "3.5.8"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.8.tgz#448e81df1693943b09466ad33d460dc427dd22fb"
+  integrity sha512-q/L59BjgE6VJtuIM4iDEEwT7xdSWVHMqC+td9sft5RfgHpDZ4Gdn0vLV59wKZ7PjGuVLCL7aNCdoiw5u6ZKSgA==
 
 "@types/jquery@^3.3.2":
   version "3.3.31"
