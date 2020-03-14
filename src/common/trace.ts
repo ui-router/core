@@ -36,7 +36,7 @@ import { parse } from '../common/hof';
 import { isFunction, isNumber } from '../common/predicates';
 import { Transition } from '../transition/transition';
 import { ViewTuple } from '../view';
-import { ActiveUIView, ViewConfig, ViewContext } from '../view/interface';
+import { RegisteredUIViewPortal, ViewConfig, ViewContext } from '../view/interface';
 import { stringify, functionToString, maxLength, padString } from './strings';
 import { safeConsole } from './safeConsole';
 import { Resolvable } from '../resolve/resolvable';
@@ -47,10 +47,10 @@ import { HookResult } from '../transition/interface';
 import { StateObject } from '../state/stateObject';
 
 /** @hidden */
-function uiViewString(uiview: ActiveUIView) {
+function uiViewString(uiview: RegisteredUIViewPortal) {
   if (!uiview) return 'ui-view (defunct)';
-  const state = uiview.creationContext ? uiview.creationContext.name || '(root)' : '(none)';
-  return `[ui-view#${uiview.id} ${uiview.$type}:${uiview.fqn} (${uiview.name}@${state})]`;
+  const state = uiview.portalState ? uiview.portalState.name || '(root)' : '(none)';
+  return `[ui-view#${uiview.id} ${uiview.type}:${uiview.fqn} (${uiview.name}@${state})]`;
 }
 
 /** @hidden */
@@ -219,19 +219,19 @@ export class Trace {
   }
 
   /** @internalapi called by ui-router code */
-  traceUIViewEvent(event: string, viewData: ActiveUIView, extra = '') {
+  traceUIViewEvent(event: string, viewData: RegisteredUIViewPortal, extra = '') {
     if (!this.enabled(Category.UIVIEW)) return;
     safeConsole.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
   }
 
   /** @internalapi called by ui-router code */
-  traceUIViewConfigUpdated(viewData: ActiveUIView, context: ViewContext) {
+  traceUIViewConfigUpdated(viewData: RegisteredUIViewPortal, context: ViewContext) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent('Updating', viewData, ` with ViewConfig from context='${context}'`);
   }
 
   /** @internalapi called by ui-router code */
-  traceUIViewFill(viewData: ActiveUIView, html: string) {
+  traceUIViewFill(viewData: RegisteredUIViewPortal, html: string) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent('Fill', viewData, ` with: ${maxLength(200, html)}`);
   }
@@ -259,7 +259,7 @@ export class Trace {
   }
 
   /** @internalapi called by ui-router code */
-  traceViewServiceUIViewEvent(event: string, viewData: ActiveUIView) {
+  traceViewServiceUIViewEvent(event: string, viewData: RegisteredUIViewPortal) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
     safeConsole.log(`VIEWCONFIG: ${event} ${uiViewString(viewData)}`);
   }

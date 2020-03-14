@@ -1,14 +1,42 @@
 /** @packageDocumentation @publicapi @module view */
+import { StateObject } from '../state';
 import { _ViewDeclaration } from '../state/interface';
 import { PathNode } from '../path/pathNode';
 
+/** @internalapi */
+export type ViewContext = StateObject;
+
+export type ViewConfigCallback = (config: ViewConfig) => void;
+
 /**
- * The context ref can be anything that has a `name` and a `parent` reference to another IContextRef
  * @internalapi
+ *
+ * The metadata around a ui-view component that registered itself with the view service.
  */
-export interface ViewContext {
+export interface RegisteredUIViewPortal {
+  /** ui-view portal component type, e.g., 'react' or 'angular' */
+  type: string;
+  /** the id of the ui-view portal */
+  id: string;
+  /** the id of the parent ui-view portal, or null if the view is rendered at the root */
+  parentId: string;
+  /** the state which rendered the ui-view portal */
+  portalState: StateObject;
+  /**
+   * The state of the content component currently loaded into the portal,
+   * or null if no component is loaded into the portal
+   */
+  contentState?: StateObject;
+  /** The ui-view short name, for named ui-views.  $default for unnamed ui-views */
   name: string;
-  parent: ViewContext;
+  /** The fully qualified ui-view address, (i.e., `${parentview.fqn}.${name}` */
+  fqn: string;
+  /**
+   * A callback that should apply a ViewConfig (or clear the ui-view, if config is undefined)
+   * When a state is activated, and should render into a ui-view, this function will be called.
+   * The ui-view portal should render the component as its portal contents.
+   */
+  callback: ViewConfigCallback;
 }
 
 /** @internalapi */
@@ -16,7 +44,7 @@ export interface ActiveUIView {
   /** type of framework, e.g., "ng1" or "ng2" */
   $type: string;
   /** An auto-incremented id */
-  id: number;
+  id: number | string;
   /** The ui-view short name */
   name: string;
   /** The ui-view's fully qualified name */
