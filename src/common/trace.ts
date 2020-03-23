@@ -33,9 +33,9 @@
  * @packageDocumentation @publicapi @module trace
  */
 import { parse } from '../common/hof';
-import { isFunction, isNumber } from '../common/predicates';
+import { isNumber } from '../common/predicates';
 import { Transition } from '../transition/transition';
-import { ViewTuple } from '../view';
+import { ActiveUIView, ViewTuple } from '../view';
 import { RegisteredUIViewPortal, ViewConfig, ViewContext } from '../view/interface';
 import { stringify, functionToString, maxLength, padString } from './strings';
 import { safeConsole } from './safeConsole';
@@ -47,10 +47,13 @@ import { HookResult } from '../transition/interface';
 import { StateObject } from '../state/stateObject';
 
 /** @hidden */
-function uiViewString(uiview: RegisteredUIViewPortal) {
+function uiViewString(uiview: RegisteredUIViewPortal | ActiveUIView) {
   if (!uiview) return 'ui-view (defunct)';
-  const state = uiview.portalState ? uiview.portalState.name || '(root)' : '(none)';
-  return `[ui-view#${uiview.id} ${uiview.type}:${uiview.fqn} (${uiview.name}@${state})]`;
+  const isActiveUiView = (obj: typeof uiview): obj is ActiveUIView => !!(uiview as ActiveUIView).$type;
+  const type = isActiveUiView(uiview) ? uiview.$type : uiview.type;
+  const stateObj = isActiveUiView(uiview) ? uiview.creationContext : uiview.portalState;
+  const stateName = stateObj ? stateObj.name || '(root)' : '(none)';
+  return `[ui-view#${uiview.id} ${type}:${uiview.fqn} (${uiview.name}@${stateName})]`;
 }
 
 /** @hidden */
@@ -219,13 +222,13 @@ export class Trace {
   }
 
   /** @internalapi called by ui-router code */
-  traceUIViewEvent(event: string, viewData: RegisteredUIViewPortal, extra = '') {
+  traceUIViewEvent(event: string, viewData: RegisteredUIViewPortal | ActiveUIView, extra = '') {
     if (!this.enabled(Category.UIVIEW)) return;
     safeConsole.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
   }
 
   /** @internalapi called by ui-router code */
-  traceUIViewConfigUpdated(viewData: RegisteredUIViewPortal, context: ViewContext) {
+  traceUIViewConfigUpdated(viewData: RegisteredUIViewPortal | ActiveUIView, context: ViewContext) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent('Updating', viewData, ` with ViewConfig from context='${context}'`);
   }
