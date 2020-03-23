@@ -234,7 +234,7 @@ export class Trace {
   }
 
   /** @internalapi called by ui-router code */
-  traceUIViewFill(viewData: RegisteredUIViewPortal, html: string) {
+  traceUIViewFill(viewData: RegisteredUIViewPortal | ActiveUIView, html: string) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent('Fill', viewData, ` with: ${maxLength(200, html)}`);
   }
@@ -262,7 +262,7 @@ export class Trace {
   }
 
   /** @internalapi called by ui-router code */
-  traceViewServiceUIViewEvent(event: string, viewData: RegisteredUIViewPortal) {
+  traceViewServiceUIViewEvent(event: string, viewData: RegisteredUIViewPortal | ActiveUIView) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
     safeConsole.log(`VIEWCONFIG: ${event} ${uiViewString(viewData)}`);
   }
