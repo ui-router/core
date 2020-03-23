@@ -1,12 +1,12 @@
 /** @packageDocumentation @publicapi @module view */
-import { equals, applyPairs, removeFrom, TypedMap, inArray, find, values, pairs } from '../common/common';
+import { applyPairs, equals, find, inArray, pairs, removeFrom, TypedMap, values } from '../common/common';
 import { curry, parse, prop } from '../common/hof';
-import { isString, isArray } from '../common/predicates';
+import { isArray, isString } from '../common/predicates';
 import { trace } from '../common/trace';
 import { PathNode } from '../path/pathNode';
-import { RegisteredUIViewPortal, ViewContext, ViewConfig, ViewConfigCallback, ActiveUIView } from './interface';
-import { _ViewDeclaration } from '../state/interface';
 import { UIRouter } from '../router';
+import { _ViewDeclaration } from '../state/interface';
+import { ActiveUIView, RegisteredUIViewPortal, ViewConfig, ViewConfigCallback, ViewContext } from './interface';
 
 export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig | ViewConfig[];
 
@@ -288,28 +288,63 @@ export class ViewService {
     this._listeners.forEach(cb => cb(allTuples));
     trace.traceViewSync(allTuples);
   }
-
-  /** @deprecated use registerView */
+  // tslint:disable-next-line
+  private _deferredRegisterViews: Array<{ isReady: () => boolean; register: () => void }> = [];
+  /**
+   * @deprecated use registerView
+   * This is a temporary backwards compatibility method and will be removed in a future version of core
+   */
   registerUIView(uiView: ActiveUIView) {
+    const fqnSegments = uiView.fqn.split('.');
+    fqnSegments.pop();
+    const parentFqn = fqnSegments.join('.');
+
     const getParentId = () => {
-      const uiViews = this._uiViews;
-      const fqnSegments = uiView.fqn.split('.');
-      fqnSegments.pop();
-      const parentFqn = fqnSegments.join('.');
       if (parentFqn === '') {
         return null; // root
       }
-      const [parentId] = pairs(uiViews).find(pair => (pair[1] as ActiveUIView).fqn === parentFqn) || [];
-      if (!parentId) {
-        console.error(uiView);
-        throw new Error(`Could not find registered parent UIView ${parentFqn} while registering uiView`);
-      }
+      const [parentId] = pairs(this._uiViews).find(pair => (pair[1] as ActiveUIView).fqn === parentFqn) || [];
       return parentId;
     };
 
-    const id = this.registerView(uiView.$type, getParentId(), uiView.name, uiView.configUpdated);
-    uiView.id = id;
-    return () => this.deregisterView(id);
+    const register = (activeUIView: ActiveUIView, parentId: string) => {
+      if (parentId === undefined) {
+        console.error(uiView);
+        throw new Error(`Parent UIView for ${uiView.fqn} was not registered`);
+      }
+
+      const id = this.registerView(activeUIView.$type, parentId, activeUIView.name, activeUIView.configUpdated);
+      activeUIView.id = id;
+      const queuedReadyView = find(this._deferredRegisterViews, val => val.isReady());
+      if (queuedReadyView) {
+        this._deferredRegisterViews = removeFrom(this._deferredRegisterViews, queuedReadyView);
+        queuedReadyView.register();
+      }
+
+      return () => this.deregisterView(id);
+    };
+
+    if (!(uiView.$type === 'ng1' && getParentId() === undefined)) {
+      return register(uiView, getParentId());
+    }
+
+    // AngularJS compiles templates depth first so ui-view parent id isn't available when children are compiled
+    // Wow. OK. This Is Fine.
+    let unregistered = false;
+    let unregister = () => {
+      unregistered = true;
+    };
+
+    this._deferredRegisterViews.push({
+      isReady: () => getParentId() !== undefined,
+      register: () => {
+        if (!unregistered) {
+          unregister = register(uiView, getParentId());
+        }
+      },
+    });
+
+    return () => unregister();
   }
 
   /**
