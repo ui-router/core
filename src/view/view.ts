@@ -1,6 +1,6 @@
 /** @packageDocumentation @publicapi @module view */
 import { equals, applyPairs, removeFrom, TypedMap, inArray, find, values, pairs } from '../common/common';
-import { curry, prop } from '../common/hof';
+import { curry, parse, prop } from '../common/hof';
 import { isString, isArray } from '../common/predicates';
 import { trace } from '../common/trace';
 import { PathNode } from '../path/pathNode';
@@ -268,7 +268,7 @@ export class ViewService {
       // If a parent ui-view is reconfigured, it could destroy child ui-views.
       // Before configuring a child ui-view, make sure it's still in the active uiViews array.
       if (values(this._uiViews).indexOf(tuple.uiView) !== -1) {
-        tuple.uiView.contentState = tuple?.viewConfig?.viewDecl.$context;
+        tuple.uiView.contentState = parse('viewConfig.viewDecl.$context')(tuple);
         tuple.uiView.callback(tuple.viewConfig);
       }
     };
@@ -336,7 +336,7 @@ export class ViewService {
       throw new Error(`Tried to register a new ui-view, but its parent ${parentId} is not currently registered`);
     }
 
-    const state = parent?.contentState ?? this.router.stateRegistry.root();
+    const state = (parent && parent.contentState) || this.router.stateRegistry.root();
     const id = `${this.router.$id}.${this._uiViewCounter++}`;
     const fqn = parent ? `${parent.fqn}.${name}` : name;
     const registeredView: RegisteredUIViewPortal = { id, parentId, type, name, fqn, callback, portalState: state };
