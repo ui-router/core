@@ -80,7 +80,7 @@
     "karma-script-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^4.0.2",
-    "prettier": "^1.18.2",
+    "prettier": "^2.0.2",
     "pretty-quick": "^2.0.1",
     "rollup": "^1.15.5",
     "rollup-plugin-node-resolve": "^5.0.2",
