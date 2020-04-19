@@ -122,7 +122,7 @@ export class UrlRuleFactory {
    *
    * #### Example:
    * ```js
-   * var rule = factory.fromState($state.get('foo'), router);
+   * var rule = factory.fromState($state.get('foo').$$state(), router);
    * var match = rule.match('/foo/123/456'); // results in { fooId: '123', barId: '456' }
    * var result = rule.handler(match);
    * // Starts a transition to 'foo' with params: { fooId: '123', barId: '456' }
