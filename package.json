@@ -92,6 +92,9 @@
     "typescript": "^3.5.2",
     "webpack": "^4.34.0"
   },
+  "resolutions": {
+    "chokidar": "3.3.1"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
