@@ -28,6 +28,18 @@ describe('TargetState object', function() {
     expect(ref.error()).toBe("No such state 'notfound'");
   });
 
+  describe('.isDef', function() {
+    it('should return true for TargetStateDef objects', () => {
+      expect(TargetState.isDef({ state: 'foo' })).toBeTrue();
+      expect(TargetState.isDef({ state: { name: 'foo' } })).toBeTrue();
+    });
+
+    it('should return false for TargetState instances', () => {
+      const ref = new TargetState(registry, 'foo');
+      expect(TargetState.isDef(ref)).toBeFalse();
+    });
+  });
+
   describe('.withState', function() {
     it('should replace the target state', () => {
       const ref = new TargetState(registry, 'foo');

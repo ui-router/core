@@ -3,7 +3,7 @@
 import { StateDeclaration, StateOrName, TargetStateDef } from './interface';
 import { TransitionOptions } from '../transition/interface';
 import { StateObject } from './stateObject';
-import { isString } from '../common/predicates';
+import { isObject, isString } from '../common/predicates';
 import { stringify } from '../common/strings';
 import { extend } from '../common';
 import { StateRegistry } from './stateRegistry';
@@ -44,7 +44,9 @@ export class TargetState {
   private _options: TransitionOptions;
 
   /** Returns true if the object has a state property that might be a state or state name */
-  static isDef = (obj): obj is TargetStateDef => obj && obj.state && (isString(obj.state) || isString(obj.state.name));
+  static isDef = (obj): obj is TargetStateDef => {
+    return obj && obj.state && (isString(obj.state) || (isObject(obj.state) && isString(obj.state.name)));
+  };
 
   /**
    * The TargetState constructor
