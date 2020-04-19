@@ -125,6 +125,9 @@ export class StateObject {
   static isStateClass = (stateDecl: _StateDeclaration): stateDecl is { new (): StateDeclaration } =>
     isFunction(stateDecl) && stateDecl['__uiRouterState'] === true;
 
+  /** Predicate which returns true if the object is a [[StateDeclaration]] object */
+  static isStateDeclaration = (obj: any): obj is StateDeclaration => isFunction(obj['$$state']);
+
   /** Predicate which returns true if the object is an internal [[StateObject]] object */
   static isState = (obj: any): obj is StateObject => isObject(obj['__stateObjectCache']);
 
@@ -181,7 +184,7 @@ export class StateObject {
     const inherited = (opts.inherit && this.parent && this.parent.parameters()) || [];
     return inherited
       .concat(values(this.params))
-      .filter(param => !opts.matchingKeys || opts.matchingKeys.hasOwnProperty(param.id));
+      .filter((param) => !opts.matchingKeys || opts.matchingKeys.hasOwnProperty(param.id));
   }
 
   /**

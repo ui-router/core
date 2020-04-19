@@ -1,9 +1,10 @@
 /** @packageDocumentation @publicapi @module url */
+import { StateDeclaration } from '../state';
 import { UrlMatcher } from './urlMatcher';
 import { isString, isDefined, isFunction } from '../common/predicates';
 import { UIRouter } from '../router';
 import { identity, extend } from '../common/common';
-import { is, pattern } from '../common/hof';
+import { is, or, pattern } from '../common/hof';
 import { StateObject } from '../state/stateObject';
 import { RawParams } from '../params/interface';
 import {
@@ -29,7 +30,7 @@ import {
  * @internalapi
  */
 export class UrlRuleFactory {
-  static isUrlRule = obj => obj && ['type', 'match', 'handler'].every(key => isDefined(obj[key]));
+  static isUrlRule = (obj) => obj && ['type', 'match', 'handler'].every((key) => isDefined(obj[key]));
 
   constructor(public router: UIRouter) {}
 
@@ -38,14 +39,14 @@ export class UrlRuleFactory {
   }
 
   create(
-    what: string | UrlMatcher | StateObject | RegExp | UrlRuleMatchFn,
+    what: string | UrlMatcher | StateObject | StateDeclaration | RegExp | UrlRuleMatchFn,
     handler?: string | UrlRuleHandlerFn
   ): UrlRule {
-    const isState = StateObject.isState;
+    const { isState, isStateDeclaration } = StateObject;
     const makeRule = pattern([
       [isString, (_what: string) => makeRule(this.compile(_what))],
       [is(UrlMatcher), (_what: UrlMatcher) => this.fromUrlMatcher(_what, handler)],
-      [isState, (_what: StateObject) => this.fromState(_what, this.router)],
+      [or(isState, isStateDeclaration), (_what: StateObject | StateDeclaration) => this.fromState(_what, this.router)],
       [is(RegExp), (_what: RegExp) => this.fromRegExp(_what, handler)],
       [isFunction, (_what: UrlRuleMatchFn) => new BaseUrlRule(_what, handler as UrlRuleHandlerFn)],
     ]);
@@ -107,9 +108,9 @@ export class UrlRuleFactory {
     // - Some optional parameters, some matched
     // - Some optional parameters, all matched
     function matchPriority(params: RawParams): number {
-      const optional = urlMatcher.parameters().filter(param => param.isOptional);
+      const optional = urlMatcher.parameters().filter((param) => param.isOptional);
       if (!optional.length) return 0.000001;
-      const matched = optional.filter(param => params[param.id]);
+      const matched = optional.filter((param) => params[param.id]);
       return matched.length / optional.length;
     }
 
@@ -128,7 +129,9 @@ export class UrlRuleFactory {
    * // Starts a transition to 'foo' with params: { fooId: '123', barId: '456' }
    * ```
    */
-  fromState(state: StateObject, router: UIRouter): StateRule {
+  fromState(stateOrDecl: StateObject | StateDeclaration, router: UIRouter): StateRule {
+    const state = StateObject.isStateDeclaration(stateOrDecl) ? stateOrDecl.$$state() : stateOrDecl;
+
     /**
      * Handles match by transitioning to matched state
      *
@@ -213,7 +216,7 @@ export class BaseUrlRule implements UrlRule {
   _group: number;
   type: UrlRuleType = 'RAW';
   handler: UrlRuleHandlerFn;
-  matchPriority = match => 0 - this.$id;
+  matchPriority = (match) => 0 - this.$id;
 
   constructor(public match: UrlRuleMatchFn, handler?: UrlRuleHandlerFn) {
     this.handler = handler || identity;
