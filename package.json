@@ -71,7 +71,7 @@
     "@uirouter/publish-scripts": "^2.3.43",
     "dts-downlevel": "^0.3.0",
     "fork-ts-checker-webpack-plugin": "^3.1.1",
-    "husky": "^3.0.0",
+    "husky": "^4.2.5",
     "jasmine-core": "^3.3.0",
     "karma": "^4.0.0",
     "karma-chrome-launcher": "^3.1.0",
