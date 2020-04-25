@@ -1,4 +1,4 @@
-import { TargetState, UIRouter } from '../src/index';
+import { StateDeclaration, TargetState, UIRouter } from '../src/index';
 import { StateObject, StateRegistry } from '../src/state';
 
 describe('TargetState object', function() {
@@ -8,6 +8,41 @@ describe('TargetState object', function() {
     registry.register({ name: 'foo' });
     registry.register({ name: 'foo.bar' });
     registry.register({ name: 'baz' });
+    registry.register({ name: 'future.**' });
+  });
+
+  describe('constructor', () => {
+    it('constructor should accept a state name', function() {
+      const state: StateObject = registry.get('foo.bar').$$state();
+      const ref = new TargetState(registry, state.name, null);
+      expect(ref.identifier()).toBe('foo.bar');
+      expect(ref.name()).toBe('foo.bar');
+      expect(ref.$state()).toBe(state);
+    });
+
+    it('constructor should accept a StateObject', function() {
+      const state: StateObject = registry.get('foo.bar').$$state();
+      const ref = new TargetState(registry, state, null);
+      expect(ref.identifier()).toBe(state);
+      expect(ref.name()).toBe('foo.bar');
+      expect(ref.$state()).toBe(state);
+    });
+
+    it('constructor should accept a StateDeclaration', function() {
+      const state: StateDeclaration = registry.get('foo.bar');
+      const ref = new TargetState(registry, state, null);
+      expect(ref.identifier()).toBe(state);
+      expect(ref.name()).toBe('foo.bar');
+      expect(ref.$state().self).toBe(state);
+    });
+
+    it('constructor should match future states', function() {
+      const state: StateDeclaration = registry.get('future.**');
+      const ref = new TargetState(registry, state, null);
+      expect(ref.identifier()).toBe(state);
+      expect(ref.name()).toBe('future.**');
+      expect(ref.$state().self).toBe(state);
+    });
   });
 
   it('should be callable and return the correct values', function() {
