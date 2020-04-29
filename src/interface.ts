@@ -5,7 +5,7 @@
  * to a more specific subsystem (such as resolve).
  *
  * @packageDocumentation @preferred @publicapi @module core
- */// Need to import or export at least one concrete something
+ */ // Need to import or export at least one concrete something
 import { noop } from './common/common';
 import { UIRouter } from './router';
 
@@ -105,6 +105,7 @@ export interface UIInjector {
 /** @internalapi */
 export interface UIRouterPlugin extends Disposable {
   name: string;
+  type?: 'view' | 'url' | undefined;
 }
 
 /** @internalapi */
