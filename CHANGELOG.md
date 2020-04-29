@@ -1,3 +1,18 @@
+## 6.0.5 (2020-04-29)
+[Compare `@uirouter/core` versions 6.0.4 and 6.0.5](https://github.com/ui-router/core/compare/6.0.4...6.0.5)
+
+### Bug Fixes
+
+* **TargetState:** make isDef check more thorough ([e657cfe](https://github.com/ui-router/core/commit/e657cfe))
+
+
+### Features
+
+* **urlRuleFactory:** Add support for StateDeclarations in UrlRuleFactory.fromState() ([539d33a](https://github.com/ui-router/core/commit/539d33a))
+
+
+
+
 ## 6.0.4 (2020-01-06)
 [Compare `@uirouter/core` versions 6.0.3 and 6.0.4](https://github.com/ui-router/core/compare/6.0.3...6.0.4)
 
