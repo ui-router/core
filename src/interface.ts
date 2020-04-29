@@ -6,7 +6,7 @@
  *
  * @packageDocumentation
  */
-// Need to import or export at least one concrete something
+ // Need to import or export at least one concrete something
 import { noop } from './common/common';
 import { UIRouter } from './router';
 
@@ -105,6 +105,7 @@ export interface UIInjector {
 
 export interface UIRouterPlugin extends Disposable {
   name: string;
+  type?: 'view' | 'url' | undefined;
 }
 
 export abstract class UIRouterPluginBase implements UIRouterPlugin, Disposable {

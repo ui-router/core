@@ -1,12 +1,12 @@
 /** @packageDocumentation @publicapi @module view */
+import { UIRouterPlugin } from '../interface';
+import { UIRouter } from '../router';
 import { StateObject } from '../state';
 import { _ViewDeclaration } from '../state/interface';
 import { PathNode } from '../path/pathNode';
 
 /** @internalapi */
 export type ViewContext = StateObject;
-
-export type ViewConfigCallback = (config: ViewConfig) => void;
 
 /**
  * @internalapi
@@ -31,13 +31,23 @@ export interface RegisteredUIViewPortal {
   name: string;
   /** The fully qualified ui-view address, (i.e., `${parentview.fqn}.${name}` */
   fqn: string;
+  /** The type of content that should be loaded into the portal */
+  currentPortalContentType: PortalContentType;
+  /** The ViewConfig object when content type is ROUTED_COMPONENT */
+  currentPortalViewConfig: ViewConfig;
+  /** The HtmlDivElement when content type is INTEROP_DIV */
+  currentPortalInteropDiv: HTMLDivElement;
   /**
-   * A callback that should apply a ViewConfig (or clear the ui-view, if config is undefined)
-   * When a state is activated, and should render into a ui-view, this function will be called.
-   * The ui-view portal should render the component as its portal contents.
+   * A callback that instructs the uiview portal what to render.
+   * This function will be called whenever the uiview portal should change its contents, e.g., after a Transition.
    */
-  callback: ViewConfigCallback;
+  renderContentIntoUIViewPortal(portalContent: 'DEFAULT_CONTENT'): void;
+  renderContentIntoUIViewPortal(portalContent: 'ROUTED_COMPONENT', config?: ViewConfig): void;
+  renderContentIntoUIViewPortal(portalContent: 'INTEROP_DIV', giveDiv: (divElement: HTMLDivElement) => void);
 }
+
+export declare type PortalContentType = 'DEFAULT_CONTENT' | 'ROUTED_COMPONENT' | 'INTEROP_DIV';
+export declare type RenderContentCallback = RegisteredUIViewPortal['renderContentIntoUIViewPortal'];
 
 export interface ActiveUIView {
   /** type of framework, e.g., "ng1" or "ng2" */
@@ -53,7 +63,7 @@ export interface ActiveUIView {
   /** The state context in which the ui-view tag was created. */
   creationContext: ViewContext;
   /** A callback that should apply a ViewConfig (or clear the ui-view, if config is undefined) */
-  configUpdated: (config: ViewConfig) => void;
+  configUpdated: RenderContentCallback;
 }
 
 /**
@@ -82,4 +92,9 @@ export interface ViewConfig {
 
   /** Fetches templates, runs dynamic (controller|template)Provider code, lazy loads Components, etc */
   load(): Promise<ViewConfig>;
+}
+
+export interface ViewPlugin extends UIRouterPlugin {
+  type: 'view';
+  renderUIViewIntoDivElement(router: UIRouter, viewConfig: ViewConfig);
 }

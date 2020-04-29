@@ -5,11 +5,21 @@ import { trace } from '../common/trace';
 import { PathNode } from '../path/pathNode';
 import { UIRouter } from '../router';
 import { _ViewDeclaration } from '../state/interface';
-import { ActiveUIView, RegisteredUIViewPortal, ViewConfig, ViewConfigCallback, ViewContext } from './interface';
+import {
+  ActiveUIView,
+  PortalContentType,
+  RegisteredUIViewPortal,
+  RenderContentCallback,
+  ViewConfig,
+  ViewContext,
+  ViewPlugin,
+} from './interface';
 
 export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig | ViewConfig[];
 
 export interface ViewServicePluginAPI {
+  _registerViewPlugin(plugin: ViewPlugin);
+  _registeredViewPlugins(): ViewPlugin[];
   _rootViewContext(context?: ViewContext): ViewContext;
   _viewConfigFactory(viewType: string, factory: ViewConfigFactory);
   /** @param id router.$id + "." + uiView.id */
@@ -32,20 +42,21 @@ export interface ViewSyncListener {
 /**
  * The View service
  *
- * This service pairs existing `ui-view` components (from the component tree)
+ * This service pairs existing `uiview` portal components (from the component tree)
  * with view configs (from the state declaration objects: [[StateDeclaration.views]]).
  *
  * - After a successful Transition, the views from the newly entered states are activated via [[activateViewConfig]].
  *   The views from exited states are deactivated via [[deactivateViewConfig]].
  *   (See: the [[registerActivateViews]] Transition Hook)
  *
- * - As `ui-view` components pop in and out of existence, they register themselves using [[registerUIView]].
+ * - As `uiview` components pop in and out of existence, they register/deregister themselves using [[registerUIView]]
+ *   and [[deregisterView]].
  *
- * - When the [[sync]] function is called, the registered `ui-view`(s) ([[ActiveUIView]])
- * are configured with the matching [[ViewConfig]](s)
- *
+ * - When the [[sync]] function is called, the registered `uiview`(s) ([[RegisteredUIViewPortal]])
+ *   are configured with the matching [[ViewConfig]](s)
  */
 export class ViewService {
+  /** @internal */ private _viewPlugins: ViewPlugin[] = [];
   /** @internal */ private _uiViews: { [viewId: string]: RegisteredUIViewPortal } = {};
   /** @internal */ private _viewConfigs: ViewConfig[] = [];
   /** @internal */ private _rootContext: ViewContext;
@@ -55,6 +66,8 @@ export class ViewService {
 
   /** @internal */
   public _pluginapi: ViewServicePluginAPI = {
+    _registerViewPlugin: plugin => this._viewPlugins.push(plugin),
+    _registeredViewPlugins: () => this._viewPlugins.slice(),
     _rootViewContext: this._rootViewContext.bind(this),
     _viewConfigFactory: this._viewConfigFactory.bind(this),
     _registeredUIView: (id: string) => this._uiViews[id],
@@ -263,12 +276,44 @@ export class ViewService {
       return { uiView, viewConfig: matchingConfigs[0] };
     };
 
+    // Updates a uiview portal with the details about what should be rendered
     const configureUIView = (tuple: ViewTuple) => {
+      const { viewConfig, uiView } = tuple;
+
       // If a parent ui-view is reconfigured, it could destroy child ui-views.
       // Before configuring a child ui-view, make sure it's still in the active uiViews array.
-      if (values(this._uiViews).indexOf(tuple.uiView) !== -1) {
-        tuple.uiView.contentState = parse('viewConfig.viewDecl.$context')(tuple);
-        tuple.uiView.callback(tuple.viewConfig);
+      const doesUIViewStillExist = () => values(this._uiViews).indexOf(uiView) !== -1;
+
+      const contentType: PortalContentType = !viewConfig
+        ? 'DEFAULT_CONTENT'
+        : uiView.type === viewConfig.viewDecl.$type
+        ? 'ROUTED_COMPONENT'
+        : 'INTEROP_DIV';
+
+      const changed = uiView.currentPortalContentType !== contentType || uiView.currentPortalViewConfig !== viewConfig;
+
+      // Short circuit if the uiview portal is already configured correctly
+      if (doesUIViewStillExist() && changed) {
+        uiView.contentState = parse('viewDecl.$context')(viewConfig);
+        uiView.currentPortalContentType = contentType;
+        uiView.currentPortalViewConfig = viewConfig;
+        uiView.currentPortalInteropDiv = undefined;
+
+        if (contentType === 'ROUTED_COMPONENT') {
+          uiView.renderContentIntoUIViewPortal('ROUTED_COMPONENT', viewConfig);
+        } else if (contentType === 'DEFAULT_CONTENT') {
+          uiView.renderContentIntoUIViewPortal('DEFAULT_CONTENT');
+        } else if (contentType === 'INTEROP_DIV') {
+          const giveDiv = (divElement: HTMLDivElement) => {
+            if (doesUIViewStillExist()) {
+              uiView.currentPortalInteropDiv = divElement;
+              // Tell the other component framework to render into this div
+              const viewPlugin = this._viewPlugins.find(p => p.name === viewConfig.viewDecl.$type);
+              viewPlugin.renderUIViewIntoDivElement(this.router, viewConfig);
+            }
+          };
+          uiView.renderContentIntoUIViewPortal('INTEROP_DIV', giveDiv);
+        }
       }
     };
 
@@ -276,7 +321,10 @@ export class ViewService {
     const uiViewTuples = values(this._uiViews)
       .sort(depthCompare(uiViewDepth, 1))
       .map(matchingConfigPair);
+
     const matchedViewConfigs = uiViewTuples.map((tuple) => tuple.viewConfig);
+
+    // View configs which should be active, but there is no matching uiview portal to render into
     const unmatchedConfigTuples = this._viewConfigs
       .filter((config) => !inArray(matchedViewConfigs, config))
       .map((viewConfig) => ({ uiView: undefined, viewConfig }));
@@ -361,10 +409,15 @@ export class ViewService {
    * @param type The type of the ui-view, i.e., 'react' or 'angularjs'
    * @param parentId The id of the parent ui-view, or null
    * @param name The name of the ui-view
-   * @param callback A function that is called when the ui-view should load a new view config
+   * @param renderContentIntoUIViewPortal A function that is called when the ui-view portal should render new content
    * @return the id of the registered ui-view
    */
-  registerView(type: string, parentId: string, name: string, callback: ViewConfigCallback): string {
+  registerView(
+    type: string,
+    parentId: string,
+    name: string,
+    renderContentIntoUIViewPortal: RenderContentCallback
+  ): string {
     const parent = this._uiViews[parentId];
     if (typeof parentId === 'string' && !parent) {
       throw new Error(`Tried to register a new ui-view, but its parent ${parentId} is not currently registered`);
@@ -373,7 +426,18 @@ export class ViewService {
     const state = (parent && parent.contentState) || this.router.stateRegistry.root();
     const id = `${this.router.$id}.${this._uiViewCounter++}`;
     const fqn = parent ? `${parent.fqn}.${name}` : name;
-    const registeredView: RegisteredUIViewPortal = { id, parentId, type, name, fqn, callback, portalState: state };
+    const registeredView: RegisteredUIViewPortal = {
+      id,
+      parentId,
+      type,
+      name,
+      fqn,
+      portalState: state,
+      currentPortalInteropDiv: undefined,
+      currentPortalViewConfig: undefined,
+      currentPortalContentType: undefined,
+      renderContentIntoUIViewPortal,
+    };
     this._uiViews[id] = registeredView;
     trace.traceViewServiceUIViewEvent(`-> Registered ui-view ${id}`, registeredView);
     this.sync();
