@@ -6,12 +6,20 @@ jobs:
     name: Upgrade dependencies
     steps:
       - uses: actions/checkout@v2
-      - name: Upgrade devDependencies
+      - name: Upgrade devDependencies --latest
         id: upgrade
         uses: ui-router/publish-scripts/docker/upgrade@github-action-yarn-upgrade
         with:
-          DEPTYPE: devDependencies
+          deptype: devDependencies
+          exclude: typescript
+          latest: true
       # Use the output from the `hello` step
       # Do the pull request
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+      - name: List upgrades
+        run: echo "Upgrades ${{ steps.upgrade.outputs.upgrades }}"
+      - name: Create Pull Request
+        # https://github.com/peter-evans/create-pull-request/releases/tag/v2.7.0
+        uses: peter-evans/create-pull-request@340e629d2f63059fb3e3f15437e92cfbc7acd85b
+        with:
+          commit-message: 'chore(package): Update to ${{ steps.upgrade.outputs.upgrades}}'
+          title: 'chore(package): Update to ${{ steps.upgrade.outputs.upgrades}}'
