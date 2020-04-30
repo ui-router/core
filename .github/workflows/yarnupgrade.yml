@@ -17,9 +17,9 @@ jobs:
       # Do the pull request
       - name: List upgrades
         run: echo "Upgrades ${{ steps.upgrade.outputs.upgrades }}"
-      - name: Create Pull Request
+        #- name: Create Pull Request
         # https://github.com/peter-evans/create-pull-request/releases/tag/v2.7.0
-        uses: peter-evans/create-pull-request@340e629d2f63059fb3e3f15437e92cfbc7acd85b
-        with:
-          commit-message: 'chore(package): Update to ${{ steps.upgrade.outputs.upgrades}}'
-          title: 'chore(package): Update to ${{ steps.upgrade.outputs.upgrades}}'
+        #uses: peter-evans/create-pull-request@340e629d2f63059fb3e3f15437e92cfbc7acd85b
+        #with:
+        #commit-message: 'chore(package): Update to ${{ steps.upgrade.outputs.upgrades}}'
+        #title: 'chore(package): Update to ${{ steps.upgrade.outputs.upgrades}}'
