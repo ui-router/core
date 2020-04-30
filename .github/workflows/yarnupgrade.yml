@@ -6,6 +6,8 @@ jobs:
     name: Upgrade dependencies
     steps:
       - uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Upgrade devDependencies --latest
         id: upgrade
         uses: ui-router/publish-scripts/actions/upgrade@github-action-yarn-upgrade
