@@ -11,7 +11,7 @@ jobs:
         uses: ui-router/publish-scripts/docker/upgrade@github-action-yarn-upgrade
         with:
           deptype: devDependencies
-          exclude: typescript
+          exclude: ''
           latest: true
       # Use the output from the `hello` step
       # Do the pull request
