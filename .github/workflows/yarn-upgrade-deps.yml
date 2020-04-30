@@ -1,0 +1,42 @@
+# This workflow requires an SSH key.
+# Create an SSH key pair with no passphrase using:
+#
+# ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+#
+# Then create a deploy key called SSH_PUBLIC_KEY and grant it write access.
+# e.g., https://github.com/ui-router/core/settings/keys
+# Then create a repo secret called SSH_PRIVATE_KEY
+# e.g., https://github.com/ui-router/core/settings/secrets
+#
+on:
+  schedule:
+    # At 06:00:00am, on every FRI, every month
+    - cron: '0 0 6 ? * FRI *'
+
+jobs:
+  upgrade-dependencies:
+    runs-on: ubuntu-latest
+    name: Upgrade dependencies
+    strategy:
+      matrix:
+        deptype: ['devDependencies']
+        latest: [true, false]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Upgrade dependencies
+        id: upgrade
+        uses: ui-router/publish-scripts/actions/upgrade@actions-upgrade-v1.0.0
+        with:
+          exclude: ''
+          deptype: ${{ matrix.deptype }}
+          latest: ${{ matrix.latest }}
+      - name: Create Pull Request
+        if: ${{ steps.upgrade.outputs.upgrades != '' }}
+        # the following hash is from https://github.com/peter-evans/create-pull-request/releases/tag/v2.7.0
+        uses: peter-evans/create-pull-request@340e629d2f63059fb3e3f15437e92cfbc7acd85b
+        with:
+          commit-message: 'chore(package): Update (latest: ${{ matrix.latest }}) to ${{ steps.upgrade.outputs.upgrades }}'
+          title: 'chore(package): Weekly dependency bump (latest: ${{ matrix.latest }})'
+          branch: 'short-commit-hash'
