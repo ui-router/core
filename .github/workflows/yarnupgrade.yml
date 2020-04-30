@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Upgrade dependencies
     steps:
+      - uses: actions/checkout@v2
       - name: Upgrade devDependencies
         id: upgrade
         uses: ui-router/publish-scripts/docker/upgrade@github-action-yarn-upgrade
