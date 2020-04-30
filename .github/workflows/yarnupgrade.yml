@@ -1,0 +1,16 @@
+on: [push]
+
+jobs:
+  yarn_upgrade:
+    runs-on: ubuntu-latest
+    name: Upgrade dependencies
+    steps:
+      - name: Upgrade devDependencies
+        id: upgrade
+        uses: ui-router/publish-scripts/docker/upgrade@41d01b07b31064e88a6809ae625ce743475b1325
+        with:
+          DEPTYPE: devDependencies
+      # Use the output from the `hello` step
+      # Do the pull request
+      - name: Get the output time
+        run: echo "The time was ${{ steps.hello.outputs.time }}"
