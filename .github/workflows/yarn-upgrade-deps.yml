@@ -11,8 +11,8 @@
 name: Weekly Dependency Bumps
 on:
   schedule:
-    # At 18:30UTC, on Saturdays
-    - cron: '30 18 * * 6'
+    # At 18:40UTC, on Saturdays
+    - cron: '40 18 * * 6'
 
 jobs:
   upgrade-dependencies:
@@ -30,7 +30,7 @@ jobs:
         id: upgrade
         uses: ui-router/publish-scripts/actions/upgrade@actions-upgrade-v1.0.0
         with:
-          exclude: ''
+          exclude: 'typescript'
           deptype: ${{ matrix.deptype }}
           latest: ${{ matrix.latest }}
       - name: Create Pull Request
