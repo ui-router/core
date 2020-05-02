@@ -8,10 +8,11 @@
 # Then create a repo secret called SSH_PRIVATE_KEY
 # e.g., https://github.com/ui-router/core/settings/secrets
 #
+name: Weekly Dependency Bumps
 on:
   schedule:
-    # At 06:00:00am, on every FRI, every month
-    - cron: '0 0 6 ? * FRI *'
+    # At 18:30UTC, on Saturdays
+    - cron: '30 18 * * 6'
 
 jobs:
   upgrade-dependencies:
