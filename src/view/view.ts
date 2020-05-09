@@ -12,14 +12,15 @@ import {
   RenderContentCallback,
   ViewConfig,
   ViewContext,
-  ViewPlugin,
+  UIRouterViewPlugin,
+  UIViewPortalRenderCommand,
 } from './interface';
 
 export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig | ViewConfig[];
 
 export interface ViewServicePluginAPI {
-  _registerViewPlugin(plugin: ViewPlugin);
-  _registeredViewPlugins(): ViewPlugin[];
+  _registerViewPlugin(plugin: UIRouterViewPlugin);
+  _registeredViewPlugins(): UIRouterViewPlugin[];
   _rootViewContext(context?: ViewContext): ViewContext;
   _viewConfigFactory(viewType: string, factory: ViewConfigFactory);
   /** @param id router.$id + "." + uiView.id */
@@ -56,7 +57,7 @@ export interface ViewSyncListener {
  *   are configured with the matching [[ViewConfig]](s)
  */
 export class ViewService {
-  /** @internal */ private _viewPlugins: ViewPlugin[] = [];
+  /** @internal */ private _viewPlugins: UIRouterViewPlugin[] = [];
   /** @internal */ private _uiViews: { [viewId: string]: RegisteredUIViewPortal } = {};
   /** @internal */ private _viewConfigs: ViewConfig[] = [];
   /** @internal */ private _rootContext: ViewContext;
@@ -66,7 +67,7 @@ export class ViewService {
 
   /** @internal */
   public _pluginapi: ViewServicePluginAPI = {
-    _registerViewPlugin: plugin => this._viewPlugins.push(plugin),
+    _registerViewPlugin: (plugin) => this._viewPlugins.push(plugin),
     _registeredViewPlugins: () => this._viewPlugins.slice(),
     _rootViewContext: this._rootViewContext.bind(this),
     _viewConfigFactory: this._viewConfigFactory.bind(this),
@@ -284,43 +285,42 @@ export class ViewService {
       // Before configuring a child ui-view, make sure it's still in the active uiViews array.
       const doesUIViewStillExist = () => values(this._uiViews).indexOf(uiView) !== -1;
 
-      const contentType: PortalContentType = !viewConfig
-        ? 'DEFAULT_CONTENT'
-        : uiView.type === viewConfig.viewDecl.$type
-        ? 'ROUTED_COMPONENT'
-        : 'INTEROP_DIV';
-
-      const changed = uiView.currentPortalContentType !== contentType || uiView.currentPortalViewConfig !== viewConfig;
-
-      // Short circuit if the uiview portal is already configured correctly
-      if (doesUIViewStillExist() && changed) {
-        uiView.contentState = parse('viewDecl.$context')(viewConfig);
-        uiView.currentPortalContentType = contentType;
-        uiView.currentPortalViewConfig = viewConfig;
-        uiView.currentPortalInteropDiv = undefined;
-
-        if (contentType === 'ROUTED_COMPONENT') {
-          uiView.renderContentIntoUIViewPortal('ROUTED_COMPONENT', viewConfig);
-        } else if (contentType === 'DEFAULT_CONTENT') {
-          uiView.renderContentIntoUIViewPortal('DEFAULT_CONTENT');
-        } else if (contentType === 'INTEROP_DIV') {
-          const giveDiv = (divElement: HTMLDivElement) => {
-            if (doesUIViewStillExist()) {
-              uiView.currentPortalInteropDiv = divElement;
-              // Tell the other component framework to render into this div
-              const viewPlugin = this._viewPlugins.find(p => p.name === viewConfig.viewDecl.$type);
-              viewPlugin.renderUIViewIntoDivElement(this.router, viewConfig);
-            }
-          };
-          uiView.renderContentIntoUIViewPortal('INTEROP_DIV', giveDiv);
+      function giveDiv(divElement: HTMLDivElement) {
+        if (doesUIViewStillExist()) {
+          // Tell the other component framework to render into this div
+          const viewPlugin = this._viewPlugins.find((p) => p.name === viewConfig.viewDecl.$type);
+          viewPlugin.renderUIViewIntoDivElement(this.router, divElement, this._uiViewPath(uiView.id));
         }
+      }
+
+      const newCommand: UIViewPortalRenderCommand = !viewConfig
+        ? { command: 'RENDER_DEFAULT_CONTENT' }
+        : uiView.type === viewConfig.viewDecl.$type
+        ? { command: 'RENDER_ROUTED_VIEW', routedViewConfig: viewConfig }
+        : { command: 'RENDER_INTEROP_DIV', giveDiv };
+
+      function hasChanged(a: UIViewPortalRenderCommand, b: UIViewPortalRenderCommand) {
+        if (a.command !== b.command) {
+          return true;
+        }
+        if (a.command === 'RENDER_DEFAULT_CONTENT' || a.command === 'RENDER_INTEROP_DIV') {
+          return false;
+        }
+        return (
+          a.command === 'RENDER_ROUTED_VIEW' && b.command === a.command && a.routedViewConfig !== b.routedViewConfig
+        );
+      }
+
+      // Don't do anything if the uiview portal is already configured correctly
+      if (doesUIViewStillExist() && hasChanged(uiView.currentPortalCommand, newCommand)) {
+        uiView.contentState = parse('viewDecl.$context')(viewConfig);
+        uiView.currentPortalCommand = newCommand;
+        uiView.renderContentIntoUIViewPortal(newCommand);
       }
     };
 
     // Sort views by FQN and state depth. Process uiviews nearest the root first.
-    const uiViewTuples = values(this._uiViews)
-      .sort(depthCompare(uiViewDepth, 1))
-      .map(matchingConfigPair);
+    const uiViewTuples = values(this._uiViews).sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair);
 
     const matchedViewConfigs = uiViewTuples.map((tuple) => tuple.viewConfig);
 
@@ -350,7 +350,7 @@ export class ViewService {
       if (parentFqn === '') {
         return null; // root
       }
-      const [parentId] = pairs(this._uiViews).find(pair => (pair[1] as ActiveUIView).fqn === parentFqn) || [];
+      const [parentId] = pairs(this._uiViews).find((pair) => (pair[1] as ActiveUIView).fqn === parentFqn) || [];
       return parentId;
     };
 
@@ -362,7 +362,7 @@ export class ViewService {
 
       const id = this.registerView(activeUIView.$type, parentId, activeUIView.name, activeUIView.configUpdated);
       activeUIView.id = id;
-      const queuedReadyView = find(this._deferredRegisterViews, val => val.isReady());
+      const queuedReadyView = find(this._deferredRegisterViews, (val) => val.isReady());
       if (queuedReadyView) {
         this._deferredRegisterViews = removeFrom(this._deferredRegisterViews, queuedReadyView);
         queuedReadyView.register();
@@ -426,20 +426,20 @@ export class ViewService {
     const state = (parent && parent.contentState) || this.router.stateRegistry.root();
     const id = `${this.router.$id}.${this._uiViewCounter++}`;
     const fqn = parent ? `${parent.fqn}.${name}` : name;
-    const registeredView: RegisteredUIViewPortal = {
+
+    const registeredUIViewPortal: RegisteredUIViewPortal = {
       id,
       parentId,
       type,
       name,
       fqn,
       portalState: state,
-      currentPortalInteropDiv: undefined,
-      currentPortalViewConfig: undefined,
-      currentPortalContentType: undefined,
+      currentPortalCommand: { command: undefined },
       renderContentIntoUIViewPortal,
     };
-    this._uiViews[id] = registeredView;
-    trace.traceViewServiceUIViewEvent(`-> Registered ui-view ${id}`, registeredView);
+
+    this._uiViews[id] = registeredUIViewPortal;
+    trace.traceViewServiceUIViewEvent(`-> Registered ui-view ${id}`, registeredUIViewPortal);
     this.sync();
 
     return id;
@@ -470,8 +470,22 @@ export class ViewService {
    * @return {Array} Returns an array of fully-qualified view names.
    */
   active() {
-    return values(this._uiViews)
-      .filter(prop('$config'))
-      .map(prop('name'));
+    return values(this._uiViews).filter(prop('$config')).map(prop('name'));
+  }
+
+  /**
+   * Returns ancestor UIViews starting with the provided id and walking up parent UIViews to the root uiView.
+   * @param uiViewId a uiView ID
+   * @return a path of RegisteredUIView objects containing all ancestor UIViews up to the root UIView
+   * @internalapi
+   */
+  private _uiViewPath(uiViewId: string): RegisteredUIViewPortal[] {
+    const path = [];
+    let uiView = this._uiViews[uiViewId];
+    while (!!uiView && !path.includes(uiView)) {
+      path.push(uiView);
+      uiView = this._uiViews[uiView.parentId];
+    }
+    return path;
   }
 }
