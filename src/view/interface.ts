@@ -31,20 +31,33 @@ export interface RegisteredUIViewPortal {
   name: string;
   /** The fully qualified ui-view address, (i.e., `${parentview.fqn}.${name}` */
   fqn: string;
-  /** The type of content that should be loaded into the portal */
-  currentPortalContentType: PortalContentType;
-  /** The ViewConfig object when content type is ROUTED_COMPONENT */
-  currentPortalViewConfig: ViewConfig;
-  /** The HtmlDivElement when content type is INTEROP_DIV */
-  currentPortalInteropDiv: HTMLDivElement;
+  /** The command most recently sent to the UIView */
+  currentPortalCommand: UIViewPortalRenderCommand;
   /**
    * A callback that instructs the uiview portal what to render.
    * This function will be called whenever the uiview portal should change its contents, e.g., after a Transition.
    */
-  renderContentIntoUIViewPortal(portalContent: 'DEFAULT_CONTENT'): void;
-  renderContentIntoUIViewPortal(portalContent: 'ROUTED_COMPONENT', config?: ViewConfig): void;
-  renderContentIntoUIViewPortal(portalContent: 'INTEROP_DIV', giveDiv: (divElement: HTMLDivElement) => void);
+  renderContentIntoUIViewPortal(uiViewPortalRenderCommand: UIViewPortalRenderCommand): void;
 }
+
+interface RenderRoutedComponentCommand {
+  command: 'RENDER_ROUTED_VIEW';
+  routedViewConfig: ViewConfig;
+}
+
+interface RenderDefaultContentCommand {
+  command: 'RENDER_DEFAULT_CONTENT';
+}
+
+interface RenderInteropDivCommand {
+  command: 'RENDER_INTEROP_DIV';
+  giveDiv: (div: HTMLDivElement) => void;
+}
+
+export type UIViewPortalRenderCommand =
+  | RenderRoutedComponentCommand
+  | RenderDefaultContentCommand
+  | RenderInteropDivCommand;
 
 export declare type PortalContentType = 'DEFAULT_CONTENT' | 'ROUTED_COMPONENT' | 'INTEROP_DIV';
 export declare type RenderContentCallback = RegisteredUIViewPortal['renderContentIntoUIViewPortal'];
@@ -95,7 +108,36 @@ export interface ViewConfig {
   load(): Promise<ViewConfig>;
 }
 
-export interface ViewPlugin extends UIRouterPlugin {
+export interface UIRouterViewPlugin extends UIRouterPlugin {
   type: 'view';
-  renderUIViewIntoDivElement(router: UIRouter, viewConfig: ViewConfig);
+
+  /**
+   * This function is called by uirouter core when routing content into a UIView from a different type (component technology).
+   * When called, the view implementation should render a UIView portal component into the provided divElement.
+   *
+   * This allows content from one technology to be rendered into the UIView of a different technology.
+   * For example, an Angular component may be rendered into a React `<UIView/>` portal.
+   *
+   * The third argument is passed to the function if there are any ancestor UIViews of the same type (component technology).
+   * This can be used to preserve the contextual hierarchy of the component technology, if it has one.
+   *
+   * For example, React has a Portals (https://reactjs.org/docs/portals.html) which allows React Context to
+   * propagate across component technology jumps.
+   * Angular has a hierarchical dependency injector.
+   * Angular Components are created within the injector hierarchy.
+   *
+   * Consider a case where React renders a UIView portal.
+   * The React UIView portal is filled with content from Angular which in turn renders an Angular UIView portal.
+   *
+   * When a react UIView renders an interop div, it can save a custom object containing a function that renders a
+   * React Portal.
+   *
+   *
+   * A UIView implementation of a particular type (i.e., fooType) may save an object when
+   * The third argument will be the object saved by the *most recent UIView of the implementor component technology*.
+   * @param router
+   * @param divElement
+   * @param buriedTreasure
+   */
+  renderUIViewIntoDivElement(router: UIRouter, divElement: HTMLDivElement, customDataFromAncestor: any);
 }
