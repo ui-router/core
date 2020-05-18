@@ -6,7 +6,7 @@
     "angularjs": "https://github.com/angular-ui/ui-router.git"
   },
   "react": {
-    "react": "https://github.com/ui-router/react.git"
+    "react": "https://github.com/ui-router/react.git@core-v7"
   },
   "other": {
     "sticky-states": "https://github.com/ui-router/sticky-states.git",
