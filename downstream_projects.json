@@ -6,7 +6,7 @@
     "angularjs": "https://github.com/angular-ui/ui-router.git"
   },
   "react": {
-    "react": "https://github.com/ui-router/react.git"
+    "react": "https://github.com/ui-router/react.git@core-v7"
   },
   "other": {
     "typescript3.9": "./test/typescript3.9",
