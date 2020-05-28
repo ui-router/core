@@ -7,7 +7,7 @@
     "compile": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && shx cp src/*.json lib",
     "build": "run-s compile fixdts bundle fixmaps:*",
     "bundle": "rollup -c && rollup -c --environment MINIFY",
-    "fixdts": "dts-downlevel 'lib/**/*.d.ts' 'lib-esm/**/*.d.ts'",
+    "fixdts": "dts-downlevel --semver '>=2.2.0' 'lib/**/*.d.ts' 'lib-esm/**/*.d.ts'",
     "fixmaps:lib": "tweak_sourcemap_paths -a --include 'lib/**/*.js.map' 'lib-esm/**/*.js.map'",
     "fixmaps:bundle": "tweak_sourcemap_paths -a --include '_bundles/**/*.js.map'",
     "prepublishOnly": "npm run build",
@@ -69,7 +69,7 @@
     "@types/jasmine": "^3.3.13",
     "@types/jquery": "^3.3.36",
     "@uirouter/publish-scripts": "^2.3.46",
-    "dts-downlevel": "^0.3.0",
+    "dts-downlevel": "^0.4.0",
     "fork-ts-checker-webpack-plugin": "^4.1.3",
     "husky": "^4.2.5",
     "jasmine-core": "^3.3.0",
@@ -89,7 +89,7 @@
     "ts-loader": "^7.0.2",
     "tslint": "^6.1.2",
     "tslint-eslint-rules": "^5.3.1",
-    "typescript": "^3.5.2",
+    "typescript": "~3.9",
     "webpack": "^4.34.0"
   },
   "resolutions": {
