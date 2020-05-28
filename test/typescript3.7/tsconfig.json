@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "lib": ["es6", "dom"],
+    "noImplicitAny": true,
+    "noEmit": true,
+    "strict": true,
+    "target": "es5",
+    "typeRoots": ["node_modules/@types"]
+  },
+  "files": ["index.ts"]
+}
