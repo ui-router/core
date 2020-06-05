@@ -29,24 +29,22 @@ const locationConfigStub = makeStub<LocationConfig>('LocationConfig', locCfgFns)
  * An instance of UI-Router.
  *
  * This object contains references to service APIs which define your application's routing behavior.
- *
- * At a minimum, you should use the [[UIRouter.stateRegistry]] API to register application states (routes).
  */
 export class UIRouter {
   /** @internal */ $id = _routerInstance++;
   /** @internal */ _disposed = false;
   /** @internal */ private _disposables: Disposable[] = [];
 
-  /** Provides trace information to the console */
+  /** Enable/disable tracing to the javascript console */
   trace: Trace = trace;
 
   /** Provides services related to ui-view synchronization */
   viewService = new ViewService(this);
 
-  /** Global router state */
+  /** An object that contains global router state, such as the current state and params */
   globals: UIRouterGlobals = new UIRouterGlobals();
 
-  /** Provides services related to Transitions */
+  /** A service that exposes global Transition Hooks */
   transitionService: TransitionService = new TransitionService(this);
 
   /**
@@ -86,6 +84,7 @@ export class UIRouter {
    *
    * Or, if a `disposable` object is provided, calls `dispose(this)` on that object only.
    *
+   * @internal
    * @param disposable (optional) the disposable to dispose
    */
   dispose(disposable?: any): void {
@@ -194,15 +193,16 @@ export class UIRouter {
   }
 
   /**
-   * Returns registered plugins
+   * Returns a plugin registered with the given `pluginName`.
    *
-   * Returns the registered plugin of the given `pluginName`.
-   * If no `pluginName` is given, returns all registered plugins
-   *
-   * @param pluginName (optional) the name of the plugin to get
-   * @return the named plugin (undefined if not found), or all plugins (if `pluginName` is omitted)
+   * @param pluginName the name of the plugin to get
+   * @return the plugin, or undefined
    */
   getPlugin(pluginName: string): UIRouterPlugin;
+  /**
+   * Returns all registered plugins
+   * @return all registered plugins
+   */
   getPlugin(): UIRouterPlugin[];
   getPlugin(pluginName?: string): UIRouterPlugin | UIRouterPlugin[] {
     return pluginName ? this._plugins[pluginName] : values(this._plugins);
