@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module transition */
 import { isString, isFunction, Glob, extend, removeFrom, tail, values, identity, mapObj } from '../common';
 import { PathNode } from '../path/pathNode';
 import {
@@ -26,7 +25,7 @@ import { TransitionService } from './transitionService';
 /**
  * Determines if the given state matches the matchCriteria
  *
- * @hidden
+ * @internal
  *
  * @param state a State Object to test against
  * @param criterion
@@ -56,7 +55,6 @@ export function matchState(state: StateObject, criterion: HookMatchCriterion, tr
 }
 
 /**
- * @internalapi
  * The registration data for a registered transition hook
  */
 export class RegisteredHook {
@@ -96,7 +94,7 @@ export class RegisteredHook {
    */
   private _matchingNodes(nodes: PathNode[], criterion: HookMatchCriterion, transition: Transition): PathNode[] {
     if (criterion === true) return nodes;
-    const matching = nodes.filter(node => matchState(node.state, criterion, transition));
+    const matching = nodes.filter((node) => matchState(node.state, criterion, transition));
     return matching.length ? matching : null;
   }
 
@@ -137,19 +135,16 @@ export class RegisteredHook {
     const criteria = extend(this._getDefaultMatchCriteria(), this.matchCriteria);
     const paths: PathType[] = values(this.tranSvc._pluginapi._getPathTypes());
 
-    return paths.reduce(
-      (mn: IMatchingNodes, pathtype: PathType) => {
-        // STATE scope criteria matches against every node in the path.
-        // TRANSITION scope criteria matches against only the last node in the path
-        const isStateHook = pathtype.scope === TransitionHookScope.STATE;
-        const path = treeChanges[pathtype.name] || [];
-        const nodes: PathNode[] = isStateHook ? path : [tail(path)];
+    return paths.reduce((mn: IMatchingNodes, pathtype: PathType) => {
+      // STATE scope criteria matches against every node in the path.
+      // TRANSITION scope criteria matches against only the last node in the path
+      const isStateHook = pathtype.scope === TransitionHookScope.STATE;
+      const path = treeChanges[pathtype.name] || [];
+      const nodes: PathNode[] = isStateHook ? path : [tail(path)];
 
-        mn[pathtype.name] = this._matchingNodes(nodes, criteria[pathtype.name], transition);
-        return mn;
-      },
-      {} as IMatchingNodes
-    );
+      mn[pathtype.name] = this._matchingNodes(nodes, criteria[pathtype.name], transition);
+      return mn;
+    }, {} as IMatchingNodes);
   }
 
   /**
@@ -172,7 +167,7 @@ export class RegisteredHook {
   }
 }
 
-/** @hidden Return a registration function of the requested type. */
+/** Return a registration function of the requested type. */
 export function makeEvent(
   registry: IHookRegistry,
   transitionService: TransitionService,

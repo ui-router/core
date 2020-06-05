@@ -1,17 +1,12 @@
-/** @packageDocumentation @publicapi @module view */
 import { _ViewDeclaration } from '../state/interface';
 import { PathNode } from '../path/pathNode';
 
-/**
- * The context ref can be anything that has a `name` and a `parent` reference to another IContextRef
- * @internalapi
- */
+/** The context ref can be anything that has a `name` and a `parent` reference to another IContextRef */
 export interface ViewContext {
   name: string;
   parent: ViewContext;
 }
 
-/** @internalapi */
 export interface ActiveUIView {
   /** type of framework, e.g., "ng1" or "ng2" */
   $type: string;

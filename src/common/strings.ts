@@ -3,7 +3,7 @@
  *
  * Although these functions are exported, they are subject to change without notice.
  *
- * @packageDocumentation @module common_strings
+ * @packageDocumentation
  */
 
 import { isArray, isFunction, isInjectable, isNull, isObject, isPromise, isString, isUndefined } from './predicates';
@@ -41,8 +41,8 @@ export function padString(length: number, str: string) {
 
 export function kebobString(camelCase: string) {
   return camelCase
-    .replace(/^([A-Z])/, $1 => $1.toLowerCase()) // replace first char
-    .replace(/([A-Z])/g, $1 => '-' + $1.toLowerCase()); // replace rest
+    .replace(/^([A-Z])/, ($1) => $1.toLowerCase()) // replace first char
+    .replace(/([A-Z])/g, ($1) => '-' + $1.toLowerCase()); // replace rest
 }
 
 export function functionToString(fn: Function) {

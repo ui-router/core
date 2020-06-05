@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module core */
 import { StateParams } from './params/stateParams';
 import { StateDeclaration } from './state/interface';
 import { StateObject } from './state/stateObject';
@@ -31,7 +30,7 @@ export class UIRouterGlobals implements Disposable {
    * Current state (internal object)
    *
    * The to-state from the latest successful transition
-   * @internalapi
+   * @internal
    */
   $current: StateObject;
 
@@ -41,13 +40,13 @@ export class UIRouterGlobals implements Disposable {
    */
   transition: Transition;
 
-  /** @internalapi */
+  /** @internal */
   lastStartedTransitionId = -1;
 
-  /** @internalapi */
+  /** @internal */
   transitionHistory = new Queue<Transition>([], 1);
 
-  /** @internalapi */
+  /** @internal */
   successfulTransitions = new Queue<Transition>([], 1);
 
   dispose() {

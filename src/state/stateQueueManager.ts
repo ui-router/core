@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module state */
 import { inArray, isString, prop } from '../common';
 import { _StateDeclaration } from './interface';
 import { StateObject } from './stateObject';
@@ -7,7 +6,6 @@ import { StateRegistryListener } from './stateRegistry';
 import { Disposable } from '../interface';
 import { UIRouter } from '../router';
 
-/** @internalapi */
 export class StateQueueManager implements Disposable {
   queue: StateObject[] = [];
 
@@ -18,7 +16,6 @@ export class StateQueueManager implements Disposable {
     public listeners: StateRegistryListener[]
   ) {}
 
-  /** @internalapi */
   dispose() {
     this.queue = [];
   }
@@ -43,10 +40,15 @@ export class StateQueueManager implements Disposable {
     const registered: StateObject[] = [], // states that got registered
       orphans: StateObject[] = [], // states that don't yet have a parent registered
       previousQueueLength = {}; // keep track of how long the queue when an orphan was first encountered
-    const getState = name => this.states.hasOwnProperty(name) && this.states[name];
+    const getState = (name) => this.states.hasOwnProperty(name) && this.states[name];
     const notifyListeners = () => {
       if (registered.length) {
-        this.listeners.forEach(listener => listener('registered', registered.map(s => s.self)));
+        this.listeners.forEach((listener) =>
+          listener(
+            'registered',
+            registered.map((s) => s.self)
+          )
+        );
       }
     };
 

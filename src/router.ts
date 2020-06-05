@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module core */
 import { UrlMatcherFactory } from './url/urlMatcherFactory';
 import { UrlRouter } from './url/urlRouter';
 import { TransitionService } from './transition/transitionService';
@@ -14,37 +13,29 @@ import { LocationServices, LocationConfig } from './common/coreservices';
 import { Trace, trace } from './common/trace';
 import { makeStub } from './common';
 
-/** @hidden */
+/** @internal */
 let _routerInstance = 0;
 
-/** @hidden */
+/** @internal */
 const locSvcFns: (keyof LocationServices)[] = ['url', 'path', 'search', 'hash', 'onChange'];
-/** @hidden */
+/** @internal */
 const locCfgFns: (keyof LocationConfig)[] = ['port', 'protocol', 'host', 'baseHref', 'html5Mode', 'hashPrefix'];
-/** @hidden */
+/** @internal */
 const locationServiceStub = makeStub<LocationServices>('LocationServices', locSvcFns);
-/** @hidden */
+/** @internal */
 const locationConfigStub = makeStub<LocationConfig>('LocationConfig', locCfgFns);
 
 /**
- * The master class used to instantiate an instance of UI-Router.
+ * An instance of UI-Router.
  *
- * UI-Router (for each specific framework) will create an instance of this class during bootstrap.
- * This class instantiates and wires the UI-Router services together.
+ * This object contains references to service APIs which define your application's routing behavior.
  *
- * After a new instance of the UIRouter class is created, it should be configured for your app.
- * For instance, app states should be registered with the [[UIRouter.stateRegistry]].
- *
- * ---
- *
- * Normally the framework code will bootstrap UI-Router.
- * If you are bootstrapping UIRouter manually, tell it to monitor the URL by calling
- * [[UrlService.listen]] then [[UrlService.sync]].
+ * At a minimum, you should use the [[UIRouter.stateRegistry]] API to register application states (routes).
  */
 export class UIRouter {
-  /** @hidden */ $id = _routerInstance++;
-  /** @hidden */ _disposed = false;
-  /** @hidden */ private _disposables: Disposable[] = [];
+  /** @internal */ $id = _routerInstance++;
+  /** @internal */ _disposed = false;
+  /** @internal */ private _disposables: Disposable[] = [];
 
   /** Provides trace information to the console */
   trace: Trace = trace;
@@ -79,7 +70,7 @@ export class UIRouter {
   /** Provides services related to states */
   stateService = new StateService(this);
 
-  /** @hidden plugin instances are registered here */
+  /** @internal plugin instances are registered here */
   private _plugins: { [key: string]: UIRouterPlugin } = {};
 
   /** Registers an object to be notified when the router is disposed */
@@ -104,7 +95,7 @@ export class UIRouter {
     }
 
     this._disposed = true;
-    this._disposables.slice().forEach(d => {
+    this._disposables.slice().forEach((d) => {
       try {
         typeof d.dispose === 'function' && d.dispose(this);
         removeFrom(this._disposables, d);
@@ -117,7 +108,7 @@ export class UIRouter {
    *
    * @param locationService a [[LocationServices]] implementation
    * @param locationConfig a [[LocationConfig]] implementation
-   * @internalapi
+   * @internal
    */
   constructor(
     public locationService: LocationServices = locationServiceStub,
@@ -218,5 +209,5 @@ export class UIRouter {
   }
 }
 
-/** @internalapi */
+/** @internal */
 export type PluginFactory<T> = (router: UIRouter, options?: any) => T;

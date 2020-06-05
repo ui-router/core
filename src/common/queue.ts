@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module common */
 import { pushTo } from './common';
 
 export class Queue<T> {
@@ -16,7 +15,7 @@ export class Queue<T> {
 
   evict(): T {
     const item: T = this._items.shift();
-    this._evictListeners.forEach(fn => fn(item));
+    this._evictListeners.forEach((fn) => fn(item));
     return item;
   }
 

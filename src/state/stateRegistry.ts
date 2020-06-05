@@ -1,5 +1,3 @@
-/** @packageDocumentation @publicapi @module state */
-
 import { StateObject } from './stateObject';
 import { StateMatcher } from './stateMatcher';
 import { StateBuilder } from './stateBuilder';
@@ -21,17 +19,25 @@ import { propEq } from '../common/hof';
  */
 export type StateRegistryListener = (event: 'registered' | 'deregistered', states: StateDeclaration[]) => void;
 
+/**
+ * A registry for all of the application's [[StateDeclaration]]s
+ *
+ * This API is found at `router.stateRegistry` ([[UIRouter.stateRegistry]])
+ */
 export class StateRegistry {
   private _root: StateObject;
   private states: { [key: string]: StateObject } = {};
 
+  /** @internal */
   matcher: StateMatcher;
   private builder: StateBuilder;
+  /** @internal */
   stateQueue: StateQueueManager;
 
+  /** @internal */
   listeners: StateRegistryListener[] = [];
 
-  /** @internalapi */
+  /** @internal */
   constructor(private router: UIRouter) {
     this.matcher = new StateMatcher(this.states);
     this.builder = new StateBuilder(this.matcher, router.urlMatcherFactory);
@@ -39,7 +45,7 @@ export class StateRegistry {
     this._registerRoot();
   }
 
-  /** @internalapi */
+  /** @internal */
   private _registerRoot() {
     const rootStateDef: StateDeclaration = {
       name: '',
@@ -55,11 +61,11 @@ export class StateRegistry {
     _root.navigable = null;
   }
 
-  /** @internalapi */
+  /** @internal */
   dispose() {
     this.stateQueue.dispose();
     this.listeners = [];
-    this.get().forEach(state => this.get(state) && this.deregister(state));
+    this.get().forEach((state) => this.get(state) && this.deregister(state));
   }
 
   /**
@@ -128,25 +134,25 @@ export class StateRegistry {
     return this.stateQueue.register(stateDefinition);
   }
 
-  /** @hidden */
+  /** @internal */
   private _deregisterTree(state: StateObject) {
-    const all = this.get().map(s => s.$$state());
+    const all = this.get().map((s) => s.$$state());
     const getChildren = (states: StateObject[]) => {
-      const _children = all.filter(s => states.indexOf(s.parent) !== -1);
+      const _children = all.filter((s) => states.indexOf(s.parent) !== -1);
       return _children.length === 0 ? _children : _children.concat(getChildren(_children));
     };
 
     const children = getChildren([state]);
     const deregistered: StateObject[] = [state].concat(children).reverse();
 
-    deregistered.forEach(_state => {
+    deregistered.forEach((_state) => {
       const rulesApi = this.router.urlService.rules;
 
       // Remove URL rule
       rulesApi
         .rules()
         .filter(propEq('state', _state))
-        .forEach(rule => rulesApi.removeRule(rule));
+        .forEach((rule) => rulesApi.removeRule(rule));
 
       // Remove state from registry
       delete this.states[_state.name];
@@ -169,7 +175,12 @@ export class StateRegistry {
     if (!_state) throw new Error("Can't deregister state; not found: " + stateOrName);
     const deregisteredStates = this._deregisterTree(_state.$$state());
 
-    this.listeners.forEach(listener => listener('deregistered', deregisteredStates.map(s => s.self)));
+    this.listeners.forEach((listener) =>
+      listener(
+        'deregistered',
+        deregisteredStates.map((s) => s.self)
+      )
+    );
     return deregisteredStates;
   }
 
@@ -195,12 +206,23 @@ export class StateRegistry {
    */
   get(stateOrName: StateOrName, base?: StateOrName): StateDeclaration;
   get(stateOrName?: StateOrName, base?: StateOrName): any {
-    if (arguments.length === 0) return <StateDeclaration[]>Object.keys(this.states).map(name => this.states[name].self);
+    if (arguments.length === 0)
+      return <StateDeclaration[]>Object.keys(this.states).map((name) => this.states[name].self);
     const found = this.matcher.find(stateOrName, base);
     return (found && found.self) || null;
   }
 
-  decorator(name: string, func: BuilderFunction) {
-    return this.builder.builder(name, func);
+  /**
+   * Registers a [[BuilderFunction]] for a specific [[StateObject]] property (e.g., `parent`, `url`, or `path`).
+   * More than one BuilderFunction can be registered for a given property.
+   *
+   * The BuilderFunction(s) will be used to define the property on any subsequently built [[StateObject]] objects.
+   *
+   * @param property The name of the State property being registered for.
+   * @param builderFunction The BuilderFunction which will be used to build the State property
+   * @returns a function which deregisters the BuilderFunction
+   */
+  decorator(property: string, builderFunction: BuilderFunction) {
+    return this.builder.builder(property, builderFunction);
   }
 }

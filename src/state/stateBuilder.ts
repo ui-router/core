@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module state */
 import { applyPairs, extend, identity, inherit, mapObj, noop, Obj, omit, tail, values, copy } from '../common/common';
 import { isArray, isDefined, isFunction, isString } from '../common/predicates';
 import { stringify } from '../common/strings';
@@ -22,6 +21,16 @@ const parseUrl = (url: string): any => {
   return { val: root ? url.substring(1) : url, root };
 };
 
+/**
+ * A function that builds the final value for a specific field on a [[StateObject]].
+ *
+ * A series of builder functions for a given field are chained together.
+ * The final value returned from the chain of builders is applied to the built [[StateObject]].
+ * Builder functions should call the [[parent]] function either first or last depending on the desired composition behavior.
+ *
+ * @param state the _partially built_ [[StateObject]]. The [[StateDeclaration]] can be inspected via [[StateObject.self]]
+ * @param parent the previous builder function in the series.
+ */
 export type BuilderFunction = (state: StateObject, parent?: BuilderFunction) => any;
 
 interface Builders {
@@ -89,7 +98,7 @@ const getParamsBuilder = (paramFactory: ParamFactory) =>
     const nonUrlParams: Param[] = values(mapObj(omit(state.params || {}, urlParams.map(prop('id'))), makeConfigParam));
     return urlParams
       .concat(nonUrlParams)
-      .map(p => [p.id, p])
+      .map((p) => [p.id, p])
       .reduce(applyPairs, {});
   };
 
@@ -154,7 +163,7 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
 
   /** convert resolve: {} and resolvePolicy: {} objects to an array of tuples */
   const objects2Tuples = (resolveObj: Obj, resolvePolicies: { [key: string]: ResolvePolicy }) =>
-    Object.keys(resolveObj || {}).map(token => ({
+    Object.keys(resolveObj || {}).map((token) => ({
       token,
       val: resolveObj[token],
       deps: undefined,
@@ -186,11 +195,11 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
 
   // prettier-ignore: Given a literal resolve or provider object, returns a Resolvable
   const literal2Resolvable = pattern([
-    [prop('resolveFn'), p => new Resolvable(getToken(p), p.resolveFn, p.deps, p.policy)],
-    [prop('useFactory'), p => new Resolvable(getToken(p), p.useFactory, p.deps || p.dependencies, p.policy)],
-    [prop('useClass'), p => new Resolvable(getToken(p), () => new (<any>p.useClass)(), [], p.policy)],
-    [prop('useValue'), p => new Resolvable(getToken(p), () => p.useValue, [], p.policy, p.useValue)],
-    [prop('useExisting'), p => new Resolvable(getToken(p), identity, [p.useExisting], p.policy)],
+    [prop('resolveFn'), (p) => new Resolvable(getToken(p), p.resolveFn, p.deps, p.policy)],
+    [prop('useFactory'), (p) => new Resolvable(getToken(p), p.useFactory, p.deps || p.dependencies, p.policy)],
+    [prop('useClass'), (p) => new Resolvable(getToken(p), () => new (<any>p.useClass)(), [], p.policy)],
+    [prop('useValue'), (p) => new Resolvable(getToken(p), () => p.useValue, [], p.policy, p.useValue)],
+    [prop('useExisting'), (p) => new Resolvable(getToken(p), identity, [p.useExisting], p.policy)],
   ]);
 
   // prettier-ignore
@@ -217,7 +226,7 @@ export function resolvablesBuilder(state: StateObject): Resolvable[] {
 }
 
 /**
- * @internalapi A internal global service
+ * A internal global service
  *
  * StateBuilder is a factory for the internal [[StateObject]] objects.
  *
@@ -270,11 +279,20 @@ export class StateBuilder {
    *
    * The BuilderFunction(s) will be used to define the property on any subsequently built [[StateObject]] objects.
    *
-   * @param name The name of the State property being registered for.
+   * @param property The name of the State property being registered for.
    * @param fn The BuilderFunction which will be used to build the State property
    * @returns a function which deregisters the BuilderFunction
    */
-  builder(name: string, fn: BuilderFunction): BuilderFunction | BuilderFunction[] | Function {
+  builder(property: string, fn: BuilderFunction): Function;
+  /**
+   * Gets the registered builder functions for a given property of [[StateObject]].
+   *
+   * @param property The name of the State property being registered for.
+   * @returns the registered builder(s).
+   *          note: for backwards compatibility, this may be a single builder or an array of builders
+   */
+  builder(property: string): BuilderFunction | BuilderFunction[];
+  builder(name: string, fn?: BuilderFunction): any {
     const builders = this.builders;
     const array = builders[name] || [];
     // Backwards compat: if only one builder exists, return it, else return whole arary.
@@ -304,7 +322,7 @@ export class StateBuilder {
     for (const key in builders) {
       if (!builders.hasOwnProperty(key)) continue;
       const chain = builders[key].reduce(
-        (parentFn: BuilderFunction, step: BuilderFunction) => _state => step(_state, parentFn),
+        (parentFn: BuilderFunction, step: BuilderFunction) => (_state) => step(_state, parentFn),
         noop
       );
       state[key] = chain(state);

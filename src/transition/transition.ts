@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module transition */
 import { trace } from '../common/trace';
 import { services } from '../common/coreservices';
 import { stringify } from '../common/strings';
@@ -35,7 +34,7 @@ import { ResolvableLiteral } from '../resolve/interface';
 import { Rejection } from './rejectFactory';
 import { applyPairs, flattenR, uniqR } from '../common';
 
-/** @hidden */
+/** @internal */
 const stateSelf: (_state: StateObject) => StateDeclaration = prop('self');
 
 /**
@@ -47,7 +46,7 @@ const stateSelf: (_state: StateObject) => StateDeclaration = prop('self');
  * It has information about all states being entered and exited as a result of the transition.
  */
 export class Transition implements IHookRegistry {
-  /** @hidden */
+  /** @internal */
   static diToken = Transition;
 
   /**
@@ -64,7 +63,7 @@ export class Transition implements IHookRegistry {
    */
   router: UIRouter;
 
-  /** @hidden */
+  /** @internal */
   private _deferred = services.$q.defer();
   /**
    * This promise is resolved or rejected based on the outcome of the Transition.
@@ -82,24 +81,24 @@ export class Transition implements IHookRegistry {
    * The value will be undefined if the transition is not complete
    */
   success: boolean;
-  /** @hidden */
+  /** @internal */
   _aborted: boolean;
-  /** @hidden */
+  /** @internal */
   private _error: Rejection;
 
-  /** @hidden Holds the hook registration functions such as those passed to Transition.onStart() */
+  /** @internal Holds the hook registration functions such as those passed to Transition.onStart() */
   _registeredHooks: RegisteredHooks = {};
 
-  /** @hidden */
+  /** @internal */
   private _options: TransitionOptions;
-  /** @hidden */
+  /** @internal */
   private _treeChanges: TreeChanges;
-  /** @hidden */
+  /** @internal */
   private _targetState: TargetState;
-  /** @hidden */
+  /** @internal */
   private _hookBuilder = new HookBuilder(this);
 
-  /** @hidden */
+  /** @internal */
   onBefore(criteria: HookMatchCriteria, callback: TransitionHookFn, options?: HookRegOptions): Function {
     return;
   }
@@ -132,18 +131,18 @@ export class Transition implements IHookRegistry {
     return;
   }
 
-  /** @hidden
+  /** @internal
    * Creates the transition-level hook registration functions
    * (which can then be used to register hooks)
    */
   private createTransitionHookRegFns() {
     this.router.transitionService._pluginapi
       ._getEvents()
-      .filter(type => type.hookPhase !== TransitionHookPhase.CREATE)
-      .forEach(type => makeEvent(this, this.router.transitionService, type));
+      .filter((type) => type.hookPhase !== TransitionHookPhase.CREATE)
+      .forEach((type) => makeEvent(this, this.router.transitionService, type));
   }
 
-  /** @internalapi */
+  /** @internal */
   getHooks(hookName: string): RegisteredHook[] {
     return this._registeredHooks[hookName];
   }
@@ -153,12 +152,13 @@ export class Transition implements IHookRegistry {
    *
    * If the target state is not valid, an error is thrown.
    *
-   * @internalapi
+   * @internal
    *
    * @param fromPath The path of [[PathNode]]s from which the transition is leaving.  The last node in the `fromPath`
    *        encapsulates the "from state".
    * @param targetState The target state and parameters being transitioned to (also, the transition options)
    * @param router The [[UIRouter]] instance
+   * @internal
    */
   constructor(fromPath: PathNode[], targetState: TargetState, router: UIRouter) {
     this.router = router;
@@ -182,13 +182,12 @@ export class Transition implements IHookRegistry {
   }
 
   private applyViewConfigs(router: UIRouter) {
-    const enteringStates = this._treeChanges.entering.map(node => node.state);
+    const enteringStates = this._treeChanges.entering.map((node) => node.state);
     PathUtils.applyViewConfigs(router.transitionService.$view, this._treeChanges.to, enteringStates);
   }
 
   /**
-   * @internalapi
-   *
+   * @internal
    * @returns the internal from [State] object
    */
   $from() {
@@ -196,8 +195,7 @@ export class Transition implements IHookRegistry {
   }
 
   /**
-   * @internalapi
-   *
+   * @internal
    * @returns the internal to [State] object
    */
   $to() {
@@ -352,7 +350,7 @@ export class Transition implements IHookRegistry {
     const allParamDescriptors: Param[] = []
       .concat(this._treeChanges.to)
       .concat(this._treeChanges.from)
-      .map(pathNode => pathNode.paramSchema)
+      .map((pathNode) => pathNode.paramSchema)
       .reduce(flattenR, [])
       .reduce(uniqR, []);
 
@@ -421,7 +419,7 @@ export class Transition implements IHookRegistry {
    */
   injector(state?: StateOrName, pathName = 'to'): UIInjector {
     let path: PathNode[] = this._treeChanges[pathName];
-    if (state) path = PathUtils.subPath(path, node => node.state === state || node.state.name === state);
+    if (state) path = PathUtils.subPath(path, (node) => node.state === state || node.state.name === state);
     return new ResolveContext(path).injector();
   }
 
@@ -495,7 +493,7 @@ export class Transition implements IHookRegistry {
 
     const stateName: string = typeof state === 'string' ? state : state.name;
     const topath = this._treeChanges.to;
-    const targetNode = find(topath, node => node.state.name === stateName);
+    const targetNode = find(topath, (node) => node.state.name === stateName);
     const resolveContext: ResolveContext = new ResolveContext(topath);
     resolveContext.addResolvables([resolvable as Resolvable], targetNode.state);
   }
@@ -576,9 +574,7 @@ export class Transition implements IHookRegistry {
    * @returns an array of states that will be exited during this transition.
    */
   exiting(): StateDeclaration[] {
-    return map(this._treeChanges.exiting, prop('state'))
-      .map(stateSelf)
-      .reverse();
+    return map(this._treeChanges.exiting, prop('state')).map(stateSelf).reverse();
   }
 
   /**
@@ -606,10 +602,7 @@ export class Transition implements IHookRegistry {
   views(pathname = 'entering', state?: StateObject): ViewConfig[] {
     let path = this._treeChanges[pathname];
     path = !state ? path : path.filter(propEq('state', state));
-    return path
-      .map(prop('views'))
-      .filter(identity)
-      .reduce(unnestR, []);
+    return path.map(prop('views')).filter(identity).reduce(unnestR, []);
   }
 
   /**
@@ -636,7 +629,7 @@ export class Transition implements IHookRegistry {
    * This transition can be returned from a [[TransitionService]] hook to
    * redirect a transition to a new state and/or set of parameters.
    *
-   * @internalapi
+   * @internal
    *
    * @returns Returns a new [[Transition]] instance.
    */
@@ -693,7 +686,7 @@ export class Transition implements IHookRegistry {
     return newTransition;
   }
 
-  /** @hidden If a transition doesn't exit/enter any states, returns any [[Param]] whose value changed */
+  /** @internal If a transition doesn't exit/enter any states, returns any [[Param]] whose value changed */
   private _changedParams(): Param[] {
     const tc = this._treeChanges;
 
@@ -706,13 +699,13 @@ export class Transition implements IHookRegistry {
     if (tc.to.length !== tc.from.length) return undefined;
     // If the to/from paths are different
     const pathsDiffer: boolean = arrayTuples(tc.to, tc.from)
-      .map(tuple => tuple[0].state !== tuple[1].state)
+      .map((tuple) => tuple[0].state !== tuple[1].state)
       .reduce(anyTrueR, false);
     if (pathsDiffer) return undefined;
 
     // Find any parameter values that differ
     const nodeSchemas: Param[][] = tc.to.map((node: PathNode) => node.paramSchema);
-    const [toValues, fromValues] = [tc.to, tc.from].map(path => path.map(x => x.paramValues));
+    const [toValues, fromValues] = [tc.to, tc.from].map((path) => path.map((x) => x.paramValues));
     const tuples = arrayTuples(nodeSchemas, toValues, fromValues);
 
     return tuples.map(([schema, toVals, fromVals]) => Param.changed(schema, toVals, fromVals)).reduce(unnestR, []);
@@ -727,7 +720,7 @@ export class Transition implements IHookRegistry {
    */
   dynamic(): boolean {
     const changes = this._changedParams();
-    return !changes ? false : changes.map(x => x.dynamic).reduce(anyTrueR, false);
+    return !changes ? false : changes.map((x) => x.dynamic).reduce(anyTrueR, false);
   }
 
   /**
@@ -741,7 +734,7 @@ export class Transition implements IHookRegistry {
     return !!this._ignoredReason();
   }
 
-  /** @hidden */
+  /** @internal */
   _ignoredReason(): 'SameAsCurrent' | 'SameAsPending' | undefined {
     const pending = this.router.globals.transition;
     const reloadState = this._options.reloadState;
@@ -749,7 +742,7 @@ export class Transition implements IHookRegistry {
     const same = (pathA, pathB) => {
       if (pathA.length !== pathB.length) return false;
       const matching = PathUtils.matching(pathA, pathB);
-      return pathA.length === matching.filter(node => !reloadState || !node.state.includes[reloadState.name]).length;
+      return pathA.length === matching.filter((node) => !reloadState || !node.state.includes[reloadState.name]).length;
     };
 
     const newTC = this.treeChanges();
@@ -764,7 +757,7 @@ export class Transition implements IHookRegistry {
    *
    * This method is generally called from the [[StateService.transitionTo]]
    *
-   * @internalapi
+   * @internal
    *
    * @returns a promise for a successful transition.
    */
@@ -860,10 +853,10 @@ export class Transition implements IHookRegistry {
 
     const paramDefs = state.parameters();
     const values = this.params();
-    const invalidParams = paramDefs.filter(param => !param.validates(values[param.id]));
+    const invalidParams = paramDefs.filter((param) => !param.validates(values[param.id]));
 
     if (invalidParams.length) {
-      const invalidValues = invalidParams.map(param => `[${param.id}:${stringify(values[param.id])}]`).join(', ');
+      const invalidValues = invalidParams.map((param) => `[${param.id}:${stringify(values[param.id])}]`).join(', ');
       const detail = `The following parameter values are not valid for state '${state.name}': ${invalidValues}`;
       return Rejection.invalid(detail);
     }

@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module params */
 import { extend, filter, map, allTrueR, find } from '../common/common';
 import { prop } from '../common/hof';
 import { isInjectable, isDefined, isString, isArray, isUndefined } from '../common/predicates';
@@ -9,14 +8,11 @@ import { ParamTypes } from './paramTypes';
 import { StateDeclaration } from '../state';
 import { UrlConfig } from '../url';
 
-/** @hidden */
 const hasOwn = Object.prototype.hasOwnProperty;
 
-/** @hidden */
 const isShorthand = (cfg: ParamDeclaration) =>
   ['value', 'type', 'squash', 'array', 'dynamic'].filter(hasOwn.bind(cfg || {})).length === 0;
 
-/** @internalapi */
 enum DefType {
   PATH,
   SEARCH,
@@ -24,7 +20,6 @@ enum DefType {
 }
 export { DefType };
 
-/** @internalapi */
 function getParamDeclaration(paramName: string, location: DefType, state: StateDeclaration): ParamDeclaration {
   const noReloadOnSearch = (state.reloadOnSearch === false && location === DefType.SEARCH) || undefined;
   const dynamic = find([state.dynamic, noReloadOnSearch], isDefined);
@@ -33,7 +28,6 @@ function getParamDeclaration(paramName: string, location: DefType, state: StateD
   return extend(defaultConfig, paramConfig);
 }
 
-/** @hidden */
 function unwrapShorthand(cfg: ParamDeclaration): ParamDeclaration {
   cfg = isShorthand(cfg) ? ({ value: cfg } as ParamDeclaration) : cfg;
 
@@ -46,7 +40,6 @@ function unwrapShorthand(cfg: ParamDeclaration): ParamDeclaration {
   return extend(cfg, { $$fn });
 }
 
-/** @hidden */
 function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, id: string, paramTypes: ParamTypes) {
   if (cfg.type && urlType && urlType.name !== 'string') throw new Error(`Param '${id}' has two type configurations.`);
   if (cfg.type && urlType && urlType.name === 'string' && paramTypes.type(cfg.type as string))
@@ -66,10 +59,7 @@ function getType(cfg: ParamDeclaration, urlType: ParamType, location: DefType, i
   return cfg.type instanceof ParamType ? cfg.type : paramTypes.type(cfg.type as string);
 }
 
-/**
- * @internalapi
- * returns false, true, or the squash value to indicate the "default parameter url squash policy".
- */
+/** returns false, true, or the squash value to indicate the "default parameter url squash policy". */
 function getSquashPolicy(config: ParamDeclaration, isOptional: boolean, defaultPolicy: boolean | string) {
   const squash = config.squash;
   if (!isOptional || squash === false) return false;
@@ -78,7 +68,6 @@ function getSquashPolicy(config: ParamDeclaration, isOptional: boolean, defaultP
   throw new Error(`Invalid squash policy: '${squash}'. Valid policies: false, true, or arbitrary string`);
 }
 
-/** @internalapi */
 function getReplace(config: ParamDeclaration, arrayMode: boolean, isOptional: boolean, squash: string | boolean) {
   const defaultPolicy = [
     { from: '', to: isOptional || arrayMode ? undefined : '' },
@@ -89,10 +78,9 @@ function getReplace(config: ParamDeclaration, arrayMode: boolean, isOptional: bo
   if (isString(squash)) replace.push({ from: squash, to: undefined });
 
   const configuredKeys = map(replace, prop('from'));
-  return filter(defaultPolicy, item => configuredKeys.indexOf(item.from) === -1).concat(replace);
+  return filter(defaultPolicy, (item) => configuredKeys.indexOf(item.from) === -1).concat(replace);
 }
 
-/** @internalapi */
 export class Param {
   id: string;
   type: ParamType;
@@ -130,7 +118,7 @@ export class Param {
    * @returns any Param objects whose values were different between values1 and values2
    */
   static changed(params: Param[], values1: RawParams = {}, values2: RawParams = {}): Param[] {
-    return params.filter(param => !param.type.equals(values1[param.id], values2[param.id]));
+    return params.filter((param) => !param.type.equals(values1[param.id], values2[param.id]));
   }
 
   /**
@@ -148,7 +136,7 @@ export class Param {
 
   /** Returns true if a the parameter values are valid, according to the Param definitions */
   static validates(params: Param[], values: RawParams = {}): boolean {
-    return params.map(param => param.validates(values[param.id])).reduce(allTrueR, true);
+    return params.map((param) => param.validates(values[param.id])).reduce(allTrueR, true);
   }
 
   constructor(id: string, type: ParamType, location: DefType, urlConfig: UrlConfig, state: StateDeclaration) {
@@ -194,9 +182,7 @@ export class Param {
 
       if (defaultValue !== null && defaultValue !== undefined && !this.type.is(defaultValue))
         throw new Error(
-          `Default value (${defaultValue}) for parameter '${this.id}' is not an instance of ParamType (${
-            this.type.name
-          })`
+          `Default value (${defaultValue}) for parameter '${this.id}' is not an instance of ParamType (${this.type.name})`
         );
 
       if (this.config.$$fn['__cacheable']) {

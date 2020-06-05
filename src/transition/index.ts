@@ -8,7 +8,7 @@
  * - [[Transition]]
  * - [[HookFn]], [[TransitionHookFn]], [[TransitionStateHookFn]], [[HookMatchCriteria]], [[HookResult]]
  *
- * @packageDocumentation @preferred @publicapi @module transition
+ * @packageDocumentation @preferred
  */
 export * from './interface';
 export * from './hookBuilder';

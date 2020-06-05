@@ -4,8 +4,9 @@
  * The classes and interfaces that are core to ui-router and do not belong
  * to a more specific subsystem (such as resolve).
  *
- * @packageDocumentation @preferred @publicapi @module core
- */// Need to import or export at least one concrete something
+ * @packageDocumentation
+ */
+// Need to import or export at least one concrete something
 import { noop } from './common/common';
 import { UIRouter } from './router';
 
@@ -102,18 +103,15 @@ export interface UIInjector {
   getNative<T>(token: any): T;
 }
 
-/** @internalapi */
 export interface UIRouterPlugin extends Disposable {
   name: string;
 }
 
-/** @internalapi */
 export abstract class UIRouterPluginBase implements UIRouterPlugin, Disposable {
   abstract name: string;
   dispose(router: UIRouter) {}
 }
 
-/** @internalapi */
 export interface Disposable {
   /** Instructs the Disposable to clean up any resources */
   dispose(router?: UIRouter);

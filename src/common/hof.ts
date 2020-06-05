@@ -3,7 +3,7 @@
  *
  * These utility functions are exported, but are subject to change without notice.
  *
- * @packageDocumentation @module common_hof
+ * @packageDocumentation
  */
 
 import { Predicate } from './common';
@@ -67,7 +67,7 @@ export function curry(fn: Function): Function {
 export function compose() {
   const args = arguments;
   const start = args.length - 1;
-  return function() {
+  return function () {
     let i = start,
       result = args[start].apply(this, arguments);
     while (i--) result = args[i].call(this, result);
@@ -203,7 +203,7 @@ export function invoke(fnName: string, args?: any[]): Function {
  * @returns {function(any): *}
  */
 export function pattern(struct: Function[][]): Function {
-  return function(x: any) {
+  return function (x: any) {
     for (let i = 0; i < struct.length; i++) {
       if (struct[i][0](x)) return struct[i][1](x);
     }

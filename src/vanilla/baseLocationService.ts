@@ -1,4 +1,3 @@
-/** @packageDocumentation @internalapi @module vanilla */
 import { deregAll, isDefined, LocationServices, removeFrom, root } from '../common';
 import { Disposable } from '../interface';
 import { UIRouter } from '../router';
@@ -11,7 +10,7 @@ export abstract class BaseLocationServices implements LocationServices, Disposab
   _location: LocationLike;
   _history: HistoryLike;
 
-  _listener = evt => this._listeners.forEach(cb => cb(evt));
+  _listener = (evt) => this._listeners.forEach((cb) => cb(evt));
 
   constructor(router: UIRouter, public fireAfterUpdate: boolean) {
     this._location = root.location;
@@ -54,7 +53,7 @@ export abstract class BaseLocationServices implements LocationServices, Disposab
       this._set(null, null, url, replace);
 
       if (this.fireAfterUpdate) {
-        this._listeners.forEach(cb => cb({ url }));
+        this._listeners.forEach((cb) => cb({ url }));
       }
     }
 

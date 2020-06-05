@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module url */
 import { extend, forEach, isDefined, isFunction, isObject } from '../common';
 import { UrlMatcher } from './urlMatcher';
 import { DefType, Param, ParamType, ParamTypeDefinition } from '../params';
@@ -6,7 +5,6 @@ import { UrlMatcherCompileConfig } from './interface';
 import { StateDeclaration } from '../state';
 import { UIRouter } from '../router';
 
-/** @internalapi */
 export class ParamFactory {
   fromConfig(id: string, type: ParamType, state: StateDeclaration) {
     return new Param(id, type, DefType.CONFIG, this.router.urlService.config, state);
@@ -28,15 +26,13 @@ export class ParamFactory {
  *
  * The factory is available to ng1 services as
  * `$urlMatcherFactory` or ng1 providers as `$urlMatcherFactoryProvider`.
- *
- * @internalapi
  */
 export class UrlMatcherFactory {
-  /** @internalapi Creates a new [[Param]] for a given location (DefType) */
+  /** Creates a new [[Param]] for a given location (DefType) */
   paramFactory = new ParamFactory(this.router);
 
   // TODO: move implementations to UrlConfig (urlService.config)
-  constructor(/** @hidden */ private router: UIRouter) {
+  constructor(/** @internal */ private router: UIRouter) {
     extend(this, { UrlMatcher, Param });
   }
 
@@ -69,12 +65,12 @@ export class UrlMatcherFactory {
     let result = true;
 
     forEach(UrlMatcher.prototype, (val, name) => {
-      if (isFunction(val)) result = result && (isDefined(object[name]) && isFunction(object[name]));
+      if (isFunction(val)) result = result && isDefined(object[name]) && isFunction(object[name]);
     });
     return result;
   }
 
-  /** @hidden */
+  /** @internal */
   $get() {
     const urlConfig = this.router.urlService.config;
     urlConfig.paramTypes.enqueue = false;

@@ -30,10 +30,10 @@
  * app.run($trace => $trace.enable());
  * ```
  *
- * @packageDocumentation @publicapi @module trace
+ * @packageDocumentation
  */
 import { parse } from '../common/hof';
-import { isFunction, isNumber } from '../common/predicates';
+import { isNumber } from '../common/predicates';
 import { Transition } from '../transition/transition';
 import { ViewTuple } from '../view';
 import { ActiveUIView, ViewConfig, ViewContext } from '../view/interface';
@@ -46,21 +46,18 @@ import { TransitionHook } from '../transition/transitionHook';
 import { HookResult } from '../transition/interface';
 import { StateObject } from '../state/stateObject';
 
-/** @hidden */
 function uiViewString(uiview: ActiveUIView) {
   if (!uiview) return 'ui-view (defunct)';
   const state = uiview.creationContext ? uiview.creationContext.name || '(root)' : '(none)';
   return `[ui-view#${uiview.id} ${uiview.$type}:${uiview.fqn} (${uiview.name}@${state})]`;
 }
 
-/** @hidden */
 const viewConfigString = (viewConfig: ViewConfig) => {
   const view = viewConfig.viewDecl;
   const state = view.$context.name || '(root)';
   return `[View#${viewConfig.$id} from '${state}' state]: target ui-view: '${view.$uiViewName}@${view.$uiViewContextAnchor}'`;
 };
 
-/** @hidden */
 function normalizedCat(input: Category | string): string {
   return isNumber(input) ? Category[input] : Category[Category[input]];
 }
@@ -88,39 +85,35 @@ enum Category {
 
 export { Category };
 
-/** @hidden */
 const _tid = parse('$id');
-
-/** @hidden */
 const _rid = parse('router.$id');
 
-/** @hidden */
-const transLbl = trans => `Transition #${_tid(trans)}-${_rid(trans)}`;
+const transLbl = (trans) => `Transition #${_tid(trans)}-${_rid(trans)}`;
 
 /**
  * Prints UI-Router Transition trace information to the console.
  */
 export class Trace {
-  /** @hidden */
+  /** @internal */
   approximateDigests: number;
 
-  /** @hidden */
+  /** @internal */
   private _enabled: { [key: string]: boolean } = {};
 
-  /** @hidden */
+  /** @internal */
   constructor() {
     this.approximateDigests = 0;
   }
 
-  /** @hidden */
+  /** @internal */
   private _set(enabled: boolean, categories: Category[]) {
     if (!categories.length) {
       categories = <any>Object.keys(Category)
-        .map(k => parseInt(k, 10))
-        .filter(k => !isNaN(k))
-        .map(key => Category[key]);
+        .map((k) => parseInt(k, 10))
+        .filter((k) => !isNaN(k))
+        .map((key) => Category[key]);
     }
-    categories.map(normalizedCat).forEach(category => (this._enabled[category] = enabled));
+    categories.map(normalizedCat).forEach((category) => (this._enabled[category] = enabled));
   }
 
   /**
@@ -165,19 +158,19 @@ export class Trace {
     return !!this._enabled[normalizedCat(category)];
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceTransitionStart(trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
     safeConsole.log(`${transLbl(trans)}: Started  -> ${stringify(trans)}`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceTransitionIgnored(trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
     safeConsole.log(`${transLbl(trans)}: Ignored  <> ${stringify(trans)}`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceHookInvocation(step: TransitionHook, trans: Transition, options: any) {
     if (!this.enabled(Category.HOOK)) return;
     const event = parse('traceData.hookType')(options) || 'internal',
@@ -186,19 +179,19 @@ export class Trace {
     safeConsole.log(`${transLbl(trans)}:   Hook -> ${event} context: ${context}, ${maxLength(200, name)}`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceHookResult(hookResult: HookResult, trans: Transition, transitionOptions: any) {
     if (!this.enabled(Category.HOOK)) return;
     safeConsole.log(`${transLbl(trans)}:   <- Hook returned: ${maxLength(200, stringify(hookResult))}`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceResolvePath(path: PathNode[], when: PolicyWhen, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
     safeConsole.log(`${transLbl(trans)}:         Resolving ${path} (${when})`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceResolvableResolved(resolvable: Resolvable, trans?: Transition) {
     if (!this.enabled(Category.RESOLVE)) return;
     safeConsole.log(
@@ -206,37 +199,37 @@ export class Trace {
     );
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceError(reason: any, trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
     safeConsole.log(`${transLbl(trans)}: <- Rejected ${stringify(trans)}, reason: ${reason}`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceSuccess(finalState: StateObject, trans: Transition) {
     if (!this.enabled(Category.TRANSITION)) return;
     safeConsole.log(`${transLbl(trans)}: <- Success  ${stringify(trans)}, final state: ${finalState.name}`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceUIViewEvent(event: string, viewData: ActiveUIView, extra = '') {
     if (!this.enabled(Category.UIVIEW)) return;
     safeConsole.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceUIViewConfigUpdated(viewData: ActiveUIView, context: ViewContext) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent('Updating', viewData, ` with ViewConfig from context='${context}'`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceUIViewFill(viewData: ActiveUIView, html: string) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent('Fill', viewData, ` with: ${maxLength(200, html)}`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceViewSync(pairs: ViewTuple[]) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
     const uivheader = 'uiview component fqn';
@@ -252,13 +245,13 @@ export class Trace {
     safeConsole.table(mapping);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceViewServiceEvent(event: string, viewConfig: ViewConfig) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
     safeConsole.log(`VIEWCONFIG: ${event} ${viewConfigString(viewConfig)}`);
   }
 
-  /** @internalapi called by ui-router code */
+  /** @internal called by ui-router code */
   traceViewServiceUIViewEvent(event: string, viewData: ActiveUIView) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
     safeConsole.log(`VIEWCONFIG: ${event} ${uiViewString(viewData)}`);

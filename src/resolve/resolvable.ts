@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module resolve */
 import { extend, identity } from '../common/common';
 import { services } from '../common/coreservices';
 import { trace } from '../common/trace';
@@ -110,9 +109,9 @@ export class Resolvable implements ResolvableLiteral {
 
     // Gets all dependencies from ResolveContext and wait for them to be resolved
     const getResolvableDependencies = () =>
-      $q.all(resolveContext.getDependencies(this).map(resolvable => resolvable.get(resolveContext, trans))) as Promise<
-        any[]
-      >;
+      $q.all(
+        resolveContext.getDependencies(this).map((resolvable) => resolvable.get(resolveContext, trans))
+      ) as Promise<any[]>;
 
     // Invokes the resolve function passing the resolved dependencies as arguments
     const invokeResolveFn = (resolvedDeps: any[]) => this.resolveFn.apply(null, resolvedDeps);

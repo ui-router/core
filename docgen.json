@@ -1,0 +1,12 @@
+{
+  "publishDir": "_core_docs",
+  "include": [],
+  "tsconfig": {
+    "compilerOptions": {}
+  },
+  "navigation": {
+    "": ["UIRouter"],
+    "Services": ["StateService", "StateRegistry", "TransitionService", "UrlService", "UrlConfig", "UrlRules"],
+    "Other": ["Transition", "Trace"]
+  }
+}

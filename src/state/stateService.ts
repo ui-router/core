@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module state */
 import {
   createProxyFunctions,
   defaults,
@@ -38,19 +37,18 @@ import { StateParams } from '../params/stateParams';
 export type OnInvalidCallback = (toState?: TargetState, fromState?: TargetState, injector?: UIInjector) => HookResult;
 
 /**
- * Provides state related service functions
+ * Provides services related to ui-router states.
  *
- * This class provides services related to ui-router states.
- * An instance of this class is located on the global [[UIRouter]] object.
+ * This API is located at `router.stateService` ([[UIRouter.stateService]])
  */
 export class StateService {
-  /** @internalapi */
+  /** @internal */
   invalidCallbacks: OnInvalidCallback[] = [];
 
   /**
    * The [[Transition]] currently in progress (or null)
    *
-   * This is a passthrough through to [[UIRouterGlobals.transition]]
+   * @deprecated This is a passthrough through to [[UIRouterGlobals.transition]]
    */
   get transition() {
     return this.router.globals.transition;
@@ -58,7 +56,7 @@ export class StateService {
   /**
    * The latest successful state parameters
    *
-   * This is a passthrough through to [[UIRouterGlobals.params]]
+   * @deprecated This is a passthrough through to [[UIRouterGlobals.params]]
    */
   get params(): StateParams {
     return this.router.globals.params;
@@ -66,28 +64,28 @@ export class StateService {
   /**
    * The current [[StateDeclaration]]
    *
-   * This is a passthrough through to [[UIRouterGlobals.current]]
+   * @deprecated This is a passthrough through to [[UIRouterGlobals.current]]
    */
   get current() {
     return this.router.globals.current;
   }
   /**
-   * The current [[StateObject]]
+   * The current [[StateObject]] (an internal API)
    *
-   * This is a passthrough through to [[UIRouterGlobals.$current]]
+   * @deprecated This is a passthrough through to [[UIRouterGlobals.$current]]
    */
   get $current() {
     return this.router.globals.$current;
   }
 
-  /** @internalapi */
-  constructor(/** @hidden */ private router: UIRouter) {
+  /** @internal */
+  constructor(/** @internal */ private router: UIRouter) {
     const getters = ['current', '$current', 'params', 'transition'];
     const boundFns = Object.keys(StateService.prototype).filter(not(inArray(getters)));
     createProxyFunctions(val(StateService.prototype), this, val(this), boundFns);
   }
 
-  /** @internalapi */
+  /** @internal */
   dispose() {
     this.defaultErrorHandler(noop);
     this.invalidCallbacks = [];
@@ -102,7 +100,7 @@ export class StateService {
    *
    * If a callback returns an TargetState, then it is used as arguments to $state.transitionTo() and the result returned.
    *
-   * @internalapi
+   * @internal
    */
   private _handleInvalidTargetState(fromPath: PathNode[], toState: TargetState) {
     const fromState = PathUtils.makeTargetState(this.router.stateRegistry, fromPath);
@@ -137,7 +135,7 @@ export class StateService {
       if (nextCallback === undefined) return Rejection.invalid(toState.error()).toPromise();
 
       const callbackResult = services.$q.when(nextCallback(toState, fromState, injector));
-      return callbackResult.then(checkForRedirect).then(result => result || invokeNextCallback());
+      return callbackResult.then(checkForRedirect).then((result) => result || invokeNextCallback());
     }
 
     return invokeNextCallback();
@@ -294,6 +292,7 @@ export class StateService {
     return new TargetState(this.router.stateRegistry, identifier, params, options);
   }
 
+  /** @internal */
   private getCurrentPath(): PathNode[] {
     const globals = this.router.globals;
     const latestSuccess: Transition = globals.successfulTransitions.peekTail();
@@ -339,7 +338,11 @@ export class StateService {
     if (!ref.valid()) return <TransitionPromise>silentRejection(ref.error());
 
     if (options.supercede === false && getCurrent()) {
-      return <TransitionPromise>Rejection.ignored('Another transition is in progress and supercede has been set to false in TransitionOptions for the transition. So the transition was ignored in favour of the existing one in progress.').toPromise();
+      return <TransitionPromise>(
+        Rejection.ignored(
+          'Another transition is in progress and supercede has been set to false in TransitionOptions for the transition. So the transition was ignored in favour of the existing one in progress.'
+        ).toPromise()
+      );
     }
 
     /**
@@ -528,8 +531,8 @@ export class StateService {
     return this.router.urlRouter.href(nav.url, params, { absolute: options.absolute });
   }
 
-  /** @hidden */
-  private _defaultErrorHandler: ((_error: any) => void) = function $defaultErrorHandler($error$) {
+  /** @internal */
+  private _defaultErrorHandler: (_error: any) => void = function $defaultErrorHandler($error$) {
     if ($error$ instanceof Error && $error$.stack) {
       console.error($error$);
       console.error($error$.stack);
@@ -579,6 +582,7 @@ export class StateService {
    * @param base When `stateOrName` is a relative state reference (such as `.bar.baz`), the state will be retrieved relative to this state.
    *
    * @returns a [[StateDeclaration]] object (or array of all registered [[StateDeclaration]] objects.)
+   * @deprecated use [[StateRegistry.get]]
    */
   get(stateOrName: StateOrName, base: StateOrName): StateDeclaration;
   get(stateOrName: StateOrName): StateDeclaration;

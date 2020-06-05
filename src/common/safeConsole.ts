@@ -1,6 +1,6 @@
 /**
  * workaround for missing console object in IE9 when dev tools haven't been opened o_O
- * @packageDocumentation @module core
+ * @packageDocumentation
  */
 /* tslint:disable:no-console */
 import { noop } from './common';

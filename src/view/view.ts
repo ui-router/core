@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module view */
 import { equals, applyPairs, removeFrom, TypedMap, inArray, find } from '../common/common';
 import { curry, prop } from '../common/hof';
 import { isString, isArray } from '../common/predicates';
@@ -47,17 +46,17 @@ export interface ViewSyncListener {
  *
  */
 export class ViewService {
-  /** @hidden */ private _uiViews: ActiveUIView[] = [];
-  /** @hidden */ private _viewConfigs: ViewConfig[] = [];
-  /** @hidden */ private _rootContext: ViewContext;
-  /** @hidden */ private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
-  /** @hidden */ private _listeners: ViewSyncListener[] = [];
+  /** @internal */ private _uiViews: ActiveUIView[] = [];
+  /** @internal */ private _viewConfigs: ViewConfig[] = [];
+  /** @internal */ private _rootContext: ViewContext;
+  /** @internal */ private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
+  /** @internal */ private _listeners: ViewSyncListener[] = [];
 
-  /** @internalapi */
+  /** @internal */
   public _pluginapi: ViewServicePluginAPI = {
     _rootViewContext: this._rootViewContext.bind(this),
     _viewConfigFactory: this._viewConfigFactory.bind(this),
-    _registeredUIView: (id: string) => find(this._uiViews, view => `${this.router.$id}.${view.id}` === id),
+    _registeredUIView: (id: string) => find(this._uiViews, (view) => `${this.router.$id}.${view.id}` === id),
     _registeredUIViews: () => this._uiViews,
     _activeViewConfigs: () => this._viewConfigs,
     _onSync: (listener: ViewSyncListener) => {
@@ -121,7 +120,7 @@ export class ViewService {
    * - And the remaining segments [ "$default", "bar" ].join("."_ of the ViewConfig's target name match
    *   the tail of the ui-view's fqn "default.bar"
    *
-   * @internalapi
+   * @internal
    */
   static matches = (uiViewsByFqn: TypedMap<ActiveUIView>, uiView: ActiveUIView) => (viewConfig: ViewConfig) => {
     // Don't supply an ng1 ui-view with an ng2 ViewConfig, etc
@@ -189,14 +188,14 @@ export class ViewService {
     return { uiViewName, uiViewContextAnchor };
   }
 
-  /** @hidden */
-  constructor(/** @hidden */ private router: UIRouter) {}
+  /** @internal */
+  constructor(/** @internal */ private router: UIRouter) {}
 
-  /** @hidden */
+  /** @internal */
   private _rootViewContext(context?: ViewContext): ViewContext {
     return (this._rootContext = context || this._rootContext);
   }
-  /** @hidden */
+  /** @internal */
   private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
     this._viewConfigFactories[viewType] = factory;
   }
@@ -227,7 +226,7 @@ export class ViewService {
   }
 
   sync() {
-    const uiViewsByFqn: TypedMap<ActiveUIView> = this._uiViews.map(uiv => [uiv.fqn, uiv]).reduce(applyPairs, <any>{});
+    const uiViewsByFqn: TypedMap<ActiveUIView> = this._uiViews.map((uiv) => [uiv.fqn, uiv]).reduce(applyPairs, <any>{});
 
     // Return a weighted depth value for a uiView.
     // The depth is the nesting depth of ui-views (based on FQN; times 10,000)
@@ -267,15 +266,15 @@ export class ViewService {
 
     // Sort views by FQN and state depth. Process uiviews nearest the root first.
     const uiViewTuples = this._uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair);
-    const matchedViewConfigs = uiViewTuples.map(tuple => tuple.viewConfig);
+    const matchedViewConfigs = uiViewTuples.map((tuple) => tuple.viewConfig);
     const unmatchedConfigTuples = this._viewConfigs
-      .filter(config => !inArray(matchedViewConfigs, config))
-      .map(viewConfig => ({ uiView: undefined, viewConfig }));
+      .filter((config) => !inArray(matchedViewConfigs, config))
+      .map((viewConfig) => ({ uiView: undefined, viewConfig }));
 
     uiViewTuples.forEach(configureUIView);
 
     const allTuples: ViewTuple[] = uiViewTuples.concat(unmatchedConfigTuples);
-    this._listeners.forEach(cb => cb(allTuples));
+    this._listeners.forEach((cb) => cb(allTuples));
     trace.traceViewSync(allTuples);
   }
 

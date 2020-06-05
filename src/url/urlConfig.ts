@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module url */
 import { Disposable } from '../interface';
 import { UIRouter } from '../router';
 import { ParamTypeDefinition, ParamTypes } from '../params';
@@ -15,16 +14,16 @@ import { isDefined, isString } from '../common';
  * This information can be used to build absolute URLs, such as
  * `https://example.com:443/basepath/state/substate?param1=a#hashvalue`;
  *
- * This API is a property of [[UrlService]] as [[UrlService.config]].
+ * This API is found at `router.urlService.config` (see: [[UIRouter.urlService]], [[URLService.config]])
  */
 export class UrlConfig implements Disposable {
-  /** @hidden */ paramTypes = new ParamTypes();
-  /** @hidden */ _isCaseInsensitive = false;
-  /** @hidden */ _isStrictMode = true;
-  /** @hidden */ _defaultSquashPolicy: boolean | string = false;
+  /** @internal */ paramTypes = new ParamTypes();
+  /** @internal */ _isCaseInsensitive = false;
+  /** @internal */ _isStrictMode = true;
+  /** @internal */ _defaultSquashPolicy: boolean | string = false;
 
-  /** @hidden */ constructor(/** @hidden */ private router: UIRouter) {}
-  /** @internalapi */ public dispose = () => this.paramTypes.dispose();
+  /** @internal */ constructor(/** @internal */ private router: UIRouter) {}
+  /** @internal */ public dispose = () => this.paramTypes.dispose();
 
   // Delegate these calls to the current LocationConfig implementation
 

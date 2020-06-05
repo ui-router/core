@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module core */
 /**
  * Matches state names using glob-like pattern strings.
  *
@@ -46,6 +45,7 @@
  * | `'**.X'`    | `'X'` , `'A.X'` , `'Z.Y.X'`                   | `'A'` , `'A.login.Z'`             |
  * | `'A.**.X'`  | `'A.X'` , `'A.B.X'` , `'A.B.C.X'`             | `'A'` , `'A.B.C'`                 |
  *
+ * @packageDocumentation
  */
 export class Glob {
   text: string;
@@ -68,7 +68,7 @@ export class Glob {
 
     const regexpString = this.text
       .split('.')
-      .map(seg => {
+      .map((seg) => {
         if (seg === '**') return '(?:|(?:\\.[^.]*)*)';
         if (seg === '*') return '\\.[^.]*';
         return '\\.' + seg;

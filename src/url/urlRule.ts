@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module url */
 import { StateDeclaration } from '../state';
 import { UrlMatcher } from './urlMatcher';
 import { isString, isDefined, isFunction } from '../common/predicates';
@@ -27,7 +26,6 @@ import {
  * - [[UrlMatcher]]
  * - `RegExp`
  * - [[StateObject]]
- * @internalapi
  */
 export class UrlRuleFactory {
   static isUrlRule = (obj) => obj && ['type', 'match', 'handler'].every((key) => isDefined(obj[key]));
@@ -208,7 +206,7 @@ export class UrlRuleFactory {
  * A base rule which calls `match`
  *
  * The value from the `match` function is passed through to the `handler`.
- * @internalapi
+ * @internal
  */
 export class BaseUrlRule implements UrlRule {
   $id: number;
