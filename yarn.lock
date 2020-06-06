@@ -96,10 +96,10 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
 
-"@uirouter/publish-scripts@^2.4.1":
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.4.1.tgz#3930672fe491119d147a0ffbda569c6b3156daa1"
-  integrity sha512-njgaHEY6plk3KXaY8OhSYhWXXKbAUbYTkzKw2oOIDjCoDJAmstzs90xxj3J/r8jo9bzLXaxOPdLyxxmby8E5eQ==
+"@uirouter/publish-scripts@^2.4.2":
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.4.2.tgz#dbbf3cc5e9c822f9c5d6bb35812495dac33af4f8"
+  integrity sha512-a01m+I2sOLymS9iztkPN83cCKeiLXv8mW8vX/GHEOWp5welJIyHCwDv2vO1gDpAVCX5JT8rkqpQOEWl4yq8fmg==
   dependencies:
     check-peer-dependencies "^2.0.2"
     conventional-changelog "^3.1.21"
