@@ -3,5 +3,6 @@
   "name": "@uirouter/core",
   "out": "_doc",
   "stripInternal": true,
-  "excludePrivate": true
+  "excludePrivate": true,
+  "excludeNotExported": true
 }
