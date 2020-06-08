@@ -97,9 +97,9 @@
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
 
 "@uirouter/publish-scripts@^2.4.2":
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.4.2.tgz#dbbf3cc5e9c822f9c5d6bb35812495dac33af4f8"
-  integrity sha512-a01m+I2sOLymS9iztkPN83cCKeiLXv8mW8vX/GHEOWp5welJIyHCwDv2vO1gDpAVCX5JT8rkqpQOEWl4yq8fmg==
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.4.3.tgz#3e2a54cc8840e81a26dd047b9350b8666e5efcc3"
+  integrity sha512-I66r7ffYDdpm5lt3noKVZ9GAit1qat081VTZ4qfQqraGn9TY/oMhT4VGbFNhHcF8cCuzoAnaZwqdz+suruRpeg==
   dependencies:
     check-peer-dependencies "^2.0.2"
     conventional-changelog "^3.1.21"
@@ -4058,16 +4058,7 @@ shell-quote@^1.6.1:
     array-reduce "~0.0.0"
     jsonify "~0.0.0"
 
-shelljs@^0.8.1, shelljs@^0.8.3:
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.3.tgz#a7f3319520ebf09ee81275b2368adb286659b097"
-  integrity sha512-fc0BKlAWiLpwZljmOvAOTE/gXawtCoNrP5oaY7KIaQbbyHeQVg01pSEuEGvGh3HEdBU4baCD7wQBwADmM/7f7A==
-  dependencies:
-    glob "^7.0.0"
-    interpret "^1.0.0"
-    rechoir "^0.6.2"
-
-shelljs@^0.8.4:
+shelljs@^0.8.1, shelljs@^0.8.3, shelljs@^0.8.4:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.4.tgz#de7684feeb767f8716b326078a8a00875890e3c2"
   integrity sha512-7gk3UZ9kOfPLIAbslLzyWeGiEqx9e3rxwZM0KE6EL8GlGwjym9Mrlx5/p33bWTu9YG6vcS4MBxYZDHYr5lr8BQ==
