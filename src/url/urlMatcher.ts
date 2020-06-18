@@ -408,7 +408,7 @@ export class UrlMatcher {
       }
       if (value && param.array === true) value = decodePathArray(value);
       if (isDefined(value)) {
-        if (!param.type.raw) {
+        if (!param.type.raw && !isArray(value)) {
           value = decodeURIComponent(value);
         }
 
@@ -416,16 +416,15 @@ export class UrlMatcher {
       }
       values[param.id] = param.value(value);
     }
-    searchParams.forEach((param) => {
+    searchParams.forEach((param: Param) => {
       let value = search[param.id];
       for (let j = 0; j < param.replace.length; j++) {
         if (param.replace[j].from === value) value = param.replace[j].to;
       }
       if (isDefined(value)) {
-        if (!param.type.raw) {
+        if (!param.type.raw && !isArray(value)) {
           value = decodeURIComponent(value);
         }
-
         value = param.type.decode(value);
       }
       values[param.id] = param.value(value);
