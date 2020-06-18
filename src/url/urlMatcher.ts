@@ -407,7 +407,13 @@ export class UrlMatcher {
         if (param.replace[j].from === value) value = param.replace[j].to;
       }
       if (value && param.array === true) value = decodePathArray(value);
-      if (isDefined(value)) value = param.type.decode(value);
+      if (isDefined(value)) {
+        if (!param.type.raw) {
+          value = decodeURIComponent(value);
+        }
+
+        value = param.type.decode(value);
+      }
       values[param.id] = param.value(value);
     }
     searchParams.forEach((param) => {
@@ -415,7 +421,13 @@ export class UrlMatcher {
       for (let j = 0; j < param.replace.length; j++) {
         if (param.replace[j].from === value) value = param.replace[j].to;
       }
-      if (isDefined(value)) value = param.type.decode(value);
+      if (isDefined(value)) {
+        if (!param.type.raw) {
+          value = decodeURIComponent(value);
+        }
+
+        value = param.type.decode(value);
+      }
       values[param.id] = param.value(value);
     });
 
