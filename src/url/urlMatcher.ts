@@ -338,6 +338,18 @@ export class UrlMatcher {
     return this.pattern;
   }
 
+  private _getDecodedParamValue(value: any, param: Param): any {
+    if (isDefined(value)) {
+      if (this.config.decodeParams && !param.type.raw && !isArray(value)) {
+        value = decodeURIComponent(value);
+      }
+
+      value = param.type.decode(value);
+    }
+
+    return param.value(value);
+  }
+
   /**
    * Tests the specified url/path against this matcher.
    *
@@ -406,28 +418,19 @@ export class UrlMatcher {
       for (let j = 0; j < param.replace.length; j++) {
         if (param.replace[j].from === value) value = param.replace[j].to;
       }
-      if (value && param.array === true) value = decodePathArray(value);
-      if (isDefined(value)) {
-        if (!param.type.raw && !isArray(value)) {
-          value = decodeURIComponent(value);
-        }
 
-        value = param.type.decode(value);
-      }
-      values[param.id] = param.value(value);
+      if (value && param.array === true) value = decodePathArray(value);
+
+      values[param.id] = this._getDecodedParamValue(value, param);
     }
     searchParams.forEach((param: Param) => {
       let value = search[param.id];
+
       for (let j = 0; j < param.replace.length; j++) {
         if (param.replace[j].from === value) value = param.replace[j].to;
       }
-      if (isDefined(value)) {
-        if (!param.type.raw && !isArray(value)) {
-          value = decodeURIComponent(value);
-        }
-        value = param.type.decode(value);
-      }
-      values[param.id] = param.value(value);
+
+      values[param.id] = this._getDecodedParamValue(value, param);
     });
 
     if (hash) values['#'] = hash;

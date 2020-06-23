@@ -21,6 +21,7 @@ export interface UrlMatcherCompileConfig {
   state?: StateDeclaration;
   strict?: boolean;
   caseInsensitive?: boolean;
+  decodeParams?: boolean;
 }
 
 /** @deprecated use [[UrlConfig]] */
