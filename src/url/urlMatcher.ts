@@ -53,6 +53,7 @@ const defaultConfig: UrlMatcherCompileConfig = {
   state: { params: {} },
   strict: true,
   caseInsensitive: true,
+  decodeParams: true,
 };
 
 /**

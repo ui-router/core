@@ -18,6 +18,7 @@ import { isDefined, isString } from '../common';
  */
 export class UrlConfig implements Disposable {
   /** @internal */ paramTypes = new ParamTypes();
+  /** @internal */ _decodeParams = true;
   /** @internal */ _isCaseInsensitive = false;
   /** @internal */ _isStrictMode = true;
   /** @internal */ _defaultSquashPolicy: boolean | string = false;
