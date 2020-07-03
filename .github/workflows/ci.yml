@@ -16,6 +16,7 @@ jobs:
     name: yarn ${{ matrix.yarncmd }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         yarncmd: ['test', 'docs']
     steps:
@@ -29,6 +30,7 @@ jobs:
     name: Test downstream ${{ matrix.group }} projects
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         group: ['angular', 'angularjs', 'react', 'other']
     steps:
