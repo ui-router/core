@@ -21,6 +21,7 @@ export interface UrlMatcherCompileConfig {
   state?: StateDeclaration;
   strict?: boolean;
   caseInsensitive?: boolean;
+  // If params are pre-decoded, set to false to avoid double decoding
   decodeParams?: boolean;
 }
 
