@@ -30,11 +30,12 @@ export class ParamFactory {
 export class UrlMatcherFactory {
   /** Creates a new [[Param]] for a given location (DefType) */
   paramFactory = new ParamFactory(this.router);
+  // TODO: Check if removal of this will break anything, then remove these
+  UrlMatcher: typeof UrlMatcher = UrlMatcher;
+  Param: typeof Param = Param;
 
   // TODO: move implementations to UrlConfig (urlService.config)
-  constructor(/** @internal */ private router: UIRouter) {
-    extend(this, { UrlMatcher, Param });
-  }
+  constructor(/** @internal */ private router: UIRouter) {}
 
   /**
    * Creates a [[UrlMatcher]] for the specified pattern.
@@ -48,7 +49,11 @@ export class UrlMatcherFactory {
     // backward-compatible support for config.params -> config.state.params
     const params = config && !config.state && (config as any).params;
     config = params ? { state: { params }, ...config } : config;
-    const globalConfig = { strict: urlConfig._isStrictMode, caseInsensitive: urlConfig._isCaseInsensitive };
+    const globalConfig: UrlMatcherCompileConfig = {
+      strict: urlConfig._isStrictMode,
+      caseInsensitive: urlConfig._isCaseInsensitive,
+      decodeParams: urlConfig._decodeParams,
+    };
     return new UrlMatcher(pattern, urlConfig.paramTypes, this.paramFactory, extend(globalConfig, config));
   }
 
