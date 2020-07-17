@@ -1,7 +1,7 @@
 {
   "name": "@uirouter/core",
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
-  "version": "6.0.5",
+  "version": "6.0.6",
   "scripts": {
     "clean": "shx rm -rf lib lib-esm _bundles .cache _doc",
     "compile": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && shx cp src/*.json lib",

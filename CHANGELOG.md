@@ -1,3 +1,11 @@
+## 6.0.6 (2020-07-17)
+[Compare `@uirouter/core` versions 6.0.5 and 6.0.6](https://github.com/ui-router/core/compare/6.0.5...6.0.6)
+
+### Bug Fixes
+
+* **params:** Bi-directionally en/decode path and search params. Fixes https://github.com/ui-router/angular/issues/340 ([#618](https://github.com/ui-router/core/issues/618)) ([89e99cd](https://github.com/ui-router/core/commit/89e99cd))
+
+
 ## 6.0.5 (2020-04-29)
 [Compare `@uirouter/core` versions 6.0.4 and 6.0.5](https://github.com/ui-router/core/compare/6.0.4...6.0.5)
 
