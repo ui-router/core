@@ -23,6 +23,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install Dependencies
         run: yarn install --pure-lockfile
+      - name: Check Peer Dependencies
+        run: npx check-peer-dependencies
       - name: Run Tests
         run: yarn ${{ matrix.yarncmd }}
 
