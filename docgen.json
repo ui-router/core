@@ -2,7 +2,11 @@
   "publishDir": "_core_docs",
   "include": [],
   "tsconfig": {
-    "compilerOptions": {}
+    "files": ["./project/src/index.ts", "./project/src/vanilla.ts"],
+    "compilerOptions": {
+      "rootDir": "./project/src",
+      "baseDir": "./project/src"
+    }
   },
   "navigation": {
     "": ["UIRouter"],
