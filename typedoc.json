@@ -1,7 +1,7 @@
 {
   "readme": "README.md",
   "name": "@uirouter/core",
-  "out": "project/_doc",
+  "out": "_doc",
   "stripInternal": true,
   "excludePrivate": true,
   "excludeNotExported": true

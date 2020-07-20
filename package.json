@@ -99,5 +99,14 @@
     "hooks": {
       "pre-commit": "pretty-quick --staged"
     }
+  },
+  "docgen": {
+    "publishDir": "_core_docs",
+    "include": [],
+    "navigation": {
+      "": ["UIRouter"],
+      "Services": ["StateService", "StateRegistry", "TransitionService", "UrlService", "UrlConfig", "UrlRules"],
+      "Other": ["Transition", "Trace"]
+    }
   }
 }
