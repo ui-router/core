@@ -300,15 +300,10 @@ export class ViewService {
         : { command: 'RENDER_INTEROP_DIV', giveDiv };
 
       function hasChanged(a: UIViewPortalRenderCommand, b: UIViewPortalRenderCommand) {
-        if (a.command !== b.command) {
-          return true;
+        if (a.command === 'RENDER_ROUTED_VIEW' && b.command === 'RENDER_ROUTED_VIEW') {
+          return a.routedViewConfig !== b.routedViewConfig;
         }
-        if (a.command === 'RENDER_DEFAULT_CONTENT' || a.command === 'RENDER_INTEROP_DIV') {
-          return false;
-        }
-        return (
-          a.command === 'RENDER_ROUTED_VIEW' && b.command === a.command && a.routedViewConfig !== b.routedViewConfig
-        );
+        return a.command !== b.command;
       }
 
       // Don't do anything if the uiview portal is already configured correctly
