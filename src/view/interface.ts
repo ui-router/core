@@ -62,6 +62,7 @@ export type UIViewPortalRenderCommand =
 export declare type PortalContentType = 'DEFAULT_CONTENT' | 'ROUTED_COMPONENT' | 'INTEROP_DIV';
 export declare type RenderContentCallback = RegisteredUIViewPortal['renderContentIntoUIViewPortal'];
 
+/** @deprecated @internalapi */
 export interface ActiveUIView {
   /** type of framework, e.g., "ng1" or "ng2" */
   $type: string;
