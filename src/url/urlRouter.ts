@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module url */
 import { stripLastPathElement } from '../common';
 import { UrlMatcher } from './urlMatcher';
 import { RawParams } from '../params';
@@ -7,7 +6,6 @@ import { UrlRuleFactory } from './urlRule';
 import { MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn } from './interface';
 import { TargetState, TargetStateDef } from '../state';
 
-/** @hidden */
 function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHref: string): string {
   if (baseHref === '/') return url;
   if (isHtml5) return stripLastPathElement(baseHref) + url;
@@ -22,23 +20,18 @@ function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHr
  * This class is now considered to be an internal API
  * Use the [[UrlService]] instead.
  * For configuring URL rules, use the [[UrlRules]] which can be found as [[UrlService.rules]].
- *
- * @internalapi
  */
 export class UrlRouter {
   /** used to create [[UrlRule]] objects for common cases */
   public urlRuleFactory: UrlRuleFactory;
-  /** @hidden */ private location: string;
+  /** @internal */ private location: string;
 
-  /** @hidden */
-  constructor(/** @hidden */ private router: UIRouter) {
+  /** @internal */
+  constructor(/** @internal */ private router: UIRouter) {
     this.urlRuleFactory = new UrlRuleFactory(router);
   }
 
-  /**
-   * Internal API.
-   * @internalapi
-   */
+  /** Internal API. */
   update(read?: boolean) {
     const $url = this.router.locationService;
     if (read) {
@@ -55,7 +48,7 @@ export class UrlRouter {
    *
    * Pushes a new location to the browser history.
    *
-   * @internalapi
+   * @internal
    * @param urlMatcher
    * @param params
    * @param options

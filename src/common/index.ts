@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module common */
 export * from './common';
 export * from './coreservices';
 export * from './glob';

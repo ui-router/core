@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module transition */
 import { StateDeclaration } from '../state/interface';
 import { PredicateBinary } from '../common/common';
 
@@ -24,7 +23,7 @@ export interface TransitionOptions {
    *
    * @default `true`
    */
-  location?: boolean | string;
+  location?: boolean | 'replace';
 
   /**
    * When transitioning to relative path (e.g '`^`'), this option defines which state to be relative from.
@@ -85,19 +84,18 @@ export interface TransitionOptions {
    * @default `true`
    */
   supercede?: boolean;
-  /** @internalapi */
+  /** @internal */
   reloadState?: StateObject;
-  /** @internalapi
+  /** @internal
    * If this transition is a redirect, this property should be the original Transition (which was redirected to this one)
    */
   redirectedFrom?: Transition;
-  /** @internalapi */
+  /** @internal */
   current?: () => Transition;
-  /** @internalapi */
+  /** @internal */
   source?: 'sref' | 'url' | 'redirect' | 'otherwise' | 'unknown';
 }
 
-/** @internalapi */
 export interface TransitionHookOptions {
   current?: () => Transition; // path?
   transition?: Transition;
@@ -299,7 +297,7 @@ export interface HookRegOptions {
  * Note: the Transition object only allows hooks to be registered before the Transition is started.
  */
 export interface IHookRegistry {
-  /** @hidden place to store the hooks */
+  /** @internal place to store the hooks */
   _registeredHooks: { [key: string]: RegisteredHook[] };
 
   /**
@@ -819,12 +817,12 @@ export interface IMatchingNodes {
   entering: PathNode[];
 }
 
-/** @hidden */
+/** @internal */
 export interface RegisteredHooks {
   [key: string]: RegisteredHook[];
 }
 
-/** @hidden */
+/** @internal */
 export interface PathTypes {
   [key: string]: PathType;
 
@@ -835,7 +833,7 @@ export interface PathTypes {
   entering: PathType;
 }
 
-/** @hidden */
+/** @internal */
 export interface PathType {
   name: string;
   scope: TransitionHookScope;

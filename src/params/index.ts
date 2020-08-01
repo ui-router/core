@@ -3,7 +3,7 @@
  *
  * See [[ParamDeclaration]]
  *
- * @packageDocumentation @preferred @publicapi @module params
+ * @packageDocumentation @preferred
  */
 export * from './interface';
 export * from './param';

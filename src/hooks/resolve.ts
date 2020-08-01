@@ -1,4 +1,3 @@
-/** @packageDocumentation @internalapi @module hooks */
 import { noop } from '../common/common';
 import { Transition } from '../transition/transition';
 import { ResolveContext } from '../resolve/resolveContext';
@@ -34,10 +33,7 @@ export const registerEagerResolvePath = (transitionService: TransitionService) =
  * See [[StateDeclaration.resolve]]
  */
 const lazyResolveState: TransitionStateHookFn = (trans: Transition, state: StateDeclaration) =>
-  new ResolveContext(trans.treeChanges().to)
-    .subContext(state.$$state())
-    .resolvePath('LAZY', trans)
-    .then(noop);
+  new ResolveContext(trans.treeChanges().to).subContext(state.$$state()).resolvePath('LAZY', trans).then(noop);
 
 export const registerLazyResolveState = (transitionService: TransitionService) =>
   transitionService.onEnter({ entering: val(true) }, lazyResolveState, { priority: RESOLVE_HOOK_PRIORITY });

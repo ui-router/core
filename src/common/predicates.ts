@@ -1,9 +1,10 @@
-/** Predicates
+/**
+ * Predicates
  *
  * These predicates return true/false based on the input.
  * Although these functions are exported, they are subject to change without notice.
  *
- * @packageDocumentation @module common_predicates
+ * @packageDocumentation
  */
 import { and, not, pipe, prop, or } from './hof';
 import { Predicate } from './common'; // has or is using
@@ -43,10 +44,4 @@ export function isInjectable(val: any) {
  *
  * It is probably a Promise if it's an object, and it has a `then` property which is a Function
  */
-export const isPromise = <(x: any) => x is Promise<any>>and(
-  isObject,
-  pipe(
-    prop('then'),
-    isFunction
-  )
-);
+export const isPromise = <(x: any) => x is Promise<any>>and(isObject, pipe(prop('then'), isFunction));

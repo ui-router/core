@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module state */
 import { StateDeclaration, _ViewDeclaration, _StateDeclaration, LazyLoadResult } from './interface';
 import { defaults, values, find, inherit } from '../common/common';
 import { propEq } from '../common/hof';
@@ -95,7 +94,7 @@ export class StateObject {
     | (($transition$: Transition) => TargetState)
     | { state: string | StateDeclaration; params: { [key: string]: any } };
 
-  /** @hidden */
+  /** @internal */
   __stateObjectCache: {
     /** Might be null */
     nameGlob?: Glob;

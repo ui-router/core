@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module url */
 import { extend, forEach, isDefined, isFunction, isObject } from '../common';
 import { UrlMatcher } from './urlMatcher';
 import { DefType, Param, ParamType, ParamTypeDefinition } from '../params';
@@ -6,7 +5,6 @@ import { UrlMatcherCompileConfig } from './interface';
 import { StateDeclaration } from '../state';
 import { UIRouter } from '../router';
 
-/** @internalapi */
 export class ParamFactory {
   fromConfig(id: string, type: ParamType, state: StateDeclaration) {
     return new Param(id, type, DefType.CONFIG, this.router.urlService.config, state);
@@ -28,17 +26,16 @@ export class ParamFactory {
  *
  * The factory is available to ng1 services as
  * `$urlMatcherFactory` or ng1 providers as `$urlMatcherFactoryProvider`.
- *
- * @internalapi
  */
 export class UrlMatcherFactory {
-  /** @internalapi Creates a new [[Param]] for a given location (DefType) */
+  /** Creates a new [[Param]] for a given location (DefType) */
   paramFactory = new ParamFactory(this.router);
+  // TODO: Check if removal of this will break anything, then remove these
+  UrlMatcher: typeof UrlMatcher = UrlMatcher;
+  Param: typeof Param = Param;
 
   // TODO: move implementations to UrlConfig (urlService.config)
-  constructor(/** @hidden */ private router: UIRouter) {
-    extend(this, { UrlMatcher, Param });
-  }
+  constructor(/** @internal */ private router: UIRouter) {}
 
   /**
    * Creates a [[UrlMatcher]] for the specified pattern.
@@ -52,7 +49,11 @@ export class UrlMatcherFactory {
     // backward-compatible support for config.params -> config.state.params
     const params = config && !config.state && (config as any).params;
     config = params ? { state: { params }, ...config } : config;
-    const globalConfig = { strict: urlConfig._isStrictMode, caseInsensitive: urlConfig._isCaseInsensitive };
+    const globalConfig: UrlMatcherCompileConfig = {
+      strict: urlConfig._isStrictMode,
+      caseInsensitive: urlConfig._isCaseInsensitive,
+      decodeParams: urlConfig._decodeParams,
+    };
     return new UrlMatcher(pattern, urlConfig.paramTypes, this.paramFactory, extend(globalConfig, config));
   }
 
@@ -69,12 +70,12 @@ export class UrlMatcherFactory {
     let result = true;
 
     forEach(UrlMatcher.prototype, (val, name) => {
-      if (isFunction(val)) result = result && (isDefined(object[name]) && isFunction(object[name]));
+      if (isFunction(val)) result = result && isDefined(object[name]) && isFunction(object[name]);
     });
     return result;
   }
 
-  /** @hidden */
+  /** @internal */
   $get() {
     const urlConfig = this.router.urlService.config;
     urlConfig.paramTypes.enqueue = false;

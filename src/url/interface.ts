@@ -5,7 +5,8 @@
  *
  * The primary API is found in [[UrlService]], [[UrlService.config]], and [[UrlService.rules]].
  *
- * @packageDocumentation @preferred @publicapi @module url
+ * @packageDocumentation
+ * @preferred
  */
 import { LocationConfig } from '../common';
 import { UIRouter } from '../router';
@@ -15,18 +16,19 @@ import { UrlConfig } from './urlConfig';
 import { UrlRules } from './urlRules';
 import { UrlService } from './urlService';
 
-/** @internalapi */
 export interface UrlMatcherCompileConfig {
   // If state is provided, use the configuration in the `params` block
   state?: StateDeclaration;
   strict?: boolean;
   caseInsensitive?: boolean;
+  // If params are pre-decoded, set to false to avoid double decoding
+  decodeParams?: boolean;
 }
 
-/** @internalapi @deprecated use [[UrlConfig]] */
+/** @deprecated use [[UrlConfig]] */
 export interface UrlConfigApi extends LocationConfig, UrlMatcherConfig {}
 
-/** @internalapi @deprecated use [[UrlConfig]] */
+/** @deprecated use [[UrlConfig]] */
 export interface UrlMatcherConfig {
   /** See: [[UrlConfig.caseInsensitive]] */ caseInsensitive: UrlConfig['caseInsensitive'];
   /** See: [[UrlConfig.strictMode]] */ strictMode: UrlConfig['strictMode'];
@@ -34,14 +36,14 @@ export interface UrlMatcherConfig {
   /** See: [[UrlConfig.type]] */ type: UrlConfig['type'];
 }
 
-/** @internalapi @deprecated use [[UrlService]] */
+/** @deprecated use [[UrlService]] */
 export interface UrlSyncApi {
   /** See: [[UrlService.sync]] */ sync: UrlService['sync'];
   /** See: [[UrlService.listen]] */ listen: UrlService['listen'];
   /** See: [[UrlService.deferIntercept]] */ deferIntercept: UrlService['deferIntercept'];
 }
 
-/** @internalapi @deprecated use [[UrlRules]] */
+/** @deprecated use [[UrlRules]] */
 export interface UrlRulesApi {
   /** See: [[UrlRules.sort]] */ sort: UrlRules['sort'];
   /** See: [[UrlRules.when]] */ when: UrlRules['when'];
@@ -100,15 +102,13 @@ export interface UrlRuleHandlerFn {
   (matchValue?: any, url?: UrlParts, router?: UIRouter): string | TargetState | TargetStateDef | void;
 }
 
-/** @internalapi */
+/** @internal */
 export type UrlRuleType = 'STATE' | 'URLMATCHER' | 'REGEXP' | 'RAW' | 'OTHER';
 
 /**
  * The interface for a URL Rule
  *
  * If you are creating a rule for use with [[UrlRules.rule]], it should implement this interface.
- *
- * @publicapi
  */
 export interface UrlRule {
   /**
@@ -126,7 +126,7 @@ export interface UrlRule {
    */
   priority: number;
 
-  /** @hidden */
+  /** @internal */
   _group: number;
 
   /** The type of the rule */
@@ -159,19 +159,16 @@ export interface UrlRule {
   matchPriority(match: any): number;
 }
 
-/** @internalapi */
 export interface MatcherUrlRule extends UrlRule {
   type: 'URLMATCHER' | 'STATE';
   urlMatcher: UrlMatcher;
 }
 
-/** @internalapi */
 export interface StateRule extends MatcherUrlRule {
   type: 'STATE';
   state: StateObject;
 }
 
-/** @internalapi */
 export interface RegExpRule extends UrlRule {
   type: 'REGEXP';
   regexp: RegExp;

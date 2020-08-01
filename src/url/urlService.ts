@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module url */
 import { UIRouter } from '../router';
 import { extend, is, isString, LocationServices, pattern } from '../common';
 import { MatchResult, UrlParts, UrlRule, UrlSyncApi } from './interface';
@@ -6,10 +5,12 @@ import { UrlRules } from './urlRules';
 import { UrlConfig } from './urlConfig';
 import { TargetState, TargetStateDef } from '../state';
 
-/** API for URL management */
+/**
+ * API for URL management
+ */
 export class UrlService implements LocationServices, UrlSyncApi {
-  /** @hidden */ private _stopListeningFn: Function;
-  /** @hidden */ interceptDeferred = false;
+  /** @internal */ private _stopListeningFn: Function;
+  /** @internal */ interceptDeferred = false;
 
   /**
    * The nested [[UrlRules]] API for managing URL rules and rewrites
@@ -25,9 +26,9 @@ export class UrlService implements LocationServices, UrlSyncApi {
    */
   public config = new UrlConfig(this.router);
 
-  /** @hidden */
-  constructor(/** @hidden */ private router: UIRouter) {}
-  /** @hidden */
+  /** @internal */
+  constructor(/** @internal */ private router: UIRouter) {}
+  /** @internal */
   public dispose() {
     this.listen(false);
     (this.rules as UrlRules).dispose();
@@ -105,7 +106,8 @@ export class UrlService implements LocationServices, UrlSyncApi {
       this._stopListeningFn && this._stopListeningFn();
       delete this._stopListeningFn;
     } else {
-      return (this._stopListeningFn = this._stopListeningFn || this.router.urlService.onChange(evt => this.sync(evt)));
+      return (this._stopListeningFn =
+        this._stopListeningFn || this.router.urlService.onChange((evt) => this.sync(evt)));
     }
   }
 
@@ -255,7 +257,7 @@ export class UrlService implements LocationServices, UrlSyncApi {
   public hash = (): string => this.router.locationService.hash();
 
   /**
-   * @internalapi
+   * @internal
    *
    * Registers a low level url change handler
    *

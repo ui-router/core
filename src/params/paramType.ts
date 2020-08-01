@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module params */
 import { extend, filter, map } from '../common/common';
 import { isArray, isDefined } from '../common/predicates';
 import { ParamTypeDefinition } from './interface';
@@ -25,7 +24,6 @@ import { ParamTypeDefinition } from './interface';
  *
  * var paramType = new ParamType(paramTypeDef);
  * ```
- * @internalapi
  */
 export class ParamType implements ParamTypeDefinition {
   /** @inheritdoc */
@@ -98,10 +96,7 @@ export class ParamType implements ParamTypeDefinition {
   }
 }
 
-/**
- * Wraps up a `ParamType` object to handle array values.
- * @internalapi
- */
+/** Wraps up a `ParamType` object to handle array values. */
 function ArrayType(type: ParamType, mode: boolean | 'auto') {
   // Wrap non-array value as array
   function arrayWrap(val: any): any[] {
@@ -126,7 +121,7 @@ function ArrayType(type: ParamType, mode: boolean | 'auto') {
       if (isArray(val) && val.length === 0) return val;
       const arr = arrayWrap(val);
       const result = map(arr, callback);
-      return allTruthyMode === true ? filter(result, x => !x).length === 0 : arrayUnwrap(result);
+      return allTruthyMode === true ? filter(result, (x) => !x).length === 0 : arrayUnwrap(result);
     };
   }
 
@@ -143,7 +138,7 @@ function ArrayType(type: ParamType, mode: boolean | 'auto') {
     };
   }
 
-  ['encode', 'decode', 'equals', '$normalize'].forEach(name => {
+  ['encode', 'decode', 'equals', '$normalize'].forEach((name) => {
     const paramTypeFn = type[name].bind(type);
     const wrapperFn: Function = name === 'equals' ? arrayEqualsHandler : arrayHandler;
     this[name] = wrapperFn(paramTypeFn);

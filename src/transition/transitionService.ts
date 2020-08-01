@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module transition */
 import {
   IHookRegistry,
   TransitionOptions,
@@ -57,7 +56,6 @@ export let defaultTransOpts: TransitionOptions = {
 
 /**
  * Plugin API for Transition Service
- * @internalapi
  */
 export interface TransitionServicePluginAPI {
   /**
@@ -111,31 +109,32 @@ export interface TransitionServicePluginAPI {
  * - It also has a factory function for creating new [[Transition]] objects, (used internally by the [[StateService]]).
  *
  * At bootstrap, [[UIRouter]] creates a single instance (singleton) of this class.
+ *
+ * This API is located at `router.transitionService` ([[UIRouter.transitionService]])
  */
 export class TransitionService implements IHookRegistry, Disposable {
-  /** @hidden */
+  /** @internal */
   _transitionCount = 0;
 
-  /** @hidden */
+  /** @internal */
   public $view: ViewService;
 
-  /** @hidden The transition hook types, such as `onEnter`, `onStart`, etc */
+  /** The transition hook types, such as `onEnter`, `onStart`, etc */
   private _eventTypes: TransitionEventType[] = [];
-  /** @hidden The registered transition hooks */
+  /** @internal The registered transition hooks */
   _registeredHooks = {} as RegisteredHooks;
-  /** @hidden The  paths on a criteria object */
+  /** The  paths on a criteria object */
   private _criteriaPaths = {} as PathTypes;
-  /** @hidden */
   private _router: UIRouter;
 
-  /** @internalapi */
+  /** @internal */
   _pluginapi: TransitionServicePluginAPI;
 
   /**
    * This object has hook de-registration functions for the built-in hooks.
    * This can be used by third parties libraries that wish to customize the behaviors
    *
-   * @hidden
+   * @internal
    */
   _deregisterHookFns: {
     addCoreResolves: Function;
@@ -155,7 +154,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     lazyLoad: Function;
   };
 
-  /** @hidden */
+  /** @internal */
   constructor(_router: UIRouter) {
     this._router = _router;
     this.$view = _router.viewService;
@@ -193,7 +192,7 @@ export class TransitionService implements IHookRegistry, Disposable {
    *
    * The hook's return value is ignored
    *
-   * @internalapi
+   * @internal
    * @param criteria defines which Transitions the Hook should be invoked for.
    * @param callback the hook function which will be invoked.
    * @param options the registration options
@@ -237,11 +236,11 @@ export class TransitionService implements IHookRegistry, Disposable {
 
   /**
    * dispose
-   * @internalapi
+   * @internal
    */
   dispose(router: UIRouter) {
     values(this._registeredHooks).forEach((hooksArray: RegisteredHook[]) =>
-      hooksArray.forEach(hook => {
+      hooksArray.forEach((hook) => {
         hook._deregistered = true;
         removeFrom(hooksArray, hook);
       })
@@ -254,6 +253,7 @@ export class TransitionService implements IHookRegistry, Disposable {
    * This is a factory function for creating new Transition objects.
    * It is used internally by the [[StateService]] and should generally not be called by application code.
    *
+   * @internal
    * @param fromPath the path to the current state (the from state)
    * @param targetState the target state (destination)
    * @returns a Transition
@@ -262,7 +262,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     return new Transition(fromPath, targetState, this._router);
   }
 
-  /** @hidden */
+  /** @internal */
   private _defineCoreEvents() {
     const Phase = TransitionHookPhase;
     const TH = TransitionHook;
@@ -312,7 +312,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     );
   }
 
-  /** @hidden */
+  /** @internal */
   private _defineCorePaths() {
     const { STATE, TRANSITION } = TransitionHookScope;
 
@@ -323,7 +323,7 @@ export class TransitionService implements IHookRegistry, Disposable {
     this._definePathType('entering', STATE);
   }
 
-  /** @hidden */
+  /** @internal */
   _defineEvent(
     name: string,
     hookPhase: TransitionHookPhase,
@@ -349,11 +349,10 @@ export class TransitionService implements IHookRegistry, Disposable {
     makeEvent(this, this, eventType);
   }
 
-  /** @hidden */
-  // tslint:disable-next-line
+  /** @internal */
   private _getEvents(phase?: TransitionHookPhase): TransitionEventType[] {
     const transitionHookTypes = isDefined(phase)
-      ? this._eventTypes.filter(type => type.hookPhase === phase)
+      ? this._eventTypes.filter((type) => type.hookPhase === phase)
       : this._eventTypes.slice();
 
     return transitionHookTypes.sort((l, r) => {
@@ -373,24 +372,24 @@ export class TransitionService implements IHookRegistry, Disposable {
    * It was defined by calling `defineTreeChangesCriterion('to', TransitionHookScope.TRANSITION)`
    * Only the tail of the `to` path is checked against the criteria and returned as part of the match.
    *
-   * @hidden
+   * @internal
    */
   private _definePathType(name: string, hookScope: TransitionHookScope) {
     this._criteriaPaths[name] = { name, scope: hookScope };
   }
 
-  /** @hidden */
+  /** @internal */
   // tslint:disable-next-line
   private _getPathTypes(): PathTypes {
     return this._criteriaPaths;
   }
 
-  /** @hidden */
+  /** @internal */
   public getHooks(hookName: string): RegisteredHook[] {
     return this._registeredHooks[hookName];
   }
 
-  /** @hidden */
+  /** @internal */
   private _registerCoreTransitionHooks() {
     const fns = this._deregisterHookFns;
 

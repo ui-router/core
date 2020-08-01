@@ -1,4 +1,3 @@
-/** @packageDocumentation @internalapi @module hooks */
 import { noop } from '../common/common';
 import { services } from '../common/coreservices';
 import { Transition } from '../transition/transition';
@@ -19,7 +18,7 @@ const loadEnteringViews: TransitionHookFn = (transition: Transition) => {
   const $q = services.$q;
   const enteringViews = transition.views('entering');
   if (!enteringViews.length) return;
-  return $q.all(enteringViews.map(view => $q.when(view.load()))).then(noop);
+  return $q.all(enteringViews.map((view) => $q.when(view.load()))).then(noop);
 };
 
 export const registerLoadEnteringViews = (transitionService: TransitionService) =>

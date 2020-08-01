@@ -1,5 +1,3 @@
-/** @packageDocumentation @internalapi @module hooks */
-
 import { trace } from '../common/trace';
 import { Rejection } from '../transition/rejectFactory';
 import { TransitionService } from '../transition/transitionService';

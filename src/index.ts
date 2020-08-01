@@ -1,5 +1,3 @@
-/** @packageDocumentation @publicapi @module common */
-
 export * from './common/index';
 export * from './params/index';
 export * from './path/index';

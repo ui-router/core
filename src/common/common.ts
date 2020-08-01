@@ -3,7 +3,8 @@
  *
  * These functions are exported, but are subject to change without notice.
  *
- * @packageDocumentation @preferred @publicapi @module common
+ * @packageDocumentation
+ * @preferred
  */
 import { isFunction, isString, isArray, isRegExp, isDate } from './predicates';
 import { all, any, prop, curry, not } from './hof';
@@ -57,8 +58,6 @@ export type PredicateBinary<X, Y> = (x?: X, y?: Y) => boolean;
  *
  * }];
  * ```
- *
- * @publicapi
  */
 export type IInjectable = Function | any[];
 
@@ -129,9 +128,9 @@ export function createProxyFunctions(
   fnNames?: string[],
   latebind = false
 ): Obj {
-  const bindFunction = fnName => source()[fnName].bind(bind());
+  const bindFunction = (fnName) => source()[fnName].bind(bind());
 
-  const makeLateRebindFn = fnName =>
+  const makeLateRebindFn = (fnName) =>
     function lateRebindFunction() {
       target[fnName] = bindFunction(fnName);
       return target[fnName].apply(null, arguments);
@@ -182,7 +181,7 @@ export function _pushTo(arr, val?): any {
 
 /** Given an array of (deregistration) functions, calls all functions and removes each one from the source array */
 export const deregAll = (functions: Function[]) =>
-  functions.slice().forEach(fn => {
+  functions.slice().forEach((fn) => {
     typeof fn === 'function' && fn();
     removeFrom(functions, fn);
   });
@@ -275,8 +274,8 @@ export function filter<T>(collection: TypedMap<T>, callback: (t: T, key?: string
 export function filter<T>(collection: any, callback: Function): T {
   const arr = isArray(collection),
     result: any = arr ? [] : {};
-  const accept = arr ? x => result.push(x) : (x, key) => (result[key] = x);
-  forEach(collection, function(item, i) {
+  const accept = arr ? (x) => result.push(x) : (x, key) => (result[key] = x);
+  forEach(collection, function (item, i) {
     if (callback(item, i)) accept(item, i);
   });
   return <T>result;
@@ -290,7 +289,7 @@ export function find<T>(collection: T[], callback: Predicate<T>): T;
 export function find(collection: any, callback: any) {
   let result;
 
-  forEach(collection, function(item, i) {
+  forEach(collection, function (item, i) {
     if (result) return;
     if (callback(item, i)) result = item;
   });
@@ -328,7 +327,7 @@ export function map(collection: any, callback: any, target: typeof collection): 
  * let vals = values(foo); // [ 1, 2, 3 ]
  * ```
  */
-export const values: (<T>(obj: TypedMap<T>) => T[]) = (obj: Obj) => Object.keys(obj).map(key => obj[key]);
+export const values: <T>(obj: TypedMap<T>) => T[] = (obj: Obj) => Object.keys(obj).map((key) => obj[key]);
 
 /**
  * Reduce function that returns true if all of the values are truthy.
@@ -451,7 +450,7 @@ export const assertPredicate: <T>(predicate: Predicate<T>, errMsg: string | Func
  */
 export const assertMap: <T, U>(mapFn: (t: T) => U, errMsg: string | Function) => (t: T) => U = assertFn;
 export function assertFn(predicateOrMap: Function, errMsg: string | Function = 'assert failure'): any {
-  return obj => {
+  return (obj) => {
     const result = predicateOrMap(obj);
     if (!result) {
       throw new Error(isFunction(errMsg) ? (<Function>errMsg)(obj) : errMsg);
@@ -469,7 +468,7 @@ export function assertFn(predicateOrMap: Function, errMsg: string | Function = '
  * pairs({ foo: "FOO", bar: "BAR }) // [ [ "foo", "FOO" ], [ "bar": "BAR" ] ]
  * ```
  */
-export const pairs = (obj: Obj) => Object.keys(obj).map(key => [key, obj[key]]);
+export const pairs = (obj: Obj) => Object.keys(obj).map((key) => [key, obj[key]]);
 
 /**
  * Given two or more parallel arrays, returns an array of tuples where
@@ -507,7 +506,7 @@ export function arrayTuples(...args: any[]): any[] {
         result.push([args[0][i], args[1][i], args[2][i], args[3][i]]);
         break;
       default:
-        result.push(args.map(array => array[i]));
+        result.push(args.map((array) => array[i]));
         break;
     }
   }
@@ -552,7 +551,7 @@ export function tail<T>(arr: T[]): T {
  * shallow copy from src to dest
  */
 export function copy(src: Obj, dest?: Obj) {
-  if (dest) Object.keys(dest).forEach(key => delete dest[key]);
+  if (dest) Object.keys(dest).forEach((key) => delete dest[key]);
   if (!dest) dest = {};
   return extend(dest, src);
 }
@@ -560,7 +559,7 @@ export function copy(src: Obj, dest?: Obj) {
 /** Naive forEach implementation works with Objects or Arrays */
 function _forEach(obj: any[] | any, cb: (el, idx?) => void, _this: Obj) {
   if (isArray(obj)) return obj.forEach(cb, _this);
-  Object.keys(obj).forEach(key => cb(obj[key], key));
+  Object.keys(obj).forEach((key) => cb(obj[key], key));
 }
 
 /** Like Object.assign() */
@@ -615,5 +614,5 @@ function _arraysEq(a1: any[], a2: any[]) {
 }
 
 // issue #2676
-export const silenceUncaughtInPromise = (promise: Promise<any>) => promise.catch(e => 0) && promise;
+export const silenceUncaughtInPromise = (promise: Promise<any>) => promise.catch((e) => 0) && promise;
 export const silentRejection = (error: any) => silenceUncaughtInPromise(services.$q.reject(error));

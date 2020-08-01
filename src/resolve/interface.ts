@@ -5,7 +5,7 @@
  *
  * Typically, resolve is configured on a state using a [[StateDeclaration.resolve]] declaration.
  *
- * @packageDocumentation @publicapi @module resolve
+ * @packageDocumentation
  */
 /**
  * An interface which is similar to an Angular 2 `Provider`
@@ -207,7 +207,6 @@ export interface CustomAsyncPolicy {
   (data: any): Promise<any>;
 }
 
-/** @internalapi */
 export let resolvePolicies = {
   when: {
     LAZY: 'LAZY',

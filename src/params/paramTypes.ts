@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module params */
 import { fromJson, toJson, identity, equals, inherit, map, extend, pick } from '../common/common';
 import { isDefined, isNullOrUndefined } from '../common/predicates';
 import { is } from '../common/hof';
@@ -190,14 +189,10 @@ export class ParamTypes {
    */
   static any: ParamTypeDefinition;
 
-  /** @hidden */
   types: any;
-  /** @hidden */
   enqueue = true;
-  /** @hidden */
   typeQueue: any[] = [];
 
-  /** @internalapi */
   private defaultTypes: any = pick(ParamTypes.prototype, [
     'hash',
     'string',
@@ -210,14 +205,12 @@ export class ParamTypes {
     'any',
   ]);
 
-  /** @internalapi */
   constructor() {
     // Register default types. Store them in the prototype of this.types.
     const makeType = (definition: ParamTypeDefinition, name: string) => new ParamType(extend({ name }, definition));
     this.types = inherit(map(this.defaultTypes, makeType), {});
   }
 
-  /** @internalapi */
   dispose() {
     this.types = {};
   }
@@ -241,7 +234,6 @@ export class ParamTypes {
     return this;
   }
 
-  /** @internalapi */
   _flushTypeQueue() {
     while (this.typeQueue.length) {
       const type = this.typeQueue.shift();
@@ -251,9 +243,8 @@ export class ParamTypes {
   }
 }
 
-/** @hidden */
 function initDefaultTypes() {
-  const makeDefaultType = def => {
+  const makeDefaultType = (def) => {
     const valToString = (val: any) => (val != null ? val.toString() : val);
 
     const defaultTypeBase = {
@@ -284,7 +275,7 @@ function initDefaultTypes() {
 
     int: makeDefaultType({
       decode: (val: string) => parseInt(val, 10),
-      is: function(val: any) {
+      is: function (val: any) {
         return !isNullOrUndefined(val) && this.decode(val.toString()) === val;
       },
       pattern: /-?\d+/,
@@ -298,12 +289,12 @@ function initDefaultTypes() {
     }),
 
     date: makeDefaultType({
-      encode: function(val: any) {
+      encode: function (val: any) {
         return !this.is(val)
           ? undefined
           : [val.getFullYear(), ('0' + (val.getMonth() + 1)).slice(-2), ('0' + val.getDate()).slice(-2)].join('-');
       },
-      decode: function(val: string) {
+      decode: function (val: string) {
         if (this.is(val)) return (<any>val) as Date;
         const match = this.capture.exec(val);
         return match ? new Date(match[1], match[2] - 1, match[3]) : undefined;

@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module transition */
 import { TransitionHookOptions, HookResult, TransitionHookPhase } from './interface';
 import { defaults, noop, silentRejection } from '../common/common';
 import { fnToString, maxLength } from '../common/strings';
@@ -26,7 +25,6 @@ export type GetErrorHandler = (hook: TransitionHook) => ErrorHandler;
 export type ResultHandler = (result: HookResult) => Promise<HookResult>;
 export type ErrorHandler = (error: any) => Promise<any>;
 
-/** @hidden */
 export class TransitionHook {
   type: TransitionEventType;
 
@@ -42,7 +40,7 @@ export class TransitionHook {
    * Otherwise, ignore the result.
    */
   static LOG_REJECTED_RESULT: GetResultHandler = (hook: TransitionHook) => (result: HookResult) => {
-    isPromise(result) && result.catch(err => hook.logError(Rejection.normalize(err)));
+    isPromise(result) && result.catch((err) => hook.logError(Rejection.normalize(err)));
     return undefined;
   };
 
@@ -111,7 +109,7 @@ export class TransitionHook {
    * Run all TransitionHooks, ignoring their return value.
    */
   static runAllHooks(hooks: TransitionHook[]): void {
-    hooks.forEach(hook => hook.invokeHook());
+    hooks.forEach((hook) => hook.invokeHook());
   }
 
   constructor(
@@ -142,11 +140,11 @@ export class TransitionHook {
 
     const invokeCallback = () => hook.callback.call(options.bind, this.transition, this.stateContext);
 
-    const normalizeErr = err => Rejection.normalize(err).toPromise();
+    const normalizeErr = (err) => Rejection.normalize(err).toPromise();
 
-    const handleError = err => hook.eventType.getErrorHandler(this)(err);
+    const handleError = (err) => hook.eventType.getErrorHandler(this)(err);
 
-    const handleResult = result => hook.eventType.getResultHandler(this)(result);
+    const handleResult = (result) => hook.eventType.getResultHandler(this)(result);
 
     try {
       const result = invokeCallback();
@@ -182,7 +180,7 @@ export class TransitionHook {
     // Hook returned a promise
     if (isPromise(result)) {
       // Wait for the promise, then reprocess with the resulting value
-      return result.then(val => this.handleHookResult(val));
+      return result.then((val) => this.handleHookResult(val));
     }
 
     trace.traceHookResult(result, this.transition, this.options);

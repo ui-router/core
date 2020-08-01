@@ -1,5 +1,3 @@
-/** @packageDocumentation @publicapi @module state */
-
 import { StateDeclaration, StateOrName, TargetStateDef } from './interface';
 import { TransitionOptions } from '../transition/interface';
 import { StateObject } from './stateObject';
@@ -60,7 +58,7 @@ export class TargetState {
    * @param _params Parameters for the target state
    * @param _options Transition options.
    *
-   * @internalapi
+   * @internal
    */
   constructor(
     private _stateRegistry: StateRegistry,

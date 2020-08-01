@@ -1,4 +1,3 @@
-/** @packageDocumentation @internalapi @module path */
 import { extend, applyPairs, find, allTrueR, pairs, arrayTuples } from '../common/common';
 import { propEq } from '../common/hof';
 import { StateObject } from '../state/stateObject';
@@ -49,7 +48,7 @@ export class PathNode {
       this.state = state;
       this.paramSchema = state.parameters({ inherit: false });
       this.paramValues = {};
-      this.resolvables = state.resolvables.map(res => res.clone());
+      this.resolvables = state.resolvables.map((res) => res.clone());
     }
   }
 
@@ -98,5 +97,5 @@ export class PathNode {
   }
 }
 
-/** @hidden */
+/** @internal */
 export type GetParamsFn = (pathNode: PathNode) => Param[];

@@ -16,12 +16,15 @@ jobs:
     name: yarn ${{ matrix.yarncmd }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         yarncmd: ['test', 'docs']
     steps:
       - uses: actions/checkout@v2
       - name: Install Dependencies
         run: yarn install --pure-lockfile
+      - name: Check Peer Dependencies
+        run: npx check-peer-dependencies
       - name: Run Tests
         run: yarn ${{ matrix.yarncmd }}
 
@@ -29,6 +32,7 @@ jobs:
     name: Test downstream ${{ matrix.group }} projects
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         group: ['angular', 'angularjs', 'react', 'other']
     steps:

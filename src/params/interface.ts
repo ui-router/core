@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module params */
 import { ParamType } from './paramType';
 
 /**
@@ -219,7 +218,7 @@ export interface ParamDeclaration {
   squash?: boolean | string;
 
   /**
-   * @internalapi
+   * @internal
    *
    * An array of [[Replace]] objects.
    *
@@ -238,8 +237,8 @@ export interface ParamDeclaration {
   replace?: Replace[];
 
   /**
-   * @hidden
-   * @internalapi
+   * @internal
+   * @internal
    *
    * This is not part of the declaration; it is a calculated value depending on if a default value was specified or not.
    */
@@ -476,7 +475,6 @@ export interface Replace {
  * ```
  *
  * See: [[UrlConfig.type]]
- * @publicapi
  */
 export interface ParamTypeDefinition {
   /**

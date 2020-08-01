@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module resolve */
 import { find, tail, uniqR, unnestR, inArray } from '../common/common';
 import { propEq, not } from '../common/hof';
 import { trace } from '../common/trace';
@@ -37,7 +36,7 @@ export class ResolveContext {
 
   /** Gets all the tokens found in the resolve context, de-duplicated */
   getTokens(): any[] {
-    return this._path.reduce((acc, node) => acc.concat(node.resolvables.map(r => r.token)), []).reduce(uniqR, []);
+    return this._path.reduce((acc, node) => acc.concat(node.resolvables.map((r) => r.token)), []).reduce(uniqR, []);
   }
 
   /**
@@ -48,7 +47,7 @@ export class ResolveContext {
    */
   getResolvable(token: any): Resolvable {
     const matching = this._path
-      .map(node => node.resolvables)
+      .map((node) => node.resolvables)
       .reduce(unnestR, [])
       .filter((r: Resolvable) => r.token === token);
     return tail(matching);
@@ -84,7 +83,7 @@ export class ResolveContext {
    * `let AB = ABCD.subcontext(a)`
    */
   subContext(state: StateObject): ResolveContext {
-    return new ResolveContext(PathUtils.subPath(this._path, node => node.state === state));
+    return new ResolveContext(PathUtils.subPath(this._path, (node) => node.state === state));
   }
 
   /**
@@ -104,8 +103,8 @@ export class ResolveContext {
    */
   addResolvables(newResolvables: Resolvable[], state: StateObject) {
     const node = <PathNode>find(this._path, propEq('state', state));
-    const keys = newResolvables.map(r => r.token);
-    node.resolvables = node.resolvables.filter(r => keys.indexOf(r.token) === -1).concat(newResolvables);
+    const keys = newResolvables.map((r) => r.token);
+    node.resolvables = node.resolvables.filter((r) => keys.indexOf(r.token) === -1).concat(newResolvables);
   }
 
   /**
@@ -141,7 +140,7 @@ export class ResolveContext {
         r
           .get(subContext, trans)
           // Return a tuple that includes the Resolvable's token
-          .then(value => ({ token: r.token, value: value }));
+          .then((value) => ({ token: r.token, value: value }));
       nowait.forEach(getResult);
       return acc.concat(wait.map(getResult));
     }, []);
@@ -167,13 +166,13 @@ export class ResolveContext {
     const node = this.findNode(resolvable);
     // Find which other resolvables are "visible" to the `resolvable` argument
     // subpath stopping at resolvable's node, or the whole path (if the resolvable isn't in the path)
-    const subPath: PathNode[] = PathUtils.subPath(this._path, x => x === node) || this._path;
+    const subPath: PathNode[] = PathUtils.subPath(this._path, (x) => x === node) || this._path;
     const availableResolvables: Resolvable[] = subPath
       .reduce((acc, _node) => acc.concat(_node.resolvables), []) // all of subpath's resolvables
-      .filter(res => res !== resolvable); // filter out the `resolvable` argument
+      .filter((res) => res !== resolvable); // filter out the `resolvable` argument
 
     const getDependency = (token: any) => {
-      const matching = availableResolvables.filter(r => r.token === token);
+      const matching = availableResolvables.filter((r) => r.token === token);
       if (matching.length) return tail(matching);
 
       const fromInjector = this.injector().getNative(token);
@@ -188,7 +187,7 @@ export class ResolveContext {
   }
 }
 
-/** @internalapi */
+/** @internal */
 class UIInjectorImpl implements UIInjector {
   native: $InjectorLike;
 

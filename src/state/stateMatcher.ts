@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module state */
 import { isString } from '../common/predicates';
 import { StateOrName } from './interface';
 import { StateObject } from './stateObject';
@@ -26,13 +25,13 @@ export class StateMatcher {
     } else if (isStr && matchGlob) {
       const _states = values(this._states);
       const matches = _states.filter(
-        _state => _state.__stateObjectCache.nameGlob && _state.__stateObjectCache.nameGlob.matches(name)
+        (_state) => _state.__stateObjectCache.nameGlob && _state.__stateObjectCache.nameGlob.matches(name)
       );
 
       if (matches.length > 1) {
         safeConsole.error(
           `stateMatcher.find: Found multiple matches for ${name} using glob: `,
-          matches.map(match => match.name)
+          matches.map((match) => match.name)
         );
       }
       return matches[0];

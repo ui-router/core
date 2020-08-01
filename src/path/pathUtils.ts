@@ -1,5 +1,3 @@
-/** @packageDocumentation @internalapi @module path */
-
 import {
   extend,
   find,
@@ -39,7 +37,7 @@ export class PathUtils {
 
   static buildPath(targetState: TargetState) {
     const toParams = targetState.params();
-    return targetState.$state().path.map(state => new PathNode(state).applyRawParams(toParams));
+    return targetState.$state().path.map((state) => new PathNode(state).applyRawParams(toParams));
   }
 
   /** Given a fromPath: PathNode[] and a TargetState, builds a toPath: PathNode[] */
@@ -59,11 +57,11 @@ export class PathUtils {
   static applyViewConfigs($view: ViewService, path: PathNode[], states: StateObject[]) {
     // Only apply the viewConfigs to the nodes for the given states
     path
-      .filter(node => inArray(states, node.state))
-      .forEach(node => {
+      .filter((node) => inArray(states, node.state))
+      .forEach((node) => {
         const viewDecls: _ViewDeclaration[] = values(node.state.views || {});
-        const subPath = PathUtils.subPath(path, n => n === node);
-        const viewConfigs: ViewConfig[][] = viewDecls.map(view => $view.createViewConfig(subPath, view));
+        const subPath = PathUtils.subPath(path, (n) => n === node);
+        const viewConfigs: ViewConfig[][] = viewDecls.map((view) => $view.createViewConfig(subPath, view));
         node.views = viewConfigs.reduce(unnestR, []);
       });
   }
@@ -86,9 +84,9 @@ export class PathUtils {
     }
 
     const noInherit = fromPath
-      .map(node => node.paramSchema)
+      .map((node) => node.paramSchema)
       .reduce(unnestR, [])
-      .filter(param => !param.inherit)
+      .filter((param) => !param.inherit)
       .map(prop('id'));
 
     /**
@@ -112,7 +110,7 @@ export class PathUtils {
   }
 
   static nonDynamicParams = (node: PathNode): Param[] =>
-    node.state.parameters({ inherit: false }).filter(param => !param.dynamic);
+    node.state.parameters({ inherit: false }).filter((param) => !param.dynamic);
 
   /**
    * Computes the tree changes (entering, exiting) between a fromPath and toPath.

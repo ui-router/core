@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module view */
 import { applyPairs, equals, find, inArray, pairs, removeFrom, TypedMap, values } from '../common/common';
 import { curry, parse, prop } from '../common/hof';
 import { isArray, isString } from '../common/predicates';
@@ -58,15 +57,15 @@ export interface ViewSyncListener {
  *   are configured with the matching [[ViewConfig]](s)
  */
 export class ViewService {
-  /** @hidden */ private _viewPlugins: UIRouterViewPlugin[] = [];
-  /** @hidden */ private _uiViews: { [viewId: string]: RegisteredUIViewPortal } = {};
-  /** @hidden */ private _viewConfigs: ViewConfig[] = [];
-  /** @hidden */ private _rootContext: ViewContext;
-  /** @hidden */ private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
-  /** @hidden */ private _listeners: ViewSyncListener[] = [];
-  /** @hidden */ private _uiViewCounter = 0;
+  /** @internal */ private _viewPlugins: UIRouterViewPlugin[] = [];
+  /** @internal */ private _uiViews: { [viewId: string]: RegisteredUIViewPortal } = {};
+  /** @internal */ private _viewConfigs: ViewConfig[] = [];
+  /** @internal */ private _rootContext: ViewContext;
+  /** @internal */ private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
+  /** @internal */ private _listeners: ViewSyncListener[] = [];
+  /** @internal */ private _uiViewCounter = 0;
 
-  /** @internalapi */
+  /** @internal */
   public _pluginapi: ViewServicePluginAPI = {
     _registerViewPlugin: (plugin) => this._viewPlugins.push(plugin),
     _registeredViewPlugins: () => this._viewPlugins.slice(),
@@ -136,7 +135,7 @@ export class ViewService {
    * - And the remaining segments [ "$default", "bar" ].join("."_ of the ViewConfig's target name match
    *   the tail of the ui-view's fqn "default.bar"
    *
-   * @internalapi
+   * @internal
    */
   static matches = (uiViewsByFqn: TypedMap<RegisteredUIViewPortal>, uiView: RegisteredUIViewPortal) => (
     viewConfig: ViewConfig
@@ -206,14 +205,14 @@ export class ViewService {
     return { uiViewName, uiViewContextAnchor };
   }
 
-  /** @hidden */
-  constructor(/** @hidden */ private router: UIRouter) {}
+  /** @internal */
+  constructor(/** @internal */ private router: UIRouter) {}
 
-  /** @hidden */
+  /** @internal */
   private _rootViewContext(context?: ViewContext): ViewContext {
     return (this._rootContext = context || this._rootContext);
   }
-  /** @hidden */
+  /** @internal */
   private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
     this._viewConfigFactories[viewType] = factory;
   }

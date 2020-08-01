@@ -1,4 +1,3 @@
-/** @packageDocumentation @internalapi @module vanilla */
 import {
   extend,
   assertPredicate,
@@ -63,10 +62,10 @@ const ARGUMENT_NAMES = /([^\s,]+)/g;
  */
 export const $injector = {
   /** Gets an object from DI based on a string token */
-  get: name => globals[name],
+  get: (name) => globals[name],
 
   /** Returns true if an object named `name` exists in global DI */
-  has: name => $injector.get(name) != null,
+  has: (name) => $injector.get(name) != null,
 
   /**
    * Injects a function
@@ -80,9 +79,9 @@ export const $injector = {
     const params = $injector.annotate(fn);
     const ensureExist = assertPredicate(
       (key: string) => all.hasOwnProperty(key),
-      key => `DI can't find injectable: '${key}'`
+      (key) => `DI can't find injectable: '${key}'`
     );
-    const args = params.filter(ensureExist).map(x => all[x]);
+    const args = params.filter(ensureExist).map((x) => all[x]);
     if (isFunction(fn)) return fn.apply(context, args);
     else return (fn as any[]).slice(-1)[0].apply(context, args);
   },

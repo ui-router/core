@@ -1,4 +1,3 @@
-/** @packageDocumentation @internalapi @module vanilla */
 import {
   LocationConfig,
   LocationServices,
@@ -23,14 +22,10 @@ export const keyValsToObjectR = (accum, [key, val]) => {
 };
 
 export const getParams = (queryString: string): any =>
-  queryString
-    .split('&')
-    .filter(identity)
-    .map(splitEqual)
-    .reduce(keyValsToObjectR, {});
+  queryString.split('&').filter(identity).map(splitEqual).reduce(keyValsToObjectR, {});
 
 export function parseUrl(url: string) {
-  const orEmptyString = x => x || '';
+  const orEmptyString = (x) => x || '';
   const [beforehash, hash] = splitHash(url).map(orEmptyString);
   const [path, search] = splitQuery(beforehash).map(orEmptyString);
 
@@ -43,10 +38,10 @@ export const buildUrl = (loc: LocationServices) => {
   const hash = loc.hash();
 
   const search = Object.keys(searchObject)
-    .map(key => {
+    .map((key) => {
       const param = searchObject[key];
       const vals = isArray(param) ? param : [param];
-      return vals.map(val => key + '=' + val);
+      return vals.map((val) => key + '=' + val);
     })
     .reduce(unnestR, [])
     .join('&');
@@ -60,7 +55,7 @@ export function locationPluginFactory(
   serviceClass: { new (uiRouter?: UIRouter): LocationServices },
   configurationClass: { new (uiRouter?: UIRouter, isHtml5?: boolean): LocationConfig }
 ) {
-  return function(uiRouter: UIRouter) {
+  return function (uiRouter: UIRouter) {
     const service = (uiRouter.locationService = new serviceClass(uiRouter));
     const configuration = (uiRouter.locationConfig = new configurationClass(uiRouter, isHtml5));
 

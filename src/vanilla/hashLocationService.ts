@@ -1,4 +1,3 @@
-/** @packageDocumentation @internalapi @module vanilla */
 import { root, trimHashVal } from '../common';
 import { UIRouter } from '../router';
 import { BaseLocationServices } from './baseLocationService';

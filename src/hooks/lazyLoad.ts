@@ -1,4 +1,3 @@
-/** @packageDocumentation @internalapi @module hooks */
 import { Transition } from '../transition/transition';
 import { TransitionService } from '../transition/transitionService';
 import { TransitionHookFn } from '../transition/interface';
@@ -61,14 +60,14 @@ const lazyLoadHook: TransitionHookFn = (transition: Transition) => {
 
   const promises = transition
     .entering()
-    .filter(state => !!state.$$state().lazyLoad)
-    .map(state => lazyLoadState(transition, state));
+    .filter((state) => !!state.$$state().lazyLoad)
+    .map((state) => lazyLoadState(transition, state));
 
   return services.$q.all(promises).then(retryTransition);
 };
 
 export const registerLazyLoadHook = (transitionService: TransitionService) =>
-  transitionService.onBefore({ entering: state => !!state.lazyLoad }, lazyLoadHook);
+  transitionService.onBefore({ entering: (state) => !!state.lazyLoad }, lazyLoadHook);
 
 /**
  * Invokes a state's lazy load function
@@ -83,14 +82,14 @@ export function lazyLoadState(transition: Transition, state: StateDeclaration): 
   // Store/get the lazy load promise on/from the hookfn so it doesn't get re-invoked
   let promise = lazyLoadFn['_promise'];
   if (!promise) {
-    const success = result => {
+    const success = (result) => {
       delete state.lazyLoad;
       delete state.$$state().lazyLoad;
       delete lazyLoadFn['_promise'];
       return result;
     };
 
-    const error = err => {
+    const error = (err) => {
       delete lazyLoadFn['_promise'];
       return services.$q.reject(err);
     };
@@ -104,7 +103,7 @@ export function lazyLoadState(transition: Transition, state: StateDeclaration): 
   /** Register any lazy loaded state definitions */
   function updateStateRegistry(result: LazyLoadResult) {
     if (result && Array.isArray(result.states)) {
-      result.states.forEach(_state => transition.router.stateRegistry.register(_state));
+      result.states.forEach((_state) => transition.router.stateRegistry.register(_state));
     }
     return result;
   }

@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module url */
 import { UIRouter } from '../router';
 import { Disposable } from '../interface';
 import { MatcherUrlRule, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi } from './interface';
@@ -7,20 +6,16 @@ import { UrlMatcher } from './urlMatcher';
 import { is, isDefined, isFunction, isString, removeFrom, val } from '../common';
 import { UrlRuleFactory } from './urlRule';
 
-/** @hidden */
 const prioritySort = (a: UrlRule, b: UrlRule) => (b.priority || 0) - (a.priority || 0);
 
-/** @hidden */
 const typeSort = (a: UrlRule, b: UrlRule) => {
   const weights = { STATE: 4, URLMATCHER: 4, REGEXP: 3, RAW: 2, OTHER: 1 };
   return (weights[a.type] || 0) - (weights[b.type] || 0);
 };
 
-/** @hidden */
 const urlMatcherSort = (a: MatcherUrlRule, b: MatcherUrlRule) =>
   !a.urlMatcher || !b.urlMatcher ? 0 : UrlMatcher.compare(a.urlMatcher, b.urlMatcher);
 
-/** @hidden */
 const idSort = (a: UrlRule, b: UrlRule) => {
   // Identically sorted STATE and URLMATCHER best rule will be chosen by `matchPriority` after each rule matches the URL
   const useMatchPriority = { STATE: true, URLMATCHER: true };
@@ -39,8 +34,6 @@ const idSort = (a: UrlRule, b: UrlRule) => {
  * - Rule registration order (for rule types other than STATE and URLMATCHER)
  *   - Equally sorted State and UrlMatcher rules will each match the URL.
  *     Then, the *best* match is chosen based on how many parameter values were matched.
- *
- * @publicapi
  */
 let defaultRuleSortFn: (a: UrlRule, b: UrlRule) => number;
 defaultRuleSortFn = (a, b) => {
@@ -56,7 +49,6 @@ defaultRuleSortFn = (a, b) => {
   return idSort(a, b);
 };
 
-/** @hidden */
 function getHandlerFn(handler: string | UrlRuleHandlerFn | TargetState | TargetStateDef): UrlRuleHandlerFn {
   if (!isFunction(handler) && !isString(handler) && !is(TargetState)(handler) && !TargetState.isDef(handler)) {
     throw new Error("'handler' must be a string, function, TargetState, or have a state: 'newtarget' property");
@@ -72,26 +64,24 @@ function getHandlerFn(handler: string | UrlRuleHandlerFn | TargetState | TargetS
  *
  * The most commonly used methods are [[otherwise]] and [[when]].
  *
- * This API is a property of [[UrlService]] as [[UrlService.rules]]
- *
- * @publicapi
+ * This API is found at `router.urlService.rules` (see: [[UIRouter.urlService]], [[URLService.rules]])
  */
 export class UrlRules implements Disposable {
   /** used to create [[UrlRule]] objects for common cases */
   public urlRuleFactory: UrlRuleFactory;
 
-  /** @hidden */ private _sortFn = defaultRuleSortFn;
-  /** @hidden */ private _otherwiseFn: UrlRule;
-  /** @hidden */ private _sorted: boolean;
-  /** @hidden */ private _rules: UrlRule[] = [];
-  /** @hidden */ private _id = 0;
+  /** @internal */ private _sortFn = defaultRuleSortFn;
+  /** @internal */ private _otherwiseFn: UrlRule;
+  /** @internal */ private _sorted: boolean;
+  /** @internal */ private _rules: UrlRule[] = [];
+  /** @internal */ private _id = 0;
 
-  /** @hidden */
-  constructor(/** @hidden */ private router: UIRouter) {
+  /** @internal */
+  constructor(/** @internal */ private router: UIRouter) {
     this.urlRuleFactory = new UrlRuleFactory(router);
   }
 
-  /** @hidden */
+  /** @internal */
   public dispose(router?: UIRouter) {
     this._rules = [];
     delete this._otherwiseFn;
@@ -290,12 +280,12 @@ export class UrlRules implements Disposable {
     this._sorted = true;
   }
 
-  /** @hidden */
+  /** @internal */
   private ensureSorted() {
     this._sorted || this.sort();
   }
 
-  /** @hidden */
+  /** @internal */
   private stableSort(arr, compareFn) {
     const arrOfWrapper = arr.map((elem, idx) => ({ elem, idx }));
 
@@ -304,7 +294,7 @@ export class UrlRules implements Disposable {
       return cmpDiff === 0 ? wrapperA.idx - wrapperB.idx : cmpDiff;
     });
 
-    return arrOfWrapper.map(wrapper => wrapper.elem);
+    return arrOfWrapper.map((wrapper) => wrapper.elem);
   }
 
   /**

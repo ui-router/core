@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module transition */
 import { extend, tail, assertPredicate, unnestR, identity } from '../common/common';
 import { isArray } from '../common/predicates';
 
@@ -32,7 +31,6 @@ import { RegisteredHook } from './hookRegistry';
  * The HookBuilder constructor is given the $transitions service and a Transition instance.  Thus, a HookBuilder
  * instance may only be used for one specific Transition object. (side note: the _treeChanges accessor is private
  * in the Transition class, so we must also provide the Transition's _treeChanges)
- *
  */
 export class HookBuilder {
   constructor(private transition: Transition) {}
@@ -41,7 +39,7 @@ export class HookBuilder {
     const $transitions = this.transition.router.transitionService;
     return $transitions._pluginapi
       ._getEvents(phase)
-      .map(type => this.buildHooks(type))
+      .map((type) => this.buildHooks(type))
       .reduce(unnestR, [])
       .filter(identity);
   }
@@ -75,7 +73,7 @@ export class HookBuilder {
       const matchingNodes: PathNode[] = matches[hookType.criteriaMatchPath.name];
 
       // Return an array of HookTuples
-      return matchingNodes.map(node => {
+      return matchingNodes.map((node) => {
         const _options = extend(
           {
             bind: hook.bind,
@@ -94,7 +92,7 @@ export class HookBuilder {
       .map(makeTransitionHooks)
       .reduce(unnestR, [])
       .sort(tupleSort(hookType.reverseSort))
-      .map(tuple => tuple.transitionHook);
+      .map((tuple) => tuple.transitionHook);
   }
 
   /**
@@ -123,7 +121,7 @@ export class HookBuilder {
       .map((reg: IHookRegistry) => reg.getHooks(hookType.name)) // Get named hooks from registries
       .filter(assertPredicate(isArray, `broken event named: ${hookType.name}`)) // Sanity check
       .reduce(unnestR, []) // Un-nest RegisteredHook[][] to RegisteredHook[] array
-      .filter(hook => hook.matches(treeChanges, transition)); // Only those satisfying matchCriteria
+      .filter((hook) => hook.matches(treeChanges, transition)); // Only those satisfying matchCriteria
   }
 }
 

@@ -1,4 +1,3 @@
-/** @packageDocumentation @internalapi @module hooks */
 import { isString, isFunction } from '../common/predicates';
 import { Transition } from '../transition/transition';
 import { services } from '../common/coreservices';
@@ -34,4 +33,4 @@ const redirectToHook: TransitionHookFn = (trans: Transition) => {
 };
 
 export const registerRedirectToHook = (transitionService: TransitionService) =>
-  transitionService.onStart({ to: state => !!state.redirectTo }, redirectToHook);
+  transitionService.onStart({ to: (state) => !!state.redirectTo }, redirectToHook);

@@ -1,9 +1,9 @@
-/** @packageDocumentation @publicapi @module transition */
 'use strict';
 import { extend, silentRejection } from '../common/common';
 import { stringify } from '../common/strings';
 import { is } from '../common/hof';
 
+/** An enum for Transition Rejection reasons */
 enum RejectType {
   /**
    * A new transition superseded this one.
@@ -49,11 +49,11 @@ enum RejectType {
 
 export { RejectType };
 
-/** @hidden */
+/** @internal */
 let id = 0;
 
 export class Rejection {
-  /** @hidden */
+  /** @internal */
   $id = id++;
   /**
    * The type of the rejection.

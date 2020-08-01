@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module view */
 import { UIRouterPlugin } from '../interface';
 import { UIRouter } from '../router';
 import { StateObject } from '../state';

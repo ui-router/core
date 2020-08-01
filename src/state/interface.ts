@@ -1,4 +1,3 @@
-/** @packageDocumentation @publicapi @module state */
 import { ParamDeclaration, RawParams } from '../params/interface';
 import { StateObject } from './stateObject';
 import { ViewContext } from '../view/interface';
@@ -11,7 +10,6 @@ import { TargetState } from './targetState';
 
 export type StateOrName = string | StateDeclaration | StateObject;
 
-/** @internalapi */
 export interface TransitionPromise extends Promise<StateObject> {
   transition: Transition;
 }
@@ -29,13 +27,10 @@ export type ResolveTypes = Resolvable | ResolvableLiteral | ProviderLike;
  * This interface defines the basic data that a normalized view declaration will have on it.
  * Each implementation of UI-Router (for a specific framework) should define its own extension of this interface.
  * Add any additional fields that the framework requires to that interface.
- *
- * @internalapi
  */
 export interface _ViewDeclaration {
   /**
    * The raw name for the view declaration, i.e., the [[StateDeclaration.views]] property name.
-   * @internalapi
    */
   $name?: string;
 
@@ -48,7 +43,6 @@ export interface _ViewDeclaration {
    *
    * The `uiViewName` can also target a _nested view_ by providing a dot-notation address
    * @example `foo.bar` or `foo.$default.bar`
-   * @internalapi
    */
   $uiViewName?: string;
 
@@ -56,7 +50,6 @@ export interface _ViewDeclaration {
    * The normalized context anchor (state name) for the `uiViewName`
    *
    * When targeting a `ui-view`, the `uiViewName` address is anchored to a context name (state name).
-   * @internalapi
    */
   $uiViewContextAnchor?: string;
 
@@ -65,13 +58,11 @@ export interface _ViewDeclaration {
    *
    * This is used when loading prerequisites for the view, before it enters the DOM.  Different types of views
    * may load differently (e.g., templateProvider+controllerProvider vs component class)
-   * @internalapi
    */
   $type?: string;
 
   /**
    * The context that this view is declared within.
-   * @internalapi
    */
   $context?: ViewContext;
 }
@@ -160,6 +151,7 @@ export interface StateDeclaration {
    * Gets the *internal API* for a registered state.
    *
    * Note: the internal [[StateObject]] API is subject to change without notice
+   * @internal
    */
   $$state?: () => StateObject;
 
