@@ -280,6 +280,7 @@ export class ViewService {
     // Updates a uiview portal with the details about what should be rendered
     const configureUIView = (tuple: ViewTuple) => {
       const { viewConfig, uiView } = tuple;
+      const id = uiView.id;
 
       // If a parent ui-view is reconfigured, it could destroy child ui-views.
       // Before configuring a child ui-view, make sure it's still in the active uiViews array.
@@ -294,10 +295,10 @@ export class ViewService {
       }
 
       const newCommand: UIViewPortalRenderCommand = !viewConfig
-        ? { command: 'RENDER_DEFAULT_CONTENT' }
+        ? { id, command: 'RENDER_DEFAULT_CONTENT' }
         : uiView.type === viewConfig.viewDecl.$type
-        ? { command: 'RENDER_ROUTED_VIEW', routedViewConfig: viewConfig }
-        : { command: 'RENDER_INTEROP_DIV', giveDiv };
+        ? { id, command: 'RENDER_ROUTED_VIEW', routedViewConfig: viewConfig }
+        : { id, command: 'RENDER_INTEROP_DIV', giveDiv };
 
       function hasChanged(a: UIViewPortalRenderCommand, b: UIViewPortalRenderCommand) {
         if (a.command === 'RENDER_ROUTED_VIEW' && b.command === 'RENDER_ROUTED_VIEW') {
@@ -429,7 +430,7 @@ export class ViewService {
       name,
       fqn,
       portalState: state,
-      currentPortalCommand: { command: undefined },
+      currentPortalCommand: { id, command: undefined },
       renderContentIntoUIViewPortal,
     };
 

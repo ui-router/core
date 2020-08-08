@@ -40,15 +40,18 @@ export interface RegisteredUIViewPortal {
 }
 
 interface RenderRoutedComponentCommand {
+  id: string;
   command: 'RENDER_ROUTED_VIEW';
   routedViewConfig: ViewConfig;
 }
 
 interface RenderDefaultContentCommand {
+  id: string;
   command: 'RENDER_DEFAULT_CONTENT';
 }
 
 interface RenderInteropDivCommand {
+  id: string;
   command: 'RENDER_INTEROP_DIV';
   giveDiv: (div: HTMLDivElement) => void;
 }
