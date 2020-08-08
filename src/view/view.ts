@@ -1,5 +1,5 @@
 import { applyPairs, equals, find, inArray, pairs, removeFrom, TypedMap, values } from '../common/common';
-import { curry, parse, prop } from '../common/hof';
+import { curry, prop } from '../common/hof';
 import { isArray, isString } from '../common/predicates';
 import { trace } from '../common/trace';
 import { PathNode } from '../path/pathNode';
@@ -7,7 +7,6 @@ import { UIRouter } from '../router';
 import { _ViewDeclaration } from '../state/interface';
 import {
   ActiveUIView,
-  PortalContentType,
   RegisteredUIViewPortal,
   RenderContentCallback,
   ViewConfig,
@@ -212,6 +211,7 @@ export class ViewService {
   private _rootViewContext(context?: ViewContext): ViewContext {
     return (this._rootContext = context || this._rootContext);
   }
+
   /** @internal */
   private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
     this._viewConfigFactories[viewType] = factory;
@@ -280,7 +280,7 @@ export class ViewService {
     // Updates a uiview portal with the details about what should be rendered
     const configureUIView = (tuple: ViewTuple) => {
       const { viewConfig, uiView } = tuple;
-      const id = uiView.id;
+      const uiViewId = uiView.id;
 
       // If a parent ui-view is reconfigured, it could destroy child ui-views.
       // Before configuring a child ui-view, make sure it's still in the active uiViews array.
@@ -294,11 +294,13 @@ export class ViewService {
         }
       }
 
+      const portalState = uiView.portalState.self;
+      const contentState = viewConfig?.viewDecl?.$context.self;
       const newCommand: UIViewPortalRenderCommand = !viewConfig
-        ? { id, command: 'RENDER_DEFAULT_CONTENT' }
+        ? { uiViewId, portalState, command: 'RENDER_DEFAULT_CONTENT' }
         : uiView.type === viewConfig.viewDecl.$type
-        ? { id, command: 'RENDER_ROUTED_VIEW', routedViewConfig: viewConfig }
-        : { id, command: 'RENDER_INTEROP_DIV', giveDiv };
+        ? { uiViewId, portalState, command: 'RENDER_ROUTED_VIEW', contentState, routedViewConfig: viewConfig }
+        : { uiViewId, portalState, command: 'RENDER_INTEROP_DIV', giveDiv };
 
       function hasChanged(a: UIViewPortalRenderCommand, b: UIViewPortalRenderCommand) {
         if (a.command === 'RENDER_ROUTED_VIEW' && b.command === 'RENDER_ROUTED_VIEW') {
@@ -309,7 +311,7 @@ export class ViewService {
 
       // Don't do anything if the uiview portal is already configured correctly
       if (doesUIViewStillExist() && hasChanged(uiView.currentPortalCommand, newCommand)) {
-        uiView.contentState = parse('viewDecl.$context')(viewConfig);
+        uiView.contentState = viewConfig?.viewDecl?.$context;
         uiView.currentPortalCommand = newCommand;
         uiView.renderContentIntoUIViewPortal(newCommand);
       }
@@ -430,7 +432,7 @@ export class ViewService {
       name,
       fqn,
       portalState: state,
-      currentPortalCommand: { id, command: undefined },
+      currentPortalCommand: { uiViewId: id, portalState: state.self, command: undefined },
       renderContentIntoUIViewPortal,
     };
 
