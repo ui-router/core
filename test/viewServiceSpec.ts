@@ -26,7 +26,7 @@ const makeUIView = (state?): ActiveUIView => ({
   fqn: '$default',
   config: null,
   creationContext: state,
-  configUpdated: function() {},
+  configUpdated: function () {},
 });
 
 describe('View Service', () => {
@@ -34,23 +34,23 @@ describe('View Service', () => {
     router = new UIRouter();
     registry = router.stateRegistry;
     $view = router.viewService;
-    tree2Array(statetree, true).forEach(state => registry.register(state));
+    tree2Array(statetree, true).forEach((state) => registry.register(state));
   });
 
   describe('registerUIView', () => {
     it('should track a ui-view', () => {
-      expect($view.available().length).toBe(0);
+      expect($view._pluginapi._registeredUIViews().length).toBe(0);
       $view.registerUIView(makeUIView());
-      expect($view.available().length).toBe(1);
+      expect($view._pluginapi._registeredUIViews().length).toBe(1);
     });
 
     it('should return a deregistration function', () => {
-      expect($view.available().length).toBe(0);
+      expect($view._pluginapi._registeredUIViews().length).toBe(0);
       const deregistrationFn = $view.registerUIView(makeUIView());
       expect(typeof deregistrationFn).toBe('function');
-      expect($view.available().length).toBe(1);
+      expect($view._pluginapi._registeredUIViews().length).toBe(1);
       deregistrationFn();
-      expect($view.available().length).toBe(0);
+      expect($view._pluginapi._registeredUIViews().length).toBe(0);
     });
   });
 
@@ -59,7 +59,7 @@ describe('View Service', () => {
       expect($view._pluginapi._registeredUIViews()).toEqual([]);
 
       const uiView = makeUIView();
-      const id = $view.registerView(uiView.$type, null, uiView.name, () => null);
+      const id = $view._pluginapi._registerView(uiView.$type, null, uiView.name, () => null);
       const registeredView = $view._pluginapi._registeredUIView(id);
       expect(registeredView).toBeDefined();
       expect(registeredView.name).toBe(uiView.name);
@@ -98,8 +98,8 @@ describe('View Service', () => {
 
     it('ViewSyncListeners receive tuples for all registered uiviews', () => {
       const listener = jasmine.createSpy('listener');
-      const id1 = $view.registerView('type1', null, 'foo', () => null);
-      const id2 = $view.registerView('type2', null, 'bar', () => null);
+      const id1 = $view._pluginapi._registerView('type1', null, 'foo', () => null);
+      const id2 = $view._pluginapi._registerView('type2', null, 'bar', () => null);
 
       $view._pluginapi._onSync(listener);
       $view.sync();

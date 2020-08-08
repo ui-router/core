@@ -25,6 +25,15 @@ export interface ViewServicePluginAPI {
   /** @param id router.$id + "." + uiView.id */
   _registeredUIView(id: string): RegisteredUIViewPortal;
   _registeredUIViews(): RegisteredUIViewPortal[];
+  _activateViewConfig(viewConfig: ViewConfig);
+  _deactivateViewConfig(viewConfig: ViewConfig);
+  _registerView(
+    type: string,
+    parentId: string,
+    name: string,
+    renderContentIntoUIViewPortal: RenderContentCallback
+  ): string;
+  _deregisterView(uiViewId: string): void;
   _activeViewConfigs(): ViewConfig[];
   _onSync(listener: ViewSyncListener): Function;
 }
@@ -70,6 +79,10 @@ export class ViewService {
     _registeredViewPlugins: () => this._viewPlugins.slice(),
     _rootViewContext: this._rootViewContext.bind(this),
     _viewConfigFactory: this._viewConfigFactory.bind(this),
+    _activateViewConfig: this._activateViewConfig.bind(this),
+    _deactivateViewConfig: this._deactivateViewConfig.bind(this),
+    _registerView: this._registerView.bind(this),
+    _deregisterView: this._deregisterView.bind(this),
     _registeredUIView: (id: string) => this._uiViews[id],
     _registeredUIViews: () => values(this._uiViews),
     _activeViewConfigs: () => this._viewConfigs,
@@ -217,6 +230,7 @@ export class ViewService {
     this._viewConfigFactories[viewType] = factory;
   }
 
+  /** @internal */
   createViewConfig(path: PathNode[], decl: _ViewDeclaration): ViewConfig[] {
     const cfgFactory = this._viewConfigFactories[decl.$type];
     if (!cfgFactory) throw new Error('ViewService: No view config factory registered for type ' + decl.$type);
@@ -232,12 +246,12 @@ export class ViewService {
    *
    * @param viewConfig The ViewConfig view to deregister.
    */
-  deactivateViewConfig(viewConfig: ViewConfig) {
+  private _deactivateViewConfig(viewConfig: ViewConfig) {
     trace.traceViewServiceEvent('<- Removing', viewConfig);
     removeFrom(this._viewConfigs, viewConfig);
   }
 
-  activateViewConfig(viewConfig: ViewConfig) {
+  private _activateViewConfig(viewConfig: ViewConfig) {
     trace.traceViewServiceEvent('-> Registering', <any>viewConfig);
     this._viewConfigs.push(viewConfig);
   }
@@ -335,6 +349,7 @@ export class ViewService {
   }
   // tslint:disable-next-line
   private _deferredRegisterViews: Array<{ isReady: () => boolean; register: () => void }> = [];
+
   /**
    * @deprecated use registerView
    * This is a temporary backwards compatibility method and will be removed in a future version of core
@@ -358,7 +373,7 @@ export class ViewService {
         throw new Error(`Parent UIView for ${uiView.fqn} was not registered`);
       }
 
-      const id = this.registerView(activeUIView.$type, parentId, activeUIView.name, activeUIView.configUpdated);
+      const id = this._registerView(activeUIView.$type, parentId, activeUIView.name, activeUIView.configUpdated);
       activeUIView.id = id;
       const queuedReadyView = find(this._deferredRegisterViews, (val) => val.isReady());
       if (queuedReadyView) {
@@ -366,7 +381,7 @@ export class ViewService {
         queuedReadyView.register();
       }
 
-      return () => this.deregisterView(id);
+      return () => this._deregisterView(id);
     };
 
     if (!(uiView.$type === 'ng1' && getParentId() === undefined)) {
@@ -410,7 +425,7 @@ export class ViewService {
    * @param renderContentIntoUIViewPortal A function that is called when the ui-view portal should render new content
    * @return the id of the registered ui-view
    */
-  registerView(
+  private _registerView(
     type: string,
     parentId: string,
     name: string,
@@ -443,7 +458,7 @@ export class ViewService {
     return id;
   }
 
-  deregisterView(id: string) {
+  private _deregisterView(id: string) {
     if (!this._uiViews[id]) {
       trace.traceViewServiceUIViewEvent(`Tried removing non-registered ui-view ${id}`, null);
       return;
@@ -451,24 +466,6 @@ export class ViewService {
 
     trace.traceViewServiceUIViewEvent('<- Deregistering ${id}', this._uiViews[id]);
     delete this._uiViews[id];
-  }
-
-  /**
-   * Returns the list of views currently available on the page, by fully-qualified name.
-   *
-   * @return {Array} Returns an array of fully-qualified view names.
-   */
-  available() {
-    return values(this._uiViews).map(prop('fqn'));
-  }
-
-  /**
-   * Returns the list of views on the page containing loaded content.
-   *
-   * @return {Array} Returns an array of fully-qualified view names.
-   */
-  active() {
-    return values(this._uiViews).filter(prop('$config')).map(prop('name'));
   }
 
   /**
