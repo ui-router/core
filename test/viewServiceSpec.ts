@@ -37,21 +37,18 @@ describe('View Service', () => {
     tree2Array(statetree, true).forEach((state) => registry.register(state));
   });
 
-  describe('registerUIView', () => {
-    it('should track a ui-view', () => {
-      expect($view._pluginapi._registeredUIViews().length).toBe(0);
-      $view.registerUIView(makeUIView());
-      expect($view._pluginapi._registeredUIViews().length).toBe(1);
-    });
+  it('_pluginapi._registerView should track a ui-view', () => {
+    expect($view._pluginapi._registeredUIViews().length).toBe(0);
+    $view._pluginapi._registerView('core', null, '', () => {});
+    expect($view._pluginapi._registeredUIViews().length).toBe(1);
+  });
 
-    it('should return a deregistration function', () => {
-      expect($view._pluginapi._registeredUIViews().length).toBe(0);
-      const deregistrationFn = $view.registerUIView(makeUIView());
-      expect(typeof deregistrationFn).toBe('function');
-      expect($view._pluginapi._registeredUIViews().length).toBe(1);
-      deregistrationFn();
-      expect($view._pluginapi._registeredUIViews().length).toBe(0);
-    });
+  it('_pluginapi.deregisterView should stop tracking a ui-view', () => {
+    expect($view._pluginapi._registeredUIViews().length).toBe(0);
+    const id = $view._pluginapi._registerView('core', null, '', () => {});
+    expect($view._pluginapi._registeredUIViews().length).toBe(1);
+    $view._pluginapi._deregisterView(id);
+    expect($view._pluginapi._registeredUIViews().length).toBe(0);
   });
 
   describe('_pluginapi._registeredUIView', () => {
