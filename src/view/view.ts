@@ -347,65 +347,6 @@ export class ViewService {
     this._listeners.forEach((cb) => cb(allTuples));
     trace.traceViewSync(allTuples);
   }
-  // tslint:disable-next-line
-  private _deferredRegisterViews: Array<{ isReady: () => boolean; register: () => void }> = [];
-
-  /**
-   * @deprecated use registerView
-   * This is a temporary backwards compatibility method and will be removed in a future version of core
-   */
-  registerUIView(uiView: ActiveUIView) {
-    const fqnSegments = uiView.fqn.split('.');
-    fqnSegments.pop();
-    const parentFqn = fqnSegments.join('.');
-
-    const getParentId = () => {
-      if (parentFqn === '') {
-        return null; // root
-      }
-      const [parentId] = pairs(this._uiViews).find((pair) => (pair[1] as ActiveUIView).fqn === parentFqn) || [];
-      return parentId;
-    };
-
-    const register = (activeUIView: ActiveUIView, parentId: string) => {
-      if (parentId === undefined) {
-        console.error(uiView);
-        throw new Error(`Parent UIView for ${uiView.fqn} was not registered`);
-      }
-
-      const id = this._registerView(activeUIView.$type, parentId, activeUIView.name, activeUIView.configUpdated);
-      activeUIView.id = id;
-      const queuedReadyView = find(this._deferredRegisterViews, (val) => val.isReady());
-      if (queuedReadyView) {
-        this._deferredRegisterViews = removeFrom(this._deferredRegisterViews, queuedReadyView);
-        queuedReadyView.register();
-      }
-
-      return () => this._deregisterView(id);
-    };
-
-    if (!(uiView.$type === 'ng1' && getParentId() === undefined)) {
-      return register(uiView, getParentId());
-    }
-
-    // AngularJS compiles templates depth first so ui-view parent id isn't available when children are compiled
-    // Wow. OK. This Is Fine.
-    let unregistered = false;
-    let unregister = () => {
-      unregistered = true;
-    };
-
-    this._deferredRegisterViews.push({
-      isReady: () => getParentId() !== undefined,
-      register: () => {
-        if (!unregistered) {
-          unregister = register(uiView, getParentId());
-        }
-      },
-    });
-
-    return () => unregister();
-  }
 
   /**
    * Registers a `ui-view` component
