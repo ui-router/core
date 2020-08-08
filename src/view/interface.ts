@@ -1,6 +1,6 @@
 import { UIRouterPlugin } from '../interface';
 import { UIRouter } from '../router';
-import { StateObject } from '../state';
+import { StateDeclaration, StateObject } from '../state';
 import { _ViewDeclaration } from '../state/interface';
 import { PathNode } from '../path/pathNode';
 
@@ -40,18 +40,22 @@ export interface RegisteredUIViewPortal {
 }
 
 interface RenderRoutedComponentCommand {
-  id: string;
+  uiViewId: string;
+  portalState: StateDeclaration;
+  contentState: StateDeclaration;
   command: 'RENDER_ROUTED_VIEW';
   routedViewConfig: ViewConfig;
 }
 
 interface RenderDefaultContentCommand {
-  id: string;
+  uiViewId: string;
+  portalState: StateDeclaration;
   command: 'RENDER_DEFAULT_CONTENT';
 }
 
 interface RenderInteropDivCommand {
-  id: string;
+  uiViewId: string;
+  portalState: StateDeclaration;
   command: 'RENDER_INTEROP_DIV';
   giveDiv: (div: HTMLDivElement) => void;
 }
@@ -61,7 +65,6 @@ export type UIViewPortalRenderCommand =
   | RenderDefaultContentCommand
   | RenderInteropDivCommand;
 
-export declare type PortalContentType = 'DEFAULT_CONTENT' | 'ROUTED_COMPONENT' | 'INTEROP_DIV';
 export declare type RenderContentCallback = RegisteredUIViewPortal['renderContentIntoUIViewPortal'];
 
 /** @deprecated @internalapi */
