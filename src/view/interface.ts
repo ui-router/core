@@ -145,4 +145,6 @@ export interface UIRouterViewPlugin extends UIRouterPlugin {
    * @param buriedTreasure
    */
   renderUIViewIntoDivElement(router: UIRouter, divElement: HTMLDivElement, customDataFromAncestor: any);
+
+  // createViewConfig();
 }
