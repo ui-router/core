@@ -8,7 +8,7 @@ import { _ViewDeclaration } from '../state/interface';
 import {
   ActiveUIView,
   RegisteredUIViewPortal,
-  RenderContentCallback,
+  PortalRenderCommandCallback,
   ViewConfig,
   ViewContext,
   UIRouterViewPlugin,
@@ -31,21 +31,30 @@ export interface ViewServicePluginAPI {
     type: string,
     parentId: string,
     name: string,
-    renderContentIntoUIViewPortal: RenderContentCallback
+    renderContentIntoUIViewPortal: PortalRenderCommandCallback
   ): string;
   _deregisterView(uiViewId: string): void;
   _activeViewConfigs(): ViewConfig[];
   _onSync(listener: ViewSyncListener): Function;
 }
 
-// A uiView and its matching viewConfig
+/** A uiView and its matching viewConfig */
 export interface ViewTuple {
-  uiView: RegisteredUIViewPortal;
+  uiView: _RegisteredUIViewPortal;
   viewConfig: ViewConfig;
 }
 
 export interface ViewSyncListener {
   (viewTuples: ViewTuple[]): void;
+}
+
+/** @internal */
+interface _RegisteredUIViewPortal extends RegisteredUIViewPortal {
+  /* The fully qualified ui-view address, (i.e., `${parentview.fqn}.${name}` */
+  _fqn: string;
+
+  /** The Render Comand Callback that the registered UIView portal provided */
+  _renderContentIntoUIViewPortal: PortalRenderCommandCallback;
 }
 
 /**
@@ -66,7 +75,7 @@ export interface ViewSyncListener {
  */
 export class ViewService {
   /** @internal */ private _viewPlugins: UIRouterViewPlugin[] = [];
-  /** @internal */ private _uiViews: { [viewId: string]: RegisteredUIViewPortal } = {};
+  /** @internal */ private _uiViews: { [viewId: string]: _RegisteredUIViewPortal } = {};
   /** @internal */ private _viewConfigs: ViewConfig[] = [];
   /** @internal */ private _rootContext: ViewContext;
   /** @internal */ private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
@@ -149,7 +158,7 @@ export class ViewService {
    *
    * @internal
    */
-  static matches = (uiViewsByFqn: TypedMap<RegisteredUIViewPortal>, uiView: RegisteredUIViewPortal) => (
+  static matches = (uiViewsByFqn: TypedMap<_RegisteredUIViewPortal>, uiView: _RegisteredUIViewPortal) => (
     viewConfig: ViewConfig
   ) => {
     // Don't supply an ng1 ui-view with an ng2 ViewConfig, etc
@@ -158,7 +167,7 @@ export class ViewService {
     // Split names apart from both viewConfig and uiView into segments
     const vc = viewConfig.viewDecl;
     const vcSegments = vc.$uiViewName.split('.');
-    const uivSegments = uiView.fqn.split('.');
+    const uivSegments = uiView._fqn.split('.');
 
     // Check if the tails of the segment arrays match. ex, these arrays' tails match:
     // vc: ["foo", "bar"], uiv fqn: ["$default", "foo", "bar"]
@@ -257,22 +266,23 @@ export class ViewService {
   }
 
   sync() {
-    const uiViewsByFqn: TypedMap<RegisteredUIViewPortal> = values(this._uiViews)
-      .map((uiv) => [uiv.fqn, uiv])
+    const uiViewsByFqn: TypedMap<_RegisteredUIViewPortal> = values(this._uiViews)
+      .map((uiv) => [uiv._fqn, uiv])
       .reduce(applyPairs, <any>{});
 
     // Return a weighted depth value for a uiView.
     // The depth is the nesting depth of ui-views (based on FQN; times 10,000)
     // plus the depth of the state that is populating the uiView
-    function uiViewDepth(uiView: RegisteredUIViewPortal) {
+    function uiViewDepth(uiView: _RegisteredUIViewPortal) {
       const stateDepth = (context: ViewContext) => (context && context.parent ? stateDepth(context.parent) + 1 : 1);
-      return uiView.fqn.split('.').length * 10000 + stateDepth(uiView.portalState);
+      return uiView._fqn.split('.').length * 10000 + stateDepth(uiView.portalState.$$state());
     }
 
     // Return the ViewConfig's context's depth in the context tree.
     function viewConfigDepth(config: ViewConfig) {
-      let context: ViewContext = config.viewDecl.$context,
-        count = 0;
+      let context: ViewContext = config.viewDecl.$context;
+      let count = 0;
+
       while (++count && context.parent) context = context.parent;
       return count;
     }
@@ -280,7 +290,7 @@ export class ViewService {
     // Given a depth function, returns a compare function which can return either ascending or descending order
     const depthCompare = curry((depthFn, posNeg, left, right) => posNeg * (depthFn(left) - depthFn(right)));
 
-    const matchingConfigPair = (uiView: RegisteredUIViewPortal): ViewTuple => {
+    const matchingConfigPair = (uiView: _RegisteredUIViewPortal): ViewTuple => {
       const matchingConfigs = this._viewConfigs.filter(ViewService.matches(uiViewsByFqn, uiView));
       if (matchingConfigs.length > 1) {
         // This is OK.  Child states can target a ui-view that the parent state also targets (the child wins)
@@ -308,26 +318,26 @@ export class ViewService {
         }
       }
 
-      const portalState = uiView.portalState.self;
+      const portalState = uiView.portalState;
       const contentState = viewConfig?.viewDecl?.$context.self;
       const newCommand: UIViewPortalRenderCommand = !viewConfig
-        ? { uiViewId, portalState, command: 'RENDER_DEFAULT_CONTENT' }
+        ? { uiViewId, portalState, portalAction: 'RENDER_DEFAULT_CONTENT' }
         : uiView.type === viewConfig.viewDecl.$type
-        ? { uiViewId, portalState, command: 'RENDER_ROUTED_VIEW', contentState, routedViewConfig: viewConfig }
-        : { uiViewId, portalState, command: 'RENDER_INTEROP_DIV', giveDiv };
+        ? { uiViewId, portalState, portalAction: 'RENDER_ROUTED_VIEW', contentState, viewConfig }
+        : { uiViewId, portalState, portalAction: 'RENDER_INTEROP_DIV', giveDiv };
 
-      function hasChanged(a: UIViewPortalRenderCommand, b: UIViewPortalRenderCommand) {
-        if (a.command === 'RENDER_ROUTED_VIEW' && b.command === 'RENDER_ROUTED_VIEW') {
-          return a.routedViewConfig !== b.routedViewConfig;
+      function hasChanged(current: RegisteredUIViewPortal, next: UIViewPortalRenderCommand) {
+        if (current.portalAction === 'RENDER_ROUTED_VIEW' && next.portalAction === 'RENDER_ROUTED_VIEW') {
+          return current.viewConfig !== next.viewConfig;
         }
-        return a.command !== b.command;
+        return current.portalAction !== next.portalAction;
       }
 
       // Don't do anything if the uiview portal is already configured correctly
-      if (doesUIViewStillExist() && hasChanged(uiView.currentPortalCommand, newCommand)) {
-        uiView.contentState = viewConfig?.viewDecl?.$context;
-        uiView.currentPortalCommand = newCommand;
-        uiView.renderContentIntoUIViewPortal(newCommand);
+      if (doesUIViewStillExist() && hasChanged(uiView, newCommand)) {
+        uiView.contentState = viewConfig?.viewDecl?.$context?.self;
+        uiView.portalAction = newCommand.portalAction;
+        uiView._renderContentIntoUIViewPortal(newCommand);
       }
     };
 
@@ -370,26 +380,29 @@ export class ViewService {
     type: string,
     parentId: string,
     name: string,
-    renderContentIntoUIViewPortal: RenderContentCallback
+    renderContentIntoUIViewPortal: PortalRenderCommandCallback
   ): string {
     const parent = this._uiViews[parentId];
+
     if (typeof parentId === 'string' && !parent) {
-      throw new Error(`Tried to register a new ui-view, but its parent ${parentId} is not currently registered`);
+      throw new Error(`Tried to register a new uiview, but its parent ${parentId} is not currently registered`);
     }
 
-    const state = (parent && parent.contentState) || this.router.stateRegistry.root();
+    const state = (parent && parent.contentState) ?? this.router.stateRegistry.root().self;
     const id = `${this.router.$id}.${this._uiViewCounter++}`;
-    const fqn = parent ? `${parent.fqn}.${name}` : name;
+    const _fqn = parent ? `${parent._fqn}.${name}` : name;
 
-    const registeredUIViewPortal: RegisteredUIViewPortal = {
+    const registeredUIViewPortal: _RegisteredUIViewPortal = {
       id,
       parentId,
       type,
       name,
-      fqn,
       portalState: state,
-      currentPortalCommand: { uiViewId: id, portalState: state.self, command: undefined },
-      renderContentIntoUIViewPortal,
+      portalAction: 'RENDER_DEFAULT_CONTENT',
+      viewConfig: undefined,
+      contentState: undefined,
+      _fqn,
+      _renderContentIntoUIViewPortal: renderContentIntoUIViewPortal,
     };
 
     this._uiViews[id] = registeredUIViewPortal;
