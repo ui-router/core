@@ -1,12 +1,11 @@
 import { applyPairs, equals, find, inArray, pairs, removeFrom, TypedMap, values } from '../common/common';
-import { curry, prop } from '../common/hof';
+import { curry } from '../common/hof';
 import { isArray, isString } from '../common/predicates';
 import { trace } from '../common/trace';
 import { PathNode } from '../path/pathNode';
 import { UIRouter } from '../router';
 import { _ViewDeclaration } from '../state/interface';
 import {
-  ActiveUIView,
   RegisteredUIViewPortal,
   PortalRenderCommandCallback,
   ViewConfig,
