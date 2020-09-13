@@ -1,9 +1,8 @@
 import { UIRouter } from '../src/router';
-import { ActiveUIView, ViewSyncListener, ViewTuple } from '../src/view';
+import { ViewSyncListener, ViewTuple } from '../src/view';
 import { tree2Array } from './_testUtils';
 import { StateRegistry } from '../src/state/stateRegistry';
 import { ViewService } from '../src/view/view';
-import { RegisteredUIViewPortal } from '../src/view/interface';
 
 let router: UIRouter = null;
 let registry: StateRegistry = null;
@@ -17,17 +16,6 @@ const statetree = {
     },
   },
 };
-
-let count = 0;
-const makeUIView = (state?): ActiveUIView => ({
-  $type: 'test',
-  id: count++,
-  name: '$default',
-  fqn: '$default',
-  config: null,
-  creationContext: state,
-  configUpdated: function () {},
-});
 
 describe('View Service', () => {
   beforeEach(() => {
@@ -55,11 +43,10 @@ describe('View Service', () => {
     it('should return a ui-view from an id', () => {
       expect($view._pluginapi._registeredUIViews()).toEqual([]);
 
-      const uiView = makeUIView();
-      const id = $view._pluginapi._registerView(uiView.$type, null, uiView.name, () => null);
+      const id = $view._pluginapi._registerView('test', null, '$default', () => null);
       const registeredView = $view._pluginapi._registeredUIView(id);
       expect(registeredView).toBeDefined();
-      expect(registeredView.name).toBe(uiView.name);
+      expect(registeredView.name).toBe('$default');
       expect(registeredView.id).toBe(id);
     });
   });

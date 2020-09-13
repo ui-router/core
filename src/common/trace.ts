@@ -35,8 +35,8 @@
 import { parse } from '../common/hof';
 import { isNumber } from '../common/predicates';
 import { Transition } from '../transition/transition';
-import { ActiveUIView, ViewTuple } from '../view';
-import { RegisteredUIViewPortal, ViewConfig, ViewContext } from '../view/interface';
+import { ViewTuple } from '../view';
+import { ViewConfig, ViewContext } from '../view/interface';
 import { stringify, functionToString, maxLength, padString } from './strings';
 import { safeConsole } from './safeConsole';
 import { Resolvable } from '../resolve/resolvable';
@@ -48,14 +48,11 @@ import { StateObject } from '../state/stateObject';
 
 // kludge to access private type, hmmm...
 type _RegisteredUIViewPortal = ViewTuple['uiView'];
-function uiViewString(uiview: _RegisteredUIViewPortal | ActiveUIView) {
+function uiViewString(uiview: _RegisteredUIViewPortal) {
   if (!uiview) return 'ui-view (defunct)';
-  const isActiveUiView = (obj: typeof uiview): obj is ActiveUIView => !!(uiview as ActiveUIView).$type;
-  const type = isActiveUiView(uiview) ? uiview.$type : uiview.type;
-  const stateObj = isActiveUiView(uiview) ? uiview.creationContext : uiview.portalState;
-  const stateName = stateObj ? stateObj.name || '(root)' : '(none)';
-  const fqn = 'fqn' in uiview ? uiview.fqn : uiview._fqn;
-  return `[ui-view#${uiview.id} ${type}:${fqn} (${uiview.name}@${stateName})]`;
+  const { portalState } = uiview;
+  const stateName = portalState ? portalState.name || '(root)' : '(none)';
+  return `[ui-view#${uiview.id} ${uiview.type}:${uiview._fqn} (${uiview.name}@${stateName})]`;
 }
 
 const viewConfigString = (viewConfig: ViewConfig) => {
@@ -218,19 +215,19 @@ export class Trace {
   }
 
   /** @internal called by ui-router code */
-  traceUIViewEvent(event: string, viewData: _RegisteredUIViewPortal | ActiveUIView, extra = '') {
+  traceUIViewEvent(event: string, viewData: _RegisteredUIViewPortal, extra = '') {
     if (!this.enabled(Category.UIVIEW)) return;
     safeConsole.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
   }
 
   /** @internal called by ui-router code */
-  traceUIViewConfigUpdated(viewData: _RegisteredUIViewPortal | ActiveUIView, context: ViewContext) {
+  traceUIViewConfigUpdated(viewData: _RegisteredUIViewPortal, context: ViewContext) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent('Updating', viewData, ` with ViewConfig from context='${context}'`);
   }
 
   /** @internal called by ui-router code */
-  traceUIViewFill(viewData: _RegisteredUIViewPortal | ActiveUIView, html: string) {
+  traceUIViewFill(viewData: _RegisteredUIViewPortal, html: string) {
     if (!this.enabled(Category.UIVIEW)) return;
     this.traceUIViewEvent('Fill', viewData, ` with: ${maxLength(200, html)}`);
   }
@@ -258,7 +255,7 @@ export class Trace {
   }
 
   /** @internal called by ui-router code */
-  traceViewServiceUIViewEvent(event: string, viewData: _RegisteredUIViewPortal | ActiveUIView) {
+  traceViewServiceUIViewEvent(event: string, viewData: _RegisteredUIViewPortal) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
     safeConsole.log(`VIEWCONFIG: ${event} ${uiViewString(viewData)}`);
   }

@@ -77,24 +77,6 @@ export type UIViewPortalRenderCommand =
  */
 export declare type PortalRenderCommandCallback = (uiViewPortalRenderCommand: UIViewPortalRenderCommand) => void;
 
-/** @deprecated @internalapi */
-export interface ActiveUIView {
-  /** type of framework, e.g., "ng1" or "ng2" */
-  $type: string;
-  /** An auto-incremented id */
-  id: number | string;
-  /** The ui-view short name */
-  name: string;
-  /** The ui-view's fully qualified name */
-  fqn: string;
-  /** The ViewConfig that is currently loaded into the ui-view */
-  config: ViewConfig;
-  /** The state context in which the ui-view tag was created. */
-  creationContext: ViewContext;
-  /** A callback that should apply a ViewConfig (or clear the ui-view, if config is undefined) */
-  configUpdated: PortalRenderCommandCallback;
-}
-
 /**
  * @internal
  *
