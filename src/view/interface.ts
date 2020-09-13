@@ -7,65 +7,75 @@ import { PathNode } from '../path/pathNode';
 /** @internalapi */
 export type ViewContext = StateObject;
 
-/**
- * @internalapi
- *
- * The metadata around a ui-view component that registered itself with the view service.
- */
+/** Information about a uiview portal component registered the view service. */
 export interface RegisteredUIViewPortal {
-  /** ui-view portal component type, e.g., 'react' or 'angular' */
-  type: string;
   /** the id of the ui-view portal */
   id: string;
+
   /** the id of the parent ui-view portal, or null if the view is rendered at the root */
   parentId: string;
-  /** the state which rendered the ui-view portal */
-  portalState: StateObject;
-  /**
-   * The state of the content component currently loaded into the portal,
-   * or null if no component is loaded into the portal
-   */
-  contentState?: StateObject;
-  /** The ui-view short name, for named ui-views.  $default for unnamed ui-views */
+
+  /** ui-view portal component type, e.g., 'react' or 'angular' */
+  type: string;
+
+  /** The ui-view short name, for named ui-views. $default for unnamed ui-views */
   name: string;
-  /** The fully qualified ui-view address, (i.e., `${parentview.fqn}.${name}` */
-  fqn: string;
-  /** The command most recently sent to the UIView */
-  currentPortalCommand: UIViewPortalRenderCommand;
+
+  /** The state which rendered the ui-view portal */
+  portalState: StateDeclaration;
+
+  /** The current uiview portal action from the most recent command */
+  portalAction: PortalAction;
+
   /**
-   * A callback that instructs the uiview portal what to render.
-   * This function will be called whenever the uiview portal should change its contents, e.g., after a Transition.
+   * The portal's current ViewConfig, or undefined.
+   * A ViewConfig is only present when [[portalAction]] is equal to `RENDER_ROUTED_VIEW`
    */
-  renderContentIntoUIViewPortal(uiViewPortalRenderCommand: UIViewPortalRenderCommand): void;
+  viewConfig?: ViewConfig;
+
+  /**
+   * The router state from in the [[viewConfig]], or undefined.
+   * This state is the router state which has its component rendered in the uiview portal.
+   */
+  contentState?: StateDeclaration;
 }
 
-interface RenderRoutedComponentCommand {
+interface RenderCommand {
+  // The id of the uiview portal
   uiViewId: string;
+  // The action the uiview portal should take
+  portalAction: PortalAction;
+  // The router state that rendered the portal
   portalState: StateDeclaration;
+}
+
+interface RenderRoutedComponentCommand extends RenderCommand {
+  portalAction: 'RENDER_ROUTED_VIEW';
   contentState: StateDeclaration;
-  command: 'RENDER_ROUTED_VIEW';
-  routedViewConfig: ViewConfig;
+  viewConfig: ViewConfig;
 }
 
-interface RenderDefaultContentCommand {
-  uiViewId: string;
-  portalState: StateDeclaration;
-  command: 'RENDER_DEFAULT_CONTENT';
+interface RenderDefaultContentCommand extends RenderCommand {
+  portalAction: 'RENDER_DEFAULT_CONTENT';
 }
 
-interface RenderInteropDivCommand {
-  uiViewId: string;
-  portalState: StateDeclaration;
-  command: 'RENDER_INTEROP_DIV';
+interface RenderInteropDivCommand extends RenderCommand {
+  portalAction: 'RENDER_INTEROP_DIV';
   giveDiv: (div: HTMLDivElement) => void;
 }
+
+export type PortalAction = 'RENDER_INTEROP_DIV' | 'RENDER_DEFAULT_CONTENT' | 'RENDER_ROUTED_VIEW';
 
 export type UIViewPortalRenderCommand =
   | RenderRoutedComponentCommand
   | RenderDefaultContentCommand
   | RenderInteropDivCommand;
 
-export declare type RenderContentCallback = RegisteredUIViewPortal['renderContentIntoUIViewPortal'];
+/**
+ * A callback provided by the uiview portal which instructs the portal what it should render.
+ * This function will be called whenever the uiview portal should change its contents, e.g., after a Transition.
+ */
+export declare type PortalRenderCommandCallback = (uiViewPortalRenderCommand: UIViewPortalRenderCommand) => void;
 
 /** @deprecated @internalapi */
 export interface ActiveUIView {
@@ -82,10 +92,12 @@ export interface ActiveUIView {
   /** The state context in which the ui-view tag was created. */
   creationContext: ViewContext;
   /** A callback that should apply a ViewConfig (or clear the ui-view, if config is undefined) */
-  configUpdated: RenderContentCallback;
+  configUpdated: PortalRenderCommandCallback;
 }
 
 /**
+ * @internal
+ *
  * This interface represents a [[_ViewDeclaration]] that is bound to a [[PathNode]].
  *
  * A `ViewConfig` is the runtime definition of a single view.

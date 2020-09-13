@@ -60,7 +60,6 @@ describe('View Service', () => {
       const registeredView = $view._pluginapi._registeredUIView(id);
       expect(registeredView).toBeDefined();
       expect(registeredView.name).toBe(uiView.name);
-      expect(registeredView.fqn).toBe(uiView.fqn);
       expect(registeredView.id).toBe(id);
     });
   });
