@@ -95,11 +95,11 @@
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
 
 "@uirouter/publish-scripts@^2.5.3":
-  version "2.5.3"
-  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.5.3.tgz#569e562e77b2704b56eb2098d1f9add035503e58"
-  integrity sha512-ZY/edN6IKfW0gfwx2b+E9K5nBuc/3gGjoeBhNX3q1IH+ntrdR7nxq009IwT556Ti8GpE/78H65RZqk9R/lwiGQ==
+  version "2.5.4"
+  resolved "https://registry.yarnpkg.com/@uirouter/publish-scripts/-/publish-scripts-2.5.4.tgz#facc20b7f3ef4cd6def05805c077edfb3b1bb935"
+  integrity sha512-zHFHH1V890JF2b6HYPdr2PvJEGyZoL4HxqrZ6dPaJRFP65chbbnWzo0+JXE7QkwPWQrG+TQU30/Golg+ekRuiQ==
   dependencies:
-    check-peer-dependencies "^2.0.2"
+    check-peer-dependencies "^2.0.6"
     conventional-changelog "^3.1.21"
     conventional-changelog-ui-router-core "^1.4.2"
     find-parent-dir "^0.3.0"
@@ -790,10 +790,10 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-check-peer-dependencies@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/check-peer-dependencies/-/check-peer-dependencies-2.0.2.tgz#f41ee03da90e9caa42b0d35b95d29ba5ec0d8f50"
-  integrity sha512-2ONozVlLrkoTtlHBNFBNDQn4pjzecvwD8NlkpiPxVcvio9YulTdORzEr4kzrm1k2M3oZ2B7uNCzoe8w/FM/6Cg==
+check-peer-dependencies@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/check-peer-dependencies/-/check-peer-dependencies-2.0.6.tgz#e407e6f3433eac6138765474a114c96a787d7c04"
+  integrity sha512-q++3UFY2vgZEcUlHSDLR6JmBispEf6az90wNFSfM3hiD+DuZUd0mD+eYGSQMTUVvvEZkaS+B71utvsKYiBPemg==
   dependencies:
     resolve "^1.14.1"
     semver "^7.1.1"
@@ -4071,16 +4071,7 @@ shell-quote@^1.6.1:
     array-reduce "~0.0.0"
     jsonify "~0.0.0"
 
-shelljs@^0.8.1, shelljs@^0.8.3:
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.3.tgz#a7f3319520ebf09ee81275b2368adb286659b097"
-  integrity sha512-fc0BKlAWiLpwZljmOvAOTE/gXawtCoNrP5oaY7KIaQbbyHeQVg01pSEuEGvGh3HEdBU4baCD7wQBwADmM/7f7A==
-  dependencies:
-    glob "^7.0.0"
-    interpret "^1.0.0"
-    rechoir "^0.6.2"
-
-shelljs@^0.8.4:
+shelljs@^0.8.1, shelljs@^0.8.3, shelljs@^0.8.4:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.4.tgz#de7684feeb767f8716b326078a8a00875890e3c2"
   integrity sha512-7gk3UZ9kOfPLIAbslLzyWeGiEqx9e3rxwZM0KE6EL8GlGwjym9Mrlx5/p33bWTu9YG6vcS4MBxYZDHYr5lr8BQ==
