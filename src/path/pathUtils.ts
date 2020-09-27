@@ -61,7 +61,7 @@ export class PathUtils {
       .forEach((node) => {
         const viewDecls: _ViewDeclaration[] = values(node.state.views || {});
         const subPath = PathUtils.subPath(path, (n) => n === node);
-        const viewConfigs: ViewConfig[][] = viewDecls.map((view) => $view.createViewConfig(subPath, view));
+        const viewConfigs: ViewConfig[][] = viewDecls.map((view) => $view._createViewConfig(subPath, view));
         node.views = viewConfigs.reduce(unnestR, []);
       });
   }
