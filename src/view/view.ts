@@ -243,7 +243,7 @@ export class ViewService {
   }
 
   /** @internal */
-  createViewConfig(path: PathNode[], decl: _ViewDeclaration): ViewConfig[] {
+  _createViewConfig(path: PathNode[], decl: _ViewDeclaration): ViewConfig[] {
     const cfgFactory = this._viewConfigFactories[decl.$type];
     if (!cfgFactory) throw new Error('ViewService: No view config factory registered for type ' + decl.$type);
     const cfgs = cfgFactory(path, decl);
@@ -304,52 +304,6 @@ export class ViewService {
       return { uiView, viewConfig: matchingConfigs[0] };
     };
 
-    // Updates a uiview portal with the details about what should be rendered
-    const configureUIView = (tuple: ViewTuple) => {
-      const { viewConfig, uiView } = tuple;
-
-      const doesUIViewStillExist = () => values(this._uiViews).indexOf(uiView) !== -1;
-
-      // If a parent ui-view is reconfigured, it could destroy child ui-views.
-      // Before configuring a child ui-view, make sure it's still in the active uiViews array.
-      if (!doesUIViewStillExist()) {
-        return;
-      }
-
-      const portalContentType: PortalContentType = !viewConfig
-        ? DEFAULT_CONTENT
-        : uiView.type === viewConfig.viewDecl.$type
-        ? ROUTED_VIEW
-        : INTEROP_DIV;
-
-      // If the content type and the viewconfig reference haven't changed, exit early
-      if (portalContentType === uiView.portalContentType && viewConfig === uiView.viewConfig) {
-        return;
-      }
-
-      // Update the registration object
-      uiView.contentState = viewConfig?.viewDecl?.$context?.self;
-      uiView.portalContentType = portalContentType;
-      uiView.viewConfig = viewConfig;
-
-      if (portalContentType === INTEROP_DIV) {
-        // This giveDiv callback is passed to this UIView from "view plugin A".
-        // The UIView is expected to render a div and call the giveDiv callback.
-        const giveDiv = (divElement: HTMLDivElement) => {
-          if (doesUIViewStillExist()) {
-            // We got a raw HTMLDivElement from "view plugin A"'s UIView.
-            // Now we tell "view plugin B" to render a UIView into this div
-            const viewPlugin = this._viewPlugins.find((p) => p.name === viewConfig.viewDecl.$type);
-            viewPlugin.renderUIViewIntoDivElement(this.router, divElement, this._uiViewPath(uiView.id));
-          }
-        };
-
-        uiView._renderContentIntoUIViewPortal({ portalContentType, uiViewPortalRegistration: uiView, giveDiv });
-      } else {
-        uiView._renderContentIntoUIViewPortal({ portalContentType, uiViewPortalRegistration: uiView });
-      }
-    };
-
     // Sort views by FQN and state depth. Process uiviews nearest the root first.
     const uiViewTuples = values(this._uiViews).sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair);
 
@@ -360,12 +314,66 @@ export class ViewService {
       .filter((config) => !inArray(matchedViewConfigs, config))
       .map((viewConfig) => ({ uiView: undefined, viewConfig }));
 
-    uiViewTuples.forEach(configureUIView);
+    uiViewTuples.forEach((tuple) => this._configureUIView(tuple));
 
     const allTuples: ViewTuple[] = uiViewTuples.concat(unmatchedConfigTuples);
     this._listeners.forEach((cb) => cb(allTuples));
     trace.traceViewSync(allTuples);
   }
+
+  /**
+   * Updates a UIView Portal with the details about what should be rendered
+   * This method short circuits if no change is necessary.
+   * Otherwise, it:
+   *
+   * - updates the UIView registration
+   * - calls the UIView's _renderContentIntoUIViewPortal() callback
+   * - passes the registration details detailing what should be rendered into the portal
+   */
+  private _configureUIView = (tuple: ViewTuple) => {
+    const { viewConfig, uiView } = tuple;
+
+    const doesUIViewStillExist = () => values(this._uiViews).indexOf(uiView) !== -1;
+
+    // If a parent ui-view is reconfigured, it could destroy child ui-views.
+    // Before configuring a child ui-view, make sure it's still in the active uiViews array.
+    if (!doesUIViewStillExist()) {
+      return;
+    }
+
+    const portalContentType: PortalContentType = !viewConfig
+      ? DEFAULT_CONTENT
+      : uiView.type === viewConfig.viewDecl.$type
+      ? ROUTED_VIEW
+      : INTEROP_DIV;
+
+    // If the content type and the viewconfig reference haven't changed, exit early
+    if (portalContentType === uiView.portalContentType && viewConfig === uiView.viewConfig) {
+      return;
+    }
+
+    // Update the registration object
+    uiView.contentState = viewConfig?.viewDecl?.$context?.self;
+    uiView.portalContentType = portalContentType;
+    uiView.viewConfig = viewConfig;
+
+    if (portalContentType === INTEROP_DIV) {
+      // This giveDiv callback is passed to this UIView from "view plugin A".
+      // The UIView is expected to render a div and call the giveDiv callback.
+      const giveDiv = (divElement: HTMLDivElement) => {
+        if (doesUIViewStillExist()) {
+          // We got a raw HTMLDivElement from "view plugin A"'s UIView.
+          // Now we tell "view plugin B" to render a UIView into this div
+          const viewPlugin = this._viewPlugins.find((p) => p.name === viewConfig.viewDecl.$type);
+          viewPlugin.renderUIViewIntoDivElement(this.router, divElement, this._uiViewPath(uiView.id));
+        }
+      };
+
+      uiView._renderContentIntoUIViewPortal({ portalContentType, uiViewPortalRegistration: uiView, giveDiv });
+    } else {
+      uiView._renderContentIntoUIViewPortal({ portalContentType, uiViewPortalRegistration: uiView });
+    }
+  };
 
   /**
    * Registers a `ui-view` component
