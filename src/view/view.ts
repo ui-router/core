@@ -415,7 +415,7 @@ export class ViewService {
       type,
       name,
       portalState: state,
-      portalContentType: 'RENDER_DEFAULT_CONTENT',
+      portalContentType: undefined,
       viewConfig: undefined,
       contentState: undefined,
       _fqn,
