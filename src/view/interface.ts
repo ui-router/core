@@ -9,7 +9,7 @@ import { PathNode } from '../path/pathNode';
 export type ViewContext = StateObject;
 
 /** Information about a uiview portal component registered the view service. */
-export interface RegisteredUIViewPortal {
+export interface UIViewPortalRegistration {
   /** the id of the ui-view portal */
   id: string;
 
@@ -25,8 +25,8 @@ export interface RegisteredUIViewPortal {
   /** The state which rendered the ui-view portal */
   portalState: StateDeclaration;
 
-  /** The current uiview portal action from the most recent command */
-  portalAction: PortalAction;
+  /** The current uiview portal content from the most recent command */
+  portalContentType: PortalContentType;
 
   /**
    * The portal's current ViewConfig, or undefined.
@@ -41,31 +41,31 @@ export interface RegisteredUIViewPortal {
   contentState?: StateDeclaration;
 }
 
+/** This object tells the UIView portal to render content */
 interface RenderCommand {
-  // The id of the uiview portal
-  uiViewId: string;
-  // The action the uiview portal should take
-  portalAction: PortalAction;
-  // The router state that rendered the portal
-  portalState: StateDeclaration;
+  // The type of content to render
+  portalContentType: PortalContentType;
+  // Current details of the registered ui-view portal
+  uiViewPortalRegistration: UIViewPortalRegistration;
 }
 
 interface RenderRoutedComponentCommand extends RenderCommand {
-  portalAction: 'RENDER_ROUTED_VIEW';
-  contentState: StateDeclaration;
-  viewConfig: ViewConfig;
+  portalContentType: typeof ROUTED_VIEW;
 }
 
 interface RenderDefaultContentCommand extends RenderCommand {
-  portalAction: 'RENDER_DEFAULT_CONTENT';
+  portalContentType: typeof DEFAULT_CONTENT;
 }
 
 interface RenderInteropDivCommand extends RenderCommand {
-  portalAction: 'RENDER_INTEROP_DIV';
+  portalContentType: typeof INTEROP_DIV;
   giveDiv: (div: HTMLDivElement) => void;
 }
 
-export type PortalAction = 'RENDER_INTEROP_DIV' | 'RENDER_DEFAULT_CONTENT' | 'RENDER_ROUTED_VIEW';
+export const INTEROP_DIV = 'RENDER_INTEROP_DIV';
+export const DEFAULT_CONTENT = 'RENDER_DEFAULT_CONTENT';
+export const ROUTED_VIEW = 'RENDER_ROUTED_VIEW';
+export type PortalContentType = typeof INTEROP_DIV | typeof DEFAULT_CONTENT | typeof ROUTED_VIEW;
 
 export type UIViewPortalRenderCommand =
   | RenderRoutedComponentCommand
