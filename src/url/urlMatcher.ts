@@ -341,8 +341,12 @@ export class UrlMatcher {
 
   private _getDecodedParamValue(value: any, param: Param): any {
     if (isDefined(value)) {
-      if (this.config.decodeParams && !param.type.raw && !isArray(value)) {
-        value = decodeURIComponent(value);
+      if (this.config.decodeParams && !param.type.raw) {
+        if (isArray(value)) {
+          value = value.map((paramValue) => decodeURIComponent(paramValue));
+        } else {
+          value = decodeURIComponent(value);
+        }
       }
 
       value = param.type.decode(value);
