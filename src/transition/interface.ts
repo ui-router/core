@@ -38,7 +38,7 @@ export interface TransitionOptions {
    * - If `true`, it will inherit parameter values from the current parameter values.
    * - If `false`, only the parameters which are provided to `transitionTo` will be used.
    *
-   * @default `false`
+   * @default `true`
    */
   inherit?: boolean;
 
