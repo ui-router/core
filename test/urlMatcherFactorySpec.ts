@@ -449,6 +449,12 @@ describe('UrlMatcher', function () {
       expect(m.exec($location.path(), $location.search())).toEqual({ param1: 'bar,baz' }); // coerced to string
       expect(m.format({ param1: ['bar', 'baz'] })).toBe('/foo?param1=bar%2Cbaz'); // coerced to string
     });
+
+    it('should decode query parameter values', function () {
+      const m = $umf.compile('/foo?param1', { state: {} });
+      $location.url('/foo?param1=%25&param1=%2F');
+      expect(m.exec($location.path(), $location.search())).toEqual({ param1: ['%', '/'] });
+    });
   });
 
   describe('multivalue-path-parameters', function () {
