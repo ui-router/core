@@ -91,7 +91,7 @@
     "tslint": "5.20.1",
     "tslint-eslint-rules": "^5.3.1",
     "typescript": "~3.9",
-    "utf-8-validate": "5.0.2",
+    "utf-8-validate": "5.0.3",
     "webpack": "^4.34.0"
   },
   "resolutions": {
