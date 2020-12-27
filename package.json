@@ -68,7 +68,7 @@
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
     "@types/jquery": "^3.3.36",
-    "@uirouter/publish-scripts": "^2.5.3",
+    "@uirouter/publish-scripts": "^2.5.5",
     "bufferutil": "4.0.2",
     "dts-downlevel": "^0.4.0",
     "fork-ts-checker-webpack-plugin": "^6.0.8",
