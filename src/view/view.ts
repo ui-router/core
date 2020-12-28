@@ -1,4 +1,4 @@
-import { applyPairs, equals, find, inArray, pairs, removeFrom, TypedMap, values } from '../common/common';
+import { applyPairs, equals, inArray, removeFrom, TypedMap, values } from '../common/common';
 import { curry } from '../common/hof';
 import { isArray, isString } from '../common/predicates';
 import { trace } from '../common/trace';
@@ -11,7 +11,6 @@ import {
   ViewConfig,
   ViewContext,
   UIRouterViewPlugin,
-  UIViewPortalRenderCommand,
   PortalContentType,
   DEFAULT_CONTENT,
   ROUTED_VIEW,
