@@ -1,9 +1,9 @@
 {
   "angular": {
-    "angular": "https://github.com/ui-router/angular.git"
+    "angular": "https://github.com/ui-router/angular.git@core-v7"
   },
   "angularjs": {
-    "angularjs": "https://github.com/angular-ui/ui-router.git"
+    "angularjs": "https://github.com/angular-ui/ui-router.git@core-v7"
   },
   "react": {
     "react": "https://github.com/ui-router/react.git@core-v7"
