@@ -38,6 +38,7 @@ export interface ViewServicePluginAPI {
   _deregisterView(uiViewId: string): void;
   _activeViewConfigs(): ViewConfig[];
   _onSync(listener: ViewSyncListener): Function;
+  _traceUIViewEvent(viewId: string, event: string, extra?: string): void;
 }
 
 /** A uiView and its matching viewConfig */
@@ -57,6 +58,15 @@ interface _UIViewPortalRegistration extends UIViewPortalRegistration {
 
   /** The Render Comand Callback that the registered UIView portal provided */
   _renderContentIntoUIViewPortal: PortalRenderCommandCallback;
+}
+/** @hidden for tracing: returns a function that returns a string to describe a _UIViewPortalRegistration */
+function uiViewStringFactory(uiview: _UIViewPortalRegistration) {
+  return function uiViewString(): string {
+    if (!uiview) return 'ui-view (defunct)';
+    const { portalState } = uiview;
+    const stateName = portalState ? portalState.name || '(root)' : '(none)';
+    return `[ui-view#${uiview.id} ${uiview.type}:${uiview._fqn} (${uiview.name}@${stateName})]`;
+  };
 }
 
 /**
@@ -101,6 +111,7 @@ export class ViewService {
       this._listeners.push(listener);
       return () => removeFrom(this._listeners, listener);
     },
+    _traceUIViewEvent: (viewId: string, event: string, extra = '') => trace.traceUIViewEvent(event, viewId, extra),
   };
 
   /**
@@ -422,7 +433,7 @@ export class ViewService {
     };
 
     this._uiViews[id] = registeredUIViewPortal;
-    trace.traceViewServiceUIViewEvent(`-> Registered ui-view ${id}`, registeredUIViewPortal);
+    trace.traceViewServiceUIViewEvent(`-> Registered ui-view ${id}`, uiViewStringFactory(registeredUIViewPortal));
     this.sync();
 
     return id;
@@ -434,7 +445,7 @@ export class ViewService {
       return;
     }
 
-    trace.traceViewServiceUIViewEvent('<- Deregistering ${id}', this._uiViews[id]);
+    trace.traceViewServiceUIViewEvent('<- Deregistering ${id}', uiViewStringFactory(this._uiViews[id]));
     delete this._uiViews[id];
   }
 

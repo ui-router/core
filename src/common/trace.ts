@@ -46,15 +46,6 @@ import { TransitionHook } from '../transition/transitionHook';
 import { HookResult } from '../transition/interface';
 import { StateObject } from '../state/stateObject';
 
-// kludge to access private type, hmmm...
-type _RegisteredUIViewPortal = ViewTuple['uiView'];
-function uiViewString(uiview: _RegisteredUIViewPortal) {
-  if (!uiview) return 'ui-view (defunct)';
-  const { portalState } = uiview;
-  const stateName = portalState ? portalState.name || '(root)' : '(none)';
-  return `[ui-view#${uiview.id} ${uiview.type}:${uiview._fqn} (${uiview.name}@${stateName})]`;
-}
-
 const viewConfigString = (viewConfig: ViewConfig) => {
   const view = viewConfig.viewDecl;
   const state = view.$context.name || '(root)';
@@ -215,21 +206,15 @@ export class Trace {
   }
 
   /** @internal called by ui-router code */
-  traceUIViewEvent(event: string, viewData: _RegisteredUIViewPortal, extra = '') {
+  traceUIViewEvent(event: string, uiViewString: string, extra = '') {
     if (!this.enabled(Category.UIVIEW)) return;
-    safeConsole.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
+    safeConsole.log(`ui-view: ${padString(30, event)} ${uiViewString}${extra}`);
   }
 
   /** @internal called by ui-router code */
-  traceUIViewConfigUpdated(viewData: _RegisteredUIViewPortal, context: ViewContext) {
+  traceUIViewConfigUpdated(getUiViewString: () => string, context: ViewContext) {
     if (!this.enabled(Category.UIVIEW)) return;
-    this.traceUIViewEvent('Updating', viewData, ` with ViewConfig from context='${context}'`);
-  }
-
-  /** @internal called by ui-router code */
-  traceUIViewFill(viewData: _RegisteredUIViewPortal, html: string) {
-    if (!this.enabled(Category.UIVIEW)) return;
-    this.traceUIViewEvent('Fill', viewData, ` with: ${maxLength(200, html)}`);
+    this.traceUIViewEvent('Updating', getUiViewString(), ` with ViewConfig from context='${context}'`);
   }
 
   /** @internal called by ui-router code */
@@ -255,9 +240,9 @@ export class Trace {
   }
 
   /** @internal called by ui-router code */
-  traceViewServiceUIViewEvent(event: string, viewData: _RegisteredUIViewPortal) {
+  traceViewServiceUIViewEvent(event: string, getUiViewString: () => string) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
-    safeConsole.log(`VIEWCONFIG: ${event} ${uiViewString(viewData)}`);
+    safeConsole.log(`VIEWCONFIG: ${event} ${getUiViewString()}`);
   }
 }
 
