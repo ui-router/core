@@ -89,15 +89,7 @@ const transLbl = (trans) => `Transition #${_tid(trans)}-${_rid(trans)}`;
  */
 export class Trace {
   /** @internal */
-  approximateDigests: number;
-
-  /** @internal */
   private _enabled: { [key: string]: boolean } = {};
-
-  /** @internal */
-  constructor() {
-    this.approximateDigests = 0;
-  }
 
   /** @internal */
   private _set(enabled: boolean, categories: Category[]) {
