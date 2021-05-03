@@ -41,8 +41,8 @@ const activateViews: TransitionHookFn = (transition: Transition) => {
 
   const $view: ViewService = transition.router.viewService;
 
-  exitingViews.forEach((vc: ViewConfig) => $view.deactivateViewConfig(vc));
-  enteringViews.forEach((vc: ViewConfig) => $view.activateViewConfig(vc));
+  exitingViews.forEach((vc: ViewConfig) => $view._pluginapi._deactivateViewConfig(vc));
+  enteringViews.forEach((vc: ViewConfig) => $view._pluginapi._activateViewConfig(vc));
 
   $view.sync();
 };

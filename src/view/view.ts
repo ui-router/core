@@ -1,27 +1,49 @@
-import { equals, applyPairs, removeFrom, TypedMap, inArray, find } from '../common/common';
-import { curry, prop } from '../common/hof';
-import { isString, isArray } from '../common/predicates';
+import { applyPairs, equals, inArray, removeFrom, TypedMap, values } from '../common/common';
+import { curry } from '../common/hof';
+import { isArray, isString } from '../common/predicates';
 import { trace } from '../common/trace';
 import { PathNode } from '../path/pathNode';
-import { ActiveUIView, ViewContext, ViewConfig } from './interface';
-import { _ViewDeclaration } from '../state/interface';
 import { UIRouter } from '../router';
+import { _ViewDeclaration } from '../state/interface';
+import {
+  UIViewPortalRegistration,
+  PortalRenderCommandCallback,
+  ViewConfig,
+  ViewContext,
+  UIRouterViewPlugin,
+  PortalContentType,
+  DEFAULT_CONTENT,
+  ROUTED_VIEW,
+  INTEROP_DIV,
+} from './interface';
 
 export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig | ViewConfig[];
 
 export interface ViewServicePluginAPI {
+  _registerViewPlugin(plugin: UIRouterViewPlugin);
+  _registeredViewPlugins(): UIRouterViewPlugin[];
   _rootViewContext(context?: ViewContext): ViewContext;
   _viewConfigFactory(viewType: string, factory: ViewConfigFactory);
   /** @param id router.$id + "." + uiView.id */
-  _registeredUIView(id: string): ActiveUIView;
-  _registeredUIViews(): ActiveUIView[];
+  _registeredUIView(id: string): UIViewPortalRegistration;
+  _registeredUIViews(): UIViewPortalRegistration[];
+  _activateViewConfig(viewConfig: ViewConfig);
+  _deactivateViewConfig(viewConfig: ViewConfig);
+  _registerView(
+    type: string,
+    parentId: string,
+    name: string,
+    renderContentIntoUIViewPortal: PortalRenderCommandCallback
+  ): string;
+  _deregisterView(uiViewId: string): void;
   _activeViewConfigs(): ViewConfig[];
   _onSync(listener: ViewSyncListener): Function;
+  _traceUIViewEvent(viewId: string, event: string, extra?: string): void;
 }
 
-// A uiView and its matching viewConfig
+/** A uiView and its matching viewConfig */
 export interface ViewTuple {
-  uiView: ActiveUIView;
+  uiView: _UIViewPortalRegistration;
   viewConfig: ViewConfig;
 }
 
@@ -29,40 +51,67 @@ export interface ViewSyncListener {
   (viewTuples: ViewTuple[]): void;
 }
 
+/** @internal */
+interface _UIViewPortalRegistration extends UIViewPortalRegistration {
+  /* The fully qualified ui-view address, (i.e., `${parentview.fqn}.${name}` */
+  _fqn: string;
+
+  /** The Render Comand Callback that the registered UIView portal provided */
+  _renderContentIntoUIViewPortal: PortalRenderCommandCallback;
+}
+/** @hidden for tracing: returns a function that returns a string to describe a _UIViewPortalRegistration */
+function uiViewStringFactory(uiview: _UIViewPortalRegistration) {
+  return function uiViewString(): string {
+    if (!uiview) return 'ui-view (defunct)';
+    const { portalState } = uiview;
+    const stateName = portalState ? portalState.name || '(root)' : '(none)';
+    return `[ui-view#${uiview.id} ${uiview.type}:${uiview._fqn} (${uiview.name}@${stateName})]`;
+  };
+}
+
 /**
  * The View service
  *
- * This service pairs existing `ui-view` components (which live in the DOM)
+ * This service pairs existing `uiview` portal components (from the component tree)
  * with view configs (from the state declaration objects: [[StateDeclaration.views]]).
  *
  * - After a successful Transition, the views from the newly entered states are activated via [[activateViewConfig]].
  *   The views from exited states are deactivated via [[deactivateViewConfig]].
  *   (See: the [[registerActivateViews]] Transition Hook)
  *
- * - As `ui-view` components pop in and out of existence, they register themselves using [[registerUIView]].
+ * - As `uiview` components pop in and out of existence, they register/deregister themselves using [[registerUIView]]
+ *   and [[deregisterView]].
  *
- * - When the [[sync]] function is called, the registered `ui-view`(s) ([[ActiveUIView]])
- * are configured with the matching [[ViewConfig]](s)
- *
+ * - When the [[sync]] function is called, the registered `uiview`(s) ([[RegisteredUIViewPortal]])
+ *   are configured with the matching [[ViewConfig]](s)
  */
 export class ViewService {
-  /** @internal */ private _uiViews: ActiveUIView[] = [];
+  /** @internal */ private _viewPlugins: UIRouterViewPlugin[] = [];
+  /** @internal */ private _uiViews: { [viewId: string]: _UIViewPortalRegistration } = {};
   /** @internal */ private _viewConfigs: ViewConfig[] = [];
   /** @internal */ private _rootContext: ViewContext;
   /** @internal */ private _viewConfigFactories: { [key: string]: ViewConfigFactory } = {};
   /** @internal */ private _listeners: ViewSyncListener[] = [];
+  /** @hidden */ private _uiViewCounter = 0;
 
   /** @internal */
   public _pluginapi: ViewServicePluginAPI = {
+    _registerViewPlugin: (plugin) => this._viewPlugins.push(plugin),
+    _registeredViewPlugins: () => this._viewPlugins.slice(),
     _rootViewContext: this._rootViewContext.bind(this),
     _viewConfigFactory: this._viewConfigFactory.bind(this),
-    _registeredUIView: (id: string) => find(this._uiViews, (view) => `${this.router.$id}.${view.id}` === id),
-    _registeredUIViews: () => this._uiViews,
+    _activateViewConfig: this._activateViewConfig.bind(this),
+    _deactivateViewConfig: this._deactivateViewConfig.bind(this),
+    _registerView: this._registerView.bind(this),
+    _deregisterView: this._deregisterView.bind(this),
+    _registeredUIView: (id: string) => this._uiViews[id],
+    _registeredUIViews: () => values(this._uiViews),
     _activeViewConfigs: () => this._viewConfigs,
     _onSync: (listener: ViewSyncListener) => {
       this._listeners.push(listener);
       return () => removeFrom(this._listeners, listener);
     },
+    _traceUIViewEvent: (viewId: string, event: string, extra = '') => trace.traceUIViewEvent(event, viewId, extra),
   };
 
   /**
@@ -122,14 +171,16 @@ export class ViewService {
    *
    * @internal
    */
-  static matches = (uiViewsByFqn: TypedMap<ActiveUIView>, uiView: ActiveUIView) => (viewConfig: ViewConfig) => {
+  static matches = (uiViewsByFqn: TypedMap<_UIViewPortalRegistration>, uiView: _UIViewPortalRegistration) => (
+    viewConfig: ViewConfig
+  ) => {
     // Don't supply an ng1 ui-view with an ng2 ViewConfig, etc
-    if (uiView.$type !== viewConfig.viewDecl.$type) return false;
+    if (uiView.type !== viewConfig.viewDecl.$type) return false;
 
     // Split names apart from both viewConfig and uiView into segments
     const vc = viewConfig.viewDecl;
     const vcSegments = vc.$uiViewName.split('.');
-    const uivSegments = uiView.fqn.split('.');
+    const uivSegments = uiView._fqn.split('.');
 
     // Check if the tails of the segment arrays match. ex, these arrays' tails match:
     // vc: ["foo", "bar"], uiv fqn: ["$default", "foo", "bar"]
@@ -139,7 +190,7 @@ export class ViewService {
     // ["$default", "foo"].join(".") == "$default.foo", does the ui-view $default.foo context match?
     const negOffset = 1 - vcSegments.length || undefined;
     const fqnToFirstSegment = uivSegments.slice(0, negOffset).join('.');
-    const uiViewContext = uiViewsByFqn[fqnToFirstSegment].creationContext;
+    const uiViewContext = uiViewsByFqn[fqnToFirstSegment].portalState;
     return vc.$uiViewContextAnchor === (uiViewContext && uiViewContext.name);
   };
 
@@ -195,12 +246,14 @@ export class ViewService {
   private _rootViewContext(context?: ViewContext): ViewContext {
     return (this._rootContext = context || this._rootContext);
   }
+
   /** @internal */
   private _viewConfigFactory(viewType: string, factory: ViewConfigFactory) {
     this._viewConfigFactories[viewType] = factory;
   }
 
-  createViewConfig(path: PathNode[], decl: _ViewDeclaration): ViewConfig[] {
+  /** @internal */
+  _createViewConfig(path: PathNode[], decl: _ViewDeclaration): ViewConfig[] {
     const cfgFactory = this._viewConfigFactories[decl.$type];
     if (!cfgFactory) throw new Error('ViewService: No view config factory registered for type ' + decl.$type);
     const cfgs = cfgFactory(path, decl);
@@ -215,31 +268,34 @@ export class ViewService {
    *
    * @param viewConfig The ViewConfig view to deregister.
    */
-  deactivateViewConfig(viewConfig: ViewConfig) {
+  private _deactivateViewConfig(viewConfig: ViewConfig) {
     trace.traceViewServiceEvent('<- Removing', viewConfig);
     removeFrom(this._viewConfigs, viewConfig);
   }
 
-  activateViewConfig(viewConfig: ViewConfig) {
+  private _activateViewConfig(viewConfig: ViewConfig) {
     trace.traceViewServiceEvent('-> Registering', <any>viewConfig);
     this._viewConfigs.push(viewConfig);
   }
 
   sync() {
-    const uiViewsByFqn: TypedMap<ActiveUIView> = this._uiViews.map((uiv) => [uiv.fqn, uiv]).reduce(applyPairs, <any>{});
+    const uiViewsByFqn: TypedMap<_UIViewPortalRegistration> = values(this._uiViews)
+      .map((uiv) => [uiv._fqn, uiv])
+      .reduce(applyPairs, <any>{});
 
     // Return a weighted depth value for a uiView.
     // The depth is the nesting depth of ui-views (based on FQN; times 10,000)
     // plus the depth of the state that is populating the uiView
-    function uiViewDepth(uiView: ActiveUIView) {
+    function uiViewDepth(uiView: _UIViewPortalRegistration) {
       const stateDepth = (context: ViewContext) => (context && context.parent ? stateDepth(context.parent) + 1 : 1);
-      return uiView.fqn.split('.').length * 10000 + stateDepth(uiView.creationContext);
+      return uiView._fqn.split('.').length * 10000 + stateDepth(uiView.portalState.$$state());
     }
 
     // Return the ViewConfig's context's depth in the context tree.
     function viewConfigDepth(config: ViewConfig) {
-      let context: ViewContext = config.viewDecl.$context,
-        count = 0;
+      let context: ViewContext = config.viewDecl.$context;
+      let count = 0;
+
       while (++count && context.parent) context = context.parent;
       return count;
     }
@@ -247,7 +303,7 @@ export class ViewService {
     // Given a depth function, returns a compare function which can return either ascending or descending order
     const depthCompare = curry((depthFn, posNeg, left, right) => posNeg * (depthFn(left) - depthFn(right)));
 
-    const matchingConfigPair = (uiView: ActiveUIView): ViewTuple => {
+    const matchingConfigPair = (uiView: _UIViewPortalRegistration): ViewTuple => {
       const matchingConfigs = this._viewConfigs.filter(ViewService.matches(uiViewsByFqn, uiView));
       if (matchingConfigs.length > 1) {
         // This is OK.  Child states can target a ui-view that the parent state also targets (the child wins)
@@ -258,25 +314,76 @@ export class ViewService {
       return { uiView, viewConfig: matchingConfigs[0] };
     };
 
-    const configureUIView = (tuple: ViewTuple) => {
-      // If a parent ui-view is reconfigured, it could destroy child ui-views.
-      // Before configuring a child ui-view, make sure it's still in the active uiViews array.
-      if (this._uiViews.indexOf(tuple.uiView) !== -1) tuple.uiView.configUpdated(tuple.viewConfig);
-    };
-
     // Sort views by FQN and state depth. Process uiviews nearest the root first.
-    const uiViewTuples = this._uiViews.sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair);
+    const uiViewTuples = values(this._uiViews).sort(depthCompare(uiViewDepth, 1)).map(matchingConfigPair);
+
     const matchedViewConfigs = uiViewTuples.map((tuple) => tuple.viewConfig);
+
+    // View configs which should be active, but there is no matching uiview portal to render into
     const unmatchedConfigTuples = this._viewConfigs
       .filter((config) => !inArray(matchedViewConfigs, config))
       .map((viewConfig) => ({ uiView: undefined, viewConfig }));
 
-    uiViewTuples.forEach(configureUIView);
+    uiViewTuples.forEach((tuple) => this._configureUIView(tuple));
 
     const allTuples: ViewTuple[] = uiViewTuples.concat(unmatchedConfigTuples);
     this._listeners.forEach((cb) => cb(allTuples));
     trace.traceViewSync(allTuples);
   }
+
+  /**
+   * Updates a UIView Portal with the details about what should be rendered
+   * This method short circuits if no change is necessary.
+   * Otherwise, it:
+   *
+   * - updates the UIView registration
+   * - calls the UIView's _renderContentIntoUIViewPortal() callback
+   * - passes the registration details detailing what should be rendered into the portal
+   */
+  private _configureUIView = (tuple: ViewTuple) => {
+    const { viewConfig, uiView } = tuple;
+
+    const doesUIViewStillExist = () => values(this._uiViews).indexOf(uiView) !== -1;
+
+    // If a parent ui-view is reconfigured, it could destroy child ui-views.
+    // Before configuring a child ui-view, make sure it's still in the active uiViews array.
+    if (!doesUIViewStillExist()) {
+      return;
+    }
+
+    const portalContentType: PortalContentType = !viewConfig
+      ? DEFAULT_CONTENT
+      : uiView.type === viewConfig.viewDecl.$type
+      ? ROUTED_VIEW
+      : INTEROP_DIV;
+
+    // If the content type and the viewconfig reference haven't changed, exit early
+    if (portalContentType === uiView.portalContentType && viewConfig === uiView.viewConfig) {
+      return;
+    }
+
+    // Update the registration object
+    uiView.contentState = viewConfig?.viewDecl?.$context?.self;
+    uiView.portalContentType = portalContentType;
+    uiView.viewConfig = viewConfig;
+
+    if (portalContentType === INTEROP_DIV) {
+      // This giveDiv callback is passed to this UIView from "view plugin A".
+      // The UIView is expected to render a div and call the giveDiv callback.
+      const giveDiv = (divElement: HTMLDivElement) => {
+        if (doesUIViewStillExist()) {
+          // We got a raw HTMLDivElement from "view plugin A"'s UIView.
+          // Now we tell "view plugin B" to render a UIView into this div
+          const viewPlugin = this._viewPlugins.find((p) => p.name === viewConfig.viewDecl.$type);
+          viewPlugin.renderUIViewIntoDivElement(this.router, divElement, this._uiViewPath(uiView.id));
+        }
+      };
+
+      uiView._renderContentIntoUIViewPortal({ portalContentType, uiViewPortalRegistration: uiView, giveDiv });
+    } else {
+      uiView._renderContentIntoUIViewPortal({ portalContentType, uiViewPortalRegistration: uiView });
+    }
+  };
 
   /**
    * Registers a `ui-view` component
@@ -290,45 +397,71 @@ export class ViewService {
    * Note: There is no corresponding `deregisterUIView`.
    *       A `ui-view` should hang on to the return value of `registerUIView` and invoke it to deregister itself.
    *
-   * @param uiView The metadata for a UIView
-   * @return a de-registration function used when the view is destroyed.
+   * @param type The type of the ui-view, i.e., 'react' or 'angularjs'
+   * @param parentId The id of the parent ui-view, or null
+   * @param name The name of the ui-view
+   * @param renderContentIntoUIViewPortal A function that is called when the ui-view portal should render new content
+   * @return the id of the registered ui-view
    */
-  registerUIView(uiView: ActiveUIView) {
-    trace.traceViewServiceUIViewEvent('-> Registering', uiView);
-    const uiViews = this._uiViews;
-    const fqnAndTypeMatches = (uiv: ActiveUIView) => uiv.fqn === uiView.fqn && uiv.$type === uiView.$type;
-    if (uiViews.filter(fqnAndTypeMatches).length)
-      trace.traceViewServiceUIViewEvent('!!!! duplicate uiView named:', uiView);
+  private _registerView(
+    type: string,
+    parentId: string,
+    name: string,
+    renderContentIntoUIViewPortal: PortalRenderCommandCallback
+  ): string {
+    const parent = this._uiViews[parentId];
 
-    uiViews.push(uiView);
+    if (typeof parentId === 'string' && !parent) {
+      throw new Error(`Tried to register a new uiview, but its parent ${parentId} is not currently registered`);
+    }
+
+    const state = (parent && parent.contentState) ?? this.router.stateRegistry.root().self;
+    const id = `${this.router.$id}.${this._uiViewCounter++}`;
+    const _fqn = parent ? `${parent._fqn}.${name}` : name;
+
+    const registeredUIViewPortal: _UIViewPortalRegistration = {
+      id,
+      parentId,
+      type,
+      name,
+      portalState: state,
+      portalContentType: undefined,
+      viewConfig: undefined,
+      contentState: undefined,
+      _fqn,
+      _renderContentIntoUIViewPortal: renderContentIntoUIViewPortal,
+    };
+
+    this._uiViews[id] = registeredUIViewPortal;
+    trace.traceViewServiceUIViewEvent(`-> Registered ui-view ${id}`, uiViewStringFactory(registeredUIViewPortal));
     this.sync();
 
-    return () => {
-      const idx = uiViews.indexOf(uiView);
-      if (idx === -1) {
-        trace.traceViewServiceUIViewEvent('Tried removing non-registered uiView', uiView);
-        return;
-      }
-      trace.traceViewServiceUIViewEvent('<- Deregistering', uiView);
-      removeFrom(uiViews)(uiView);
-    };
+    return id;
+  }
+
+  private _deregisterView(id: string) {
+    if (!this._uiViews[id]) {
+      trace.traceViewServiceUIViewEvent(`Tried removing non-registered ui-view ${id}`, null);
+      return;
+    }
+
+    trace.traceViewServiceUIViewEvent('<- Deregistering ${id}', uiViewStringFactory(this._uiViews[id]));
+    delete this._uiViews[id];
   }
 
   /**
-   * Returns the list of views currently available on the page, by fully-qualified name.
-   *
-   * @return {Array} Returns an array of fully-qualified view names.
+   * Returns ancestor UIViews starting with the provided id and walking up parent UIViews to the root uiView.
+   * @param uiViewId a uiView ID
+   * @return a path of RegisteredUIView objects containing all ancestor UIViews up to the root UIView
+   * @internalapi
    */
-  available() {
-    return this._uiViews.map(prop('fqn'));
-  }
-
-  /**
-   * Returns the list of views on the page containing loaded content.
-   *
-   * @return {Array} Returns an array of fully-qualified view names.
-   */
-  active() {
-    return this._uiViews.filter(prop('$config')).map(prop('name'));
+  private _uiViewPath(uiViewId: string): UIViewPortalRegistration[] {
+    const path = [];
+    let uiView = this._uiViews[uiViewId];
+    while (!!uiView && !path.includes(uiView)) {
+      path.push(uiView);
+      uiView = this._uiViews[uiView.parentId];
+    }
+    return path;
   }
 }

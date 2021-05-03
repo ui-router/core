@@ -36,7 +36,7 @@ import { parse } from '../common/hof';
 import { isNumber } from '../common/predicates';
 import { Transition } from '../transition/transition';
 import { ViewTuple } from '../view';
-import { ActiveUIView, ViewConfig, ViewContext } from '../view/interface';
+import { ViewConfig, ViewContext } from '../view/interface';
 import { stringify, functionToString, maxLength, padString } from './strings';
 import { safeConsole } from './safeConsole';
 import { Resolvable } from '../resolve/resolvable';
@@ -45,12 +45,6 @@ import { PolicyWhen } from '../resolve/interface';
 import { TransitionHook } from '../transition/transitionHook';
 import { HookResult } from '../transition/interface';
 import { StateObject } from '../state/stateObject';
-
-function uiViewString(uiview: ActiveUIView) {
-  if (!uiview) return 'ui-view (defunct)';
-  const state = uiview.creationContext ? uiview.creationContext.name || '(root)' : '(none)';
-  return `[ui-view#${uiview.id} ${uiview.$type}:${uiview.fqn} (${uiview.name}@${state})]`;
-}
 
 const viewConfigString = (viewConfig: ViewConfig) => {
   const view = viewConfig.viewDecl;
@@ -95,15 +89,7 @@ const transLbl = (trans) => `Transition #${_tid(trans)}-${_rid(trans)}`;
  */
 export class Trace {
   /** @internal */
-  approximateDigests: number;
-
-  /** @internal */
   private _enabled: { [key: string]: boolean } = {};
-
-  /** @internal */
-  constructor() {
-    this.approximateDigests = 0;
-  }
 
   /** @internal */
   private _set(enabled: boolean, categories: Category[]) {
@@ -212,21 +198,15 @@ export class Trace {
   }
 
   /** @internal called by ui-router code */
-  traceUIViewEvent(event: string, viewData: ActiveUIView, extra = '') {
+  traceUIViewEvent(event: string, uiViewString: string, extra = '') {
     if (!this.enabled(Category.UIVIEW)) return;
-    safeConsole.log(`ui-view: ${padString(30, event)} ${uiViewString(viewData)}${extra}`);
+    safeConsole.log(`ui-view: ${padString(30, event)} ${uiViewString}${extra}`);
   }
 
   /** @internal called by ui-router code */
-  traceUIViewConfigUpdated(viewData: ActiveUIView, context: ViewContext) {
+  traceUIViewConfigUpdated(getUiViewString: () => string, context: ViewContext) {
     if (!this.enabled(Category.UIVIEW)) return;
-    this.traceUIViewEvent('Updating', viewData, ` with ViewConfig from context='${context}'`);
-  }
-
-  /** @internal called by ui-router code */
-  traceUIViewFill(viewData: ActiveUIView, html: string) {
-    if (!this.enabled(Category.UIVIEW)) return;
-    this.traceUIViewEvent('Fill', viewData, ` with: ${maxLength(200, html)}`);
+    this.traceUIViewEvent('Updating', getUiViewString(), ` with ViewConfig from context='${context}'`);
   }
 
   /** @internal called by ui-router code */
@@ -236,7 +216,7 @@ export class Trace {
     const cfgheader = 'view config state (view name)';
     const mapping = pairs
       .map(({ uiView, viewConfig }) => {
-        const uiv = uiView && uiView.fqn;
+        const uiv = uiView && uiView._fqn;
         const cfg = viewConfig && `${viewConfig.viewDecl.$context.name}: (${viewConfig.viewDecl.$name})`;
         return { [uivheader]: uiv, [cfgheader]: cfg };
       })
@@ -252,9 +232,9 @@ export class Trace {
   }
 
   /** @internal called by ui-router code */
-  traceViewServiceUIViewEvent(event: string, viewData: ActiveUIView) {
+  traceViewServiceUIViewEvent(event: string, getUiViewString: () => string) {
     if (!this.enabled(Category.VIEWCONFIG)) return;
-    safeConsole.log(`VIEWCONFIG: ${event} ${uiViewString(viewData)}`);
+    safeConsole.log(`VIEWCONFIG: ${event} ${getUiViewString()}`);
   }
 }
 

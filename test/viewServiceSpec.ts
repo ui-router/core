@@ -3,7 +3,6 @@ import { ViewSyncListener, ViewTuple } from '../src/view';
 import { tree2Array } from './_testUtils';
 import { StateRegistry } from '../src/state/stateRegistry';
 import { ViewService } from '../src/view/view';
-import { ActiveUIView } from '../src/view/interface';
 
 let router: UIRouter = null;
 let registry: StateRegistry = null;
@@ -18,49 +17,37 @@ const statetree = {
   },
 };
 
-let count = 0;
-const makeUIView = (state?): ActiveUIView => ({
-  $type: 'test',
-  id: count++,
-  name: '$default',
-  fqn: '$default',
-  config: null,
-  creationContext: state,
-  configUpdated: function() {},
-});
-
 describe('View Service', () => {
   beforeEach(() => {
     router = new UIRouter();
     registry = router.stateRegistry;
     $view = router.viewService;
-    tree2Array(statetree, true).forEach(state => registry.register(state));
+    tree2Array(statetree, true).forEach((state) => registry.register(state));
   });
 
-  describe('registerUIView', () => {
-    it('should track a ui-view', () => {
-      expect($view.available().length).toBe(0);
-      $view.registerUIView(makeUIView());
-      expect($view.available().length).toBe(1);
-    });
+  it('_pluginapi._registerView should track a ui-view', () => {
+    expect($view._pluginapi._registeredUIViews().length).toBe(0);
+    $view._pluginapi._registerView('core', null, '', () => {});
+    expect($view._pluginapi._registeredUIViews().length).toBe(1);
+  });
 
-    it('should return a deregistration function', () => {
-      expect($view.available().length).toBe(0);
-      const deregistrationFn = $view.registerUIView(makeUIView());
-      expect(typeof deregistrationFn).toBe('function');
-      expect($view.available().length).toBe(1);
-      deregistrationFn();
-      expect($view.available().length).toBe(0);
-    });
+  it('_pluginapi.deregisterView should stop tracking a ui-view', () => {
+    expect($view._pluginapi._registeredUIViews().length).toBe(0);
+    const id = $view._pluginapi._registerView('core', null, '', () => {});
+    expect($view._pluginapi._registeredUIViews().length).toBe(1);
+    $view._pluginapi._deregisterView(id);
+    expect($view._pluginapi._registeredUIViews().length).toBe(0);
   });
 
   describe('_pluginapi._registeredUIView', () => {
     it('should return a ui-view from an id', () => {
-      expect($view._pluginapi._registeredUIView(`${router.$id}.0`)).toBeUndefined();
+      expect($view._pluginapi._registeredUIViews()).toEqual([]);
 
-      const uiView = makeUIView();
-      $view.registerUIView(uiView);
-      expect($view._pluginapi._registeredUIView(`${router.$id}.${uiView.id}`)).toBe(uiView);
+      const id = $view._pluginapi._registerView('test', null, '$default', () => null);
+      const registeredView = $view._pluginapi._registeredUIView(id);
+      expect(registeredView).toBeDefined();
+      expect(registeredView.name).toBe('$default');
+      expect(registeredView.id).toBe(id);
     });
   });
 
@@ -94,17 +81,20 @@ describe('View Service', () => {
 
     it('ViewSyncListeners receive tuples for all registered uiviews', () => {
       const listener = jasmine.createSpy('listener');
-      const uiView1 = makeUIView();
-      const uiView2 = makeUIView();
-      $view.registerUIView(uiView1);
-      $view.registerUIView(uiView2);
+      const id1 = $view._pluginapi._registerView('type1', null, 'foo', () => null);
+      const id2 = $view._pluginapi._registerView('type2', null, 'bar', () => null);
 
       $view._pluginapi._onSync(listener);
       $view.sync();
 
-      const tuple1 = { uiView: uiView1, viewConfig: undefined };
-      const tuple2 = { uiView: uiView2, viewConfig: undefined };
-      expect(listener).toHaveBeenCalledWith([tuple1, tuple2]);
+      const argument = listener.calls.mostRecent().args[0];
+      expect(argument).toEqual(jasmine.any(Array));
+      expect(argument.length).toBe(2);
+      const [tuple1, tuple2] = argument;
+      expect(Object.keys(tuple1)).toEqual(['uiView', 'viewConfig']);
+      expect(Object.keys(tuple2)).toEqual(['uiView', 'viewConfig']);
+      expect(tuple1.uiView).toEqual(jasmine.objectContaining({ id: id1 }));
+      expect(tuple2.uiView).toEqual(jasmine.objectContaining({ id: id2 }));
     });
   });
 });
