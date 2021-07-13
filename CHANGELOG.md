@@ -1,3 +1,11 @@
+## 6.0.8 (2021-07-13)
+[Compare `@uirouter/core` versions 6.0.7 and 6.0.8](https://github.com/ui-router/core/compare/6.0.7...6.0.8)
+
+
+### Fixes
+
+* fix circular dependency with rejectFactory (#801)
+
 ## 6.0.7 (2020-12-21)
 [Compare `@uirouter/core` versions 6.0.6 and 6.0.7](https://github.com/ui-router/core/compare/6.0.6...6.0.7)
 
