@@ -62,22 +62,22 @@ export function fnToString(fn: IInjectable) {
   return (_fn && _fn.toString()) || 'undefined';
 }
 
-const isRejection = Rejection.isRejectionPromise;
-const hasToString = (obj: any) =>
-  isObject(obj) && !isArray(obj) && obj.constructor !== Object && isFunction(obj.toString);
-
-const stringifyPattern = pattern([
-  [isUndefined, val('undefined')],
-  [isNull, val('null')],
-  [isPromise, val('[Promise]')],
-  [isRejection, (x: any) => x._transitionRejection.toString()],
-  [hasToString, (x: object) => x.toString()],
-  [isInjectable, functionToString],
-  [val(true), identity],
-]) as (val: any) => string;
-
 export function stringify(o: any) {
   const seen: any[] = [];
+
+  const isRejection = Rejection.isRejectionPromise;
+  const hasToString = (obj: any) =>
+    isObject(obj) && !isArray(obj) && obj.constructor !== Object && isFunction(obj.toString);
+
+  const stringifyPattern = pattern([
+    [isUndefined, val('undefined')],
+    [isNull, val('null')],
+    [isPromise, val('[Promise]')],
+    [isRejection, (x: any) => x._transitionRejection.toString()],
+    [hasToString, (x: object) => x.toString()],
+    [isInjectable, functionToString],
+    [val(true), identity],
+  ]) as (val: any) => string;
 
   function format(value: any) {
     if (isObject(value)) {
@@ -98,12 +98,14 @@ export function stringify(o: any) {
 }
 
 /** Returns a function that splits a string on a character or substring */
-export const beforeAfterSubstr = (char: string) => (str: string): string[] => {
-  if (!str) return ['', ''];
-  const idx = str.indexOf(char);
-  if (idx === -1) return [str, ''];
-  return [str.substr(0, idx), str.substr(idx + 1)];
-};
+export const beforeAfterSubstr =
+  (char: string) =>
+  (str: string): string[] => {
+    if (!str) return ['', ''];
+    const idx = str.indexOf(char);
+    if (idx === -1) return [str, ''];
+    return [str.substr(0, idx), str.substr(idx + 1)];
+  };
 
 export const hostRegex = new RegExp('^(?:[a-z]+:)?//[^/]+/');
 export const stripLastPathElement = (str: string) => str.replace(/\/[^/]*$/, '');
