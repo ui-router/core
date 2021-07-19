@@ -80,7 +80,7 @@
     "karma-jasmine": "^4.0.1",
     "karma-script-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^4.0.2",
+    "karma-webpack": "^5.0.0",
     "prettier": "^2.0.5",
     "pretty-quick": "^3.1.0",
     "rollup": "1.32.1",
@@ -92,7 +92,7 @@
     "tslint-eslint-rules": "^5.3.1",
     "typescript": "~3.9",
     "utf-8-validate": "5.0.3",
-    "webpack": "^4.34.0"
+    "webpack": "^5.45.1"
   },
   "resolutions": {
     "chokidar": "3.3.1"
