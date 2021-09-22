@@ -62,6 +62,7 @@
   },
   "typings": "lib/index.d.ts",
   "main": "lib/index.js",
+  "browser": "lib/index.js",
   "jsnext:main": "lib-esm/index.js",
   "module": "lib-esm/index.js",
   "license": "MIT",
