@@ -28,7 +28,7 @@ export class StateParams {
       if (!parentParams.length) continue;
 
       for (const j in parentParams) {
-        if (inheritList.indexOf(parentParams[j]) >= 0) continue;
+        if (parents[i].params[parentParams[j]].inherit == false || inheritList.indexOf(parentParams[j]) >= 0) continue;
         inheritList.push(parentParams[j]);
         inherited[parentParams[j]] = this[parentParams[j]];
       }
