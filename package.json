@@ -98,7 +98,7 @@
     "chokidar": "3.3.1"
   },
   "checkPeerDependencies": {
-    "ignore": ["ajv"]
+    "ignore": ["@uirouter/core", "ajv"]
   },
   "husky": {
     "hooks": {
