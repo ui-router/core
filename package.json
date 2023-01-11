@@ -97,9 +97,6 @@
   "resolutions": {
     "chokidar": "3.3.1"
   },
-  "checkPeerDependencies": {
-    "ignore": ["@uirouter/core", "ajv"]
-  },
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
