@@ -1165,5 +1165,70 @@ describe('stateService', function() {
         .then(expectNone, expectNone)
         .then(done);
     });
+
+    describe('.href()', () => {
+      beforeEach(async () => {
+        const foo: StateDeclaration = {
+          name: 'foo',
+          url: '/foo',
+        };
+        const bar: StateDeclaration = {
+          parent: 'foo',
+          name: 'bar',
+          url: '/bar/:path?query1&query2',
+          params: {
+            query1: { inherit: false, value: null },
+          },
+        };
+
+        $registry.register(foo);
+        $registry.register(bar);
+
+        await initStateTo(bar, {
+          path: 'originalPath',
+          query1: 'originalQuery1',
+          query2: 'originalQuery2',
+        });
+      });
+
+      it('should create a href', () => {
+        expect(
+          $state.href('bar', {
+            path: 'example',
+            query1: 'aa',
+            query2: 'bb',
+          })
+        ).toEqual('#/foo/bar/example?query1=aa&query2=bb');
+      });
+
+      it('shold create a href with relative', () => {
+        expect($state.href('^', null, { relative: 'bar' })).toEqual('#/foo');
+      });
+
+      it('should create an absolute url', () => {
+        expect(
+          $state.href(
+            'bar',
+            {
+              path: 'example',
+              query1: 'aa',
+              query2: 'bb',
+            },
+            { absolute: true }
+          )
+        ).toEqual('http://localhost/#/foo/bar/example?query1=aa&query2=bb');
+      });
+
+      it('should handle inherit: false params', () => {
+        expect(
+          $state.href('bar', {
+            path: 'newpath',
+          })
+          // Path has new value
+          // Query1 should not be inherited
+          // Query2 should be inherited
+        ).toEqual('#/foo/bar/newpath?query2=originalQuery2');
+      });
+    });
   });
 });
