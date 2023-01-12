@@ -1,7 +1,7 @@
 {
   "name": "@uirouter/core",
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
-  "version": "6.0.8",
+  "version": "6.0.9",
   "scripts": {
     "clean": "shx rm -rf lib lib-esm _bundles .cache _doc",
     "compile": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && shx cp src/*.json lib",
@@ -68,7 +68,7 @@
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
     "@types/jquery": "^3.3.36",
-    "@uirouter/publish-scripts": "^2.5.5",
+    "@uirouter/publish-scripts": "^2.6.0",
     "bufferutil": "4.0.2",
     "dts-downlevel": "^0.4.0",
     "fork-ts-checker-webpack-plugin": "^6.0.8",
