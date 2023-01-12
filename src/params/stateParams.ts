@@ -1,3 +1,4 @@
+import { Param } from '.';
 import { extend, ancestors, Obj } from '../common/common';
 import { StateObject } from '../state/stateObject';
 
@@ -17,20 +18,23 @@ export class StateParams {
    * @param {Object} $to Internal definition of object representing state to transition to.
    */
   $inherit(newParams: Obj, $current: StateObject, $to: StateObject) {
-    let parentParams: string[];
+    let parentParams: { [key: string]: Param };
+    let parentParamsKeys: string[];
     const parents = ancestors($current, $to),
       inherited: Obj = {},
       inheritList: string[] = [];
 
     for (const i in parents) {
       if (!parents[i] || !parents[i].params) continue;
-      parentParams = Object.keys(parents[i].params);
-      if (!parentParams.length) continue;
+      parentParams = parents[i].params;
+      parentParamsKeys = Object.keys(parentParams);
+      if (!parentParamsKeys.length) continue;
 
-      for (const j in parentParams) {
-        if (parents[i].params[parentParams[j]].inherit == false || inheritList.indexOf(parentParams[j]) >= 0) continue;
-        inheritList.push(parentParams[j]);
-        inherited[parentParams[j]] = this[parentParams[j]];
+      for (const j in parentParamsKeys) {
+        if (parentParams[parentParamsKeys[j]].inherit == false || inheritList.indexOf(parentParamsKeys[j]) >= 0)
+          continue;
+        inheritList.push(parentParamsKeys[j]);
+        inherited[parentParamsKeys[j]] = this[parentParamsKeys[j]];
       }
     }
     return extend({}, inherited, newParams);
