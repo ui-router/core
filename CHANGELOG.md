@@ -1,3 +1,13 @@
+## 6.0.9 (2023-01-12)
+[Compare `@uirouter/core` versions 6.0.8 and 6.0.9](https://github.com/ui-router/core/compare/6.0.8...6.0.9)
+
+### Bug Fixes
+
+* **stateService:** make sure `$state.href` (and by extension `uiSref`) handle state Params `inherit: false` ([#834](https://github.com/ui-router/core/issues/834)) ([12cd951](https://github.com/ui-router/core/commit/12cd951))
+
+
+
+
 ## 6.0.8 (2021-07-13)
 [Compare `@uirouter/core` versions 6.0.7 and 6.0.8](https://github.com/ui-router/core/compare/6.0.7...6.0.8)
 
