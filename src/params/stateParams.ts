@@ -18,16 +18,14 @@ export class StateParams {
    * @param {Object} $to Internal definition of object representing state to transition to.
    */
   $inherit(newParams: Obj, $current: StateObject, $to: StateObject) {
-    let parentParams: { [key: string]: Param };
-    let parentParamsKeys: string[];
     const parents = ancestors($current, $to),
       inherited: Obj = {},
       inheritList: string[] = [];
 
     for (const i in parents) {
       if (!parents[i] || !parents[i].params) continue;
-      parentParams = parents[i].params;
-      parentParamsKeys = Object.keys(parentParams);
+      const parentParams = parents[i].params;
+      const parentParamsKeys = Object.keys(parentParams);
       if (!parentParamsKeys.length) continue;
 
       for (const j in parentParamsKeys) {
