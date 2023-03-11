@@ -1,8 +1,0 @@
-{
-  "comment": "This forces angular compiler to import from @uirouter/core, instead of deep imports into @uirouter/core/lib",
-  "importAs": "@uirouter/core",
-  "__symbolic": "module",
-  "version": 3,
-  "metadata": {},
-  "exports": []
-}
