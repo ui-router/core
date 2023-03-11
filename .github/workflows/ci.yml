@@ -21,6 +21,9 @@ jobs:
         yarncmd: ['test', 'docs']
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
       - name: Install Dependencies
         run: yarn install --pure-lockfile
       - name: Check Peer Dependencies
