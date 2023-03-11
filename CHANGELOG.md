@@ -1,3 +1,13 @@
+# 6.1.0 (2023-03-11)
+[Compare `@uirouter/core` versions 6.0.9 and 6.1.0](https://github.com/ui-router/core/compare/6.0.9...6.1.0)
+
+### Bug Fixes
+
+* **angular-compiler:** remove index.metadata.json from uirouter core, ([37b5ebe](https://github.com/ui-router/core/commit/37b5ebe))
+
+
+
+
 ## 6.0.9 (2023-01-12)
 [Compare `@uirouter/core` versions 6.0.8 and 6.0.9](https://github.com/ui-router/core/compare/6.0.8...6.0.9)
 
