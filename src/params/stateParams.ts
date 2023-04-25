@@ -1,4 +1,3 @@
-import { Param } from '.';
 import { extend, ancestors, Obj } from '../common/common';
 import { StateObject } from '../state/stateObject';
 
@@ -22,17 +21,17 @@ export class StateParams {
       inherited: Obj = {},
       inheritList: string[] = [];
 
-    for (const i in parents) {
-      if (!parents[i] || !parents[i].params) continue;
-      const parentParams = parents[i].params;
+    for (const parent of parents) {
+      if (!parent.params) continue;
+      const parentParams = parent.params;
       const parentParamsKeys = Object.keys(parentParams);
       if (!parentParamsKeys.length) continue;
 
-      for (const j in parentParamsKeys) {
-        if (parentParams[parentParamsKeys[j]].inherit == false || inheritList.indexOf(parentParamsKeys[j]) >= 0)
+      for (const parentParamsKey of parentParamsKeys) {
+        if (parentParams[parentParamsKey].inherit == false || inheritList.indexOf(parentParamsKey) >= 0)
           continue;
-        inheritList.push(parentParamsKeys[j]);
-        inherited[parentParamsKeys[j]] = this[parentParamsKeys[j]];
+        inheritList.push(parentParamsKey);
+        inherited[parentParamsKey] = this[parentParamsKey];
       }
     }
     return extend({}, inherited, newParams);
