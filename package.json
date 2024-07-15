@@ -1,7 +1,7 @@
 {
   "name": "@uirouter/core",
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "scripts": {
     "clean": "shx rm -rf lib lib-esm _bundles .cache _doc",
     "compile": "npm run clean && tsc && tsc -m es6 --outDir lib-esm",
@@ -66,12 +66,12 @@
   "module": "lib-esm/index.js",
   "license": "MIT",
   "devDependencies": {
-    "@types/jasmine": "^3.3.13",
+    "@types/jasmine": "^5.1.4",
     "@types/jquery": "^3.3.36",
-    "@uirouter/publish-scripts": "^2.6.0",
+    "@uirouter/publish-scripts": "^2.6.3",
     "bufferutil": "4.0.2",
     "dts-downlevel": "^0.4.0",
-    "fork-ts-checker-webpack-plugin": "^6.0.8",
+    "fork-ts-checker-webpack-plugin": "^9.0.2",
     "husky": "^4.2.5",
     "jasmine-core": "^3.3.0",
     "karma": "^5.0.4",
@@ -79,8 +79,11 @@
     "karma-firefox-launcher": "^2.1.0",
     "karma-jasmine": "^4.0.1",
     "karma-script-launcher": "^1.0.0",
-    "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^4.0.2",
+    "karma-sourcemap-loader": "^0.4.0",
+    "karma-webpack": "^5.0.1",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
     "prettier": "^2.0.5",
     "pretty-quick": "^3.1.0",
     "rollup": "1.32.1",
@@ -88,11 +91,9 @@
     "rollup-plugin-sourcemaps": "^0.6.1",
     "rollup-plugin-uglify": "^6.0.0",
     "ts-loader": "^8.0.12",
-    "tslint": "5.20.1",
-    "tslint-eslint-rules": "^5.3.1",
-    "typescript": "~3.9",
+    "typescript": "~5.4.5",
     "utf-8-validate": "5.0.3",
-    "webpack": "^4.34.0"
+    "webpack": "^5.92.1"
   },
   "resolutions": {
     "chokidar": "3.3.1"
@@ -122,5 +123,6 @@
         "Trace"
       ]
     }
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
