@@ -13,7 +13,7 @@ const noImpl = (fnname: string) => () => {
 };
 
 export const makeStub = <T>(service: string, methods: (keyof T)[]): T =>
-  methods.reduce((acc, key) => ((acc[key] = noImpl(`${service}.${key}()`) as any), acc), {} as T);
+  methods.reduce((acc, key) => ((acc[key] = noImpl(`${service}.${String(key)}()`) as any), acc), {} as T);
 
 const services: CoreServices = {
   $q: undefined,

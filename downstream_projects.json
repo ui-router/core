@@ -9,23 +9,8 @@
     "react": "https://github.com/ui-router/react.git"
   },
   "other": {
+    "typescript5.4": "./test/typescript5.4",
     "typescript3.9": "./test/typescript3.9",
-    "typescript3.8": "./test/typescript3.8",
-    "typescript3.7": "./test/typescript3.7",
-    "typescript3.6": "./test/typescript3.6",
-    "typescript3.5": "./test/typescript3.5",
-    "typescript3.4": "./test/typescript3.4",
-    "typescript3.3": "./test/typescript3.3",
-    "typescript3.2": "./test/typescript3.2",
-    "typescript3.1": "./test/typescript3.1",
-    "typescript3.0": "./test/typescript3.0",
-    "typescript2.8": "./test/typescript2.8",
-    "typescript2.7": "./test/typescript2.7",
-    "typescript2.6": "./test/typescript2.6",
-    "typescript2.5": "./test/typescript2.5",
-    "typescript2.4": "./test/typescript2.4",
-    "typescript2.3": "./test/typescript2.3",
-    "typescript2.2": "./test/typescript2.2",
     "sticky-states": "https://github.com/ui-router/sticky-states.git"
   }
 }

@@ -12,16 +12,16 @@ import { TestingPlugin } from './_testingPlugin';
 import { StateDeclaration } from '../src/state/interface';
 import { PathNode } from '../src/path/pathNode';
 
-describe('stateService', function() {
+describe('stateService', function () {
   let router: UIRouter;
   let $registry: StateRegistry;
   let $transitions: TransitionService;
   let $state: StateService;
   let $loc: LocationServices;
 
-  const delay = millis => () => new Promise(resolve => setTimeout(resolve, millis));
+  const delay = (millis) => () => new Promise((resolve) => setTimeout(resolve, millis));
 
-  const wait = (val?) => new Promise(resolve => setTimeout(() => resolve(val), 50));
+  const wait = (val?) => new Promise((resolve) => setTimeout(() => resolve(val), 50));
 
   async function initStateTo(state, params = {}) {
     await $state.transitionTo(state, params);
@@ -62,18 +62,18 @@ describe('stateService', function() {
       };
 
       const states = tree2Array(stateTree, false);
-      states.forEach(state => $registry.register(state));
+      states.forEach((state) => $registry.register(state));
     });
 
-    it('should handle redirects', done => {
+    it('should handle redirects', (done) => {
       let log = [],
         cOpts: TransitionOptions = {};
 
-      $transitions.onStart({ to: 'D' }, trans => {
+      $transitions.onStart({ to: 'D' }, (trans) => {
         log.push('redirect');
         return trans.router.stateService.target('C');
       });
-      $transitions.onStart({ to: 'C' }, trans => {
+      $transitions.onStart({ to: 'C' }, (trans) => {
         cOpts = trans.options();
       });
 
@@ -88,43 +88,43 @@ describe('stateService', function() {
       });
     });
 
-    it('should error after 20+ async redirects', done => {
+    it('should error after 20+ async redirects', (done) => {
       const errors = [];
-      $transitions.onEnter({ entering: 'D' }, trans => trans.router.stateService.target('D'));
-      $transitions.onError({}, trans => {
+      $transitions.onEnter({ entering: 'D' }, (trans) => trans.router.stateService.target('D'));
+      $transitions.onError({}, (trans) => {
         errors.push(trans.error());
       });
 
-      $state.defaultErrorHandler(function() {});
+      $state.defaultErrorHandler(function () {});
 
-      $state.go('D').catch(err => {
+      $state.go('D').catch((err) => {
         expect(errors.length).toBe(21);
         expect(err.message).toContain('Too many consecutive Transition redirects');
         done();
       });
     });
 
-    it('synchronous redirects should not be allowed to cause an infinite redirect loop', done => {
+    it('synchronous redirects should not be allowed to cause an infinite redirect loop', (done) => {
       const errors = [];
       let count = 0;
-      $transitions.onBefore({ entering: 'D' }, trans => {
+      $transitions.onBefore({ entering: 'D' }, (trans) => {
         if (count++ >= 1000) throw new Error(`Doh! 1000 redirects O_o`);
         return trans.router.stateService.target('D');
       });
-      $transitions.onError({}, trans => {
+      $transitions.onError({}, (trans) => {
         errors.push(trans.error());
       });
 
-      $state.defaultErrorHandler(function() {});
+      $state.defaultErrorHandler(function () {});
 
-      $state.go('D').catch(err => {
+      $state.go('D').catch((err) => {
         expect(count).toBe(21);
         expect(err.message).toContain('Too many consecutive Transition redirects');
         done();
       });
     });
 
-    it('should not update the URL in response to synchronizing URL', done => {
+    it('should not update the URL in response to synchronizing URL', (done) => {
       $loc.url('/a/b/c');
       const url = spyOn($loc, 'url').and.callThrough();
 
@@ -132,15 +132,15 @@ describe('stateService', function() {
         expect($state.current.name).toBe('C');
         const pushedUrls = url.calls
           .all()
-          .map(x => x.args[0])
-          .filter(x => x !== undefined);
+          .map((x) => x.args[0])
+          .filter((x) => x !== undefined);
         expect(pushedUrls).toEqual([]);
         expect($loc.path()).toBe('/a/b/c');
         done();
       });
     });
 
-    it('should update the URL in response to synchronizing URL then redirecting', done => {
+    it('should update the URL in response to synchronizing URL then redirecting', (done) => {
       $transitions.onStart({ to: 'C' }, () => $state.target('D'));
 
       $loc.url('/a/b/c');
@@ -150,8 +150,8 @@ describe('stateService', function() {
         expect($state.current.name).toBe('D');
         const pushedUrls = url.calls
           .all()
-          .map(x => x.args[0])
-          .filter(x => x !== undefined);
+          .map((x) => x.args[0])
+          .filter((x) => x !== undefined);
         expect(pushedUrls).toEqual(['/a/b/c/d']);
         expect($loc.path()).toBe('/a/b/c/d');
         done();
@@ -159,7 +159,7 @@ describe('stateService', function() {
     });
   });
 
-  describe('.transitionTo()', function() {
+  describe('.transitionTo()', function () {
     let A, B, C, D, DD;
     beforeEach(() => {
       A = { name: 'A', url: '/a' };
@@ -168,7 +168,7 @@ describe('stateService', function() {
       D = { name: 'D', url: '/d', params: { x: null, y: null } };
       DD = { name: 'DD', url: '/dd', parent: D, params: { x: null, y: null, z: null } };
 
-      [A, B, C, D, DD].forEach(state => $registry.register(state));
+      [A, B, C, D, DD].forEach((state) => $registry.register(state));
     });
 
     it('returns a promise for the target state', () => {
@@ -180,18 +180,18 @@ describe('stateService', function() {
     // @todo this should fail:
     // $state.transitionTo('about.person.item', { id: 5 }); $q.flush();
 
-    it('allows transitions by name', async done => {
+    it('allows transitions by name', async (done) => {
       await $state.transitionTo('A', {});
       expect($state.current).toBe(A);
 
       done();
     });
 
-    describe('dynamic transitions', function() {
+    describe('dynamic transitions', function () {
       let dynlog, paramsChangedLog;
       let dynamicstate, childWithParam, childNoParam;
 
-      beforeEach(async function(done) {
+      beforeEach(async function (done) {
         $loc.url('asdfasfdasf');
         dynlog = paramsChangedLog = '';
         dynamicstate = {
@@ -230,7 +230,7 @@ describe('stateService', function() {
                 trans.params('to'),
                 trans.params('from')
               )
-                .map(param => param.id + '=' + trans.params('to')[param.id])
+                .map((param) => param.id + '=' + trans.params('to')[param.id])
                 .join(',');
               if (changed) {
                 dynlog += prefix + changed + suffix + ';';
@@ -267,23 +267,23 @@ describe('stateService', function() {
         done();
       });
 
-      afterEach(done => {
+      afterEach((done) => {
         router.dispose();
         done();
       });
 
-      describe('[ transition.dynamic() ]:', function() {
+      describe('[ transition.dynamic() ]:', function () {
         it('is considered fully dynamic when only dynamic params have changed', () => {
           const promise = $state.go('.', { pathDyn: 'pd2', searchDyn: 'sd2' });
           expect(promise.transition.dynamic()).toBeTruthy();
         });
 
-        it('is not considered fully dynamic if any state is entered', function() {
+        it('is not considered fully dynamic if any state is entered', function () {
           const promise = $state.go(childWithParam);
           expect(promise.transition.dynamic()).toBeFalsy();
         });
 
-        it('is not considered fully dynamic if any state is exited', async function(done) {
+        it('is not considered fully dynamic if any state is exited', async function (done) {
           await initStateTo(childWithParam, {
             config: 'p1',
             path: 'p1',
@@ -297,23 +297,23 @@ describe('stateService', function() {
           done();
         });
 
-        it('is not considered fully dynamic if any state is reloaded', function() {
+        it('is not considered fully dynamic if any state is reloaded', function () {
           const promise = $state.go(dynamicstate, null, { reload: true });
           expect(promise.transition.dynamic()).toBeFalsy();
         });
 
-        it('is not considered fully dynamic if any non-dynamic parameter changes', function() {
+        it('is not considered fully dynamic if any non-dynamic parameter changes', function () {
           const promise = $state.go(dynamicstate, { path: 'p2' });
           expect(promise.transition.dynamic()).toBeFalsy();
         });
       });
 
-      describe('[ promises ]', function() {
-        it('runs successful transition when fully dynamic', async done => {
+      describe('[ promises ]', function () {
+        it('runs successful transition when fully dynamic', async (done) => {
           const promise = $state.go(dynamicstate, { searchDyn: 'sd2' });
           const transition = promise.transition;
           let transSuccess = false;
-          transition.promise.then(function(result) {
+          transition.promise.then(function (result) {
             transSuccess = true;
           });
           await promise;
@@ -325,7 +325,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('resolves the $state.go() promise with the original/final state, when fully dynamic', async done => {
+        it('resolves the $state.go() promise with the original/final state, when fully dynamic', async (done) => {
           await initStateTo(dynamicstate, { path: 'p1', pathDyn: 'pd1', search: 's1', searchDyn: 'sd1' });
 
           const promise = $state.go(dynamicstate, { pathDyn: 'pd2', searchDyn: 'sd2' });
@@ -339,8 +339,8 @@ describe('stateService', function() {
         });
       });
 
-      describe('[ enter/exit ]', function() {
-        it('does not exit nor enter any states when fully dynamic', async done => {
+      describe('[ enter/exit ]', function () {
+        it('does not exit nor enter any states when fully dynamic', async (done) => {
           const promise = $state.go(dynamicstate, { searchDyn: 'sd2' });
           await promise;
 
@@ -354,7 +354,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('does not exit nor enter the state when only dynamic search params change', async done => {
+        it('does not exit nor enter the state when only dynamic search params change', async (done) => {
           const promise = $state.go(dynamicstate, { searchDyn: 'sd2' });
           await promise;
 
@@ -365,7 +365,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('does not exit nor enter the state when only dynamic path params change', async done => {
+        it('does not exit nor enter the state when only dynamic path params change', async (done) => {
           const promise = $state.go(dynamicstate, { pathDyn: 'pd2' });
           await promise;
 
@@ -376,7 +376,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('exits and enters a state when a non-dynamic search param changes', async done => {
+        it('exits and enters a state when a non-dynamic search param changes', async (done) => {
           const promise = $state.go(dynamicstate, { search: 's2' });
           await promise;
 
@@ -387,7 +387,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('exits and enters a state when a non-dynamic path param changes', async done => {
+        it('exits and enters a state when a non-dynamic path param changes', async (done) => {
           const promise = $state.go(dynamicstate, { path: 'p2' });
           await promise;
 
@@ -398,7 +398,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('does not exit nor enter a state when only dynamic params change (triggered via url)', done => {
+        it('does not exit nor enter a state when only dynamic params change (triggered via url)', (done) => {
           awaitTransition(router).then(() => {
             expect(dynlog).toBe('success;[searchDyn=sd2];');
             done();
@@ -407,7 +407,7 @@ describe('stateService', function() {
           $loc.url('/dynstate/p1/pd1?search=s1&searchDyn=sd2');
         });
 
-        it('exits and enters a state when any non-dynamic params change (triggered via url)', done => {
+        it('exits and enters a state when any non-dynamic params change (triggered via url)', (done) => {
           awaitTransition(router).then(() => {
             expect(dynlog).toBe('exit:dyn;enter:dyn;success;');
             done();
@@ -416,7 +416,7 @@ describe('stateService', function() {
           $loc.url('/dynstate/p1/pd1?search=s2&searchDyn=sd2');
         });
 
-        it('does not exit nor enter a state when only dynamic params change (triggered via $state transition)', async done => {
+        it('does not exit nor enter a state when only dynamic params change (triggered via $state transition)', async (done) => {
           await $state.go('.', { searchDyn: 'sd2' }, { inherit: true });
           expect(dynlog).toBe('success;[searchDyn=sd2];');
 
@@ -424,16 +424,16 @@ describe('stateService', function() {
         });
       });
 
-      describe('[ global $stateParams service ]', function() {
-        it('updates the global $state.params object', async done => {
+      describe('[ global $stateParams service ]', function () {
+        it('updates the global $state.params object', async (done) => {
           await $state.go(dynamicstate, { searchDyn: 'sd2' });
           expect($state.params).toEqualValues({ path: 'p1', pathDyn: 'pd1', search: 's1', searchDyn: 'sd2' });
 
           done();
         });
 
-        it('updates $stateParams and $location.search when only dynamic params change (triggered via url)', async done => {
-          const dereg = $transitions.onBefore({}, trans => {
+        it('updates $stateParams and $location.search when only dynamic params change (triggered via url)', async (done) => {
+          const dereg = $transitions.onBefore({}, (trans) => {
             trans.promise.then(expects, expects);
 
             function expects() {
@@ -449,7 +449,7 @@ describe('stateService', function() {
           $loc.url('/dynstate/p1/pd1?search=s1&searchDyn=sd2'); // {search: 's1', searchDyn: 'sd2'});
         });
 
-        it('updates $stateParams and $location.search when only dynamic params change (triggered via $state transition)', async done => {
+        it('updates $stateParams and $location.search when only dynamic params change (triggered via $state transition)', async (done) => {
           await $state.go('.', { searchDyn: 'sd2' });
 
           expect($state.params['search']).toBe('s1');
@@ -460,7 +460,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('performs a shallow copy to $stateParams (for object parameters)', async done => {
+        it('performs a shallow copy to $stateParams (for object parameters)', async (done) => {
           const x = { foo: '123' },
             y = { bar: 'abc' };
           await $state.go('D', { x, y });
@@ -471,7 +471,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('updates the object reference in-place', async done => {
+        it('updates the object reference in-place', async (done) => {
           const params = $state.params;
           const x = { foo: '123' };
           await $state.go('D', { x });
@@ -484,10 +484,10 @@ describe('stateService', function() {
       });
     });
 
-    describe('(with dynamic params because reloadOnSearch=false)', function() {
+    describe('(with dynamic params because reloadOnSearch=false)', function () {
       let RS;
 
-      beforeEach(done => {
+      beforeEach((done) => {
         RS = { name: 'RS', url: '^/search?term', reloadOnSearch: false };
         $registry.register(RS);
         initStateTo(RS)
@@ -495,15 +495,15 @@ describe('stateService', function() {
           .then(done);
       });
 
-      describe('and only query params changed', function() {
+      describe('and only query params changed', function () {
         let entered = false;
         beforeEach(() => {
-          $transitions.onEnter({ entering: 'RS' }, function() {
+          $transitions.onEnter({ entering: 'RS' }, function () {
             entered = true;
           });
         });
 
-        it("doesn't re-enter state (triggered by url change)", function(done) {
+        it("doesn't re-enter state (triggered by url change)", function (done) {
           $loc.url($loc.path() + '?term=hello');
           awaitTransition(router).then(() => {
             expect($loc.search()).toEqual({ term: 'hello' });
@@ -512,11 +512,11 @@ describe('stateService', function() {
           });
         });
 
-        it("doesn't re-enter state (triggered by $state transition)", async done => {
+        it("doesn't re-enter state (triggered by $state transition)", async (done) => {
           const promise = $state.go($state.current, { term: 'hello' });
           let success = false,
             transition = promise.transition;
-          transition.promise.then(function() {
+          transition.promise.then(function () {
             success = true;
           });
           await promise;
@@ -530,7 +530,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('updates $stateParams', async function(done) {
+        it('updates $stateParams', async function (done) {
           await $state.go('RS', { term: 'hello' });
 
           expect($state.params).toEqualValues({ term: 'hello' });
@@ -539,7 +539,7 @@ describe('stateService', function() {
           done();
         });
 
-        it('updates URL when (triggered by $state transition)', async done => {
+        it('updates URL when (triggered by $state transition)', async (done) => {
           await $state.go('.', { term: 'goodbye' });
 
           expect($state.params).toEqualValues({ term: 'goodbye' });
@@ -552,7 +552,7 @@ describe('stateService', function() {
       });
     });
 
-    it('ignores non-applicable state parameters', async done => {
+    it('ignores non-applicable state parameters', async (done) => {
       await $state.transitionTo('A', { w00t: 'hi mom!' });
 
       expect($state.current).toBe(A);
@@ -560,7 +560,7 @@ describe('stateService', function() {
       done();
     });
 
-    it('is ignored when passing the current state and identical parameters', async done => {
+    it('is ignored when passing the current state and identical parameters', async (done) => {
       let enterlog = '';
       $transitions.onEnter({ entering: 'A' }, (trans, state) => {
         enterlog += state.name + ';';
@@ -582,7 +582,7 @@ describe('stateService', function() {
       }
     });
 
-    it('is not ignored when reload: true option is set', async done => {
+    it('is not ignored when reload: true option is set', async (done) => {
       let enterlog = '';
       $transitions.onEnter({ entering: 'A' }, (trans, state) => {
         enterlog += state.name + ';';
@@ -599,7 +599,7 @@ describe('stateService', function() {
       done();
     });
 
-    it('is not ignored if any nodes are found in treechanges.entering', async done => {
+    it('is not ignored if any nodes are found in treechanges.entering', async (done) => {
       let enterlog = '';
       $transitions.onEnter({ entering: 'A' }, (trans, state) => {
         enterlog += state.name + ';';
@@ -608,7 +608,7 @@ describe('stateService', function() {
       expect(enterlog).toBe('A;');
 
       const pathNode = new PathNode(A.$$state());
-      $transitions.onCreate({}, trans => trans.treeChanges().entering.push(pathNode));
+      $transitions.onCreate({}, (trans) => trans.treeChanges().entering.push(pathNode));
 
       const goPromise = $state.transitionTo(A);
       await goPromise;
@@ -619,7 +619,7 @@ describe('stateService', function() {
       done();
     });
 
-    it('is not ignored if any nodes are found in treechanges.exiting', async done => {
+    it('is not ignored if any nodes are found in treechanges.exiting', async (done) => {
       let exitlog = '';
       $transitions.onExit({ exiting: 'A' }, (trans, state) => {
         exitlog += state.name + ';';
@@ -627,7 +627,7 @@ describe('stateService', function() {
       await initStateTo(A);
 
       const pathNode = new PathNode(A.$$state());
-      $transitions.onCreate({}, trans => trans.treeChanges().exiting.push(pathNode));
+      $transitions.onCreate({}, (trans) => trans.treeChanges().exiting.push(pathNode));
       const goPromise = $state.transitionTo(A);
       await goPromise;
       await goPromise.transition.promise;
@@ -638,12 +638,12 @@ describe('stateService', function() {
     });
 
     describe('when supercede TransitionOption is false', () => {
-      it('ignores transition if another transition is running', async done => {
+      it('ignores transition if another transition is running', async (done) => {
         $state.defaultErrorHandler(() => null);
         await initStateTo(A);
 
         const activeTransition = $state.transitionTo(B, {});
-        const superseded = await $state.transitionTo(C, {}, { supercede: false }).catch(err => err);
+        const superseded = await $state.transitionTo(C, {}, { supercede: false }).catch((err) => err);
 
         const result: Rejection = await superseded;
         expect(result.type).toEqual(RejectType.IGNORED);
@@ -656,11 +656,11 @@ describe('stateService', function() {
       });
     });
 
-    it('aborts pending transitions (last call wins)', async done => {
+    it('aborts pending transitions (last call wins)', async (done) => {
       $state.defaultErrorHandler(() => null);
       await initStateTo(A);
 
-      const superseded = $state.transitionTo(B, {}).catch(err => err);
+      const superseded = $state.transitionTo(B, {}).catch((err) => err);
       await $state.transitionTo(C, {});
 
       const result = await superseded;
@@ -670,13 +670,13 @@ describe('stateService', function() {
       done();
     });
 
-    it('ignores transitions that are equivalent to the pending transition', async done => {
+    it('ignores transitions that are equivalent to the pending transition', async (done) => {
       $state.defaultErrorHandler(() => null);
       await initStateTo(A);
-      router.transitionService.onStart({}, trans => new Promise<any>(resolve => setTimeout(resolve, 50)));
+      router.transitionService.onStart({}, (trans) => new Promise<any>((resolve) => setTimeout(resolve, 50)));
 
-      const trans1 = $state.go(B, {}).transition.promise.catch(err => err);
-      const trans2 = $state.go(B, {}).transition.promise.catch(err => err);
+      const trans1 = $state.go(B, {}).transition.promise.catch((err) => err);
+      const trans2 = $state.go(B, {}).transition.promise.catch((err) => err);
 
       const result1 = await trans1;
       const result2 = await trans2;
@@ -688,13 +688,13 @@ describe('stateService', function() {
       done();
     });
 
-    it('cancels pending transitions that are superseded by an ignored transition', async done => {
+    it('cancels pending transitions that are superseded by an ignored transition', async (done) => {
       $state.defaultErrorHandler(() => null);
       await initStateTo(A);
-      router.transitionService.onStart({}, trans => new Promise<any>(resolve => setTimeout(resolve, 50)));
+      router.transitionService.onStart({}, (trans) => new Promise<any>((resolve) => setTimeout(resolve, 50)));
 
-      const trans1 = $state.go(B, {}).transition.promise.catch(err => err);
-      const trans2 = $state.go(A, {}).transition.promise.catch(err => err);
+      const trans1 = $state.go(B, {}).transition.promise.catch((err) => err);
+      const trans2 = $state.go(A, {}).transition.promise.catch((err) => err);
 
       const result1 = await trans1;
       const result2 = await trans2;
@@ -706,11 +706,11 @@ describe('stateService', function() {
       done();
     });
 
-    it('aborts pending transitions even when going back to the current state', async done => {
+    it('aborts pending transitions even when going back to the current state', async (done) => {
       $state.defaultErrorHandler(() => null);
       await initStateTo(A);
 
-      const superseded = $state.go(B, {}).transition.promise.catch(err => err);
+      const superseded = $state.go(B, {}).transition.promise.catch((err) => err);
       await $state.go(A, {});
       const result = await superseded;
 
@@ -720,13 +720,13 @@ describe('stateService', function() {
       done();
     });
 
-    it('can be manually aborted', async done => {
+    it('can be manually aborted', async (done) => {
       $state.defaultErrorHandler(() => null);
 
       await initStateTo(A);
 
-      router.transitionService.onStart({}, trans => {
-        if (trans.$id === 1) return new Promise(resolve => setTimeout(resolve, 50)) as any;
+      router.transitionService.onStart({}, (trans) => {
+        if (trans.$id === 1) return new Promise((resolve) => setTimeout(resolve, 50)) as any;
       });
 
       const promise = $state.transitionTo(B, {});
@@ -734,7 +734,7 @@ describe('stateService', function() {
 
       setTimeout(() => transition.abort());
 
-      const expects = result => {
+      const expects = (result) => {
         expect($state.current).toBe(A);
         expect(result.type).toBe(RejectType.ABORTED);
 
@@ -744,17 +744,17 @@ describe('stateService', function() {
       promise.then(expects, expects);
     });
 
-    it('aborts pending transitions when superseded from callbacks', async done => {
+    it('aborts pending transitions when superseded from callbacks', async (done) => {
       // router.trace.enable(1);
       $state.defaultErrorHandler(() => null);
       $registry.register({
         name: 'redir',
         url: 'redir',
-        onEnter: trans => {
+        onEnter: (trans) => {
           trans.router.stateService.go('A');
         },
       });
-      const result = await $state.transitionTo('redir').catch(err => err);
+      const result = await $state.transitionTo('redir').catch((err) => err);
       await router.globals.transition.promise;
 
       expect($state.current.name).toBe('A');
@@ -763,10 +763,10 @@ describe('stateService', function() {
       done();
     });
 
-    it('does not abort pending transition when a new transition is cancelled by onBefore hook', done => {
-      router.transitionService.onBefore({}, t => {
+    it('does not abort pending transition when a new transition is cancelled by onBefore hook', (done) => {
+      router.transitionService.onBefore({}, (t) => {
         if (t.$id === 1) return false;
-        return new Promise(resolve => setTimeout(resolve, 100)) as any;
+        return new Promise((resolve) => setTimeout(resolve, 100)) as any;
       });
 
       const promise1 = $state.transitionTo('A'); // takes 100 ms
@@ -779,13 +779,13 @@ describe('stateService', function() {
         done();
       });
 
-      promise2.catch(err => (promise2Error = err));
+      promise2.catch((err) => (promise2Error = err));
     });
 
-    it('triggers onEnter and onExit callbacks', async done => {
+    it('triggers onEnter and onExit callbacks', async (done) => {
       let log = '';
       await initStateTo(A);
-      $transitions.onSuccess({}, trans => {
+      $transitions.onSuccess({}, (trans) => {
         log += trans.to().name + ';';
       });
       $transitions.onEnter({}, (trans, state) => {
@@ -807,12 +807,12 @@ describe('stateService', function() {
     });
 
     // test for #3081
-    it('injects resolve values from the exited state into onExit', async done => {
+    it('injects resolve values from the exited state into onExit', async (done) => {
       $registry.register({
         name: 'design',
         url: '/design',
         resolve: { cc: () => 'cc resolve' },
-        onExit: function(trans, state) {
+        onExit: function (trans, state) {
           expect(trans.from().name).toBe('design');
           expect(trans.to().name).toBe('A');
           expect(state).toBe($registry.get('design'));
@@ -826,7 +826,7 @@ describe('stateService', function() {
       done();
     });
 
-    it("doesn't transition to parent state when child has no URL", async done => {
+    it("doesn't transition to parent state when child has no URL", async (done) => {
       $registry.register({ name: 'about', url: '/abougx' });
       $registry.register({ name: 'about.sidebar' });
       await $state.transitionTo('about.sidebar');
@@ -835,12 +835,12 @@ describe('stateService', function() {
       done();
     });
 
-    it('notifies on failed relative state resolution', async done => {
+    it('notifies on failed relative state resolution', async (done) => {
       await $state.transitionTo(DD);
 
       let actual: any;
       const message = "Could not resolve '^.Z' from state 'DD'";
-      await $state.transitionTo('^.Z', null, { relative: $state.$current }).catch(function(err) {
+      await $state.transitionTo('^.Z', null, { relative: $state.$current }).catch(function (err) {
         actual = err;
       });
       expect(actual.detail).toEqual(message);
@@ -848,7 +848,7 @@ describe('stateService', function() {
       done();
     });
 
-    it('updates the location #fragment, if specified', async done => {
+    it('updates the location #fragment, if specified', async (done) => {
       await $state.transitionTo('DD', { '#': 'frag' });
 
       expect($loc.path()).toBe('/d/dd');
@@ -857,7 +857,7 @@ describe('stateService', function() {
       done();
     });
 
-    it('runs a transition when the location #fragment is updated', async done => {
+    it('runs a transition when the location #fragment is updated', async (done) => {
       let transitionCount = 0;
       $transitions.onSuccess({}, () => {
         transitionCount++;
@@ -874,17 +874,17 @@ describe('stateService', function() {
       done();
     });
 
-    it('injects $transition$ into resolves', async done => {
+    it('injects $transition$ into resolves', async (done) => {
       let log = '';
       $registry.register({
         name: 'about',
         url: '/about',
         resolve: {
-          stateInfo: function($transition$) {
+          stateInfo: function ($transition$) {
             return [$transition$.from().name, $transition$.to().name];
           },
         },
-        onEnter: function($transition$) {
+        onEnter: function ($transition$) {
           const stateInfo = $transition$.injector().get('stateInfo');
           log = stateInfo.join(' => ');
         },
@@ -912,8 +912,8 @@ describe('stateService', function() {
     };
 
     beforeEach(() => {
-      spy = jasmine.createSpy('defaultErrorHandler', function(err) {});
-      $state.defaultErrorHandler(err => spy(err.detail));
+      spy = jasmine.createSpy('defaultErrorHandler', function (err) {});
+      $state.defaultErrorHandler((err) => spy(err.detail));
       $registry.register({ name: 'a' });
       $registry.register({ name: 'a.b' });
       doh = new Error('doh');
@@ -922,7 +922,7 @@ describe('stateService', function() {
 
     // thrown error
 
-    it('should not be called when an onCreate hook throws', done => {
+    it('should not be called when an onCreate hook throws', (done) => {
       $transitions.onCreate({}, () => {
         count++;
         throw doh;
@@ -932,40 +932,31 @@ describe('stateService', function() {
       done();
     });
 
-    it('should be called when an onBefore hook throws', done => {
+    it('should be called when an onBefore hook throws', (done) => {
       $transitions.onBefore({}, () => {
         count++;
         throw doh;
       });
-      $state
-        .go('a')
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(expectDoh, expectDoh).then(done);
     });
 
-    it('should be called when an onStart hook throws', done => {
+    it('should be called when an onStart hook throws', (done) => {
       $transitions.onStart({}, () => {
         count++;
         throw doh;
       });
-      $state
-        .go('a')
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(expectDoh, expectDoh).then(done);
     });
 
-    it('should be called when an onEnter hook throws', done => {
+    it('should be called when an onEnter hook throws', (done) => {
       $transitions.onEnter({}, () => {
         count++;
         throw doh;
       });
-      $state
-        .go('a')
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(expectDoh, expectDoh).then(done);
     });
 
-    it('should be called when an onRetain hook throws', done => {
+    it('should be called when an onRetain hook throws', (done) => {
       $transitions.onRetain({}, () => {
         count++;
         throw doh;
@@ -977,7 +968,7 @@ describe('stateService', function() {
         .then(done);
     });
 
-    it('should be called when an onExit hook throws', done => {
+    it('should be called when an onExit hook throws', (done) => {
       $transitions.onExit({}, () => {
         count++;
         throw doh;
@@ -989,65 +980,49 @@ describe('stateService', function() {
         .then(done);
     });
 
-    it('should be called when an onFinish hook throws', done => {
+    it('should be called when an onFinish hook throws', (done) => {
       $transitions.onFinish({}, () => {
         count++;
         throw doh;
       });
-      $state
-        .go('a')
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(expectDoh, expectDoh).then(done);
     });
 
     // rejected promise
 
-    it('should be called when an onCreate hook rejects a promise', done => {
+    it('should be called when an onCreate hook rejects a promise', (done) => {
       $transitions.onCreate({}, () => {
         count++;
         return Promise.reject(doh);
       });
-      $state
-        .go('a')
-        .then(delay(50), delay(50))
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
     });
 
-    it('should be called when a rejected promise is returned from an onBefore hook', done => {
+    it('should be called when a rejected promise is returned from an onBefore hook', (done) => {
       $transitions.onBefore({}, () => {
         count++;
         return Promise.reject(doh);
       });
-      $state
-        .go('a')
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(expectDoh, expectDoh).then(done);
     });
 
-    it('should be called when a rejected promise is returned from an onStart hook', done => {
+    it('should be called when a rejected promise is returned from an onStart hook', (done) => {
       $transitions.onStart({}, () => {
         count++;
         return Promise.reject(doh);
       });
-      $state
-        .go('a')
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(expectDoh, expectDoh).then(done);
     });
 
-    it('should be called when a rejected promise is returned from an onEnter hook', done => {
+    it('should be called when a rejected promise is returned from an onEnter hook', (done) => {
       $transitions.onEnter({}, () => {
         count++;
         return Promise.reject(doh);
       });
-      $state
-        .go('a')
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(expectDoh, expectDoh).then(done);
     });
 
-    it('should be called when a rejected promise is returned from an onRetain hook', done => {
+    it('should be called when a rejected promise is returned from an onRetain hook', (done) => {
       $transitions.onRetain({}, () => {
         count++;
         return Promise.reject(doh);
@@ -1059,7 +1034,7 @@ describe('stateService', function() {
         .then(done);
     });
 
-    it('should be called when a rejected promise is returned from an onExit hook', done => {
+    it('should be called when a rejected promise is returned from an onExit hook', (done) => {
       $transitions.onExit({}, () => {
         count++;
         return Promise.reject(doh);
@@ -1071,46 +1046,35 @@ describe('stateService', function() {
         .then(done);
     });
 
-    it('should be called when a rejected promise is returned from an onFinish hook', done => {
+    it('should be called when a rejected promise is returned from an onFinish hook', (done) => {
       $transitions.onFinish({}, () => {
         count++;
         return Promise.reject(doh);
       });
-      $state
-        .go('a')
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(expectDoh, expectDoh).then(done);
     });
 
     // onSuccess
 
-    it('should be called when an onSuccess hook throws', done => {
+    it('should be called when an onSuccess hook throws', (done) => {
       $transitions.onSuccess({}, () => {
         count++;
         throw doh;
       });
-      $state
-        .go('a')
-        .then(delay(50), delay(50))
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
     });
 
-    it('should be called when a rejected promise is returned from an onSuccess hook', done => {
+    it('should be called when a rejected promise is returned from an onSuccess hook', (done) => {
       $transitions.onSuccess({}, () => {
         count++;
         return Promise.reject(doh);
       });
-      $state
-        .go('a')
-        .then(delay(50), delay(50))
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
     });
 
     // onError
 
-    it('should be called when an onError hook throws', done => {
+    it('should be called when an onError hook throws', (done) => {
       $transitions.onStart({}, () => {
         throw doh;
       });
@@ -1118,14 +1082,10 @@ describe('stateService', function() {
         count++;
         throw doh;
       });
-      $state
-        .go('a')
-        .then(delay(50), delay(50))
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
     });
 
-    it('should be called when a rejected promise is returned from an onError hook', done => {
+    it('should be called when a rejected promise is returned from an onError hook', (done) => {
       $transitions.onStart({}, () => {
         throw doh;
       });
@@ -1133,37 +1093,27 @@ describe('stateService', function() {
         count++;
         return Promise.reject(doh);
       });
-      $state
-        .go('a')
-        .then(delay(50), delay(50))
-        .then(expectDoh, expectDoh)
-        .then(done);
+      $state.go('a').then(delay(50), delay(50)).then(expectDoh, expectDoh).then(done);
     });
 
     // ABORT
 
-    it('should be not called when a hook aborts the transition', done => {
+    it('should be not called when a hook aborts the transition', (done) => {
       $transitions.onFinish({}, () => {
         count++;
         return false;
       });
-      $state
-        .go('a')
-        .then(expectNone, expectNone)
-        .then(done);
+      $state.go('a').then(expectNone, expectNone).then(done);
     });
 
     // REDIRECT
 
-    it('should be not called when a hook redirects the transition', done => {
-      $transitions.onStart({ to: 'a' }, trans => {
+    it('should be not called when a hook redirects the transition', (done) => {
+      $transitions.onStart({ to: 'a' }, (trans) => {
         count++;
         return trans.router.stateService.target('a.b');
       });
-      $state
-        .go('a')
-        .then(expectNone, expectNone)
-        .then(done);
+      $state.go('a').then(expectNone, expectNone).then(done);
     });
 
     describe('.href()', () => {
@@ -1201,7 +1151,7 @@ describe('stateService', function() {
         ).toEqual('#/foo/bar/example?query1=aa&query2=bb');
       });
 
-      it('shold create a href with relative', () => {
+      it('should create a href with relative', () => {
         expect($state.href('^', null, { relative: 'bar' })).toEqual('#/foo');
       });
 

@@ -29,7 +29,11 @@ export class StateParams {
       if (!parentParamsKeys.length) continue;
 
       for (const j in parentParamsKeys) {
-        if (parentParams[parentParamsKeys[j]].inherit == false || inheritList.indexOf(parentParamsKeys[j]) >= 0)
+        if (
+          !parentParamsKeys.hasOwnProperty(j) ||
+          parentParams[parentParamsKeys[j]].inherit == false ||
+          inheritList.indexOf(parentParamsKeys[j]) >= 0
+        )
           continue;
         inheritList.push(parentParamsKeys[j]);
         inherited[parentParamsKeys[j]] = this[parentParamsKeys[j]];

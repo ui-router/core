@@ -1,7 +1,7 @@
 {
-  "name": "@uirouter/core-test-typescript3.8",
+  "name": "@uirouter/core-test-typescript5.4",
   "version": "1.0.0",
-  "description": "Test against Typescript 3.8",
+  "description": "Test against Typescript 5.4",
   "scripts": {
     "test": "tsc"
   },
@@ -9,7 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "@uirouter/core": "latest",
-    "typescript": "3.8"
+    "typescript": "5.4.5"
   },
   "devDependencies": {}
 }

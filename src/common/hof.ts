@@ -116,8 +116,10 @@ export const parse = (name: string) => pipe.apply(null, name.split('.').map(prop
  * Given a function that returns a truthy or falsey value, returns a
  * function that returns the opposite (falsey or truthy) value given the same inputs
  */
-export const not: (fn: Predicate<any>) => Predicate<any> = (fn: Predicate<any>) => (...args: any[]) =>
-  !fn.apply(null, args);
+export const not: (fn: Predicate<any>) => Predicate<any> =
+  (fn: Predicate<any>) =>
+  (...args: any[]) =>
+    !fn.apply(null, args);
 
 /**
  * Given two functions that return truthy or falsey values, returns a function that returns truthy
@@ -147,14 +149,19 @@ export const all = (fn1: Predicate<any>) => (arr: any[]) => arr.reduce((b, x) =>
 export const any = (fn1: Predicate<any>) => (arr: any[]) => arr.reduce((b, x) => b || !!fn1(x), false) as boolean;
 
 /** Given a class, returns a Predicate function that returns true if the object is of that class */
-export const is = <T>(ctor: { new (...args): T }) => (obj: any): obj is T =>
-  (obj != null && obj.constructor === ctor) || obj instanceof ctor;
+export const is =
+  <T>(ctor: { new (...args: any[]): T }) =>
+  (obj: any): obj is T =>
+    (obj != null && obj.constructor === ctor) || obj instanceof ctor;
 
 /** Given a value, returns a Predicate function that returns true if another value is === equal to the original value */
 export const eq: (comp: any) => Predicate<any> = (value: any) => (other: any) => value === other;
 
 /** Given a value, returns a function which returns the value */
-export const val = <T>(v: T) => () => v;
+export const val =
+  <T>(v: T) =>
+  () =>
+    v;
 
 export function invoke(fnName: string): Function;
 export function invoke(fnName: string, args: any[]): Function;
