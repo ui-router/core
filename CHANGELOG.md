@@ -1,3 +1,13 @@
+## 6.1.1 (2024-07-15)
+[Compare `@uirouter/core` versions 6.1.0 and 6.1.1](https://github.com/ui-router/core/compare/6.1.0...6.1.1)
+
+### Bug Fixes
+
+* **stateParams:** $inherit is not affected by enumerable prototype custom methods ([#841](https://github.com/ui-router/core/issues/841)) ([9c94c2a](https://github.com/ui-router/core/commit/9c94c2a))
+
+
+
+
 # 6.1.0 (2023-03-11)
 [Compare `@uirouter/core` versions 6.0.9 and 6.1.0](https://github.com/ui-router/core/compare/6.0.9...6.1.0)
 
