@@ -1,9 +1,9 @@
-import { extend, forEach, isDefined, isFunction, isObject } from '../common';
-import { UrlMatcher } from './urlMatcher';
-import { DefType, Param, ParamType, ParamTypeDefinition } from '../params';
-import { UrlMatcherCompileConfig } from './interface';
-import { StateDeclaration } from '../state';
-import { UIRouter } from '../router';
+import { extend, forEach, isDefined, isFunction, isObject } from '../common/index.js';
+import { UrlMatcher } from './urlMatcher.js';
+import { DefType, Param, ParamType, ParamTypeDefinition } from '../params/index.js';
+import { UrlMatcherCompileConfig } from './interface.js';
+import { StateDeclaration } from '../state/index.js';
+import { UIRouter } from '../router.js';
 
 export class ParamFactory {
   fromConfig(id: string, type: ParamType, state: StateDeclaration) {

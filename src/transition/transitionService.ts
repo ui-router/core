@@ -11,29 +11,29 @@ import {
   RegisteredHooks,
   TransitionHookFn,
   TransitionStateHookFn,
-} from './interface';
-import { Transition } from './transition';
-import { makeEvent, RegisteredHook } from './hookRegistry';
-import { TargetState } from '../state/targetState';
-import { PathNode } from '../path/pathNode';
-import { ViewService } from '../view/view';
-import { UIRouter } from '../router';
-import { registerAddCoreResolvables, treeChangesCleanup } from '../hooks/coreResolvables';
-import { registerRedirectToHook } from '../hooks/redirectTo';
-import { registerOnExitHook, registerOnRetainHook, registerOnEnterHook } from '../hooks/onEnterExitRetain';
-import { registerEagerResolvePath, registerLazyResolveState, registerResolveRemaining } from '../hooks/resolve';
-import { registerLoadEnteringViews, registerActivateViews } from '../hooks/views';
-import { registerUpdateGlobalState } from '../hooks/updateGlobals';
-import { registerUpdateUrl } from '../hooks/url';
-import { registerLazyLoadHook } from '../hooks/lazyLoad';
-import { TransitionEventType } from './transitionEventType';
-import { TransitionHook, GetResultHandler, GetErrorHandler } from './transitionHook';
-import { isDefined } from '../common/predicates';
-import { removeFrom, values, createProxyFunctions } from '../common/common';
-import { Disposable } from '../interface'; // has or is using
-import { val } from '../common/hof';
-import { registerIgnoredTransitionHook } from '../hooks/ignoredTransition';
-import { registerInvalidTransitionHook } from '../hooks/invalidTransition';
+} from './interface.js';
+import { Transition } from './transition.js';
+import { makeEvent, RegisteredHook } from './hookRegistry.js';
+import { TargetState } from '../state/targetState.js';
+import { PathNode } from '../path/pathNode.js';
+import { ViewService } from '../view/view.js';
+import { UIRouter } from '../router.js';
+import { registerAddCoreResolvables, treeChangesCleanup } from '../hooks/coreResolvables.js';
+import { registerRedirectToHook } from '../hooks/redirectTo.js';
+import { registerOnExitHook, registerOnRetainHook, registerOnEnterHook } from '../hooks/onEnterExitRetain.js';
+import { registerEagerResolvePath, registerLazyResolveState, registerResolveRemaining } from '../hooks/resolve.js';
+import { registerLoadEnteringViews, registerActivateViews } from '../hooks/views.js';
+import { registerUpdateGlobalState } from '../hooks/updateGlobals.js';
+import { registerUpdateUrl } from '../hooks/url.js';
+import { registerLazyLoadHook } from '../hooks/lazyLoad.js';
+import { TransitionEventType } from './transitionEventType.js';
+import { TransitionHook, GetResultHandler, GetErrorHandler } from './transitionHook.js';
+import { isDefined } from '../common/predicates.js';
+import { removeFrom, values, createProxyFunctions } from '../common/common.js';
+import { Disposable } from '../interface.js'; // has or is using
+import { val } from '../common/hof.js';
+import { registerIgnoredTransitionHook } from '../hooks/ignoredTransition.js';
+import { registerInvalidTransitionHook } from '../hooks/invalidTransition.js';
 
 /**
  * The default [[Transition]] options.

@@ -1,6 +1,6 @@
-import { UIRouter } from '../router';
-import { BaseLocationServices } from './baseLocationService';
-import { LocationConfig, root, splitHash, splitQuery, stripLastPathElement } from '../common';
+import { UIRouter } from '../router.js';
+import { BaseLocationServices } from './baseLocationService.js';
+import { LocationConfig, root, splitHash, splitQuery, stripLastPathElement } from '../common/index.js';
 
 /**
  * A `LocationServices` that gets/sets the current location using the browser's `location` and `history` apis

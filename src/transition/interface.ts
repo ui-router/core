@@ -1,11 +1,11 @@
-import { StateDeclaration } from '../state/interface';
-import { PredicateBinary } from '../common/common';
+import { StateDeclaration } from '../state/interface.js';
+import { PredicateBinary } from '../common/common.js';
 
-import { Transition } from './transition';
-import { StateObject } from '../state/stateObject';
-import { PathNode } from '../path/pathNode';
-import { TargetState } from '../state/targetState';
-import { RegisteredHook } from './hookRegistry';
+import { Transition } from './transition.js';
+import { StateObject } from '../state/stateObject.js';
+import { PathNode } from '../path/pathNode.js';
+import { TargetState } from '../state/targetState.js';
+import { RegisteredHook } from './hookRegistry.js';
 
 /**
  * The TransitionOptions object can be used to change the behavior of a transition.

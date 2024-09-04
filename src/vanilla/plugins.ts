@@ -1,14 +1,14 @@
-import { BrowserLocationConfig } from './browserLocationConfig';
-import { HashLocationService } from './hashLocationService';
-import { locationPluginFactory } from './utils';
-import { LocationPlugin, ServicesPlugin } from './interface';
-import { UIRouter } from '../router';
-import { PushStateLocationService } from './pushStateLocationService';
-import { MemoryLocationService } from './memoryLocationService';
-import { MemoryLocationConfig } from './memoryLocationConfig';
-import { $injector } from './injector';
-import { $q } from './q';
-import { services } from '../common/coreservices';
+import { BrowserLocationConfig } from './browserLocationConfig.js';
+import { HashLocationService } from './hashLocationService.js';
+import { locationPluginFactory } from './utils.js';
+import { LocationPlugin, ServicesPlugin } from './interface.js';
+import { UIRouter } from '../router.js';
+import { PushStateLocationService } from './pushStateLocationService.js';
+import { MemoryLocationService } from './memoryLocationService.js';
+import { MemoryLocationConfig } from './memoryLocationConfig.js';
+import { $injector } from './injector.js';
+import { $q } from './q.js';
+import { services } from '../common/coreservices.js';
 
 export function servicesPlugin(router: UIRouter): ServicesPlugin {
   services.$injector = $injector;

@@ -1,15 +1,15 @@
-import { extend, identity } from '../common/common';
-import { services } from '../common/coreservices';
-import { trace } from '../common/trace';
-import { ResolvePolicy, ResolvableLiteral, PolicyAsync } from './interface';
+import { extend, identity } from '../common/common.js';
+import { services } from '../common/coreservices.js';
+import { trace } from '../common/trace.js';
+import { ResolvePolicy, ResolvableLiteral, PolicyAsync } from './interface.js';
 
-import { ResolveContext } from './resolveContext';
-import { stringify } from '../common/strings';
-import { isFunction, isObject } from '../common/predicates';
-import { Transition } from '../transition/transition';
-import { StateObject } from '../state/stateObject';
-import { PathNode } from '../path/pathNode';
-import { isNullOrUndefined } from '../common/predicates';
+import { ResolveContext } from './resolveContext.js';
+import { stringify } from '../common/strings.js';
+import { isFunction, isObject } from '../common/predicates.js';
+import { Transition } from '../transition/transition.js';
+import { StateObject } from '../state/stateObject.js';
+import { PathNode } from '../path/pathNode.js';
+import { isNullOrUndefined } from '../common/predicates.js';
 
 // TODO: explicitly make this user configurable
 export let defaultResolvePolicy: ResolvePolicy = {

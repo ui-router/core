@@ -1,5 +1,5 @@
-import { BaseLocationServices } from './baseLocationService';
-import { UIRouter } from '../router';
+import { BaseLocationServices } from './baseLocationService.js';
+import { UIRouter } from '../router.js';
 
 /** A `LocationServices` that gets/sets the current location from an in-memory object */
 export class MemoryLocationService extends BaseLocationServices {

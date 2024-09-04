@@ -1,5 +1,5 @@
-import { extend, tail, assertPredicate, unnestR, identity } from '../common/common';
-import { isArray } from '../common/predicates';
+import { extend, tail, assertPredicate, unnestR, identity } from '../common/common.js';
+import { isArray } from '../common/predicates.js';
 
 import {
   TransitionOptions,
@@ -9,15 +9,15 @@ import {
   IMatchingNodes,
   TransitionHookPhase,
   TransitionHookScope,
-} from './interface';
+} from './interface.js';
 
-import { Transition } from './transition';
-import { TransitionHook } from './transitionHook';
-import { StateObject } from '../state/stateObject';
-import { PathNode } from '../path/pathNode';
-import { TransitionService } from './transitionService';
-import { TransitionEventType } from './transitionEventType';
-import { RegisteredHook } from './hookRegistry';
+import { Transition } from './transition.js';
+import { TransitionHook } from './transitionHook.js';
+import { StateObject } from '../state/stateObject.js';
+import { PathNode } from '../path/pathNode.js';
+import { TransitionService } from './transitionService.js';
+import { TransitionEventType } from './transitionEventType.js';
+import { RegisteredHook } from './hookRegistry.js';
 
 /**
  * This class returns applicable TransitionHooks for a specific Transition instance.

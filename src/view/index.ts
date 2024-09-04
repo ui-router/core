@@ -1,2 +1,2 @@
-export * from './interface';
-export * from './view';
+export * from './interface.js';
+export * from './view.js';

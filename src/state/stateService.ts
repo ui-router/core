@@ -7,32 +7,32 @@ import {
   removeFrom,
   silenceUncaughtInPromise,
   silentRejection,
-} from '../common/common';
-import { isDefined, isObject, isString } from '../common/predicates';
-import { Queue } from '../common/queue';
-import { services } from '../common/coreservices';
+} from '../common/common.js';
+import { isDefined, isObject, isString } from '../common/predicates.js';
+import { Queue } from '../common/queue.js';
+import { services } from '../common/coreservices.js';
 
-import { PathUtils } from '../path/pathUtils';
-import { PathNode } from '../path/pathNode';
+import { PathUtils } from '../path/pathUtils.js';
+import { PathNode } from '../path/pathNode.js';
 
-import { HookResult, TransitionOptions } from '../transition/interface';
-import { defaultTransOpts } from '../transition/transitionService';
-import { Rejection, RejectType } from '../transition/rejectFactory';
-import { Transition } from '../transition/transition';
+import { HookResult, TransitionOptions } from '../transition/interface.js';
+import { defaultTransOpts } from '../transition/transitionService.js';
+import { Rejection, RejectType } from '../transition/rejectFactory.js';
+import { Transition } from '../transition/transition.js';
 
-import { HrefOptions, LazyLoadResult, StateDeclaration, StateOrName, TransitionPromise } from './interface';
-import { StateObject } from './stateObject';
-import { TargetState } from './targetState';
+import { HrefOptions, LazyLoadResult, StateDeclaration, StateOrName, TransitionPromise } from './interface.js';
+import { StateObject } from './stateObject.js';
+import { TargetState } from './targetState.js';
 
-import { RawParams } from '../params/interface';
-import { Param } from '../params/param';
-import { Glob } from '../common/glob';
-import { UIRouter } from '../router';
-import { UIInjector } from '../interface';
-import { ResolveContext } from '../resolve/resolveContext';
-import { lazyLoadState } from '../hooks/lazyLoad';
-import { not, val } from '../common/hof';
-import { StateParams } from '../params/stateParams';
+import { RawParams } from '../params/interface.js';
+import { Param } from '../params/param.js';
+import { Glob } from '../common/glob.js';
+import { UIRouter } from '../router.js';
+import { UIInjector } from '../interface.js';
+import { ResolveContext } from '../resolve/resolveContext.js';
+import { lazyLoadState } from '../hooks/lazyLoad.js';
+import { not, val } from '../common/hof.js';
+import { StateParams } from '../params/stateParams.js';
 
 export type OnInvalidCallback = (toState?: TargetState, fromState?: TargetState, injector?: UIInjector) => HookResult;
 
@@ -354,35 +354,37 @@ export class StateService {
      * no error occurred.  Likewise, the transition.run() promise may be rejected because of
      * a Redirect, but the transitionTo() promise is chained to the new Transition's promise.
      */
-    const rejectedTransitionHandler = (trans: Transition) => (error: any): Promise<any> => {
-      if (error instanceof Rejection) {
-        const isLatest = router.globals.lastStartedTransitionId <= trans.$id;
+    const rejectedTransitionHandler =
+      (trans: Transition) =>
+      (error: any): Promise<any> => {
+        if (error instanceof Rejection) {
+          const isLatest = router.globals.lastStartedTransitionId <= trans.$id;
 
-        if (error.type === RejectType.IGNORED) {
-          isLatest && router.urlRouter.update();
-          // Consider ignored `Transition.run()` as a successful `transitionTo`
-          return services.$q.when(globals.current);
+          if (error.type === RejectType.IGNORED) {
+            isLatest && router.urlRouter.update();
+            // Consider ignored `Transition.run()` as a successful `transitionTo`
+            return services.$q.when(globals.current);
+          }
+
+          const detail: any = error.detail;
+          if (error.type === RejectType.SUPERSEDED && error.redirected && detail instanceof TargetState) {
+            // If `Transition.run()` was redirected, allow the `transitionTo()` promise to resolve successfully
+            // by returning the promise for the new (redirect) `Transition.run()`.
+            const redirect: Transition = trans.redirect(detail);
+            return redirect.run().catch(rejectedTransitionHandler(redirect));
+          }
+
+          if (error.type === RejectType.ABORTED) {
+            isLatest && router.urlRouter.update();
+            return services.$q.reject(error);
+          }
         }
 
-        const detail: any = error.detail;
-        if (error.type === RejectType.SUPERSEDED && error.redirected && detail instanceof TargetState) {
-          // If `Transition.run()` was redirected, allow the `transitionTo()` promise to resolve successfully
-          // by returning the promise for the new (redirect) `Transition.run()`.
-          const redirect: Transition = trans.redirect(detail);
-          return redirect.run().catch(rejectedTransitionHandler(redirect));
-        }
+        const errorHandler = this.defaultErrorHandler();
+        errorHandler(error);
 
-        if (error.type === RejectType.ABORTED) {
-          isLatest && router.urlRouter.update();
-          return services.$q.reject(error);
-        }
-      }
-
-      const errorHandler = this.defaultErrorHandler();
-      errorHandler(error);
-
-      return services.$q.reject(error);
-    };
+        return services.$q.reject(error);
+      };
 
     const transition = this.router.transitionService.create(currentPath, ref);
     const transitionToPromise = transition.run().catch(rejectedTransitionHandler(transition));

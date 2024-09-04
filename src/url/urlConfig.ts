@@ -1,7 +1,7 @@
-import { Disposable } from '../interface';
-import { UIRouter } from '../router';
-import { ParamTypeDefinition, ParamTypes } from '../params';
-import { isDefined, isString } from '../common';
+import { Disposable } from '../interface.js';
+import { UIRouter } from '../router.js';
+import { ParamTypeDefinition, ParamTypes } from '../params/index.js';
+import { isDefined, isString } from '../common/index.js';
 
 /**
  * An API to customize the URL behavior and retrieve URL configuration

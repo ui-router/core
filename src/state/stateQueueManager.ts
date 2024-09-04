@@ -1,10 +1,10 @@
-import { inArray, isString, prop } from '../common';
-import { _StateDeclaration } from './interface';
-import { StateObject } from './stateObject';
-import { StateBuilder } from './stateBuilder';
-import { StateRegistryListener } from './stateRegistry';
-import { Disposable } from '../interface';
-import { UIRouter } from '../router';
+import { inArray, isString, prop } from '../common/index.js';
+import { _StateDeclaration } from './interface.js';
+import { StateObject } from './stateObject.js';
+import { StateBuilder } from './stateBuilder.js';
+import { StateRegistryListener } from './stateRegistry.js';
+import { Disposable } from '../interface.js';
+import { UIRouter } from '../router.js';
 
 export class StateQueueManager implements Disposable {
   queue: StateObject[] = [];

@@ -8,13 +8,13 @@
  * @packageDocumentation
  * @preferred
  */
-import { LocationConfig } from '../common';
-import { UIRouter } from '../router';
-import { StateDeclaration, StateObject, TargetState, TargetStateDef } from '../state';
-import { UrlMatcher } from './urlMatcher';
-import { UrlConfig } from './urlConfig';
-import { UrlRules } from './urlRules';
-import { UrlService } from './urlService';
+import { LocationConfig } from '../common/index.js';
+import { UIRouter } from '../router.js';
+import { StateDeclaration, StateObject, TargetState, TargetStateDef } from '../state/index.js';
+import { UrlMatcher } from './urlMatcher.js';
+import { UrlConfig } from './urlConfig.js';
+import { UrlRules } from './urlRules.js';
+import { UrlService } from './urlService.js';
 
 export interface UrlMatcherCompileConfig {
   // If state is provided, use the configuration in the `params` block

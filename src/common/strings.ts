@@ -6,10 +6,10 @@
  * @packageDocumentation
  */
 
-import { isArray, isFunction, isInjectable, isNull, isObject, isPromise, isString, isUndefined } from './predicates';
-import { Rejection } from '../transition/rejectFactory';
-import { identity, IInjectable, pushR, tail } from './common';
-import { pattern, val } from './hof';
+import { isArray, isFunction, isInjectable, isNull, isObject, isPromise, isString, isUndefined } from './predicates.js';
+import { Rejection } from '../transition/rejectFactory.js';
+import { identity, IInjectable, pushR, tail } from './common.js';
+import { pattern, val } from './hof.js';
 
 /**
  * Returns a string shortened to a maximum length

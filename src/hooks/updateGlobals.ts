@@ -1,6 +1,6 @@
-import { Transition } from '../transition/transition';
-import { copy } from '../common/common';
-import { TransitionService } from '../transition/transitionService';
+import { Transition } from '../transition/transition.js';
+import { copy } from '../common/common.js';
+import { TransitionService } from '../transition/transitionService.js';
 
 /**
  * A [[TransitionHookFn]] which updates global UI-Router state

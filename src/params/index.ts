@@ -5,8 +5,8 @@
  *
  * @packageDocumentation @preferred
  */
-export * from './interface';
-export * from './param';
-export * from './paramTypes';
-export * from './stateParams';
-export * from './paramType';
+export * from './interface.js';
+export * from './param.js';
+export * from './paramTypes.js';
+export * from './stateParams.js';
+export * from './paramType.js';

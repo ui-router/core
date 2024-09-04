@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import { Predicate } from './common';
+import { Predicate } from './common.js';
 /**
  * Returns a new function for [Partial Application](https://en.wikipedia.org/wiki/Partial_application) of the original function.
  *

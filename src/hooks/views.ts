@@ -1,10 +1,10 @@
-import { noop } from '../common/common';
-import { services } from '../common/coreservices';
-import { Transition } from '../transition/transition';
-import { ViewService } from '../view/view';
-import { ViewConfig } from '../view/interface';
-import { TransitionHookFn } from '../transition/interface';
-import { TransitionService } from '../transition/transitionService';
+import { noop } from '../common/common.js';
+import { services } from '../common/coreservices.js';
+import { Transition } from '../transition/transition.js';
+import { ViewService } from '../view/view.js';
+import { ViewConfig } from '../view/interface.js';
+import { TransitionHookFn } from '../transition/interface.js';
+import { TransitionService } from '../transition/transitionService.js';
 
 /**
  * A [[TransitionHookFn]] which waits for the views to load

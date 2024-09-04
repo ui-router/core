@@ -1,5 +1,5 @@
-import { isDefined, isUndefined } from '../common/predicates';
-import { LocationConfig } from '../common/coreservices';
+import { isDefined, isUndefined } from '../common/predicates.js';
+import { LocationConfig } from '../common/coreservices.js';
 
 /** A `LocationConfig` that delegates to the browser's `location` object */
 export class BrowserLocationConfig implements LocationConfig {

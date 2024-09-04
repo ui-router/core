@@ -1,9 +1,9 @@
-import { fromJson, toJson, identity, equals, inherit, map, extend, pick } from '../common/common';
-import { isDefined, isNullOrUndefined } from '../common/predicates';
-import { is } from '../common/hof';
-import { services } from '../common/coreservices';
-import { ParamType } from './paramType';
-import { ParamTypeDefinition } from './interface';
+import { fromJson, toJson, identity, equals, inherit, map, extend, pick } from '../common/common.js';
+import { isDefined, isNullOrUndefined } from '../common/predicates.js';
+import { is } from '../common/hof.js';
+import { services } from '../common/coreservices.js';
+import { ParamType } from './paramType.js';
+import { ParamTypeDefinition } from './interface.js';
 
 /**
  * A registry for parameter types.

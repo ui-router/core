@@ -1,6 +1,6 @@
-import { LocationConfig, LocationServices } from '../common/coreservices';
-import { UIRouterPlugin } from '../interface';
-import { $InjectorLike, $QLike } from '../common/index';
+import { LocationConfig, LocationServices } from '../common/coreservices.js';
+import { UIRouterPlugin } from '../interface.js';
+import { $InjectorLike, $QLike } from '../common/index.js';
 
 export interface LocationPlugin extends UIRouterPlugin {
   service: LocationServices;

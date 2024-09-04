@@ -1,8 +1,8 @@
-import { UrlRouter } from '../url/urlRouter';
-import { StateService } from '../state/stateService';
-import { Transition } from '../transition/transition';
-import { TransitionHookFn } from '../transition/interface';
-import { TransitionService } from '../transition/transitionService';
+import { UrlRouter } from '../url/urlRouter.js';
+import { StateService } from '../state/stateService.js';
+import { Transition } from '../transition/transition.js';
+import { TransitionHookFn } from '../transition/interface.js';
+import { TransitionService } from '../transition/transitionService.js';
 
 /**
  * A [[TransitionHookFn]] which updates the URL after a successful transition

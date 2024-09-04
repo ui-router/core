@@ -1,9 +1,9 @@
-import { StateParams } from './params/stateParams';
-import { StateDeclaration } from './state/interface';
-import { StateObject } from './state/stateObject';
-import { Transition } from './transition/transition';
-import { Queue } from './common/queue';
-import { Disposable } from './interface';
+import { StateParams } from './params/stateParams.js';
+import { StateDeclaration } from './state/interface.js';
+import { StateObject } from './state/stateObject.js';
+import { Transition } from './transition/transition.js';
+import { Queue } from './common/queue.js';
+import { Disposable } from './interface.js';
 
 /**
  * Global router state

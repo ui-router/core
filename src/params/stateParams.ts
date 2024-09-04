@@ -1,6 +1,6 @@
-import { Param } from '.';
-import { extend, ancestors, Obj } from '../common/common';
-import { StateObject } from '../state/stateObject';
+import { Param } from '../index.js';
+import { extend, ancestors, Obj } from '../common/common.js';
+import { StateObject } from '../state/stateObject.js';
 
 export class StateParams {
   [key: string]: any;

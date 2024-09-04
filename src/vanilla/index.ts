@@ -3,18 +3,18 @@
  *
  * @packageDocumentation
  */
-export * from './interface';
+export * from './interface.js';
 
-export * from './q';
-export * from './injector';
+export * from './q.js';
+export * from './injector.js';
 
-export * from './baseLocationService';
-export * from './hashLocationService';
-export * from './memoryLocationService';
-export * from './pushStateLocationService';
+export * from './baseLocationService.js';
+export * from './hashLocationService.js';
+export * from './memoryLocationService.js';
+export * from './pushStateLocationService.js';
 
-export * from './memoryLocationConfig';
-export * from './browserLocationConfig';
+export * from './memoryLocationConfig.js';
+export * from './browserLocationConfig.js';
 
-export * from './utils';
-export * from './plugins';
+export * from './utils.js';
+export * from './plugins.js';
