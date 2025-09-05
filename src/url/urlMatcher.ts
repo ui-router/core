@@ -234,13 +234,14 @@ export class UrlMatcher {
     // The regular expression is somewhat complicated due to the need to allow curly braces
     // inside the regular expression. The placeholder regexp breaks down as follows:
     //    ([:*])([\w\[\]]+)              - classic placeholder ($1 / $2) (search version has - for snake-case)
-    //    \{([\w\[\]]+)(?:\:\s*( ... ))?\}  - curly brace placeholder ($3) with optional regexp/type ... ($4) (search version has - for snake-case
+    //    \{([\w\[\]]+)(?:\: ... ( ... ))?\}  - curly brace placeholder ($3) with optional regexp/type ... ($5) (search version has - for snake-case
     //    (?: ... | ... | ... )+         - the regexp consists of any number of atoms, an atom being either
-    //    [^{}\\]+                       - anything other than curly braces or backslash
+    //    [^{}\\]                        - anything other than curly braces or backslash
     //    \\.                            - a backslash escape
-    //    \{(?:[^{}\\]+|\\.)*\}          - a matched set of curly braces containing other atoms
-    const placeholder = /([:*])([\w\[\]]+)|\{([\w\[\]]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g;
-    const searchPlaceholder = /([:]?)([\w\[\].-]+)|\{([\w\[\].-]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g;
+    //    \{(?:[^{}\\]|\\.)*\}           - a matched set of curly braces containing other atoms
+    const placeholder = /([:*])([\w\[\]]+)|\{([\w\[\]]+)(?:\:(?=(\s*))\4((?:[^{}\\]|\\.|\{(?:[^{}\\]|\\.)*\})+))?\}/g;
+    const searchPlaceholder =
+      /([:]?)([\w\[\].-]+)|\{([\w\[\].-]+)(?:\:(?=(\s*))\4((?:[^{}\\]|\\.|\{(?:[^{}\\]|\\.)*\})+))?\}/g;
     const patterns: any[][] = [];
     let last = 0;
     let matchArray: RegExpExecArray;
@@ -256,7 +257,7 @@ export class UrlMatcher {
     const matchDetails = (m: RegExpExecArray, isSearch: boolean): MatchDetails => {
       // IE[78] returns '' for unmatched groups instead of null
       const id: string = m[2] || m[3];
-      const regexp: string = isSearch ? m[4] : m[4] || (m[1] === '*' ? '[\\s\\S]*' : null);
+      const regexp: string = isSearch ? m[5] : m[5] || (m[1] === '*' ? '[\\s\\S]*' : null);
 
       const makeRegexpType = (str) =>
         inherit(paramTypes.type(isSearch ? 'query' : 'path'), {
