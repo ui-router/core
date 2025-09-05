@@ -1,1 +1,1 @@
-export * from './vanilla/index';
+export * from './vanilla/index.js';

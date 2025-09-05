@@ -1,11 +1,11 @@
-import { StateDeclaration, StateOrName, TargetStateDef } from './interface';
-import { TransitionOptions } from '../transition/interface';
-import { StateObject } from './stateObject';
-import { isObject, isString } from '../common/predicates';
-import { stringify } from '../common/strings';
-import { extend } from '../common';
-import { StateRegistry } from './stateRegistry';
-import { RawParams } from '../params';
+import { StateDeclaration, StateOrName, TargetStateDef } from './interface.js';
+import { TransitionOptions } from '../transition/interface.js';
+import { StateObject } from './stateObject.js';
+import { isObject, isString } from '../common/predicates.js';
+import { stringify } from '../common/strings.js';
+import { extend } from '../common/index.js';
+import { StateRegistry } from './stateRegistry.js';
+import { RawParams } from '../params/index.js';
 
 /**
  * Encapsulate the target (destination) state/params/options of a [[Transition]].

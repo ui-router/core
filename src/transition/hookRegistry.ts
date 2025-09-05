@@ -1,5 +1,5 @@
-import { isString, isFunction, Glob, extend, removeFrom, tail, values, identity, mapObj } from '../common';
-import { PathNode } from '../path/pathNode';
+import { isString, isFunction, Glob, extend, removeFrom, tail, values, identity, mapObj } from '../common/index.js';
+import { PathNode } from '../path/pathNode.js';
 import {
   TransitionStateHookFn,
   TransitionHookFn,
@@ -7,7 +7,7 @@ import {
   TransitionHookScope,
   IHookRegistry,
   PathType,
-} from './interface';
+} from './interface.js';
 
 import {
   HookRegOptions,
@@ -16,11 +16,11 @@ import {
   HookMatchCriterion,
   IMatchingNodes,
   HookFn,
-} from './interface';
-import { Transition } from './transition';
-import { StateObject } from '../state/stateObject';
-import { TransitionEventType } from './transitionEventType';
-import { TransitionService } from './transitionService';
+} from './interface.js';
+import { Transition } from './transition.js';
+import { StateObject } from '../state/stateObject.js';
+import { TransitionEventType } from './transitionEventType.js';
+import { TransitionService } from './transitionService.js';
 
 /**
  * Determines if the given state matches the matchCriteria

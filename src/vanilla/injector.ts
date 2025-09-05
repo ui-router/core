@@ -6,7 +6,7 @@ import {
   isInjectable,
   $InjectorLike,
   IInjectable,
-} from '../common/index';
+} from '../common/index.js';
 
 // globally available injectables
 const globals = {};

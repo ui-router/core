@@ -1,7 +1,7 @@
 'use strict';
-import { extend, silentRejection } from '../common/common';
-import { stringify } from '../common/strings';
-import { is } from '../common/hof';
+import { extend, silentRejection } from '../common/common.js';
+import { stringify } from '../common/strings.js';
+import { is } from '../common/hof.js';
 
 /** An enum for Transition Rejection reasons */
 enum RejectType {

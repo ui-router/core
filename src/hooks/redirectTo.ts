@@ -1,9 +1,9 @@
-import { isString, isFunction } from '../common/predicates';
-import { Transition } from '../transition/transition';
-import { services } from '../common/coreservices';
-import { TargetState } from '../state/targetState';
-import { TransitionService } from '../transition/transitionService';
-import { TransitionHookFn } from '../transition/interface';
+import { isString, isFunction } from '../common/predicates.js';
+import { Transition } from '../transition/transition.js';
+import { services } from '../common/coreservices.js';
+import { TargetState } from '../state/targetState.js';
+import { TransitionService } from '../transition/transitionService.js';
+import { TransitionHookFn } from '../transition/interface.js';
 
 /**
  * A [[TransitionHookFn]] that redirects to a different state or params

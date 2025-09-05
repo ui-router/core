@@ -1,4 +1,4 @@
-import { ParamType } from './paramType';
+import { ParamType } from './paramType.js';
 
 /**
  * Parameter values

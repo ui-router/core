@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 /* tslint:disable:no-console */
-import { noop } from './common';
+import { noop } from './common.js';
 
 const noopConsoleStub = { log: noop, error: noop, table: noop };
 

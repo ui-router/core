@@ -1,4 +1,4 @@
-import { isArray, isObject, $QLike } from '../common/index';
+import { isArray, isObject, $QLike } from '../common/index.js';
 
 /**
  * An angular1-like promise api

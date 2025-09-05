@@ -1,14 +1,14 @@
-import { StateDeclaration, _ViewDeclaration, _StateDeclaration, LazyLoadResult } from './interface';
-import { defaults, values, find, inherit } from '../common/common';
-import { propEq } from '../common/hof';
-import { Param } from '../params/param';
-import { UrlMatcher } from '../url/urlMatcher';
-import { Resolvable } from '../resolve/resolvable';
-import { TransitionStateHookFn } from '../transition/interface';
-import { TargetState } from './targetState';
-import { Transition } from '../transition/transition';
-import { Glob } from '../common/glob';
-import { isObject, isFunction } from '../common/predicates';
+import { StateDeclaration, _ViewDeclaration, _StateDeclaration, LazyLoadResult } from './interface.js';
+import { defaults, values, find, inherit } from '../common/common.js';
+import { propEq } from '../common/hof.js';
+import { Param } from '../params/param.js';
+import { UrlMatcher } from '../url/urlMatcher.js';
+import { Resolvable } from '../resolve/resolvable.js';
+import { TransitionStateHookFn } from '../transition/interface.js';
+import { TargetState } from './targetState.js';
+import { Transition } from '../transition/transition.js';
+import { Glob } from '../common/glob.js';
+import { isObject, isFunction } from '../common/predicates.js';
 
 /**
  * Internal representation of a UI-Router state.

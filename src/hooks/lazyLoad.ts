@@ -1,9 +1,9 @@
-import { Transition } from '../transition/transition';
-import { TransitionService } from '../transition/transitionService';
-import { TransitionHookFn } from '../transition/interface';
-import { StateDeclaration, LazyLoadResult } from '../state/interface';
-import { services } from '../common/coreservices';
-import { StateRule } from '../url/interface';
+import { Transition } from '../transition/transition.js';
+import { TransitionService } from '../transition/transitionService.js';
+import { TransitionHookFn } from '../transition/interface.js';
+import { StateDeclaration, LazyLoadResult } from '../state/interface.js';
+import { services } from '../common/coreservices.js';
+import { StateRule } from '../url/interface.js';
 
 /**
  * A [[TransitionHookFn]] that performs lazy loading

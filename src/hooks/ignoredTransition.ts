@@ -1,7 +1,7 @@
-import { trace } from '../common/trace';
-import { Rejection } from '../transition/rejectFactory';
-import { TransitionService } from '../transition/transitionService';
-import { Transition } from '../transition/transition';
+import { trace } from '../common/trace.js';
+import { Rejection } from '../transition/rejectFactory.js';
+import { TransitionService } from '../transition/transitionService.js';
+import { Transition } from '../transition/transition.js';
 
 /**
  * A [[TransitionHookFn]] that skips a transition if it should be ignored

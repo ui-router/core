@@ -18,11 +18,11 @@
  *
  * @packageDocumentation
  */
-export * from './interface';
-export * from './stateBuilder';
-export * from './stateObject';
-export * from './stateMatcher';
-export * from './stateQueueManager';
-export * from './stateRegistry';
-export * from './stateService';
-export * from './targetState';
+export * from './interface.js';
+export * from './stateBuilder.js';
+export * from './stateObject.js';
+export * from './stateMatcher.js';
+export * from './stateQueueManager.js';
+export * from './stateRegistry.js';
+export * from './stateService.js';
+export * from './targetState.js';

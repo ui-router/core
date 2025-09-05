@@ -1,17 +1,17 @@
-import { UrlMatcherFactory } from './url/urlMatcherFactory';
-import { UrlRouter } from './url/urlRouter';
-import { TransitionService } from './transition/transitionService';
-import { ViewService } from './view/view';
-import { StateRegistry } from './state/stateRegistry';
-import { StateService } from './state/stateService';
-import { UIRouterGlobals } from './globals';
-import { UIRouterPlugin, Disposable } from './interface';
-import { values, removeFrom } from './common/common';
-import { isFunction } from './common/predicates';
-import { UrlService } from './url/urlService';
-import { LocationServices, LocationConfig } from './common/coreservices';
-import { Trace, trace } from './common/trace';
-import { makeStub } from './common';
+import { UrlMatcherFactory } from './url/urlMatcherFactory.js';
+import { UrlRouter } from './url/urlRouter.js';
+import { TransitionService } from './transition/transitionService.js';
+import { ViewService } from './view/view.js';
+import { StateRegistry } from './state/stateRegistry.js';
+import { StateService } from './state/stateService.js';
+import { UIRouterGlobals } from './globals.js';
+import { UIRouterPlugin, Disposable } from './interface.js';
+import { values, removeFrom } from './common/common.js';
+import { isFunction } from './common/predicates.js';
+import { UrlService } from './url/urlService.js';
+import { LocationServices, LocationConfig } from './common/coreservices.js';
+import { Trace, trace } from './common/trace.js';
+import { makeStub } from './common/index.js';
 
 /** @internal */
 let _routerInstance = 0;

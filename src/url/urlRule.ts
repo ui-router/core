@@ -1,11 +1,11 @@
-import { StateDeclaration } from '../state';
-import { UrlMatcher } from './urlMatcher';
-import { isString, isDefined, isFunction } from '../common/predicates';
-import { UIRouter } from '../router';
-import { identity, extend } from '../common/common';
-import { is, or, pattern } from '../common/hof';
-import { StateObject } from '../state/stateObject';
-import { RawParams } from '../params/interface';
+import { StateDeclaration } from '../state/index.js';
+import { UrlMatcher } from './urlMatcher.js';
+import { isString, isDefined, isFunction } from '../common/predicates.js';
+import { UIRouter } from '../router.js';
+import { identity, extend } from '../common/common.js';
+import { is, or, pattern } from '../common/hof.js';
+import { StateObject } from '../state/stateObject.js';
+import { RawParams } from '../params/interface.js';
 import {
   UrlRule,
   UrlRuleMatchFn,

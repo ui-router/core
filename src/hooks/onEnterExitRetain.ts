@@ -1,8 +1,8 @@
-import { TransitionStateHookFn } from '../transition/interface';
-import { Transition } from '../transition/transition';
-import { TransitionService } from '../transition/transitionService';
-import { StateDeclaration } from '../state/interface';
-import { StateObject } from '../state/stateObject';
+import { TransitionStateHookFn } from '../transition/interface.js';
+import { Transition } from '../transition/transition.js';
+import { TransitionService } from '../transition/transitionService.js';
+import { StateDeclaration } from '../state/interface.js';
+import { StateObject } from '../state/stateObject.js';
 
 /**
  * A factory which creates an onEnter, onExit or onRetain transition hook function

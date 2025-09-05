@@ -1,10 +1,10 @@
-import { trace } from '../common/trace';
-import { services } from '../common/coreservices';
-import { stringify } from '../common/strings';
-import { map, find, extend, mergeR, tail, omit, arrayTuples, unnestR, identity, anyTrueR } from '../common/common';
-import { isObject, isUndefined } from '../common/predicates';
-import { prop, propEq, val, not, is } from '../common/hof';
-import { StateDeclaration, StateOrName } from '../state/interface';
+import { trace } from '../common/trace.js';
+import { services } from '../common/coreservices.js';
+import { stringify } from '../common/strings.js';
+import { map, find, extend, mergeR, tail, omit, arrayTuples, unnestR, identity, anyTrueR } from '../common/common.js';
+import { isObject, isUndefined } from '../common/predicates.js';
+import { prop, propEq, val, not, is } from '../common/hof.js';
+import { StateDeclaration, StateOrName } from '../state/interface.js';
 import {
   TransitionOptions,
   TreeChanges,
@@ -15,24 +15,24 @@ import {
   HookMatchCriteria,
   TransitionStateHookFn,
   TransitionHookFn,
-} from './interface'; // has or is using
-import { TransitionHook } from './transitionHook';
-import { matchState, makeEvent, RegisteredHook } from './hookRegistry';
-import { HookBuilder } from './hookBuilder';
-import { PathNode } from '../path/pathNode';
-import { PathUtils } from '../path/pathUtils';
-import { StateObject } from '../state/stateObject';
-import { TargetState } from '../state/targetState';
-import { Param } from '../params/param';
-import { Resolvable } from '../resolve/resolvable';
-import { ViewConfig } from '../view/interface';
-import { ResolveContext } from '../resolve/resolveContext';
-import { UIRouter } from '../router';
-import { UIInjector } from '../interface';
-import { RawParams } from '../params/interface';
-import { ResolvableLiteral } from '../resolve/interface';
-import { Rejection } from './rejectFactory';
-import { applyPairs, flattenR, uniqR } from '../common';
+} from './interface.js'; // has or is using
+import { TransitionHook } from './transitionHook.js';
+import { matchState, makeEvent, RegisteredHook } from './hookRegistry.js';
+import { HookBuilder } from './hookBuilder.js';
+import { PathNode } from '../path/pathNode.js';
+import { PathUtils } from '../path/pathUtils.js';
+import { StateObject } from '../state/stateObject.js';
+import { TargetState } from '../state/targetState.js';
+import { Param } from '../params/param.js';
+import { Resolvable } from '../resolve/resolvable.js';
+import { ViewConfig } from '../view/interface.js';
+import { ResolveContext } from '../resolve/resolveContext.js';
+import { UIRouter } from '../router.js';
+import { UIInjector } from '../interface.js';
+import { RawParams } from '../params/interface.js';
+import { ResolvableLiteral } from '../resolve/interface.js';
+import { Rejection } from './rejectFactory.js';
+import { applyPairs, flattenR, uniqR } from '../common/index.js';
 
 /** @internal */
 const stateSelf: (_state: StateObject) => StateDeclaration = prop('self');

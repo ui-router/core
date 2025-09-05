@@ -32,19 +32,19 @@
  *
  * @packageDocumentation
  */
-import { parse } from '../common/hof';
-import { isNumber } from '../common/predicates';
-import { Transition } from '../transition/transition';
-import { ViewTuple } from '../view';
-import { ActiveUIView, ViewConfig, ViewContext } from '../view/interface';
-import { stringify, functionToString, maxLength, padString } from './strings';
-import { safeConsole } from './safeConsole';
-import { Resolvable } from '../resolve/resolvable';
-import { PathNode } from '../path/pathNode';
-import { PolicyWhen } from '../resolve/interface';
-import { TransitionHook } from '../transition/transitionHook';
-import { HookResult } from '../transition/interface';
-import { StateObject } from '../state/stateObject';
+import { parse } from '../common/hof.js';
+import { isNumber } from '../common/predicates.js';
+import { Transition } from '../transition/transition.js';
+import { ViewTuple } from '../view/index.js';
+import { ActiveUIView, ViewConfig, ViewContext } from '../view/interface.js';
+import { stringify, functionToString, maxLength, padString } from './strings.js';
+import { safeConsole } from './safeConsole.js';
+import { Resolvable } from '../resolve/resolvable.js';
+import { PathNode } from '../path/pathNode.js';
+import { PolicyWhen } from '../resolve/interface.js';
+import { TransitionHook } from '../transition/transitionHook.js';
+import { HookResult } from '../transition/interface.js';
+import { StateObject } from '../state/stateObject.js';
 
 function uiViewString(uiview: ActiveUIView) {
   if (!uiview) return 'ui-view (defunct)';

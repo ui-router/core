@@ -1,9 +1,9 @@
-import { UIRouter } from '../router';
-import { extend, is, isString, LocationServices, pattern } from '../common';
-import { MatchResult, UrlParts, UrlRule, UrlSyncApi } from './interface';
-import { UrlRules } from './urlRules';
-import { UrlConfig } from './urlConfig';
-import { TargetState, TargetStateDef } from '../state';
+import { UIRouter } from '../router.js';
+import { extend, is, isString, LocationServices, pattern } from '../common/index.js';
+import { MatchResult, UrlParts, UrlRule, UrlSyncApi } from './interface.js';
+import { UrlRules } from './urlRules.js';
+import { UrlConfig } from './urlConfig.js';
+import { TargetState, TargetStateDef } from '../state/index.js';
 
 /**
  * API for URL management

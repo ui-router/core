@@ -6,10 +6,10 @@
  * @packageDocumentation
  * @preferred
  */
-import { isFunction, isString, isArray, isRegExp, isDate } from './predicates';
-import { all, any, prop, curry, not } from './hof';
-import { services } from './coreservices';
-import { StateObject } from '../state/stateObject';
+import { isFunction, isString, isArray, isRegExp, isDate } from './predicates.js';
+import { all, any, prop, curry, not } from './hof.js';
+import { services } from './coreservices.js';
+import { StateObject } from '../state/stateObject.js';
 
 declare const global;
 export const root: any =

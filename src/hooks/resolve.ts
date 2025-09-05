@@ -1,10 +1,10 @@
-import { noop } from '../common/common';
-import { Transition } from '../transition/transition';
-import { ResolveContext } from '../resolve/resolveContext';
-import { TransitionStateHookFn, TransitionHookFn } from '../transition/interface';
-import { TransitionService } from '../transition/transitionService';
-import { val } from '../common/hof';
-import { StateDeclaration } from '../state/interface';
+import { noop } from '../common/common.js';
+import { Transition } from '../transition/transition.js';
+import { ResolveContext } from '../resolve/resolveContext.js';
+import { TransitionStateHookFn, TransitionHookFn } from '../transition/interface.js';
+import { TransitionService } from '../transition/transitionService.js';
+import { val } from '../common/hof.js';
+import { StateDeclaration } from '../state/interface.js';
 
 export const RESOLVE_HOOK_PRIORITY = 1000;
 

@@ -1,16 +1,16 @@
-import { TransitionHookOptions, HookResult, TransitionHookPhase } from './interface';
-import { defaults, noop, silentRejection } from '../common/common';
-import { fnToString, maxLength } from '../common/strings';
-import { isPromise } from '../common/predicates';
-import { is, parse } from '../common/hof';
-import { trace } from '../common/trace';
-import { services } from '../common/coreservices';
-import { Rejection } from './rejectFactory';
-import { TargetState } from '../state/targetState';
-import { Transition } from './transition';
-import { TransitionEventType } from './transitionEventType';
-import { RegisteredHook } from './hookRegistry';
-import { StateDeclaration } from '../state/interface';
+import { TransitionHookOptions, HookResult, TransitionHookPhase } from './interface.js';
+import { defaults, noop, silentRejection } from '../common/common.js';
+import { fnToString, maxLength } from '../common/strings.js';
+import { isPromise } from '../common/predicates.js';
+import { is, parse } from '../common/hof.js';
+import { trace } from '../common/trace.js';
+import { services } from '../common/coreservices.js';
+import { Rejection } from './rejectFactory.js';
+import { TargetState } from '../state/targetState.js';
+import { Transition } from './transition.js';
+import { TransitionEventType } from './transitionEventType.js';
+import { RegisteredHook } from './hookRegistry.js';
+import { StateDeclaration } from '../state/interface.js';
 
 const defaultOptions: TransitionHookOptions = {
   current: noop,

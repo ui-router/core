@@ -10,20 +10,20 @@ import {
   Predicate,
   inArray,
   arrayTuples,
-} from '../common/common';
-import { prop, propEq, not } from '../common/hof';
+} from '../common/common.js';
+import { prop, propEq, not } from '../common/hof.js';
 
-import { RawParams } from '../params/interface';
-import { TreeChanges } from '../transition/interface';
-import { ViewConfig } from '../view/interface';
-import { _ViewDeclaration } from '../state/interface';
+import { RawParams } from '../params/interface.js';
+import { TreeChanges } from '../transition/interface.js';
+import { ViewConfig } from '../view/interface.js';
+import { _ViewDeclaration } from '../state/interface.js';
 
-import { StateObject } from '../state/stateObject';
-import { TargetState } from '../state/targetState';
-import { GetParamsFn, PathNode } from './pathNode';
-import { ViewService } from '../view/view';
-import { Param } from '../params/param';
-import { StateRegistry } from '../state';
+import { StateObject } from '../state/stateObject.js';
+import { TargetState } from '../state/targetState.js';
+import { GetParamsFn, PathNode } from './pathNode.js';
+import { ViewService } from '../view/view.js';
+import { Param } from '../params/param.js';
+import { StateRegistry } from '../state/index.js';
 
 /**
  * This class contains functions which convert TargetStates, Nodes and paths from one type to another.

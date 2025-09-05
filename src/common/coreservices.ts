@@ -4,9 +4,9 @@
  *
  * @packageDocumentation
  */
-import { IInjectable, Obj } from './common';
-import { Disposable } from '../interface';
-import { UrlConfig, UrlService } from '../url';
+import { IInjectable, Obj } from './common.js';
+import { Disposable } from '../interface.js';
+import { UrlConfig, UrlService } from '../url/index.js';
 
 const noImpl = (fnname: string) => () => {
   throw new Error(`No implementation for ${fnname}. The framework specific code did not implement this method.`);

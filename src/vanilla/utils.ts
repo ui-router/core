@@ -7,8 +7,8 @@ import {
   splitEqual,
   splitHash,
   splitQuery,
-} from '../common';
-import { UIRouter } from '../router';
+} from '../common/index.js';
+import { UIRouter } from '../router.js';
 
 export const keyValsToObjectR = (accum, [key, val]) => {
   if (!accum.hasOwnProperty(key)) {

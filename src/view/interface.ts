@@ -1,5 +1,5 @@
-import { _ViewDeclaration } from '../state/interface';
-import { PathNode } from '../path/pathNode';
+import { _ViewDeclaration } from '../state/interface.js';
+import { PathNode } from '../path/pathNode.js';
 
 /** The context ref can be anything that has a `name` and a `parent` reference to another IContextRef */
 export interface ViewContext {

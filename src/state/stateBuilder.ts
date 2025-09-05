@@ -1,19 +1,31 @@
-import { applyPairs, extend, identity, inherit, mapObj, noop, Obj, omit, tail, values, copy } from '../common/common';
-import { isArray, isDefined, isFunction, isString } from '../common/predicates';
-import { stringify } from '../common/strings';
-import { is, pattern, pipe, prop, val } from '../common/hof';
-import { StateDeclaration } from './interface';
+import {
+  applyPairs,
+  extend,
+  identity,
+  inherit,
+  mapObj,
+  noop,
+  Obj,
+  omit,
+  tail,
+  values,
+  copy,
+} from '../common/common.js';
+import { isArray, isDefined, isFunction, isString } from '../common/predicates.js';
+import { stringify } from '../common/strings.js';
+import { is, pattern, pipe, prop, val } from '../common/hof.js';
+import { StateDeclaration } from './interface.js';
 
-import { StateObject } from './stateObject';
-import { StateMatcher } from './stateMatcher';
-import { Param } from '../params/param';
-import { UrlMatcherFactory } from '../url/urlMatcherFactory';
-import { UrlMatcher } from '../url/urlMatcher';
-import { Resolvable } from '../resolve/resolvable';
-import { services } from '../common/coreservices';
-import { ResolvePolicy } from '../resolve/interface';
-import { ParamDeclaration } from '../params';
-import { ParamFactory } from '../url';
+import { StateObject } from './stateObject.js';
+import { StateMatcher } from './stateMatcher.js';
+import { Param } from '../params/param.js';
+import { UrlMatcherFactory } from '../url/urlMatcherFactory.js';
+import { UrlMatcher } from '../url/urlMatcher.js';
+import { Resolvable } from '../resolve/resolvable.js';
+import { services } from '../common/coreservices.js';
+import { ResolvePolicy } from '../resolve/interface.js';
+import { ParamDeclaration } from '../params/index.js';
+import { ParamFactory } from '../url/index.js';
 
 const parseUrl = (url: string): any => {
   if (!isString(url)) return false;

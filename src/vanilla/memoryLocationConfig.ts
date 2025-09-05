@@ -1,6 +1,6 @@
-import { LocationConfig } from '../common/coreservices';
-import { isDefined } from '../common/predicates';
-import { noop } from '../common/common';
+import { LocationConfig } from '../common/coreservices.js';
+import { isDefined } from '../common/predicates.js';
+import { noop } from '../common/common.js';
 
 /** A `LocationConfig` mock that gets/sets all config from an in-memory object */
 export class MemoryLocationConfig implements LocationConfig {

@@ -1,10 +1,10 @@
-import { extend, applyPairs, find, allTrueR, pairs, arrayTuples } from '../common/common';
-import { propEq } from '../common/hof';
-import { StateObject } from '../state/stateObject';
-import { RawParams } from '../params/interface';
-import { Param } from '../params/param';
-import { Resolvable } from '../resolve/resolvable';
-import { ViewConfig } from '../view/interface';
+import { extend, applyPairs, find, allTrueR, pairs, arrayTuples } from '../common/common.js';
+import { propEq } from '../common/hof.js';
+import { StateObject } from '../state/stateObject.js';
+import { RawParams } from '../params/interface.js';
+import { Param } from '../params/param.js';
+import { Resolvable } from '../resolve/resolvable.js';
+import { ViewConfig } from '../view/interface.js';
 
 /**
  * A node in a [[TreeChanges]] path

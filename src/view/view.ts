@@ -1,11 +1,11 @@
-import { equals, applyPairs, removeFrom, TypedMap, inArray, find } from '../common/common';
-import { curry, prop } from '../common/hof';
-import { isString, isArray } from '../common/predicates';
-import { trace } from '../common/trace';
-import { PathNode } from '../path/pathNode';
-import { ActiveUIView, ViewContext, ViewConfig } from './interface';
-import { _ViewDeclaration } from '../state/interface';
-import { UIRouter } from '../router';
+import { equals, applyPairs, removeFrom, TypedMap, inArray, find } from '../common/common.js';
+import { curry, prop } from '../common/hof.js';
+import { isString, isArray } from '../common/predicates.js';
+import { trace } from '../common/trace.js';
+import { PathNode } from '../path/pathNode.js';
+import { ActiveUIView, ViewContext, ViewConfig } from './interface.js';
+import { _ViewDeclaration } from '../state/interface.js';
+import { UIRouter } from '../router.js';
 
 export type ViewConfigFactory = (path: PathNode[], decl: _ViewDeclaration) => ViewConfig | ViewConfig[];
 

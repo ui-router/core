@@ -1,12 +1,12 @@
-import { extend, filter, map, allTrueR, find } from '../common/common';
-import { prop } from '../common/hof';
-import { isInjectable, isDefined, isString, isArray, isUndefined } from '../common/predicates';
-import { RawParams, ParamDeclaration } from '../params/interface';
-import { services } from '../common/coreservices';
-import { ParamType } from './paramType';
-import { ParamTypes } from './paramTypes';
-import { StateDeclaration } from '../state';
-import { UrlConfig } from '../url';
+import { extend, filter, map, allTrueR, find } from '../common/common.js';
+import { prop } from '../common/hof.js';
+import { isInjectable, isDefined, isString, isArray, isUndefined } from '../common/predicates.js';
+import { RawParams, ParamDeclaration } from '../params/interface.js';
+import { services } from '../common/coreservices.js';
+import { ParamType } from './paramType.js';
+import { ParamTypes } from './paramTypes.js';
+import { StateDeclaration } from '../state/index.js';
+import { UrlConfig } from '../url/index.js';
 
 const hasOwn = Object.prototype.hasOwnProperty;
 

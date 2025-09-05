@@ -1,3 +1,3 @@
-export * from './interface';
-export * from './resolvable';
-export * from './resolveContext';
+export * from './interface.js';
+export * from './resolvable.js';
+export * from './resolveContext.js';

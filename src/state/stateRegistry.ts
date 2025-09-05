@@ -1,13 +1,13 @@
-import { StateObject } from './stateObject';
-import { StateMatcher } from './stateMatcher';
-import { StateBuilder } from './stateBuilder';
-import { StateQueueManager } from './stateQueueManager';
-import { StateDeclaration, _StateDeclaration } from './interface';
-import { BuilderFunction } from './stateBuilder';
-import { StateOrName } from './interface';
-import { removeFrom } from '../common/common';
-import { UIRouter } from '../router';
-import { propEq } from '../common/hof';
+import { StateObject } from './stateObject.js';
+import { StateMatcher } from './stateMatcher.js';
+import { StateBuilder } from './stateBuilder.js';
+import { StateQueueManager } from './stateQueueManager.js';
+import { StateDeclaration, _StateDeclaration } from './interface.js';
+import { BuilderFunction } from './stateBuilder.js';
+import { StateOrName } from './interface.js';
+import { removeFrom } from '../common/common.js';
+import { UIRouter } from '../router.js';
+import { propEq } from '../common/hof.js';
 
 /**
  * The signature for the callback function provided to [[StateRegistry.onStatesChanged]].

@@ -1,10 +1,10 @@
-import { UIRouter } from '../router';
-import { Disposable } from '../interface';
-import { MatcherUrlRule, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi } from './interface';
-import { TargetState, TargetStateDef } from '../state';
-import { UrlMatcher } from './urlMatcher';
-import { is, isDefined, isFunction, isString, removeFrom, val } from '../common';
-import { UrlRuleFactory } from './urlRule';
+import { UIRouter } from '../router.js';
+import { Disposable } from '../interface.js';
+import { MatcherUrlRule, UrlRule, UrlRuleHandlerFn, UrlRuleMatchFn, UrlRulesApi } from './interface.js';
+import { TargetState, TargetStateDef } from '../state/index.js';
+import { UrlMatcher } from './urlMatcher.js';
+import { is, isDefined, isFunction, isString, removeFrom, val } from '../common/index.js';
+import { UrlRuleFactory } from './urlRule.js';
 
 const prioritySort = (a: UrlRule, b: UrlRule) => (b.priority || 0) - (a.priority || 0);
 

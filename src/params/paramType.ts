@@ -1,6 +1,6 @@
-import { extend, filter, map } from '../common/common';
-import { isArray, isDefined } from '../common/predicates';
-import { ParamTypeDefinition } from './interface';
+import { extend, filter, map } from '../common/common.js';
+import { isArray, isDefined } from '../common/predicates.js';
+import { ParamTypeDefinition } from './interface.js';
 
 /**
  * An internal class which implements [[ParamTypeDefinition]].

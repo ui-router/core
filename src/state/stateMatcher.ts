@@ -1,8 +1,8 @@
-import { isString } from '../common/predicates';
-import { StateOrName } from './interface';
-import { StateObject } from './stateObject';
-import { values } from '../common/common';
-import { safeConsole } from '../common/safeConsole';
+import { isString } from '../common/predicates.js';
+import { StateOrName } from './interface.js';
+import { StateObject } from './stateObject.js';
+import { values } from '../common/common.js';
+import { safeConsole } from '../common/safeConsole.js';
 
 export class StateMatcher {
   constructor(private _states: { [key: string]: StateObject }) {}

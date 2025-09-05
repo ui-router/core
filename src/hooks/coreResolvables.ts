@@ -1,9 +1,9 @@
-import { Transition } from '../transition/transition';
-import { UIRouter } from '../router';
-import { TransitionService } from '../transition/transitionService';
-import { Resolvable } from '../resolve';
-import { inArray, uniqR, unnestR, values } from '../common';
-import { PathNode } from '../path';
+import { Transition } from '../transition/transition.js';
+import { UIRouter } from '../router.js';
+import { TransitionService } from '../transition/transitionService.js';
+import { Resolvable } from '../resolve/index.js';
+import { inArray, uniqR, unnestR, values } from '../common/index.js';
+import { PathNode } from '../path/index.js';
 
 function addCoreResolvables(trans: Transition) {
   trans.addResolvable(Resolvable.fromData(UIRouter, trans.router), '');

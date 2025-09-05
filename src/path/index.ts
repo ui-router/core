@@ -1,2 +1,2 @@
-export * from './pathNode';
-export * from './pathUtils';
+export * from './pathNode.js';
+export * from './pathUtils.js';

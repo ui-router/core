@@ -1,10 +1,10 @@
-import { stripLastPathElement } from '../common';
-import { UrlMatcher } from './urlMatcher';
-import { RawParams } from '../params';
-import { UIRouter } from '../router';
-import { UrlRuleFactory } from './urlRule';
-import { MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn } from './interface';
-import { TargetState, TargetStateDef } from '../state';
+import { stripLastPathElement } from '../common/index.js';
+import { UrlMatcher } from './urlMatcher.js';
+import { RawParams } from '../params/index.js';
+import { UIRouter } from '../router.js';
+import { UrlRuleFactory } from './urlRule.js';
+import { MatchResult, UrlParts, UrlRule, UrlRuleHandlerFn } from './interface.js';
+import { TargetState, TargetStateDef } from '../state/index.js';
 
 function appendBasePath(url: string, isHtml5: boolean, absolute: boolean, baseHref: string): string {
   if (baseHref === '/') return url;

@@ -1,5 +1,5 @@
-import { TransitionService } from '../transition/transitionService';
-import { Transition } from '../transition/transition';
+import { TransitionService } from '../transition/transitionService.js';
+import { Transition } from '../transition/transition.js';
 
 /**
  * A [[TransitionHookFn]] that rejects the Transition if it is invalid

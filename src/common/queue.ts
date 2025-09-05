@@ -1,4 +1,4 @@
-import { pushTo } from './common';
+import { pushTo } from './common.js';
 
 export class Queue<T> {
   private _evictListeners: ((item: T) => void)[] = [];

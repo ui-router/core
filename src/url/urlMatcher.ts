@@ -1,14 +1,14 @@
-import { map, inherit, identity, unnest, tail, find, Obj, allTrueR, unnestR, arrayTuples } from '../common/common';
-import { prop, propEq } from '../common/hof';
-import { isArray, isString, isDefined } from '../common/predicates';
-import { Param, DefType } from '../params/param';
-import { ParamTypes } from '../params/paramTypes';
-import { RawParams } from '../params/interface';
-import { UrlMatcherCompileConfig } from './interface';
-import { joinNeighborsR, splitOnDelim } from '../common/strings';
-import { ParamType } from '../params';
-import { defaults } from '../common';
-import { ParamFactory } from './urlMatcherFactory';
+import { map, inherit, identity, unnest, tail, find, Obj, allTrueR, unnestR, arrayTuples } from '../common/common.js';
+import { prop, propEq } from '../common/hof.js';
+import { isArray, isString, isDefined } from '../common/predicates.js';
+import { Param, DefType } from '../params/param.js';
+import { ParamTypes } from '../params/paramTypes.js';
+import { RawParams } from '../params/interface.js';
+import { UrlMatcherCompileConfig } from './interface.js';
+import { joinNeighborsR, splitOnDelim } from '../common/strings.js';
+import { ParamType } from '../params/index.js';
+import { defaults } from '../common/index.js';
+import { ParamFactory } from './urlMatcherFactory.js';
 
 function quoteRegExp(str: any, param?: any) {
   let surroundPattern = ['', ''],
@@ -240,7 +240,8 @@ export class UrlMatcher {
     //    \\.                            - a backslash escape
     //    \{(?:[^{}\\]+|\\.)*\}          - a matched set of curly braces containing other atoms
     const placeholder = /([:*])([\w\[\]]+)|\{([\w\[\]]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g;
-    const searchPlaceholder = /([:]?)([\w\[\].-]+)|\{([\w\[\].-]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g;
+    const searchPlaceholder =
+      /([:]?)([\w\[\].-]+)|\{([\w\[\].-]+)(?:\:\s*((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g;
     const patterns: any[][] = [];
     let last = 0;
     let matchArray: RegExpExecArray;

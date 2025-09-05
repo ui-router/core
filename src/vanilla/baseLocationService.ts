@@ -1,8 +1,8 @@
-import { deregAll, isDefined, LocationServices, removeFrom, root } from '../common';
-import { Disposable } from '../interface';
-import { UIRouter } from '../router';
-import { HistoryLike, LocationLike } from './interface';
-import { buildUrl, getParams, parseUrl } from './utils';
+import { deregAll, isDefined, LocationServices, removeFrom, root } from '../common/index.js';
+import { Disposable } from '../interface.js';
+import { UIRouter } from '../router.js';
+import { HistoryLike, LocationLike } from './interface.js';
+import { buildUrl, getParams, parseUrl } from './utils.js';
 
 /** A base `LocationServices` */
 export abstract class BaseLocationServices implements LocationServices, Disposable {

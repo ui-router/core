@@ -7,8 +7,8 @@
  * @packageDocumentation
  */
 // Need to import or export at least one concrete something
-import { noop } from './common/common';
-import { UIRouter } from './router';
+import { noop } from './common/common.js';
+import { UIRouter } from './router.js';
 
 /**
  * An interface for getting values from dependency injection.
