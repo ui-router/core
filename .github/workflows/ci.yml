@@ -6,6 +6,9 @@ on:
       - master
   pull_request:
 
+env:
+  NODE_OPTIONS: --openssl-legacy-provider
+
 jobs:
   ci:
     needs: [test, downstream]
